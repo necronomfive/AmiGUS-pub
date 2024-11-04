@@ -2,6 +2,8 @@
 *.d
 
 # Object files
+**/build/*
+**/target/*
 *.o
 *.ko
 *.obj
@@ -50,3 +52,19 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Codecraft session files
+*.session
+
+# UAE extras
+*.uaem
+
+# Some AHI4 specifics
+**/include/*
+**/tools/*
+Play16**
+Mixer**
+*.wav
+*.xlsx
+PlayWAV**
+ftp-*.sh

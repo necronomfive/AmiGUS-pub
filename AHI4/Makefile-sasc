@@ -20,7 +20,9 @@ SDIR   = src/
 HDIR   = header/
 
 AHI_INCLUDE     = include
-NDK_ASM_INCLUDE = NDKasmInclude:
+NDK             = NDK_3.2:
+NDK_ASM_INCLUDE = $(NDK)Include_I
+NDK_C_INCLUDE   = $(NDK)Include_H
 
 MODE_FILE_DST   = $(DDIR)AMIGUS
 MODE_FILE_SRC   = $(SDIR)audiomodes.asm
@@ -33,24 +35,18 @@ LIB_OBJS        = $(BDIR)libinit.o \
                   $(BDIR)debug.o \
                   $(BDIR)support.o \
                   $(BDIR)worker.o
-CFLAGS          = RESOPT PARM=R NOSTKCHK STRMER UCHAR NOCHKABORT NOICONS \
-                  DATA=FO CODE=FAR DEFINE=__NOLIBBASE__                  \
-                  IDIR=$(AHI_INCLUDE)/C IDIR=$(HDIR)                     \
-                  OPT OPTINLOCAL OPTGO OPTLOOP OPTPEEP OPTSCHED          \
+CFLAGS          = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
+                  PARAMETERS=REGISTER DATA=FARONLY CODE=FAR                 \
+                  NOSTACKCHECK NOCHECKABORT NOICONS                         \
+                  IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)  \
+                  STRINGMERGE UNSIGNEDCHAR                                  \
+                  OPTIMIZE OPTIMIZERGLOBAL OPTIMIZERINLINE OPTIMIZERINLOCAL \
+                  OPTIMIZERLOOP OPTIMIZERPEEPHOLE OPTIMIZERSCHEDULE         \
                   OBJNAME
 
-YYYYYYYYYYY     = cc
-XXXXXXXXXXX     = PARAMS=REGISTER LIBCODE NOSTACKCHECK DEBUG=FULL STRINGMERGE \
-                  DATA=NEAR NOVERSION UTILITYLIB NOSTANDARDIO OPTIMIZE        \
-                  OPTTIME OPTSCHED IDIR=$(AHI_INCLUDE)/C IDIR=$(HDIR)        \
-                  OBJNAME
-
-#-O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR) -D__NOLIBBASE__ -o
 LFLAGS          = NOICONS SMALLDATA SMALLCODE STRIPDEBUG \
                   TO 
-# -nostdlib -o 
 LFLAGS1         = FROM
-# empty :)
 
 CC              = sc
 LD              = slink
@@ -59,7 +55,6 @@ all: FOLDERS $(MODE_FILE_DST) $(LIB_DST)
 
 $(MODE_FILE_DST): $(MODE_FILE_SRC)
 	$(MODE_FILE_ASM) $(MODE_FILE_FLAGS) $^ -o $@
-#	basm -ua+ -o$@ $(SDIR)audiomodes.basm
 
 $(LIB_DST): $(LIB_OBJS)
 	$(LD) $(LFLAGS) $@ $(LFLAGS1) $^

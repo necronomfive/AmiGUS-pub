@@ -20,7 +20,9 @@ SDIR   = src/
 HDIR   = header/
 
 AHI_INCLUDE     = include
-NDK_ASM_INCLUDE = NDKasmInclude:
+NDK             = NDK_3.2:
+NDK_ASM_INCLUDE = $(NDK)Include_I
+NDK_C_INCLUDE   = $(NDK)Include_H
 
 MODE_FILE_DST   = $(DDIR)AMIGUS
 MODE_FILE_SRC   = $(SDIR)audiomodes.asm
@@ -33,32 +35,35 @@ LIB_OBJS        = $(BDIR)libinit.o \
                   $(BDIR)debug.o \
                   $(BDIR)support.o \
                   $(BDIR)worker.o
-CFLAGS          = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR) -D__NOLIBBASE__
-LFLAGS          = -nostdlib
+CFLAGS          = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR) -D__NOLIBBASE__ -o
+LFLAGS          = -nostdlib -o
+LFLAGS1         =
+
+CC              = vc
+LD              = vc
 
 all: FOLDERS $(MODE_FILE_DST) $(LIB_DST)
 
 $(MODE_FILE_DST): $(MODE_FILE_SRC)
 	$(MODE_FILE_ASM) $(MODE_FILE_FLAGS) $^ -o $@
-#	basm -ua+ -o$@ $(SDIR)audiomodes.basm
 
 $(LIB_DST): $(LIB_OBJS)
-	vc $(LFLAGS) -o $@ $^
+	$(LD) $(LFLAGS) $@ $(LFLAGS1) $^
 	
 $(BDIR)libinit.o: $(SDIR)libinit.c $(HDIR)amigus_private.h
-	vc $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $@ $<
 
 $(BDIR)amigus.o: $(SDIR)amigus.c $(HDIR)amigus_private.h
-	vc $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $@ $<
 
 $(BDIR)debug.o: $(SDIR)debug.c $(HDIR)debug.h
-	vc $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $@ $<
 
 $(BDIR)support.o: $(SDIR)support.c $(HDIR)support.h
-	vc $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $@ $<
 
 $(BDIR)worker.o: $(SDIR)worker.c
-	vc $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $@ $<
 
 install: all
 	copy FROM $(MODE_FILE_DST)     	TO	Devs:AudioModes/	CLONE 

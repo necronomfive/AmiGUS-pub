@@ -35,6 +35,7 @@ LIB_OBJS        = $(BDIR)libinit.o \
                   $(BDIR)debug.o \
                   $(BDIR)support.o \
                   $(BDIR)worker.o
+
 CFLAGS          = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
                   PARAMETERS=REGISTER DATA=FARONLY CODE=FAR                 \
                   NOSTACKCHECK NOCHECKABORT NOICONS                         \

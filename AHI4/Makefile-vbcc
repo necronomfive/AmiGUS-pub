@@ -35,6 +35,7 @@ LIB_OBJS        = $(BDIR)libinit.o \
                   $(BDIR)debug.o \
                   $(BDIR)support.o \
                   $(BDIR)worker.o
+
 CFLAGS          = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR) -D__NOLIBBASE__ -o
 LFLAGS          = -nostdlib -o
 LFLAGS1         =

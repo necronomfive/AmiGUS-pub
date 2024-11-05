@@ -129,9 +129,7 @@ struct AmiGUSBasePrivate {
   ULONG                         agb_BufferSize;     /* LONGs allocated each  */
   ULONG                         agb_currentBuffer;  /* Current playing buf.  */
 
-
-  /* AmiGUS samples/words per watermark */
-  ULONG                         agb_watermark;
+  ULONG                         agb_watermark;      /* Counting in WORDs!    */
   LONG                          agb_WorkerReady;
   
   struct AHIAudioCtrlDrv      * agb_AudioCtrl;

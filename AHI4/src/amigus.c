@@ -714,6 +714,7 @@ LONG FindNearestFrequency(LONG aFrequency) {
 
 void initAmiGUS(void) {
 
+  LONG i;
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   LOG_D(("D: Init AmiGUS @ 0x%08lx\n", amiGUS));
 
@@ -724,10 +725,20 @@ void initAmiGUS(void) {
   WriteReg16( amiGUS,
               AMIGUS_MAIN_FIFO_RESET,
               AMIGUS_FIFO_RESET);
+  // Idea: Watermark is here 6 words aka 3 longs,
+  //       2 24bit samples, ... 
+  // Cool, always a fit for all sample widths.
   WriteReg16( amiGUS,
               AMIGUS_MAIN_FIFO_WATERMARK,
-              AmiGUSBase->agb_watermark
+              6
             );
+  // now write twice the amount of data into FIFO to kick off playback
+  for ( i = 6; 0 < i; --i ) {
+
+    WriteReg32( amiGUS,
+                AMIGUS_MAIN_FIFO_WRITE,
+                0L );
+  }
   WriteReg16( amiGUS, 
               AMIGUS_MAIN_INT_CONTROL, 
               /* Clear interrupt flag bits */
@@ -808,6 +819,10 @@ void stopAmiGUS(void) {
 // TRUE = failure
 BOOL CreatePlaybackBuffers(VOID) {
 
+  /* Equals words here for stereo 16bit and we use that here! */
+  ULONG samplesPerPass = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples;
+  ULONG longsPerPass = samplesPerPass;
+
   if ( AmiGUSBase->agb_Buffer[0] ) {
 
     LOG_D(("D: Playback buffers already exist!\n"));
@@ -830,11 +845,14 @@ BOOL CreatePlaybackBuffers(VOID) {
     LOG_D(("Could not allocate FAST RAM for buffer 1!\n"));
     return TRUE;
   }
-  // Buffers definitely are empty here, maybe?
-  AmiGUSBase->agb_BufferIndex[0] = 0;//AmiGUSBase->agb_BufferSize;
-  AmiGUSBase->agb_BufferIndex[1] = 0;//AmiGUSBase->agb_BufferSize;
-  AmiGUSBase->agb_BufferMax[0] = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples;//AmiGUSBase->agb_BufferSize;
-  AmiGUSBase->agb_BufferMax[1] = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples;//AmiGUSBase->agb_BufferSize;
+  /*
+   * Buffers definitely are empty here,
+   * all these have to tick in LONGs!
+   */
+  AmiGUSBase->agb_BufferIndex[0] = longsPerPass;
+  AmiGUSBase->agb_BufferIndex[1] = longsPerPass;
+  AmiGUSBase->agb_BufferMax[0] = longsPerPass;
+  AmiGUSBase->agb_BufferMax[1] = longsPerPass;
 /*
   if ( AmiGUSBase->agb_BufferSize > (AMIGUS_PLAYBACK_FIFO_WORDS >> 1) ) {
 
@@ -845,8 +863,11 @@ BOOL CreatePlaybackBuffers(VOID) {
     AmiGUSBase->agb_watermark = AmiGUSBase->agb_BufferSize >> 1;
   }
 */
-  AmiGUSBase->agb_watermark = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples;
-  LOG_D(("D: Watermark is %ld\n", AmiGUSBase->agb_watermark));
+  AmiGUSBase->agb_watermark = longsPerPass << 1;
+  LOG_D(("D: Mix %ld samples = %ld LONGs per pass, watermark %ld WORDs\n",
+         samplesPerPass,
+         longsPerPass,
+         AmiGUSBase->agb_watermark));
   AmiGUSBase->agb_currentBuffer = 0;
 
   LOG_D(("D: All playback buffers created\n"));

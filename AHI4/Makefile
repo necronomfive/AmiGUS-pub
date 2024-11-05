@@ -29,14 +29,22 @@ MODE_FILE_SRC   = $(SDIR)audiomodes.asm
 MODE_FILE_ASM   = vasmm68k_mot
 MODE_FILE_FLAGS = -quiet -phxass -I$(NDK_ASM_INCLUDE) -I$(AHI_INCLUDE)/Asm -Fbin
 
-LIB_DST         = $(DDIR)AmiGUS.audio
+SRCS            = $(wildcard $(SDIR)#?.c)
+BDIR_SRCS       = $(foreach SRC,$(SRCS),$(subst $(SDIR),$(BDIR),$(SRC)))
+BDIR_OBJS       = $(BDIR_SRCS:%c=%o)
 LIB_OBJS        = $(BDIR)libinit.o \
-                  $(BDIR)amigus.o \
-                  $(BDIR)debug.o \
-                  $(BDIR)support.o \
-                  $(BDIR)worker.o
+                  $(filter-out %/libinit.o,$(BDIR_OBJS))
+LIB_DST         = $(DDIR)AmiGUS.audio
 
-CFLAGS          = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
+# activate VBCC builds by adding `VBCC=1` to the make call!
+ifdef VBCC
+  CFLAGS        = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR) -D__NOLIBBASE__ -o
+  LFLAGS        = -nostdlib -o
+  LFLAGS1       =
+  CC            = vc
+  LD            = vc
+else
+  CFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
                   PARAMETERS=REGISTER DATA=FARONLY CODE=FAR                 \
                   NOSTACKCHECK NOCHECKABORT NOICONS                         \
                   IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)  \
@@ -45,12 +53,12 @@ CFLAGS          = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
                   OPTIMIZERLOOP OPTIMIZERPEEPHOLE OPTIMIZERSCHEDULE         \
                   OBJNAME
 
-LFLAGS          = NOICONS SMALLDATA SMALLCODE STRIPDEBUG \
+  LFLAGS        = NOICONS SMALLDATA SMALLCODE STRIPDEBUG \
                   TO 
-LFLAGS1         = FROM
-
-CC              = sc
-LD              = slink
+  LFLAGS1       = FROM
+  CC            = sc
+  LD            = slink
+endif
 
 all: FOLDERS $(MODE_FILE_DST) $(LIB_DST)
 
@@ -60,19 +68,7 @@ $(MODE_FILE_DST): $(MODE_FILE_SRC)
 $(LIB_DST): $(LIB_OBJS)
 	$(LD) $(LFLAGS) $@ $(LFLAGS1) $^
 	
-$(BDIR)libinit.o: $(SDIR)libinit.c $(HDIR)amigus_private.h
-	$(CC) $(CFLAGS) $@ $<
-
-$(BDIR)amigus.o: $(SDIR)amigus.c $(HDIR)amigus_private.h
-	$(CC) $(CFLAGS) $@ $<
-
-$(BDIR)debug.o: $(SDIR)debug.c $(HDIR)debug.h
-	$(CC) $(CFLAGS) $@ $<
-
-$(BDIR)support.o: $(SDIR)support.c $(HDIR)support.h
-	$(CC) $(CFLAGS) $@ $<
-
-$(BDIR)worker.o: $(SDIR)worker.c
+$(BDIR)%.o: $(SDIR)%.c $(HDIR)*
 	$(CC) $(CFLAGS) $@ $<
 
 install: all

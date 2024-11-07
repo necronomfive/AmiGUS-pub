@@ -36,7 +36,7 @@ VOID FillBuffer( BYTE buffer ) {
   const ULONG halfLongSize = longSize >> 1;
   ULONG *longBuffer = (ULONG *)AmiGUSBase->agb_Buffer[ buffer ];
 
-  LOG_D(( "D: FB%1ld\n", buffer ));
+//  LOG_D(( "D: FB%1ld\n", buffer ));
   for ( ; halfLongSize > i; ++i) {
   
     longBuffer[ i ] = 0x00000000;
@@ -46,7 +46,9 @@ VOID FillBuffer( BYTE buffer ) {
     longBuffer[ i ] = 0x44444444;
   }
   AmiGUSBase->agb_BufferIndex[ buffer ] = 0;
+  AmiGUSBase->agb_watermark = longSize << 1;
 }
+
 #endif
 #if 0
 
@@ -56,7 +58,7 @@ VOID FillBuffer( BYTE buffer ) {
   const ULONG longSize = AmiGUSBase->agb_BufferMax[ buffer ];
   ULONG *longBuffer = (ULONG *)AmiGUSBase->agb_Buffer[ buffer ];
 
-  //LOG_D(( "D: FB%1ld -> %08lx\n", buffer, longBuffer ));
+//  LOG_D(( "D: FB%1ld -> %08lx\n", buffer, longBuffer ));
 //  LOG_D(( "D: FB%1ld\n", buffer ));
   for ( ; longSize > i; ++i) {
 
@@ -67,6 +69,7 @@ VOID FillBuffer( BYTE buffer ) {
     }
   }
   AmiGUSBase->agb_BufferIndex[ buffer ] = 0;
+  AmiGUSBase->agb_watermark = longSize << 1;
 }
 
 #endif

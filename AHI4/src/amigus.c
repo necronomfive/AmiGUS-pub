@@ -714,7 +714,10 @@ LONG FindNearestFrequency(LONG aFrequency) {
 
 void initAmiGUS(void) {
 
-  LONG i;
+  ULONG i;
+  // Working maybe:
+  // ULONG prefillSize = AMIGUS_PLAYBACK_FIFO_LONGS;
+  ULONG prefillSize = 6; /* in LONGs */ 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   LOG_D(("D: Init AmiGUS @ 0x%08lx\n", amiGUS));
 
@@ -730,15 +733,8 @@ void initAmiGUS(void) {
   // Cool, always a fit for all sample widths.
   WriteReg16( amiGUS,
               AMIGUS_MAIN_FIFO_WATERMARK,
-              6
+              prefillSize >> 2
             );
-  // now write twice the amount of data into FIFO to kick off playback
-  for ( i = 6; 0 < i; --i ) {
-
-    WriteReg32( amiGUS,
-                AMIGUS_MAIN_FIFO_WRITE,
-                0L );
-  }
   WriteReg16( amiGUS, 
               AMIGUS_MAIN_INT_CONTROL, 
               /* Clear interrupt flag bits */
@@ -762,6 +758,14 @@ void initAmiGUS(void) {
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
             );
+  
+  // now write twice the amount of data into FIFO to kick off playback
+  for ( i = prefillSize; 0 < i; --i ) {
+
+    WriteReg32( amiGUS,
+                AMIGUS_MAIN_FIFO_WRITE,
+                0L );
+  }
   WriteReg16( amiGUS,
               AMIGUS_MAIN_SAMPLE_FORMAT,
               AMIGUS_SAMPLE_FORMAT_STEREO_16BIT

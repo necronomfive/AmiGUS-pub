@@ -53,7 +53,6 @@ ASM(void) SAVEDS AHIsub_Disable(
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 );
 
-
 ASM(void) SAVEDS AHIsub_Enable(
   REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)

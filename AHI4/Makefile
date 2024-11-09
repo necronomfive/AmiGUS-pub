@@ -48,7 +48,9 @@ else
                   PARAMETERS=REGISTER DATA=FARONLY CODE=FAR                 \
                   NOSTACKCHECK NOCHECKABORT NOICONS                         \
                   IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)  \
-                  STRINGMERGE UNSIGNEDCHAR                                  \
+                  OBJNAME
+                  
+  xxx=            STRINGMERGE UNSIGNEDCHAR                                  \
                   OPTIMIZE OPTIMIZERGLOBAL OPTIMIZERINLINE OPTIMIZERINLOCAL \
                   OPTIMIZERLOOP OPTIMIZERPEEPHOLE OPTIMIZERSCHEDULE         \
                   OBJNAME

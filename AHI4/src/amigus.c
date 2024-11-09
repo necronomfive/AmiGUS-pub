@@ -716,8 +716,8 @@ void initAmiGUS(void) {
 
   ULONG i;
   // Working maybe:
-  // ULONG prefillSize = AMIGUS_PLAYBACK_FIFO_LONGS;
-  ULONG prefillSize = 6; /* in LONGs */ 
+  ULONG prefillSize = AMIGUS_PLAYBACK_FIFO_LONGS;
+  //ULONG prefillSize = 6; /* in LONGs */ 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   LOG_D(("D: Init AmiGUS @ 0x%08lx\n", amiGUS));
 
@@ -733,7 +733,7 @@ void initAmiGUS(void) {
   // Cool, always a fit for all sample widths.
   WriteReg16( amiGUS,
               AMIGUS_MAIN_FIFO_WATERMARK,
-              prefillSize >> 2
+              prefillSize >> 1
             );
   WriteReg16( amiGUS, 
               AMIGUS_MAIN_INT_CONTROL, 
@@ -769,7 +769,6 @@ void initAmiGUS(void) {
   WriteReg16( amiGUS,
               AMIGUS_MAIN_SAMPLE_FORMAT,
               AMIGUS_SAMPLE_FORMAT_STEREO_16BIT
-//            | AMIGUS_SAMPLE_FORMAT_FLAG_LITTLE_ENDIAN
             );
   WriteReg16( amiGUS,
               AMIGUS_MAIN_SAMPLE_RATE,
@@ -777,16 +776,6 @@ void initAmiGUS(void) {
             | AMIGUS_SAMPLE_RATE_FLAG_INTERPOLATION
             | AMIGUS_SAMPLE_RATE_FLAG_ENABLE
             );
-/*
-  LOG_D(("D: Wrote %04lx to start playback\n",
-         AMIGUS_SAMPLE_RATE_44100
-       | AMIGUS_SAMPLE_RATE_FLAG_INTERPOLATION
-       | AMIGUS_SAMPLE_RATE_FLAG_ENABLE ));
-  LOG_D(("D: Read back %04lx\n",
-         ReadReg16(
-             amiGUS,
-             AMIGUS_MAIN_SAMPLE_RATE) ));
-             */
   AmiGUSBase->agb_State = 1;
 }
 

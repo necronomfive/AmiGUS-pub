@@ -28,15 +28,15 @@ VOID RawPutCharC(__reg("d0") BYTE putCh) {
     RawPutChar(putCh);
 }
 
-void debug_kprintf(STRPTR format, ...) {
+VOID debug_kprintf(STRPTR format, ...) {
     RawIOInit();
-    RawDoFmt(format, 0, (void (*)())&RawPutCharC,0);
+    RawDoFmt(format, 0, (VOID (*)())&RawPutCharC,0);
     RawMayGetChar();
 } 
 
 #else
 
-void debug_kvprintf(STRPTR format, APTR vargs) {
+VOID debug_kvprintf(STRPTR format, APTR vargs) {
   RawIOInit();
   // Ugly like hell, but...
   RawDoFmt(
@@ -48,12 +48,12 @@ void debug_kvprintf(STRPTR format, APTR vargs) {
     |          |  |    | /-----+------> Exec kick1.2 function using SysBase
     |          |  |    | |     | /--+-> RawPutChar is -516 (see above)
     |          |  |    | |     | |  |   */
-    (void (*)()) ((LONG) SysBase -516),
+    (VOID (*)()) ((LONG) SysBase -516),
     0);
   RawMayGetChar();
 }
 
-void debug_kprintf(STRPTR format, ...) {
+VOID debug_kprintf(STRPTR format, ...) {
   debug_kvprintf(
     format,
     /*

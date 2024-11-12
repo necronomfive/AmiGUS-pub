@@ -134,5 +134,8 @@ VOID LogTicks( UBYTE bitmask ) {
     case 0x03:
       LOG_I(("I: Tick freq %ld low %ld\n", ef, ecv.ev_lo));
       break;
+    case 0x07:
+      LOG_I(("I: Tick freq %ld low %ld high %ld\n", ef, ecv.ev_lo, ecv.ev_hi));
+      break;
   }
 }

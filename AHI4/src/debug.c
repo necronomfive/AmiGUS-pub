@@ -14,29 +14,37 @@
  * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <proto/dos.h>
 #include <proto/exec.h>
+
+#include "SDI_compiler.h"
 
 #include "amigus_private.h"
 #include "debug.h"
+#include "errors.h"
+#include "support.h"
 
 #define NOT_USE_RawPutCharC
 #ifdef USE_RawPutCharC
 
 // Comes with a tiny performance impact,
 // so... rather not do it.
-VOID RawPutCharC(__reg("d0") BYTE putCh) {
-    RawPutChar(putCh);
+ASM(VOID) RawPutCharC( REG(d0, UBYTE putCh ) {
+
+  RawPutChar(putCh);
 }
 
-VOID debug_kprintf(STRPTR format, ...) {
-    RawIOInit();
-    RawDoFmt(format, 0, (VOID (*)())&RawPutCharC,0);
-    RawMayGetChar();
+VOID debug_kprintf( STRPTR format, ... ) {
+
+  RawIOInit();
+  RawDoFmt( format, 0, (VOID (*)())&RawPutCharC, 0 );
+  RawMayGetChar();
 } 
 
 #else
 
-VOID debug_kvprintf(STRPTR format, APTR vargs) {
+VOID debug_kvprintf( STRPTR format, APTR vargs ) {
+
   RawIOInit();
   // Ugly like hell, but...
   RawDoFmt(
@@ -49,11 +57,12 @@ VOID debug_kvprintf(STRPTR format, APTR vargs) {
     |          |  |    | |     | /--+-> RawPutChar is -516 (see above)
     |          |  |    | |     | |  |   */
     (VOID (*)()) ((LONG) SysBase -516),
-    0);
+    0 );
   RawMayGetChar();
 }
 
-VOID debug_kprintf(STRPTR format, ...) {
+VOID debug_kprintf( STRPTR format, ... ) {
+
   debug_kvprintf(
     format,
     /*
@@ -62,7 +71,138 @@ VOID debug_kprintf(STRPTR format, ...) {
     |    |  |    | /-----+----> STRPTR, address of format, first argument
     |    |  |    | |     | /+-> 4 bytes later, the next argument follows
     |    |  |    | |     | ||   */
-    (APTR) ((LONG) &format +4));
+    (APTR) ((LONG) &format +4) );
 }
 
 #endif
+
+#ifdef USE_FILE_LOGGING
+
+VOID debug_fprintf( STRPTR format, ... ) {
+
+  static BOOL errorShown = FALSE;
+  STRPTR logFilePath = "ram:AmiGUS-AHI.log";
+  UBYTE buffer[512];
+  LONG i;
+  
+  i = GetVar( "AmiGUS-LOG-FILEPATH", buffer, sizeof(buffer), 0 );
+  if (( i > 0 ) && (i <= 512 )) {
+    logFilePath = buffer;
+  }
+  if (( !AmiGUSBase->agb_LogFile ) || ( errorShown )) {
+    AmiGUSBase->agb_LogFile = Open( logFilePath, MODE_NEWFILE );
+    if ( !AmiGUSBase->agb_LogFile ) {
+      DisplayError( EOpenLogFile );
+      errorShown = TRUE;
+      return;
+    }
+  }
+  VFPrintf(
+    AmiGUSBase->agb_LogFile,
+    format,
+    /*
+    /----+--------------------> Cast to required APTR 
+    |    |  /----+------------> Nice math in LONGs to make it work 
+    |    |  |    | /-----+----> STRPTR, address of format, first argument
+    |    |  |    | |     | /+-> 4 bytes later, the next argument follows
+    |    |  |    | |     | ||   */
+    (APTR) ((LONG) &format +4) );
+}
+
+#endif /* USE_FILE_LOGGING */
+#ifdef USE_MEM_LOGGING
+
+ASM(VOID) debug_mPutChProc( REG(d0, UBYTE c), REG(a3, UBYTE ** target) ) {
+
+  **target = c;
+  ++(*target);
+}
+
+VOID debug_mprintf( STRPTR format, ... ) {
+
+  /*
+   * Used to ensure to only try allocating buffer exactly once,
+   * even if it fails.
+   */
+  static BOOL attempted = FALSE;
+  
+  if ( !AmiGUSBase->agb_LogMem ) {
+
+    // Yep, defaults to 
+    LONG size = 32<<20;             // 32MB in the
+    APTR where = (APTR) 0x0bffFFff; // middle 3/4000 CPU board space
+    UBYTE buffer[64];
+    LONG i;
+
+    if ( attempted ) {
+
+      debug_kprintf( "AmiGUS Log gave up...\n" );
+      return;
+    }    
+    attempted = TRUE;
+
+    i = GetVar( "AmiGUS-LOG-ADDRESS", buffer, sizeof(buffer), 0 );
+    if ( i > 0 ) {
+      StrToLong( buffer, (LONG *) &where );
+    }
+    /*
+     * UAE:  setenv AmiGUS-LOG-ADDRESS 1207959552 -> 0x48000000
+     * 3/4k: setenv AmiGUS-LOG-ADDRESS 201326591  -> 0x0bffFFff
+     */
+    i = GetVar( "AmiGUS-LOG-SIZE", buffer, sizeof(buffer), 0 );
+    if ( i > 0 ) {
+      StrToLong( buffer, &size );
+    }
+
+    debug_kprintf(
+      "AmiGUS-LOG-ADDRESS %lx = %lu (requested)\nAmiGUS-LOG-SIZE %ld\n", 
+      (ULONG)where,
+      (ULONG)where,
+      size
+    );
+
+    if ( 0 < (LONG) where ) {
+      AmiGUSBase->agb_LogMem = AllocAbs( size, where );
+      if ( AmiGUSBase->agb_LogMem ) {
+        for ( i = 0; i < size; i += 4 ) {
+          *(ULONG *)((LONG) where + i) = 0;
+        }
+      }
+    } else {
+      AmiGUSBase->agb_LogMem = AllocMem(
+        size, 
+        MEMF_CLEAR | MEMF_PUBLIC );
+    }
+    if ( !AmiGUSBase->agb_LogMem ) {
+    
+      DisplayError( EAllocateLogMem );
+      debug_kprintf( "AmiGUS Log giving up...\n" );
+      return;
+    }
+    debug_kprintf(
+      "AmiGUS Log @ 0x%lx = %lu (retrieved)\n",
+      AmiGUSBase->agb_LogMem,
+      AmiGUSBase->agb_LogMem
+    );
+    RawDoFmt(
+      AMIGUS_MEM_LOG_MARKER,
+      NULL,
+      &debug_mPutChProc,
+      &AmiGUSBase->agb_LogMem );
+    debug_kprintf( "AmiGUS Log ready\n" );
+  }
+
+  RawDoFmt(
+    format,
+    /*
+    /----+--------------------> Cast to required APTR 
+    |    |  /----+------------> Nice math in LONGs to make it work 
+    |    |  |    | /-----+----> STRPTR, address of format, first argument
+    |    |  |    | |     | /+-> 4 bytes later, the next argument follows
+    |    |  |    | |     | ||   */
+    (APTR) ((LONG) &format +4),
+    &debug_mPutChProc,
+    &AmiGUSBase->agb_LogMem );
+}
+
+#endif /* USE_MEM_LOGGING */

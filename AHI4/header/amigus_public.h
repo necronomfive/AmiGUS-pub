@@ -23,8 +23,8 @@
 
 #define LIBNAME                     "AmiGUS.audio"
 
-#define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Faßbach"
-#define AMIGUS_AHI_COPYRIGHT        "© 2024 Christoph Faßbach"
+#define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Faï¿½bach"
+#define AMIGUS_AHI_COPYRIGHT        "ï¿½ 2024 Christoph Faï¿½bach"
 #define AMIGUS_AHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
                                     "Frank Wille (vbcc), Martin Blom (AHI)"
 #define AMIGUS_AHI_VERSION          IDSTRING
@@ -44,6 +44,10 @@
 #define AMIGUS_PLAYBACK_FIFO_BYTES  8192
 #define AMIGUS_PLAYBACK_FIFO_WORDS  4096
 #define AMIGUS_PLAYBACK_FIFO_LONGS  2048
+
+#define AMIGUS_MEM_LOG_MARKER        "********************************"   \
+                                     " AmiGUS "                           \
+                                     "********************************\n"
 
 /* 
  * This is the official part of AmiGUSBase.

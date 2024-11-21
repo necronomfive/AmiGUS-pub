@@ -52,12 +52,11 @@ struct TErrorMessage errors[] =
     { EAmiGUSFirmwareOutdated, "AmiGUS card firmware outdated.", "Will update, promised!" },
 
     { EAudioModeNotImplemented, "Right now implemented, 16bit, stereo, no Hifi", "Coming soon..." },
-/*
-    { EOpenOpenPciBase, "Unable to open OpenPCI.library.", "Ouch!" },
-    { EOpenMediatorBase, "Can not open mediator.library.", "BRMPL!" },
-     
-    { EOpenLogFile, "Can not create log file RAM:AmiGUS-ahi.log.", "Oops!" },
+
+    { EOpenLogFile, "Can not create log file RAM:AmiGUS-AHI.log.", "Oops!" },
+    { EAllocateLogMem, "Can not allocate memory blob for extra-dirty logging.", "Meh." },
     { EDriverInUse, "Currently only one client is supported.", "Shame!" },
+    /*
     { EOutOfMemory, "You are out of memory!", "Shit!" },
     { EMixerBufferNotAligned, "Misaligned mixer buffer not yet handled.", "Ok" },
 */

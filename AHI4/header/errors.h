@@ -27,8 +27,9 @@ enum TErrorCodes
   /* Global errors 1-99 */
   EOpenDosBase,
   EOpenUtilityBase,
-  /*
   EOpenLogFile,
+  EAllocateLogMem,
+  /*
   EAllocateEssSoloBase,
   ERegisterInterruptFailed,
   EEnableBusMasterFailed,

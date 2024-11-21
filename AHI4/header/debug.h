@@ -54,11 +54,32 @@ VOID RawPutChar(BYTE putCh);
  * All of these will need double ((...)) to workaround a SAS/C insufficiency!
  */
 
+#define USE_MEM_LOGGING
+#if defined (USE_SERIAL_LOGGING)
+
 #define LOG_V(X) debug_kprintf X
 #define LOG_D(X) debug_kprintf X
 #define LOG_I(X) debug_kprintf X
 #define LOG_W(X) debug_kprintf X
 #define LOG_E(X) debug_kprintf X
+
+#elif defined (USE_FILE_LOGGING)
+
+#define LOG_V(X) debug_fprintf X
+#define LOG_D(X) debug_fprintf X
+#define LOG_I(X) debug_fprintf X
+#define LOG_W(X) debug_fprintf X
+#define LOG_E(X) debug_fprintf X
+
+#elif defined (USE_MEM_LOGGING)
+
+#define LOG_V(X) debug_mprintf X
+#define LOG_D(X) debug_mprintf X
+#define LOG_I(X) debug_mprintf X
+#define LOG_W(X) debug_mprintf X
+#define LOG_E(X) debug_mprintf X
+
+#endif
 
 /* Used to disable loglevels without warnings! */
 #ifndef LOG_V
@@ -82,5 +103,7 @@ VOID RawPutChar(BYTE putCh);
  * Whatever parameter you pass in here will ALWAYS be promoted to LONG!
  */
 void debug_kprintf(STRPTR format, ...);
+void debug_fprintf(STRPTR format, ...);
+void debug_mprintf(STRPTR format, ...);
 
 #endif /* DEBUG_H */

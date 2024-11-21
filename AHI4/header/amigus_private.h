@@ -134,6 +134,9 @@ struct AmiGUSBasePrivate {
   
   struct AHIAudioCtrlDrv      * agb_AudioCtrl;
   ULONG                         agb_State; // 0 stopped, 1 playing
+
+  BPTR                          agb_LogFile;       /* Debug log file handle */
+  APTR                          agb_LogMem;        /* Debug log memory blob */
 };
 
 #if defined(BASE_GLOBAL)

@@ -27,6 +27,7 @@
 #include <exec/resident.h>
 #include <intuition/intuitionbase.h>
 #include <libraries/expansionbase.h>
+#include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/utility.h>
 
@@ -141,20 +142,43 @@ static void CloseLibraries(
   struct ExecBase *SysBase = AmiGUSBase->agb_SysBase;
 #endif
 
-if(AmiGUSBase->TimerBase)
-  CloseDevice(AmiGUSBase->TimerRequest);
-if(AmiGUSBase->TimerRequest)
-  FreeMem(AmiGUSBase->TimerRequest, sizeof(struct IORequest));
+  if( AmiGUSBase->TimerBase ) {
 
+    CloseDevice(AmiGUSBase->TimerRequest );
+  }
+  if( AmiGUSBase->TimerRequest ) {
 
-  if(AmiGUSBase->agb_DOSBase)
-    CloseLibrary((struct Library *) AmiGUSBase->agb_DOSBase);
-  if(AmiGUSBase->agb_IntuitionBase)
-    CloseLibrary((struct Library *) AmiGUSBase->agb_IntuitionBase);
-  if(AmiGUSBase->agb_UtilityBase)
-    CloseLibrary((struct Library *) AmiGUSBase->agb_UtilityBase);
-  if(AmiGUSBase->agb_ExpansionBase)
-    CloseLibrary((struct Library *) AmiGUSBase->agb_ExpansionBase);
+    FreeMem( AmiGUSBase->TimerRequest, sizeof(struct IORequest) );
+  }  
+  if ( AmiGUSBase->agb_LogFile ) {
+
+    Close( AmiGUSBase->agb_LogFile );
+  }
+  /*
+  Remember: memory cannot be overwritten if we do not return it. :)
+  So... we leak it here... 
+  if ( AmiGUSBase->agb_LogMem ) {
+
+    FreeMem( AmiGUSBase->agb_LogMem, ... );
+  }    
+  */
+
+  if( AmiGUSBase->agb_DOSBase ) {
+
+    CloseLibrary( (struct Library *) AmiGUSBase->agb_DOSBase );
+  }
+  if( AmiGUSBase->agb_IntuitionBase ) {
+
+    CloseLibrary( (struct Library *) AmiGUSBase->agb_IntuitionBase );
+  }
+  if( AmiGUSBase->agb_UtilityBase ) {
+
+    CloseLibrary( (struct Library *) AmiGUSBase->agb_UtilityBase );
+  }
+  if( AmiGUSBase->agb_ExpansionBase ) {
+
+    CloseLibrary( (struct Library *) AmiGUSBase->agb_ExpansionBase );
+  }
 }
 
 /* Expunge the library, remove it from memory */
@@ -215,6 +239,7 @@ static ASM(struct Library *) LibInit(
   REG(a6, struct ExecBase *SysBase)) {
 #endif
 
+  /* Prevent use of customized library versions on CPUs not targetted. */
 #ifdef _M68060
   if(!(SysBase->AttnFlags & AFF_68060))
     return 0;
@@ -237,7 +262,9 @@ static ASM(struct Library *) LibInit(
   MakeGlobalSys(amiGUSBase);
 #endif
 
-  if((amiGUSBase->agb_DOSBase = (struct DosLibrary *) OpenLibrary(DOSNAME, 37)))
+  amiGUSBase->agb_LogFile = NULL;
+  amiGUSBase->agb_LogMem = NULL;
+  if((amiGUSBase->agb_DOSBase = (struct DosLibrary *) OpenLibrary("dos.library", 37)))
   {
     if((amiGUSBase->agb_IntuitionBase = (struct IntuitionBase *) OpenLibrary("intuition.library", 37)))
     {
@@ -247,12 +274,12 @@ static ASM(struct Library *) LibInit(
         {
           LONG error;
 
-amiGUSBase->TimerRequest = AllocMem(
-  sizeof(struct IORequest),
-  MEMF_ANY | MEMF_CLEAR);
-OpenDevice("timer.device", 0, amiGUSBase->TimerRequest, 0);
-amiGUSBase->TimerBase = amiGUSBase->TimerRequest->io_Device;
-
+          amiGUSBase->TimerRequest = AllocMem( sizeof(struct IORequest),
+                                               MEMF_ANY | MEMF_CLEAR );
+          /* TODO: Handle errors!!! */
+          OpenDevice("timer.device", 0, amiGUSBase->TimerRequest, 0);
+          /* TODO: Handle errors!!! */
+          amiGUSBase->TimerBase = amiGUSBase->TimerRequest->io_Device;
 
 #ifdef BASE_GLOBAL
           MakeGlobalLibs(amiGUSBase);

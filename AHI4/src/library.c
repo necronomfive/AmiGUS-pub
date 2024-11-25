@@ -14,8 +14,8 @@
  * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#ifndef LIBINIT_C
-#define LIBINIT_C
+#ifndef LIBRARY_C
+#define LIBRARY_C
 
 /* This file cannot cope with BASE_REDEFINE, blocking that permanently here. */
 #define NO_BASE_REDEFINE
@@ -350,4 +350,4 @@ const ULONG LibInitTable[4] = {
   (ULONG)LibInit                    /* The address of the routine to do the setup */
 };
 
-#endif /* LIBINIT_C */
+#endif /* LIBRARY_C */

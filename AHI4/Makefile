@@ -32,8 +32,8 @@ MODE_FILE_FLAGS = -quiet -phxass -I$(NDK_ASM_INCLUDE) -I$(AHI_INCLUDE)/Asm -Fbin
 SRCS            = $(wildcard $(SDIR)#?.c)
 BDIR_SRCS       = $(foreach SRC,$(SRCS),$(subst $(SDIR),$(BDIR),$(SRC)))
 BDIR_OBJS       = $(BDIR_SRCS:%c=%o)
-LIB_OBJS        = $(BDIR)libinit.o \
-                  $(filter-out %/libinit.o,$(BDIR_OBJS))
+LIB_OBJS        = $(BDIR)library.o \
+                  $(filter-out %/library.o,$(BDIR_OBJS))
 LIB_DST         = $(DDIR)AmiGUS.audio
 
 # activate VBCC builds by adding `VBCC=1` to the make call!

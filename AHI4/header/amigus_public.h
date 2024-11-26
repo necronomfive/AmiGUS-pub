@@ -21,8 +21,8 @@
 #include <exec/libraries.h>
 #endif
 
-#define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Fa�bach"
-#define AMIGUS_AHI_COPYRIGHT        "� 2024 Christoph Fa�bach"
+#define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Fassbach"
+#define AMIGUS_AHI_COPYRIGHT        "(c) 2024 Christoph Fassbach"
 #define AMIGUS_AHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
                                     "Frank Wille (vbcc), Martin Blom (AHI)"
 #define AMIGUS_AHI_VERSION          LIBRARY_IDSTRING

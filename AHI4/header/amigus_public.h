@@ -21,13 +21,11 @@
 #include <exec/libraries.h>
 #endif
 
-#define LIBNAME                     "AmiGUS.audio"
-
 #define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Fa�bach"
 #define AMIGUS_AHI_COPYRIGHT        "� 2024 Christoph Fa�bach"
 #define AMIGUS_AHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
                                     "Frank Wille (vbcc), Martin Blom (AHI)"
-#define AMIGUS_AHI_VERSION          IDSTRING
+#define AMIGUS_AHI_VERSION          LIBRARY_IDSTRING
 #define AMIGUS_AHI_RECORD           FALSE
 #define AMIGUS_AHI_FULL_DUPLEX      FALSE
 

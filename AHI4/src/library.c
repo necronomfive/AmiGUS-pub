@@ -19,17 +19,14 @@
 
 /* This file cannot cope with BASE_REDEFINE, blocking that permanently here. */
 #define NO_BASE_REDEFINE
-#include "amigus_private.h"
-#include "debug.h"
-#include "support.h"
 
 #include <exec/execbase.h>
 #include <exec/resident.h>
-#include <intuition/intuitionbase.h>
-#include <libraries/expansionbase.h>
-#include <proto/dos.h>
 #include <proto/exec.h>
-#include <proto/utility.h>
+#include <SDI_compiler.h>
+
+#include "amigus_private.h"
+#include "library.h"
 
 #ifdef __MORPHOS__
 #ifndef RTF_PPC
@@ -47,181 +44,104 @@ ULONG __amigappc__=1;
 
 /* First executable routine of this library; must return an error
    to the unsuspecting caller */
-LONG ReturnError(void)
-{
+LONG ReturnError( VOID ) {
+
   return -1;
 }
 
-/************************************************************************/
+/*****************************************************************************/
 
 /* natural aligned! */
 struct LibInitData {
- UBYTE i_Type;     UBYTE o_Type;     UBYTE  d_Type;	UBYTE p_Type;
- UWORD i_Name;     UWORD o_Name;     STRPTR d_Name;
- UBYTE i_Flags;    UBYTE o_Flags;    UBYTE  d_Flags;	UBYTE p_Flags;
- UBYTE i_Version;  UBYTE o_Version;  UWORD  d_Version;
- UBYTE i_Revision; UBYTE o_Revision; UWORD  d_Revision;
- UWORD i_IdString; UWORD o_IdString; STRPTR d_IdString;
- ULONG endmark;
+
+  UBYTE i_Type;     UBYTE o_Type;                                     // 2 byte
+  UBYTE  d_Type;    UBYTE p_Type;                                     // 2 byte
+  UWORD i_Name;     UWORD o_Name;     STRPTR d_Name;                  // 8 byte
+  UBYTE i_Flags;    UBYTE o_Flags;                                    // 2 byte
+  UBYTE  d_Flags;   UBYTE p_Flags;                                    // 2 byte
+  UBYTE i_Version;  UBYTE o_Version;  UWORD  d_Version;               // 4 byte
+  UBYTE i_Revision; UBYTE o_Revision; UWORD  d_Revision;              // 4 byte
+  UWORD i_IdString; UWORD o_IdString; STRPTR d_IdString;              // 8 byte
+  ULONG endmark;                                                      // 4 byte
 };
 
-/************************************************************************/
+/*****************************************************************************/
 extern const ULONG LibInitTable[4]; /* the prototype */
 
 /* The library loader looks for this marker in the memory
    the library code and data will occupy. It is responsible
    setting up the Library base data structure. */
 const struct Resident RomTag = {
-  RTC_MATCHWORD,                   /* Marker value. */
-  (struct Resident *)&RomTag,      /* This points back to itself. */
-  (struct Resident *)LibInitTable, /* This points somewhere behind this marker. */
+
+  RTC_MATCHWORD,                   /* Marker value.                          */
+  (struct Resident *)&RomTag,      /* This points back to itself.            */
+  (struct Resident *)LibInitTable, /* Points somewhere behind this marker.   */
 #ifdef __MORPHOS__
   RTF_PPC|
 #endif
-  RTF_AUTOINIT,                    /* The Library should be set up according to the given table. */
-  VERSION,                         /* The version of this Library. */
-  NT_LIBRARY,                      /* This defines this module as a Library. */
-  0,                               /* Initialization priority of this Library; unused. */
-  LIBNAME,                         /* Points to the name of the Library. */
-  IDSTRING,                        /* The identification string of this Library. */
-  (APTR)&LibInitTable              /* This table is for initializing the Library. */
+  RTF_AUTOINIT,                    /* Set up shall be according to table.    */
+  LIBRARY_VERSION,                 /* Version of this Library.               */
+  NT_LIBRARY,                      /* Defines this module as a Library.      */
+  0,                               /* (Unused) Initialization priority.      */
+  LIBRARY_NAME,                    /* Points to the name of the Library.     */
+  LIBRARY_IDSTRING,                /* Identification string of this Library. */
+  (APTR)&LibInitTable              /* Table is for initializing the Library. */
 };
 
-/************************************************************************/
+/*****************************************************************************/
 
 /* The mandatory reserved library function */
-static ULONG LibReserved(void) {
+static ULONG LibReserved( VOID ) {
 
   return 0;
 }
 
 /* Open the library, as called via OpenLibrary() */
-static ASM(struct Library *) LibOpen(
-  REG(a6, struct AmiGUSBasePrivate * amiGUSBase)) {
+static ASM(struct Library *) LibOpen( REG(a6, struct BaseLibrary * base) ) {
 
   /* Prevent delayed expunge and increment opencnt */
-  amiGUSBase->agb_LibNode.lib_Flags &= ~LIBF_DELEXP;
-  amiGUSBase->agb_LibNode.lib_OpenCnt++;
+  base->LibNode.lib_Flags &= ~LIBF_DELEXP;
+  base->LibNode.lib_OpenCnt++;
 
-  return &amiGUSBase->agb_LibNode;
-}
-
-#ifdef BASE_GLOBAL
-struct ExecBase          * SysBase           = 0;
-struct DosLibrary        * DOSBase           = 0;
-struct IntuitionBase     * IntuitionBase     = 0;
-struct Library           * UtilityBase       = 0;
-struct Library           * ExpansionBase     = 0;
-struct Device            * TimerBase         = 0;
-struct AmiGUSBasePrivate * AmiGUSBase        = 0;
-
-static void MakeGlobalLibs(
-    struct AmiGUSBasePrivate * amiGUSBase) {
-
-
-  DOSBase       = amiGUSBase->agb_DOSBase;
-  IntuitionBase = amiGUSBase->agb_IntuitionBase;
-  UtilityBase   = amiGUSBase->agb_UtilityBase;
-  ExpansionBase = amiGUSBase->agb_ExpansionBase;
-TimerBase = amiGUSBase->TimerBase;
-  AmiGUSBase    = amiGUSBase;
-}
-
-static void MakeGlobalSys(
-    struct AmiGUSBasePrivate *amiGUSBase) {
-
-  SysBase = amiGUSBase->agb_SysBase;
-}
-#endif
-
-/* Closes all the libraries opened by LibInit() */
-static void CloseLibraries(
-    struct AmiGUSBasePrivate * AmiGUSBase) {
-
-#ifndef BASE_GLOBAL
-  struct ExecBase *SysBase = AmiGUSBase->agb_SysBase;
-#endif
-
-  if( AmiGUSBase->TimerBase ) {
-
-    CloseDevice(AmiGUSBase->TimerRequest );
-  }
-  if( AmiGUSBase->TimerRequest ) {
-
-    FreeMem( AmiGUSBase->TimerRequest, sizeof(struct IORequest) );
-  }  
-  if ( AmiGUSBase->agb_LogFile ) {
-
-    Close( AmiGUSBase->agb_LogFile );
-  }
-  /*
-  Remember: memory cannot be overwritten if we do not return it. :)
-  So... we leak it here... 
-  if ( AmiGUSBase->agb_LogMem ) {
-
-    FreeMem( AmiGUSBase->agb_LogMem, ... );
-  }    
-  */
-
-  if( AmiGUSBase->agb_DOSBase ) {
-
-    CloseLibrary( (struct Library *) AmiGUSBase->agb_DOSBase );
-  }
-  if( AmiGUSBase->agb_IntuitionBase ) {
-
-    CloseLibrary( (struct Library *) AmiGUSBase->agb_IntuitionBase );
-  }
-  if( AmiGUSBase->agb_UtilityBase ) {
-
-    CloseLibrary( (struct Library *) AmiGUSBase->agb_UtilityBase );
-  }
-  if( AmiGUSBase->agb_ExpansionBase ) {
-
-    CloseLibrary( (struct Library *) AmiGUSBase->agb_ExpansionBase );
-  }
+  return &base->LibNode;
 }
 
 /* Expunge the library, remove it from memory */
-static ASM(SEGLISTPTR) LibExpunge(
-  REG(a6, struct AmiGUSBasePrivate * amiGUSBase)) {
+static ASM(SEGLISTPTR) LibExpunge( REG(a6, struct BaseLibrary * base) ) {
 
-#ifndef BASE_GLOBAL
-  struct ExecBase *SysBase = amiGUSBase->agb_SysBase;
-#endif
+  if(!base->LibNode.lib_OpenCnt) {
 
-  if(!amiGUSBase->agb_LibNode.lib_OpenCnt) {
-
-    SEGLISTPTR seglist;
-
-    seglist = amiGUSBase->agb_SegList;
-
-    CloseLibraries(amiGUSBase);
-
+    SEGLISTPTR seglist = base->SegList;
+    
+    CustomLibClose( base );
+    
     /* Remove the library from the public list */
-    Remove((struct Node *) amiGUSBase);
+    Remove( (struct Node *) base );
 
     /* Free the vector table and the library data */
-    FreeMem((STRPTR) amiGUSBase - amiGUSBase->agb_LibNode.lib_NegSize,
-    amiGUSBase->agb_LibNode.lib_NegSize +
-    amiGUSBase->agb_LibNode.lib_PosSize);
+    FreeMem(
+      (STRPTR) base - base->LibNode.lib_NegSize,
+      base->LibNode.lib_NegSize + base->LibNode.lib_PosSize );
 
     return seglist;
-  }
-  else
-    amiGUSBase->agb_LibNode.lib_Flags |= LIBF_DELEXP;
 
+  } else {
+
+    base->LibNode.lib_Flags |= LIBF_DELEXP;
+  }
   /* Return the segment pointer, if any */
   return 0;
 }
 
 /* Close the library, as called by CloseLibrary() */
-static ASM(SEGLISTPTR) LibClose(
-  REG(a6, struct AmiGUSBasePrivate * amiGUSBase)) {
+static ASM(SEGLISTPTR) LibClose( REG(a6, struct BaseLibrary * base) ) {
 
-  if(!(--amiGUSBase->agb_LibNode.lib_OpenCnt)) {
+  if( !(--base->LibNode.lib_OpenCnt) ) {
 
-    if(amiGUSBase->agb_LibNode.lib_Flags & LIBF_DELEXP)
-      return LibExpunge(amiGUSBase);
+    if( base->LibNode.lib_Flags & LIBF_DELEXP ) {
+
+      return LibExpunge( base );
+    }
   }
   return 0;
 }
@@ -229,92 +149,42 @@ static ASM(SEGLISTPTR) LibClose(
 /* Initialize library */
 #ifdef __MORPHOS__
 static struct Library * LibInit(
-  struct AmiGUSBasePrivate * amiGUSBase,
+  struct BaseLibrary * base,
   SEGLISTPTR seglist, 
   struct ExecBase *SysBase) {
 #else
 static ASM(struct Library *) LibInit(
   REG(a0, SEGLISTPTR seglist),
-  REG(d0, struct AmiGUSBasePrivate * amiGUSBase),
-  REG(a6, struct ExecBase *SysBase)) {
-#endif
-
-  /* Prevent use of customized library versions on CPUs not targetted. */
-#ifdef _M68060
-  if(!(SysBase->AttnFlags & AFF_68060))
-    return 0;
-#elif defined (_M68040)
-  if(!(SysBase->AttnFlags & AFF_68040))
-    return 0;
-#elif defined (_M68030)
-  if(!(SysBase->AttnFlags & AFF_68030))
-    return 0;
-#elif defined (_M68020)
-  if(!(SysBase->AttnFlags & AFF_68020))
-    return 0;
+  REG(d0, struct BaseLibrary * base),
+  REG(a6, struct ExecBase * sysBase) ) {
 #endif
 
   /* Remember stuff */
-  amiGUSBase->agb_SegList = seglist;
-  amiGUSBase->agb_SysBase = SysBase;
-
-#ifdef BASE_GLOBAL
-  MakeGlobalSys(amiGUSBase);
-#endif
-
-  amiGUSBase->agb_LogFile = NULL;
-  amiGUSBase->agb_LogMem = NULL;
-  if((amiGUSBase->agb_DOSBase = (struct DosLibrary *) OpenLibrary("dos.library", 37)))
-  {
-    if((amiGUSBase->agb_IntuitionBase = (struct IntuitionBase *) OpenLibrary("intuition.library", 37)))
-    {
-      if((amiGUSBase->agb_UtilityBase = (struct Library *) OpenLibrary("utility.library", 37)))
-      {
-        if((amiGUSBase->agb_ExpansionBase = (struct Library *) OpenLibrary("expansion.library", 37)))
-        {
-          LONG error;
-
-          amiGUSBase->TimerRequest = AllocMem( sizeof(struct IORequest),
-                                               MEMF_ANY | MEMF_CLEAR );
-          /* TODO: Handle errors!!! */
-          OpenDevice("timer.device", 0, amiGUSBase->TimerRequest, 0);
-          /* TODO: Handle errors!!! */
-          amiGUSBase->TimerBase = amiGUSBase->TimerRequest->io_Device;
-
-#ifdef BASE_GLOBAL
-          MakeGlobalLibs(amiGUSBase);
-#endif
-          LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", AmiGUSBase));
-
-          error = FindAmiGUS(amiGUSBase);
-          if ( error ) {
-
-            DisplayError(error);
-          }
-
-          return &amiGUSBase->agb_LibNode;
-        }
-      }
-    }
-    CloseLibraries(amiGUSBase);
+  base->SegList = seglist;
+  if ( !CustomLibInit( base, sysBase ) ) {
+    
+    return &base->LibNode;
   }
+
+  CustomLibClose( base );
 
   /* Free the vector table and the library data */
   FreeMem(
-      (STRPTR) amiGUSBase - amiGUSBase->agb_LibNode.lib_NegSize,
-      amiGUSBase->agb_LibNode.lib_NegSize
-          + amiGUSBase->agb_LibNode.lib_PosSize);
+      (STRPTR) base - base->LibNode.lib_NegSize,
+      base->LibNode.lib_NegSize + base->LibNode.lib_PosSize );
 
   return 0;
 }
 
 /************************************************************************/
 
-/* This is the table of functions that make up the library. The first
-   four are mandatory, everything following it are user callable
-   routines. The table is terminated by the value -1. */
-
+/*
+ * This is the table of functions that make up the library. The first
+ * four are mandatory, everything following it are user callable
+ * routines. The table is terminated by the value -1.
+ */
 static const APTR LibVectors[] = {
+
 #ifdef __MORPHOS__
   (APTR) FUNCARRAY_32BIT_QUICK_NATIVE,
 #endif
@@ -329,25 +199,27 @@ static const APTR LibVectors[] = {
 };
 
 static const struct LibInitData LibInitData = {
- 0xA0,   (UBYTE) OFFSET(Node,    ln_Type),      NT_LIBRARY,                0,
- 0xC000, (UBYTE) OFFSET(Node,    ln_Name),      LIBNAME,
- 0xA0,   (UBYTE) OFFSET(Library, lib_Flags),    LIBF_SUMUSED|LIBF_CHANGED, 0,
- 0x90,   (UBYTE) OFFSET(Library, lib_Version),  VERSION,
- 0x90,   (UBYTE) OFFSET(Library, lib_Revision), REVISION,
- 0xC000, (UBYTE) OFFSET(Library, lib_IdString), IDSTRING,
- 0
+
+  0xA0,   (UBYTE) OFFSET(Node,    ln_Type),      NT_LIBRARY,                0,
+  0xC000, (UBYTE) OFFSET(Node,    ln_Name),      LIBRARY_NAME,
+  0xA0,   (UBYTE) OFFSET(Library, lib_Flags),    LIBF_SUMUSED|LIBF_CHANGED, 0,
+  0x90,   (UBYTE) OFFSET(Library, lib_Version),  LIBRARY_VERSION,
+  0x90,   (UBYTE) OFFSET(Library, lib_Revision), LIBRARY_REVISION,
+  0xC000, (UBYTE) OFFSET(Library, lib_IdString), LIBRARY_IDSTRING,
+  0
 };
 
-/* The following data structures and data are responsible for
-   setting up the Library base data structure and the library
-   function vector.
-*/
+/*
+ * The following data structures and data are responsible for
+ * setting up the Library base data structure and the library
+ * function vector.
+ */
 const ULONG LibInitTable[4] = {
-  (ULONG)sizeof(
-      struct AmiGUSBasePrivate),    /* Size of the base data structure */
+
+  (ULONG)sizeof( LIBRARY_TYPE ),    /* Size of the base data structure */
   (ULONG)LibVectors,                /* Points to the function vector */
-  (ULONG)&LibInitData,              /* Library base data structure setup table */
-  (ULONG)LibInit                    /* The address of the routine to do the setup */
+  (ULONG)&LibInitData,              /* Library base data structure table */
+  (ULONG)LibInit                    /* Address of the library setup routine */
 };
 
 #endif /* LIBRARY_C */

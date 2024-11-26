@@ -25,8 +25,13 @@ enum TErrorCodes
   ENoError = 0,
   /* Insert errors below. */
   /* Global errors 1-99 */
+  EWrongDriverCPUVersion,
   EOpenDosBase,
+  EOpenIntuitionBase,
   EOpenUtilityBase,
+  EOpenExpansionBase,
+  EAllocateTimerRequest,
+  EOpenTimerDevice,
   EOpenLogFile,
   EAllocateLogMem,
   /*

@@ -71,8 +71,8 @@ struct AmiGUSBasePrivate {
   struct Library              * agb_UtilityBase;
   struct Library              * agb_ExpansionBase;
 
-  struct Device               * TimerBase;
-  struct IORequest            * TimerRequest;
+  struct Device               * agb_TimerBase;
+  struct IORequest            * agb_TimerRequest;
   /* AmiGUS specific member variables */
   APTR                          agb_CardBase;
   struct Interrupt            * agb_Interrupt;

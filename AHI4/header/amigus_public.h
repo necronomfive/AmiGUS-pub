@@ -22,7 +22,7 @@
 #endif
 
 #define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Fassbach"
-#define AMIGUS_AHI_COPYRIGHT        "(c) 2024 Christoph Fassbach"
+#define AMIGUS_AHI_COPYRIGHT        "(c) 2024 Christoph Fassbach / LGPL3"
 #define AMIGUS_AHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
                                     "Frank Wille (vbcc), Martin Blom (AHI)"
 #define AMIGUS_AHI_VERSION          LIBRARY_IDSTRING

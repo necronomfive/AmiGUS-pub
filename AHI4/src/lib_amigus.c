@@ -47,13 +47,13 @@ VOID CustomLibClose( struct BaseLibrary * base ) {
   struct ExecBase *SysBase = AmiGUSBase->agb_SysBase;
 #endif
 
-  if( amiGUSBase->TimerBase ) {
+  if( amiGUSBase->agb_TimerBase ) {
 
-    CloseDevice( amiGUSBase->TimerRequest );
+    CloseDevice( amiGUSBase->agb_TimerRequest );
   }
-  if( amiGUSBase->TimerRequest ) {
+  if( amiGUSBase->agb_TimerRequest ) {
 
-    FreeMem( amiGUSBase->TimerRequest, sizeof(struct IORequest) );
+    FreeMem( amiGUSBase->agb_TimerRequest, sizeof(struct IORequest) );
   }  
   if ( amiGUSBase->agb_LogFile ) {
 
@@ -147,25 +147,25 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
 
     return EOpenExpansionBase;
   }
-  amiGUSBase->TimerRequest = AllocMem( sizeof(struct IORequest),
-                                       MEMF_ANY | MEMF_CLEAR );
-  if( !(amiGUSBase->TimerRequest) ) {
+  amiGUSBase->agb_TimerRequest = AllocMem( sizeof(struct IORequest),
+                                           MEMF_ANY | MEMF_CLEAR );
+  if( !(amiGUSBase->agb_TimerRequest) ) {
 
     return EAllocateTimerRequest;
   }
-  error = OpenDevice("timer.device", 0, amiGUSBase->TimerRequest, 0);
+  error = OpenDevice("timer.device", 0, amiGUSBase->agb_TimerRequest, 0);
   if ( error ) {
 
     return EOpenTimerDevice;
   }
-  amiGUSBase->TimerBase = amiGUSBase->TimerRequest->io_Device;
+  amiGUSBase->agb_TimerBase = amiGUSBase->agb_TimerRequest->io_Device;
 
 #ifdef BASE_GLOBAL
   DOSBase       = amiGUSBase->agb_DOSBase;
   IntuitionBase = amiGUSBase->agb_IntuitionBase;
   UtilityBase   = amiGUSBase->agb_UtilityBase;
   ExpansionBase = amiGUSBase->agb_ExpansionBase;
-  TimerBase     = amiGUSBase->TimerBase;
+  TimerBase     = amiGUSBase->agb_TimerBase;
   AmiGUSBase    = amiGUSBase;
 #endif
 

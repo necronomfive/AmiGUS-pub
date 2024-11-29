@@ -35,7 +35,7 @@
                                     + (   21 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
-#define AMIGUS_AHI_NUM_FREQUENCIES  9
+#define AMIGUS_AHI_NUM_SAMPLE_RATES 9
 #define AMIGUS_AHI_NUM_OUTPUTS      1
 #define AMIGUS_AHI_NUM_INPUTS       4
 

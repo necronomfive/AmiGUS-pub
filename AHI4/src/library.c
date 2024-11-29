@@ -25,7 +25,6 @@
 #include <proto/exec.h>
 #include <SDI_compiler.h>
 
-#include "amigus_private.h"
 #include "library.h"
 
 #ifdef __MORPHOS__

@@ -25,7 +25,7 @@
 
 #include <limits.h>
 
-#include "amigus.h"
+#include "amigus_hardware.h"
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
@@ -69,360 +69,6 @@ void WriteReg32(APTR amiGUS, ULONG offset, ULONG value) {
 }
 
 
-/* Basic functions */
-
-ASM(ULONG) SAVEDS AHIsub_AllocAudio(
-//  REG(a6, struct Library* aBase) works fine with vbcc, but not with SASC,
-  REG(a1, struct TagItem* aTagList),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
-) {
-  struct TagItem *stateTag = 0;
-  struct TagItem *tag = 0;
-  ULONG frequencyId = 0;
-  ULONG frequency = 0;
-  ULONG samplesAmiGus = 0;
-  ULONG samplesAhi = 0;
-  ULONG reminder = 0;
-  UBYTE isStereo = FALSE;
-  UBYTE isHifi = FALSE;
-  UBYTE isRealtime = FALSE;
-  UBYTE bitsPerAmiGusSample = 0;
-
-  /* Will rely on AHI provided mixing and timing */
-  ULONG result = AHISF_MIXING | AHISF_TIMING;
-
-  LOG_D(("D: AHIsub_AllocAudio start\n"));
-  LogTicks(0x03);
-
-  /*
-   * ------------------------------------------------------
-   * Part 1: Allocate this AmiGUS to exactly this callee,
-   *         re-entrance/interrupt/multitasking safe.
-   * ------------------------------------------------------
-   */
-  Disable();
-  if ( AmiGUSBase->agb_UsageCounter ) {
-
-    Enable();
-    DisplayError( EDriverInUse );
-    return AHISF_ERROR;
-  
-  } else {
-
-    ++AmiGUSBase->agb_UsageCounter;
-    Enable();
-  }
-  LOG_D(("D: Alloc`ed AmiGUS AHI hardware\n"));
-
-  /*
-   * ------------------------------------------------------
-   * Part 2: Extract audio mode information
-   * ------------------------------------------------------
-   */
-  /* Find nearest supported frequency and provide it back */
-  frequencyId = FindNearestFrequencyIndex( aAudioCtrl->ahiac_MixFreq );
-  frequency = Frequencies[ frequencyId ];
-  LOG_V(("D: Using %ldHz = 0x%02lx for requested %ldHz\n",
-         frequency,
-         frequencyId,
-         aAudioCtrl->ahiac_MixFreq));
-  aAudioCtrl->ahiac_MixFreq = frequency;
-
-  /* Parse aTagList */
-  stateTag = aTagList;
-  while ( tag = NextTagItem( &stateTag ) ) {
-
-    switch ( tag->ti_Tag ) {
-      case AHIDB_Bits: {
-        bitsPerAmiGusSample = (UBYTE)tag->ti_Data;
-        break;
-      }
-      case AHIDB_Stereo: {
-        isStereo = (UBYTE)tag->ti_Data;
-        result |= AHISF_KNOWSTEREO;
-        break;
-      }
-      case AHIDB_HiFi: {
-        isHifi = (UBYTE)tag->ti_Data;
-        LOG_D(("D: TODO: Why is HiFi in the list?\n"));
-//        result |= AHISF_KNOWHIFI;
-        break;
-      }
-      case AHIDB_Realtime: {
-        isRealtime = (UBYTE)tag->ti_Data;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }
-
-  LOG_D(("D: Mode is %ldbit, %ld stereo, %ld HiFi, %ld Realtime, %ldHz\n",
-         bitsPerAmiGusSample, isStereo, isHifi, isRealtime, frequency
-       ));
-  if (( isHifi ) || ( !isStereo ) || ( 16 != bitsPerAmiGusSample )) {
-    DisplayError( EAudioModeNotImplemented );
-    return AHISF_ERROR;
-  }
-
-  /*
-   * ------------------------------------------------------
-   * Part 3: Apply information to AmiGUS & driver.
-   * ------------------------------------------------------
-   */
-
-  // TODO: Initialize AmiGUS with that information.
-
-  // TODO: switch copy functions here for HiFi modes
-  //       Others will be plain LONG copys.
-
-  /*
-   * ------------------------------------------------------
-   * Part 4: Prepare slave task communication.
-   * ------------------------------------------------------
-   */
-  AmiGUSBase->agb_WorkerWorkSignal = -1;
-  AmiGUSBase->agb_WorkerStopSignal = -1;
-  AmiGUSBase->agb_MainProcess = ( struct Process * ) FindTask( NULL );
-  AmiGUSBase->agb_MainSignal = AllocSignal( -1 );
-  if ( -1 == AmiGUSBase->agb_MainSignal ) {
-
-    DisplayError( EMainProcessSignalsFailed );
-    return AHISF_ERROR;
-  }
-  AmiGUSBase->agb_WorkerReady = FALSE;
-
-  LOG_D(("D: AHIsub_AllocAudio done, expected %ld actual %ld\n", 
-         AHISF_MIXING | AHISF_TIMING | AHISF_KNOWSTEREO,
-         result));
-
-  return result;
-}
-
-ASM(void) SAVEDS AHIsub_FreeAudio(
-  REG(a6, struct Library* aBase),
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
-) {
-  LOG_D(("D: AHIsub_FreeAudio start\n"));
-
-  /*
-   * ------------------------------------------------------
-   * Part 4: Free slave task communication.
-   * ------------------------------------------------------
-   */
-  /* Freeing a non-alloc`ed signal, i.e. -1, is harmless */
-  FreeSignal( AmiGUSBase->agb_MainSignal );
-  AmiGUSBase->agb_MainSignal = -1;
-  LOG_D(("D: Free`ed main signal\n"));
-
-  /*
-   * ------------------------------------------------------
-   * Part 1: De-allocate this AmiGUS,
-   *         re-entrance/interrupt/multitasking safe.
-   * ------------------------------------------------------
-   */
-  Disable();
-  if ( !AmiGUSBase->agb_UsageCounter ) {
-
-    Enable();
-    DisplayError( EDriverNotInUse );
-    return;
-  
-  } else {
-
-    --AmiGUSBase->agb_UsageCounter;
-    Enable();
-  }
-  LOG_D(("D: Free`ed AmiGUS AHI hardware\n"));
-
-  LOG_D(("D: AHIsub_FreeAudio done\n"));
-
-  return;
-}
-
-ASM(void) SAVEDS AHIsub_Disable(
-  REG(a6, struct Library* aBase),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
-) {
-/*
-  LOG_D(("AHIsub_Disable\n"));
-  WriteReg16( AmiGUSBase->agb_CardBase,
-              AMIGUS_MAIN_INT_ENABLE,
-              AMIGUS_INT_FLAG_MASK_CLEAR
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-            );
-*/
-  Disable();
-  return;
-}
-
-
-ASM(void) SAVEDS AHIsub_Enable(
-  REG(a6, struct Library* aBase),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
-) {
-/*
-  LOG_D(("AHIsub_Enable\n"));
-  WriteReg16( AmiGUSBase->agb_CardBase,
-              AMIGUS_MAIN_INT_ENABLE,
-              AMIGUS_INT_FLAG_MASK_SET
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-            );
-         */
-  Enable();
-  return;
-}
-
-ASM(ULONG) SAVEDS AHIsub_Start(
-  REG(a6, struct Library* aBase),
-  REG(d0, ULONG aFlags),
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
-) {
-  LOG_D(("D: AHIsub_Start start\n"));
-
-  AHIsub_Update( aBase, aFlags, aAudioCtrl );
-
-  if ( AHISF_PLAY & aFlags ) {
-
-    LOG_D(("D: Creating playback buffers\n", (LONG) AmiGUSBase));
-    if ( CreatePlaybackBuffers() ) {
-
-      LOG_D(("D: No playback buffers, failed.\n"));
-      return AHIE_UNKNOWN;
-    }
-  }
-
-  LOG_D(("D: Creating worker process for AmiGUSBase @ %08lx\n", (LONG) AmiGUSBase));
-  if ( CreateWorkerProcess() ) {
-
-    LOG_D(("D: No worker, failed.\n"));
-    return AHIE_UNKNOWN;
-  }
-  if ( CreateInterruptHandler() ) {
-  
-    LOG_D(("D: No INT handler, failed.\n"));
-    return AHIE_UNKNOWN;
-  }
-
-  initAmiGUS();
-  LOG_D(("D: AHIsub_Start done\n"));
-  return AHIE_OK;
-}
-
-ASM(void) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
-  REG(a6, struct Library* aBase),
-  REG(d0, ULONG aFlags),
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
-) {
-  LOG_D(("D: AHIsub_Update start\n"));
-  LOG_V(("V: old ctrl 0x%08lx, new ctrl 0x%08lx, longSize %ld, BuffSamples %lu, Min %lu, Max %lu, BuffSize %lu, BuffType %lu\n",
-          AmiGUSBase->agb_AudioCtrl,
-          aAudioCtrl,
-          AmiGUSBase->agb_BufferSize,
-          aAudioCtrl->ahiac_BuffSamples,
-          aAudioCtrl->ahiac_MinBuffSamples,
-          aAudioCtrl->ahiac_MaxBuffSamples,
-          aAudioCtrl->ahiac_BuffSize,
-          aAudioCtrl->ahiac_BuffType
-       ));
-  AmiGUSBase->agb_AudioCtrl = aAudioCtrl;
-  LOG_D(("D: AHIsub_Update stop\n"));
-  return;
-}
-
-ASM(void) SAVEDS AHIsub_Stop(
-  REG(a6, struct Library* aBase),
-  REG(d0, ULONG aFlags),
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
-) {
-  LOG_D(("D: AHIsub_Stop start\n"));
-
-  LOG_D(("D: Read FIFO level %04lx\n",
-         ReadReg16(
-             AmiGUSBase->agb_CardBase,
-             AMIGUS_MAIN_FIFO_USAGE) ));
-  stopAmiGUS();
-
-  DestroyInterruptHandler();
-  DestroyWorkerProcess();
-  DestroyPlaybackBuffers();
-
-
-  LOG_D(("AHIsub_Stop done\n"));
-  return;
-}
-
-/* Acceleration functions */
-
-ASM(ULONG) SAVEDS AHIsub_SetVol(
-  REG(a6, struct Library* aBase),
-  REG(d0, UWORD aChannel),
-  REG(d1, Fixed aVolume),
-  REG(d2, sposition aPan),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl),
-  REG(d3, ULONG aFlags)
-) {
-//  LOG_D(("AHIsub_SetVol\n"));
-  return AHIS_UNKNOWN;
-}
-
-ASM(ULONG) SAVEDS AHIsub_SetFreq(
-  REG(a6, struct Library* aBase),
-  REG(d0, UWORD aChannel),
-  REG(d1, ULONG aFreq),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl),
-  REG(d2, ULONG aFlags)
-) {
-//  LOG_D(("AHIsub_SetFreq\n"));
-  return AHIS_UNKNOWN;
-}
-
-ASM(ULONG) SAVEDS AHIsub_SetSound(
-  REG(a6, struct Library* aBase),
-  REG(d0, UWORD aChannel),
-  REG(d1, UWORD aSound),
-  REG(d2, ULONG aOffset),
-  REG(d3, LONG aLength),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl),
-  REG(d4, ULONG aFlags)
-) {
-//  LOG_D(("AHIsub_SetSound\n"));
-  return AHIS_UNKNOWN;
-}
-
-ASM(ULONG) SAVEDS AHIsub_SetEffect(
-  REG(a6, struct Library* aBase),
-  REG(a0, APTR aEffect),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
-) {
-  LOG_D(("AHIsub_SetEffect\n"));
-  return 0L;
-}
-
-ASM(ULONG) SAVEDS AHIsub_LoadSound(
-  REG(a6, struct Library* aBase),
-  REG(d0, UWORD aSound),
-  REG(d1, ULONG aType),
-  REG(a0, APTR aInfo),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
-) {
-//  LOG_D(("AHIsub_LoadSound\n"));
-  return AHIS_UNKNOWN;
-}
-
-ASM(ULONG) SAVEDS AHIsub_UnloadSound(
-  REG(a6, struct Library* aBase),
-  REG(d0, UWORD aSound),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
-) {
-//  LOG_D(("AHIsub_UnloadSound\n"));
-  return AHIS_UNKNOWN;
-}
-
-/* Query functions */
 
 /*
  * ---------------------------------------------------
@@ -431,11 +77,13 @@ ASM(ULONG) SAVEDS AHIsub_UnloadSound(
  */
 
 /*
- * Array of supported frequencies, shall always be in 
- * sync with AMIGUS_AHI_NUM_FREQUENCIES from amigus_public.h
+ * Array of supported sample rates, shall always be in 
+ * sync with 
+ * - AMIGUS_SAMPLE_RATE_* in amigus_hardware.h and
+ * - AMIGUS_AHI_NUM_SAMPLE_RATES in amigus_public.h.
  */
-const LONG Frequencies[ AMIGUS_AHI_NUM_FREQUENCIES ] =
-  {
+const LONG AmiGUSSampleRates[ AMIGUS_AHI_NUM_SAMPLE_RATES ] = {
+
    8000, // AMIGUS_SAMPLE_RATE_8000  @ index 0x0000
   11025, // AMIGUS_SAMPLE_RATE_11025 @ index 0x0001
   16000, // AMIGUS_SAMPLE_RATE_16000 @ index 0x0002
@@ -445,186 +93,21 @@ const LONG Frequencies[ AMIGUS_AHI_NUM_FREQUENCIES ] =
   44100, // AMIGUS_SAMPLE_RATE_44100 @ index 0x0006
   48000, // AMIGUS_SAMPLE_RATE_48000 @ index 0x0007
   96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0008
-  };
+};
 
-const STRPTR Outputs[ AMIGUS_AHI_NUM_OUTPUTS ] =
-  {
+const STRPTR AmiGUSOutputs[ AMIGUS_AHI_NUM_OUTPUTS ] = {
+
   "Line Out"
-  };
+};
 
-const STRPTR Inputs[ AMIGUS_AHI_NUM_INPUTS ] =
-  {
+const STRPTR AmiGUSInputs[ AMIGUS_AHI_NUM_INPUTS ] = {
+
   "Line In",
   "Paula",
   "CD-ROM",
   "Decoder"
-  };
+};
 
-ASM(LONG) SAVEDS AHIsub_GetAttr(
-  REG(a6, struct Library* aBase),
-  REG(d0, ULONG aAttribute),
-  REG(d1, LONG aArgument),
-  REG(d2, LONG aDefault),
-  REG(a1, struct TagItem* aTagList),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
-) {
-  LONG result = aDefault;
-  switch ( aAttribute )
-    {
-    case AHIDB_Bits:
-      {
-      result = GetTagData(AHIDB_Bits, aDefault, aTagList);
-      break;
-      }
-    case AHIDB_MaxChannels:
-      {
-      result = 1;
-      break;
-      }
-    case AHIDB_Frequencies:
-      {
-      result = AMIGUS_AHI_NUM_FREQUENCIES;
-      break;
-      }
-    case AHIDB_Frequency:
-      {
-      result = Frequencies[ aArgument ];
-      break;
-      }
-    case AHIDB_Index:
-      {
-      result = FindNearestFrequencyIndex(aArgument);
-      break;
-      }
-    case AHIDB_Author:
-      {
-      result = (LONG) AMIGUS_AHI_AUTHOR;
-      break;
-      }
-    case AHIDB_Copyright:
-      {
-      result = (LONG) AMIGUS_AHI_COPYRIGHT;
-      break;
-      }
-    case AHIDB_Version:
-      {
-      result = (LONG) AMIGUS_AHI_VERSION;
-      break;
-      }
-    case AHIDB_Annotation:
-      {
-      result = (LONG) AMIGUS_AHI_ANNOTATION;
-      break;
-      }
-    case AHIDB_Record:
-      {
-      result = AMIGUS_AHI_RECORD;
-      break;
-      }
-    case AHIDB_FullDuplex:
-      {
-      result = AMIGUS_AHI_FULL_DUPLEX;
-      break;
-      }
-    case AHIDB_Realtime:
-      {
-      result = GetTagData(AHIDB_Realtime, TRUE, aTagList);
-      break;
-      }
-    case AHIDB_MaxPlaySamples:
-      {
-      ULONG bits = GetTagData(AHIDB_Bits, 0, aTagList);
-      ULONG bytesPerSample = bits / 8;
-      ULONG flags = aAudioCtrl->ahiac_Flags;
-      ULONG stereo = AHISF_KNOWSTEREO & flags;
-      
-      LOG_V(("AHIDB_MaxPlaySamples bits %ld flags %lx stereo %lx bytes/sample %ld\n", 
-            bits, 
-            flags,
-            stereo,
-            bytesPerSample));
-
-      result = UDivMod32(AMIGUS_PLAYBACK_FIFO_BYTES, bytesPerSample);
-      /*
-      Could get reminder by getRegD1(); like
-        __reg("d1") ULONG __getRegD1()="\t";
-        #define getRegD1() __getRegD1()
-      */
-      if ( stereo  ) {
-        result >>= 1;
-      }
-      break;
-      }
-    case AHIDB_MaxRecordSamples:
-      {
-      /* TODO: Ask how much record buffer we have!? */
-      break;
-      }
-    case AHIDB_MinInputGain:
-    case AHIDB_MinMonitorVolume:
-    case AHIDB_MinOutputVolume:
-      {
-//      result = 0;
-      break;
-      }
-    case AHIDB_MaxInputGain:
-    case AHIDB_MaxMonitorVolume:
-    case AHIDB_MaxOutputVolume:
-      {
-//      result = USHRT_MAX;
-      break;
-      }
-    case AHIDB_Inputs:
-      {
-      result = AMIGUS_AHI_NUM_INPUTS;
-      break;
-      }
-    case AHIDB_Input:
-      {
-      result = ( LONG ) Inputs[ aArgument ];
-      break;
-      }
-    case AHIDB_Outputs:
-      {
-      result = AMIGUS_AHI_NUM_OUTPUTS;
-      break;
-      }
-    case AHIDB_Output:
-      {
-      result = ( LONG ) Outputs[ aArgument ];
-      break;
-      }
-    case AHIDB_PingPong:
-      {
-      LOG_V(("V: PingPong\n"));
-      break;
-      }
-    default:
-      {
-      DisplayError( EGetAttrNotImplemented );
-      break;
-      }
-    }
-
-  LOG_D(("D: AHIsub_GetAttr %ld %ld %ld => %ld\n", 
-        aAttribute - AHI_TagBase,
-        aDefault,
-        aArgument,
-        result));
-  return result;
-}
-
-/* Mixer functions */
-
-ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
-  REG(a6, struct Library* aBase),
-  REG(d0, ULONG aAttribute),
-  REG(d1, LONG aArgument),
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
-) {
-  LOG_D(("AHIsub_HardwareControl\n"));
-  return 0L;
-}
 
 LONG FindAmiGUS(struct AmiGUSBasePrivate *amiGUSBase) {
 
@@ -683,10 +166,10 @@ LONG FindNearestFrequencyIndex(LONG aFrequency) {
   LONG next = LONG_MAX;
   LONG i = 0;
 
-  while ( AMIGUS_AHI_NUM_FREQUENCIES > i ) {
+  while ( AMIGUS_AHI_NUM_SAMPLE_RATES > i ) {
 
     prev = next;
-    next = Frequencies[ i ] - aFrequency;
+    next = AmiGUSSampleRates[ i ] - aFrequency;
 
     /* We need absolute difference only. */
     if (0 > next) {
@@ -706,9 +189,11 @@ LONG FindNearestFrequencyIndex(LONG aFrequency) {
 LONG FindNearestFrequency(LONG aFrequency) {
 
   LONG index = FindNearestFrequencyIndex( aFrequency );
-  LONG result = Frequencies[ index ];
-  LOG_V(("V: Using %ldHz for requested %ldHz\n", result, aFrequency));
-
+  LONG result = AmiGUSSampleRates[ index ];
+  LOG_D(("D: Using %ldHz = 0x%02lx for requested %ldHz\n",
+         result,
+         index,
+         aFrequency));
   return result;
 }
 

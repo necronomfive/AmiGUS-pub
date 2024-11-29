@@ -119,33 +119,35 @@ struct AmiGUSBasePrivate {
   #define UtilityBase               amiGUSBase->agb_UtilityBase
 #endif
 
+extern const LONG AmiGUSSampleRates[ AMIGUS_AHI_NUM_SAMPLE_RATES ];
+extern const STRPTR AmiGUSOutputs[ AMIGUS_AHI_NUM_OUTPUTS ];
+extern const STRPTR AmiGUSInputs[ AMIGUS_AHI_NUM_INPUTS ];
+
 /******************************************************************************
  * Library accessible function
  *****************************************************************************/
 
-LONG FindAmiGUS(struct AmiGUSBasePrivate *amiGUSBase);
-LONG FindNearestFrequencyIndex(LONG aFrequency);
-LONG FindNearestFrequency(LONG aFrequency);
-void initAmiGUS(void);
-void stopAmiGUS(void);
+LONG FindAmiGUS( struct AmiGUSBasePrivate *amiGUSBase );
+LONG FindNearestFrequencyIndex( LONG aFrequency );
+LONG FindNearestFrequency( LONG aFrequency );
+VOID initAmiGUS( VOID );
+VOID stopAmiGUS( VOID );
 ASM(LONG) SAVEDS INTERRUPT handleInterrupt(
   REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
 );
 
-UWORD ReadReg16(APTR amiGUS, ULONG offset);
-void WriteReg16(APTR amiGUS, ULONG offset, UWORD value);
-ULONG ReadReg32(APTR amiGUS, ULONG offset);
-void WriteReg32(APTR amiGUS, ULONG offset, ULONG value);
+UWORD ReadReg16( APTR amiGUS, ULONG offset );
+VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
+ULONG ReadReg32( APTR amiGUS, ULONG offset );
+VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
 
-BOOL CreatePlaybackBuffers(VOID);
-VOID DestroyPlaybackBuffers(VOID);
+BOOL CreatePlaybackBuffers( VOID );
+VOID DestroyPlaybackBuffers( VOID );
 
-BOOL CreateInterruptHandler(VOID);
-VOID DestroyInterruptHandler(VOID);
+BOOL CreateInterruptHandler( VOID );
+VOID DestroyInterruptHandler( VOID );
 
-BOOL CreateWorkerProcess(VOID);
-VOID DestroyWorkerProcess(VOID);
-
-extern const LONG Frequencies[];
+BOOL CreateWorkerProcess( VOID );
+VOID DestroyWorkerProcess( VOID );
 
 #endif /* AMIGUS_PRIVATE_H */

@@ -20,7 +20,7 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
-#include "amigus.h"
+#include "amigus_hardware.h"
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"

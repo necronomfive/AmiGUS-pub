@@ -21,15 +21,6 @@
 #include <exec/libraries.h>
 
 /******************************************************************************
- * Define your library's base type here,
- * will be used in library.c - thus,
- * you need to take care the definition of your library's base structure is 
- * known in library.c.
- * You need to include it there!
- *****************************************************************************/
-#define LIBRARY_TYPE      struct AmiGUSBasePrivate
-
-/******************************************************************************
  * Define your library's public functions here,
  * will be used in library.c.
  *****************************************************************************/
@@ -58,7 +49,7 @@
 #define LIBRARY_VERSION   4
 #define LIBRARY_REVISION  1
 #define LIBRARY_DATETXT	  __AMIGADATE__
-#define LIBRARY_VERSTXT	  "4.1"
+#define LIBRARY_VERSTXT	  "4.003"
 
 #ifdef _M68060
   #define LIBRARY_ADDTXT  " 060"
@@ -99,6 +90,18 @@ struct BaseLibrary {
   UWORD                         Unused0;                 /* better alignment */
   SEGLISTPTR                    SegList;
 };
+
+/******************************************************************************
+ * Define your library's base type here, will be used in library.c.
+ *****************************************************************************/
+#define LIBRARY_TYPE      struct AmiGUSBasePrivate
+
+/******************************************************************************
+ * Your library's own base structure shall have its own include,
+ * maybe together with your library specific functions.
+ * Include it here!
+ *****************************************************************************/
+#include "amigus_private.h"
 
 /******************************************************************************
  * Now go ahead and implement these functions in your library adapter code!

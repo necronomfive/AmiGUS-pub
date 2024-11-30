@@ -65,6 +65,7 @@ enum TErrorCodes
   EGetAttrNotImplemented,
   EHardwareControlNotImplemented,
   EAudioModeNotImplemented,
+  ERecordingNotImplemented,
   /* Hardware errors 200-300 */
   EAmiGUSNotFound = 200,
   EAmiGUSDetectError,

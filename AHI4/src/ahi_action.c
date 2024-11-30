@@ -78,6 +78,12 @@ ASM(ULONG) SAVEDS AHIsub_Start(
     }
   }
 
+ if ( AHISF_RECORD & aFlags ) {
+
+    DisplayError( ERecordingNotImplemented );
+    return AHIE_UNKNOWN;
+  }
+
   LOG_D(("D: Creating worker process for AmiGUSBase @ %08lx\n", (LONG) AmiGUSBase));
   if ( CreateWorkerProcess() ) {
 

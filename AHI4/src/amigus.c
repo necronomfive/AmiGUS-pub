@@ -160,7 +160,7 @@ LONG FindAmiGUS(struct AmiGUSBasePrivate *amiGUSBase) {
   return ENoError;
 }
 
-LONG FindNearestFrequencyIndex(LONG aFrequency) {
+LONG FindSampleRateIdForValue( LONG sampleRate ) {
 
   LONG prev;
   LONG next = LONG_MAX;
@@ -169,31 +169,37 @@ LONG FindNearestFrequencyIndex(LONG aFrequency) {
   while ( AMIGUS_AHI_NUM_SAMPLE_RATES > i ) {
 
     prev = next;
-    next = AmiGUSSampleRates[ i ] - aFrequency;
+    next = AmiGUSSampleRates[ i ] - sampleRate;
 
     /* We need absolute difference only. */
     if (0 > next) {
       next = -next;
     }
 
-    LOG_V(("V: Frequency diff was %ld, next %ld\n", prev, next));
+    LOG_D(("D: Frequency diff was %ld, next %ld\n", prev, next));
     if ( prev < next ) {
       /* Since frequencies are ordered, stop when difference is increasing. */
       break;
     }
     ++i;
   }
+  LOG_I(("I: Using %ldHz aka ID %ld = 0x%02lx for requested %ldHz\n", 
+         AmiGUSSampleRates[ i - 1 ],
+         i - 1,
+         i - 1,
+         sampleRate));
   return i - 1;
 }
 
-LONG FindNearestFrequency(LONG aFrequency) {
+LONG FindSampleRateValueForId( LONG id ) {
 
-  LONG index = FindNearestFrequencyIndex( aFrequency );
-  LONG result = AmiGUSSampleRates[ index ];
-  LOG_D(("D: Using %ldHz = 0x%02lx for requested %ldHz\n",
-         result,
-         index,
-         aFrequency));
+  LONG result = -1;
+  if (( 0 <= id) &&
+      ( AMIGUS_AHI_NUM_SAMPLE_RATES > id)) {
+
+    result = AmiGUSSampleRates[ id ];
+  }
+  LOG_D(("D: Using %ldHz for ID %ld = 0x%02lx\n", result, id, id));
   return result;
 }
 

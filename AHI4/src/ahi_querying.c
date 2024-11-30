@@ -53,12 +53,12 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
       }
     case AHIDB_Frequency:
       {
-      result = AmiGUSSampleRates[ aArgument ];
+      result = FindSampleRateValueForId( aArgument );
       break;
       }
     case AHIDB_Index:
       {
-      result = FindNearestFrequencyIndex(aArgument);
+      result = FindSampleRateIdForValue( aArgument );
       break;
       }
     case AHIDB_Author:

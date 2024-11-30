@@ -33,8 +33,8 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
 ) {
   struct TagItem *stateTag = 0;
   struct TagItem *tag = 0;
-  ULONG frequencyId = 0;
-  ULONG frequency = 0;
+  ULONG sampleRateId = 0;
+  ULONG sampleRate = 0;
   ULONG samplesAmiGus = 0;
   ULONG samplesAhi = 0;
   ULONG reminder = 0;
@@ -75,13 +75,13 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
    * ------------------------------------------------------
    */
   /* Find nearest supported frequency and provide it back */
-  frequencyId = FindNearestFrequencyIndex( aAudioCtrl->ahiac_MixFreq );
-  frequency = AmiGUSSampleRates[ frequencyId ];
+  sampleRateId = FindSampleRateIdForValue( aAudioCtrl->ahiac_MixFreq );
+  sampleRate = FindSampleRateValueForId( sampleRateId );
   LOG_V(("D: Using %ldHz = 0x%02lx for requested %ldHz\n",
-         frequency,
-         frequencyId,
+         sampleRate,
+         sampleRateId,
          aAudioCtrl->ahiac_MixFreq));
-  aAudioCtrl->ahiac_MixFreq = frequency;
+  aAudioCtrl->ahiac_MixFreq = sampleRate;
 
   /* Parse aTagList */
   stateTag = aTagList;
@@ -114,7 +114,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   }
 
   LOG_D(("D: Mode is %ldbit, %ld stereo, %ld HiFi, %ld Realtime, %ldHz\n",
-         bitsPerAmiGusSample, isStereo, isHifi, isRealtime, frequency
+         bitsPerAmiGusSample, isStereo, isHifi, isRealtime, sampleRate
        ));
   if (( isHifi ) || ( !isStereo ) || ( 16 != bitsPerAmiGusSample )) {
     DisplayError( EAudioModeNotImplemented );

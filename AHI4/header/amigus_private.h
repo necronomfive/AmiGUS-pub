@@ -119,7 +119,6 @@ struct AmiGUSBasePrivate {
   #define UtilityBase               amiGUSBase->agb_UtilityBase
 #endif
 
-extern const LONG AmiGUSSampleRates[ AMIGUS_AHI_NUM_SAMPLE_RATES ];
 extern const STRPTR AmiGUSOutputs[ AMIGUS_AHI_NUM_OUTPUTS ];
 extern const STRPTR AmiGUSInputs[ AMIGUS_AHI_NUM_INPUTS ];
 
@@ -128,10 +127,13 @@ extern const STRPTR AmiGUSInputs[ AMIGUS_AHI_NUM_INPUTS ];
  *****************************************************************************/
 
 LONG FindAmiGUS( struct AmiGUSBasePrivate *amiGUSBase );
-LONG FindNearestFrequencyIndex( LONG aFrequency );
-LONG FindNearestFrequency( LONG aFrequency );
+
+LONG FindSampleRateIdForValue( LONG sampleRate );
+LONG FindSampleRateValueForId( LONG id );
+
 VOID initAmiGUS( VOID );
 VOID stopAmiGUS( VOID );
+
 ASM(LONG) SAVEDS INTERRUPT handleInterrupt(
   REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
 );

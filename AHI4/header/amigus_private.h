@@ -39,21 +39,13 @@
 #endif
 #endif
 
-/*
-#pragma dontwarn 61
-#include <proto/ahi_sub.h>
-#pragma popwarn
-*/
-
 #include <dos/dos.h>
 #include <libraries/expansionbase.h>
 #include <utility/hooks.h>
-#include <utility/utility.h>
-#include <SDI_compiler.h>
 
-#include "SDI_AHI4_protos.h"
 #include "amigus_public.h"
 #include "library.h"
+#include "SDI_AHI4_protos.h"
 
 /******************************************************************************
  * Library base structure
@@ -96,6 +88,9 @@ struct AmiGUSBasePrivate {
   
   struct AHIAudioCtrlDrv      * agb_AudioCtrl;
   ULONG                         agb_State;         /* 0 stopped, 1 playing   */
+
+  LONG /* added to desired */(ASM(*) agb_CopyFunction )( REG(d0, ULONG *), REG(a0, ULONG *) );
+  LONG                          agb_BytesPerAhiSample;
 
   BPTR                          agb_LogFile;       /* Debug log file handle  */
   APTR                          agb_LogMem;        /* Debug log memory blob  */

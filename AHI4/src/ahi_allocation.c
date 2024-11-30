@@ -19,6 +19,7 @@
 #include <proto/utility.h>
 
 #include "amigus_private.h"
+#include "copy_functions.h"
 #include "debug.h"
 #include "errors.h"
 #include "support.h"
@@ -35,9 +36,6 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   struct TagItem *tag = 0;
   ULONG sampleRateId = 0;
   ULONG sampleRate = 0;
-  ULONG samplesAmiGus = 0;
-  ULONG samplesAhi = 0;
-  ULONG reminder = 0;
   UBYTE isStereo = FALSE;
   UBYTE isHifi = FALSE;
   UBYTE isRealtime = FALSE;
@@ -99,8 +97,8 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
       }
       case AHIDB_HiFi: {
         isHifi = (UBYTE)tag->ti_Data;
-        LOG_D(("D: TODO: Why is HiFi in the list?\n"));
-//        result |= AHISF_KNOWHIFI;
+        LOG_D(("D: TODO: Why is HiFi in the list? ALWAYS!?\n"));
+        result |= AHISF_KNOWHIFI;
         break;
       }
       case AHIDB_Realtime: {
@@ -113,24 +111,43 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     }
   }
 
-  LOG_D(("D: Mode is %ldbit, %ld stereo, %ld HiFi, %ld Realtime, %ldHz\n",
+  LOG_I(("I: Mode is %ldbit, %ld stereo, %ld HiFi, %ld Realtime, %ldHz\n",
          bitsPerAmiGusSample, isStereo, isHifi, isRealtime, sampleRate
        ));
-  if (( isHifi ) || ( !isStereo ) || ( 16 != bitsPerAmiGusSample )) {
-    DisplayError( EAudioModeNotImplemented );
-    return AHISF_ERROR;
-  }
 
   /*
    * ------------------------------------------------------
    * Part 3: Apply information to AmiGUS & driver.
    * ------------------------------------------------------
    */
+  if ( isHifi ) {
 
+    AmiGUSBase->agb_BytesPerAhiSample = 4;
+    if ( 16 == bitsPerAmiGusSample ) {
+
+      AmiGUSBase->agb_CopyFunction = &Shift16LongCopy;
+
+    } else {
+
+      AmiGUSBase->agb_CopyFunction = &Merge24LongCopy;
+    }
+  } else {
+
+    AmiGUSBase->agb_CopyFunction = &PlainLongCopy;
+    if ( 16 == bitsPerAmiGusSample ) {
+
+      AmiGUSBase->agb_BytesPerAhiSample = 2;
+
+    } else {
+
+      AmiGUSBase->agb_BytesPerAhiSample = 1;
+    }
+  }
+  if ( isStereo ) {
+
+    AmiGUSBase->agb_BytesPerAhiSample <<= 1;
+  }
   // TODO: Initialize AmiGUS with that information.
-
-  // TODO: switch copy functions here for HiFi modes
-  //       Others will be plain LONG copys.
 
   /*
    * ------------------------------------------------------

@@ -20,11 +20,13 @@
 #include "amigus_hardware.h"
 #include "amigus_private.h"
 #include "debug.h"
+#include "errors.h"
+#include "support.h"
 #include "SDI_AHI4_protos.h"
 
 /* Basic functions - Actions */
 
-ASM(void) SAVEDS AHIsub_Disable(
+ASM(VOID) SAVEDS AHIsub_Disable(
   REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 ) {
@@ -42,7 +44,7 @@ ASM(void) SAVEDS AHIsub_Disable(
 }
 
 
-ASM(void) SAVEDS AHIsub_Enable(
+ASM(VOID) SAVEDS AHIsub_Enable(
   REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 ) {
@@ -101,7 +103,7 @@ ASM(ULONG) SAVEDS AHIsub_Start(
   return AHIE_OK;
 }
 
-ASM(void) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
+ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
   REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
@@ -122,7 +124,7 @@ ASM(void) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
   return;
 }
 
-ASM(void) SAVEDS AHIsub_Stop(
+ASM(VOID) SAVEDS AHIsub_Stop(
   REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)

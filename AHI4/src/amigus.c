@@ -32,22 +32,6 @@
 #include "support.h"
 #include "worker.h"
 
-#if defined(__VBCC__)
-
-__reg("d1") ULONG __GET_REG_D1()="\t";
-#define GET_REG(reg) __GET_ ## reg()
-
-#elif defined(__SASC)
-
-#define GET_REG getreg
-
-#define getreg __builtin_getreg
-extern long getreg(int);
-
-#define REG_D1 1
-
-#endif
-
 UWORD ReadReg16(APTR amiGUS, ULONG offset) {
 
   return *((UWORD *)((ULONG) amiGUS + offset));
@@ -301,11 +285,7 @@ void stopAmiGUS(void) {
 }
 
 // TRUE = failure
-BOOL CreatePlaybackBuffers(VOID) {
-
-  /* Equals words here for stereo 16bit and we use that here! */
-  ULONG samplesPerPass = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples;
-  ULONG longsPerPass = samplesPerPass;
+BOOL CreatePlaybackBuffers( VOID ) {
 
   if ( AmiGUSBase->agb_Buffer[0] ) {
 
@@ -329,29 +309,10 @@ BOOL CreatePlaybackBuffers(VOID) {
     LOG_D(("Could not allocate FAST RAM for buffer 1!\n"));
     return TRUE;
   }
-  /*
-   * Buffers definitely are empty here,
-   * all these have to tick in LONGs!
-   */
-  AmiGUSBase->agb_BufferIndex[0] = longsPerPass;
-  AmiGUSBase->agb_BufferIndex[1] = longsPerPass;
-  AmiGUSBase->agb_BufferMax[0] = longsPerPass;
-  AmiGUSBase->agb_BufferMax[1] = longsPerPass;
-/*
-  if ( AmiGUSBase->agb_BufferSize > (AMIGUS_PLAYBACK_FIFO_WORDS >> 1) ) {
 
-    AmiGUSBase->agb_watermark = AMIGUS_PLAYBACK_FIFO_WORDS >> 1;
-
-  } else {
-
-    AmiGUSBase->agb_watermark = AmiGUSBase->agb_BufferSize >> 1;
-  }
-*/
-  AmiGUSBase->agb_watermark = longsPerPass << 1;
-  LOG_D(("D: Mix %ld samples = %ld LONGs per pass, watermark %ld WORDs\n",
-         samplesPerPass,
-         longsPerPass,
-         AmiGUSBase->agb_watermark));
+  /* All buffers are created empty - back to initial state! */
+  AmiGUSBase->agb_BufferIndex[ 0 ] = AmiGUSBase->agb_BufferMax[ 0 ];
+  AmiGUSBase->agb_BufferIndex[ 1 ] = AmiGUSBase->agb_BufferMax[ 1 ];
   AmiGUSBase->agb_currentBuffer = 0;
 
   LOG_D(("D: All playback buffers created\n"));

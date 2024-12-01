@@ -29,9 +29,9 @@
 **
 ** To keep confusion level low: When changing this file, please note it in
 ** above history list and indicate that the change was not made by myself
-** (e.g. add your name or nick name).
+** (e.g.ï¿½add your name or nick name).
 **
-** Dirk Stöcker <stoecker@epost.de>
+** Dirk Stï¿½cker <stoecker@epost.de>
 */
 
 #ifdef ASM
@@ -165,6 +165,26 @@
 #if !defined(OFFSET)
   #define OFFSET(structName, structEntry) \
     ((char *)(&(((struct structName *)0)->structEntry))-(char *)0)
+#endif
+
+/* Christoph's extras: */
+/**
+ * Usage: x = GET_REG(REG_D1)
+ */
+#if defined(__VBCC__)
+
+__reg("d1") ULONG __GET_REG_D1()="\t";
+#define GET_REG(reg) __GET_ ## reg()
+
+#elif defined(__SASC)
+
+#define GET_REG getreg
+
+#define getreg __builtin_getreg
+extern long getreg(int);
+
+#define REG_D1 1
+
 #endif
 
 #endif /* SDI_COMPILER_H */

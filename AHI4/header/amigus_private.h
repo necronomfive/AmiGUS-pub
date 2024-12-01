@@ -90,7 +90,6 @@ struct AmiGUSBasePrivate {
   ULONG                         agb_State;         /* 0 stopped, 1 playing   */
 
   LONG /* added to desired */(ASM(*) agb_CopyFunction )( REG(d0, ULONG *), REG(a0, ULONG *) );
-  LONG                          agb_BytesPerAhiSample;
 
   BPTR                          agb_LogFile;       /* Debug log file handle  */
   APTR                          agb_LogMem;        /* Debug log memory blob  */

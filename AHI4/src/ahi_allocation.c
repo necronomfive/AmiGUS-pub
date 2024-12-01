@@ -19,10 +19,10 @@
 #include <proto/utility.h>
 
 #include "amigus_private.h"
-#include "copy_functions.h"
 #include "debug.h"
 #include "errors.h"
 #include "support.h"
+#include "utilities.h"
 #include "SDI_AHI4_protos.h"
 
 /* Basic functions - Allocation */
@@ -40,9 +40,16 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   UBYTE isHifi = FALSE;
   UBYTE isRealtime = FALSE;
   UBYTE bitsPerAmiGusSample = 0;
+  UWORD ahiBufferMultipleOf;
+  UWORD ahiSampleBytes;
+  UWORD ahiBufferBytes;
+  UWORD ahiBufferSamples;
 
-  /* Will rely on AHI provided mixing and timing */
-  ULONG result = AHISF_MIXING | AHISF_TIMING;
+  /* 
+   * Will rely on AHI provided mixing,
+   * will do own timing to be able to adjust buffer sizes.
+   */
+  ULONG result = AHISF_MIXING;
 
   LOG_D(("D: AHIsub_AllocAudio start\n"));
   LogTicks(0x03);
@@ -122,31 +129,72 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
    */
   if ( isHifi ) {
 
-    AmiGUSBase->agb_BytesPerAhiSample = 4;
+    ahiSampleBytes = 4;
     if ( 16 == bitsPerAmiGusSample ) {
 
       AmiGUSBase->agb_CopyFunction = &Shift16LongCopy;
+      ahiBufferMultipleOf = 8;
 
     } else {
 
       AmiGUSBase->agb_CopyFunction = &Merge24LongCopy;
+      ahiBufferMultipleOf = 16;
     }
   } else {
 
     AmiGUSBase->agb_CopyFunction = &PlainLongCopy;
+    ahiBufferMultipleOf = 4;
+
     if ( 16 == bitsPerAmiGusSample ) {
 
-      AmiGUSBase->agb_BytesPerAhiSample = 2;
+      ahiSampleBytes = 2;
 
     } else {
 
-      AmiGUSBase->agb_BytesPerAhiSample = 1;
+      ahiSampleBytes = 1;
     }
   }
   if ( isStereo ) {
 
-    AmiGUSBase->agb_BytesPerAhiSample <<= 1;
+    ahiSampleBytes <<= 1;
   }
+
+  LOG_D(( "D: Applying properties: "
+          "sample rate %ld ~ size %ld buf mult %ld stereo %ld realtime %ld\n",
+          sampleRate,
+          ahiSampleBytes,
+          ahiBufferMultipleOf,
+          isStereo,
+          isRealtime ));
+  ahiBufferBytes = getBufferBytes(
+    sampleRate,
+    ahiSampleBytes,
+    ahiBufferMultipleOf,
+    isStereo,
+    isRealtime );
+  ahiBufferSamples = getBufferSamples(
+    ahiBufferBytes,
+    ahiSampleBytes,
+    isStereo );
+  LOG_I(( "I: Setting mixing buffer properties to %ld samples,"
+          " %ld bytes, %ld longs and watermark %ld WORDs\n",
+          ahiBufferSamples,
+          ahiBufferBytes,
+          ahiBufferBytes >> 2,
+          ahiBufferBytes >> 1 ));
+
+  aAudioCtrl->ahiac_MixFreq = sampleRate;
+  aAudioCtrl->ahiac_BuffSamples = ahiBufferSamples;
+
+  /* Buffers are ticking in LONGs! */
+  AmiGUSBase->agb_BufferMax[ 0 ] = ahiBufferBytes >> 2;
+  AmiGUSBase->agb_BufferMax[ 1 ] = ahiBufferBytes >> 2;
+  AmiGUSBase->agb_watermark = ahiBufferBytes >> 1;
+  LOG_D(("D: Mix %ld samples = %ld LONGs per pass, watermark %ld WORDs\n",
+         samplesPerPass,
+         longsPerPass,
+         AmiGUSBase->agb_watermark));
+
   // TODO: Initialize AmiGUS with that information.
 
   /*

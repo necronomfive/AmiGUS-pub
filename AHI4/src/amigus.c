@@ -186,7 +186,7 @@ LONG FindSampleRateValueForId( LONG id ) {
   return result;
 }
 
-void initAmiGUS(void) {
+VOID initAmiGUS( VOID ) {
 
   ULONG i;
   // Working maybe:
@@ -197,41 +197,37 @@ void initAmiGUS(void) {
 
   WriteReg16( amiGUS,
               AMIGUS_MAIN_SAMPLE_RATE,
-              AMIGUS_SAMPLE_RATE_FLAG_DISABLE
-            );
+              AMIGUS_SAMPLE_RATE_FLAG_DISABLE );
   WriteReg16( amiGUS,
               AMIGUS_MAIN_FIFO_RESET,
-              AMIGUS_FIFO_RESET);
+              AMIGUS_FIFO_RESET );
   // Idea: Watermark is here 6 words aka 3 longs,
   //       2 24bit samples, ... 
   // Cool, always a fit for all sample widths.
   WriteReg16( amiGUS,
               AMIGUS_MAIN_FIFO_WATERMARK,
-              prefillSize >> 1
-            );
+              // Watermark is WORDs, so using LONG value means half
+              prefillSize );
   WriteReg16( amiGUS, 
               AMIGUS_MAIN_INT_CONTROL, 
               /* Clear interrupt flag bits */
               AMIGUS_INT_FLAG_MASK_CLEAR
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_FULL
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-            );
+            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK );
   WriteReg16( amiGUS,
               AMIGUS_MAIN_INT_ENABLE,
               /* Clear interrupt mask bits */
               AMIGUS_INT_FLAG_MASK_CLEAR
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_FULL
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-            );
+            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK );
   WriteReg16( amiGUS,
               AMIGUS_MAIN_INT_ENABLE,
               /* Now set some! */
               AMIGUS_INT_FLAG_MASK_SET
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-            );
+            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK );
   
   // now write twice the amount of data into FIFO to kick off playback
   for ( i = prefillSize; 0 < i; --i ) {
@@ -242,14 +238,12 @@ void initAmiGUS(void) {
   }
   WriteReg16( amiGUS,
               AMIGUS_MAIN_SAMPLE_FORMAT,
-              AMIGUS_SAMPLE_FORMAT_STEREO_16BIT
-            );
+              AmiGUSBase->agb_SampleFormat );
   WriteReg16( amiGUS,
               AMIGUS_MAIN_SAMPLE_RATE,
-              AMIGUS_SAMPLE_RATE_44100
+              AmiGUSBase->agb_SampleRateId
             | AMIGUS_SAMPLE_RATE_FLAG_INTERPOLATION
-            | AMIGUS_SAMPLE_RATE_FLAG_ENABLE
-            );
+            | AMIGUS_SAMPLE_RATE_FLAG_ENABLE );
   AmiGUSBase->agb_State = 1;
 }
 
@@ -260,26 +254,22 @@ void stopAmiGUS(void) {
 
   WriteReg16( amiGUS, 
               AMIGUS_MAIN_SAMPLE_RATE, 
-              AMIGUS_SAMPLE_RATE_FLAG_DISABLE
-            );
+              AMIGUS_SAMPLE_RATE_FLAG_DISABLE );
   WriteReg16( amiGUS, 
               AMIGUS_MAIN_INT_CONTROL, 
               /* Clear interrupt flag bits */
               AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_FULL
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-            );
+            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK );
   WriteReg16( amiGUS,
               AMIGUS_MAIN_INT_ENABLE,
               /* Clear interrupt mask bits */
               AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_FULL
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-            );
+            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK );
   WriteReg16( amiGUS,
               AMIGUS_MAIN_FIFO_RESET,
-              0x0000
-            );
+              0x0000 );
   AmiGUSBase->agb_State = 0;
 }
 

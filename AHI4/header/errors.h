@@ -44,6 +44,7 @@ enum TErrorCodes
   EDriverNotInUse,
   EOutOfMemory,/*
   EMixerBufferNotAligned,*/
+  ESampleFormatMissingFromMode,
   EWorkerProcessCreationFailed,
   EWorkerProcessDied,
   EWorkerProcessSignalsFailed,

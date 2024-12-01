@@ -36,6 +36,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   struct TagItem *tag = 0;
   ULONG sampleRateId = 0;
   ULONG sampleRate = 0;
+  WORD sampleFormat = -1;
   UBYTE isStereo = FALSE;
   UBYTE isHifi = FALSE;
   UBYTE isRealtime = FALSE;
@@ -87,6 +88,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
          sampleRateId,
          aAudioCtrl->ahiac_MixFreq));
   aAudioCtrl->ahiac_MixFreq = sampleRate;
+  AmiGUSBase->agb_SampleRateId = sampleRateId;
 
   /* Parse aTagList */
   stateTag = aTagList;
@@ -99,17 +101,20 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
       }
       case AHIDB_Stereo: {
         isStereo = (UBYTE)tag->ti_Data;
-        result |= AHISF_KNOWSTEREO;
+        result |= ( isStereo << AHISB_KNOWSTEREO );
         break;
       }
       case AHIDB_HiFi: {
         isHifi = (UBYTE)tag->ti_Data;
-        LOG_D(("D: TODO: Why is HiFi in the list? ALWAYS!?\n"));
-        result |= AHISF_KNOWHIFI;
+        result |= ( isHifi << AHISB_KNOWHIFI );
         break;
       }
       case AHIDB_Realtime: {
         isRealtime = (UBYTE)tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_SampleFormat: {
+        sampleFormat = (WORD)tag->ti_Data;
         break;
       }
       default: {
@@ -118,9 +123,17 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     }
   }
 
-  LOG_I(("I: Mode is %ldbit, %ld stereo, %ld HiFi, %ld Realtime, %ldHz\n",
-         bitsPerAmiGusSample, isStereo, isHifi, isRealtime, sampleRate
-       ));
+  if ( 0 < sampleFormat ) {
+
+    DisplayError( ESampleFormatMissingFromMode );
+    return AHISF_ERROR;
+  }
+
+  AmiGUSBase->agb_SampleFormat = sampleFormat;
+  LOG_I(( "I: AmiGUS mode is format %ld, "
+          "%ldbit, %ld stereo, %ld HiFi, %ld Realtime, %ldHz\n",
+          AmiGUSBase->agb_SampleFormat,
+          bitsPerAmiGusSample, isStereo, isHifi, isRealtime, sampleRate ));
 
   /*
    * ------------------------------------------------------
@@ -203,8 +216,6 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
           AmiGUSBase->agb_BufferMax,
           AmiGUSBase->agb_watermark ));
 
-  // TODO: Initialize AmiGUS with that information.
-
   /*
    * ------------------------------------------------------
    * Part 4: Prepare slave task communication.
@@ -221,9 +232,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   }
   AmiGUSBase->agb_WorkerReady = FALSE;
 
-  LOG_D(("D: AHIsub_AllocAudio done, expected %ld actual %ld\n", 
-         AHISF_MIXING | AHISF_TIMING | AHISF_KNOWSTEREO,
-         result));
+  LOG_D(( "D: AHIsub_AllocAudio done, returning %ld.\n", result ));
 
   return result;
 }

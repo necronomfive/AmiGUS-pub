@@ -41,6 +41,8 @@
 #define AMIGUS_AHI_NUM_OUTPUTS      1
 #define AMIGUS_AHI_NUM_INPUTS       4
 
+#define AHIDB_AmiGUS_SampleFormat   AHIDB_UserBase+0
+
 #define AMIGUS_MEM_LOG_MARKER        "********************************"   \
                                      " AmiGUS "                           \
                                      "********************************\n"

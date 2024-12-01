@@ -75,6 +75,8 @@ struct AmiGUSBasePrivate {
   BYTE                          agb_WorkerStopSignal;
   BYTE                          agb_UsageCounter;    
   /* Only 1 AmiGUS supported per machine currently, sorry */
+  UWORD                         agb_SampleRateId;
+  UWORD                         agb_SampleFormat;
 
   /* Mixing double-buffers to be copied to FIFO alternatingly */
   ULONG                       * agb_Buffer[2];      /* Fully LONG aligned!   */

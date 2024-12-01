@@ -25,7 +25,6 @@
 
 #include <limits.h>
 
-#include "amigus_hardware.h"
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
@@ -293,17 +292,18 @@ BOOL CreatePlaybackBuffers( VOID ) {
     return FALSE;
   }
 
-  AmiGUSBase->agb_BufferSize = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize >> 2;
-  LOG_D(("D: Allocating playback buffers a %ld LONGs\n", AmiGUSBase->agb_BufferSize ));
+  AmiGUSBase->agb_BufferSize = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize;
+  LOG_D(( "D: Allocating playback buffers a %ld BYTEs\n",
+          AmiGUSBase->agb_BufferSize ));
   AmiGUSBase->agb_Buffer[0] = (ULONG *)
-      AllocMem( AmiGUSBase->agb_BufferSize << 2, MEMF_FAST | MEMF_CLEAR );
+      AllocMem( AmiGUSBase->agb_BufferSize, MEMF_FAST | MEMF_CLEAR );
   if ( !AmiGUSBase->agb_Buffer[0] ) {
 
     LOG_D(("Could not allocate FAST RAM for buffer 0!\n"));
     return TRUE;
   }
   AmiGUSBase->agb_Buffer[1] = (ULONG *)
-      AllocMem( AmiGUSBase->agb_BufferSize << 2, MEMF_FAST | MEMF_CLEAR );
+      AllocMem( AmiGUSBase->agb_BufferSize, MEMF_FAST | MEMF_CLEAR );
   if ( !AmiGUSBase->agb_Buffer[1] ) {
 
     LOG_D(("Could not allocate FAST RAM for buffer 1!\n"));
@@ -311,8 +311,8 @@ BOOL CreatePlaybackBuffers( VOID ) {
   }
 
   /* All buffers are created empty - back to initial state! */
-  AmiGUSBase->agb_BufferIndex[ 0 ] = AmiGUSBase->agb_BufferMax[ 0 ];
-  AmiGUSBase->agb_BufferIndex[ 1 ] = AmiGUSBase->agb_BufferMax[ 1 ];
+  AmiGUSBase->agb_BufferIndex[ 0 ] = AmiGUSBase->agb_BufferMax;
+  AmiGUSBase->agb_BufferIndex[ 1 ] = AmiGUSBase->agb_BufferMax;
   AmiGUSBase->agb_currentBuffer = 0;
 
   LOG_D(("D: All playback buffers created\n"));
@@ -323,16 +323,14 @@ VOID DestroyPlaybackBuffers(VOID) {
 
   if ( AmiGUSBase->agb_Buffer[0] ) {
 
-    FreeMem( AmiGUSBase->agb_Buffer[0],
-             AmiGUSBase->agb_BufferSize << 2 );
+    FreeMem( AmiGUSBase->agb_Buffer[0], AmiGUSBase->agb_BufferSize );
     AmiGUSBase->agb_Buffer[0] = NULL;
     AmiGUSBase->agb_BufferIndex[0] = 0;
     LOG_D(("D: Free`ed buffer 0!\n"));
   }
   if ( AmiGUSBase->agb_Buffer[1] ) {
 
-    FreeMem( AmiGUSBase->agb_Buffer[1],
-             AmiGUSBase->agb_BufferSize << 2 );
+    FreeMem( AmiGUSBase->agb_Buffer[1], AmiGUSBase->agb_BufferSize );
     AmiGUSBase->agb_Buffer[1] = NULL;
     AmiGUSBase->agb_BufferIndex[1] = 0;
     LOG_D(("D: Free`ed buffer 1!\n"));
@@ -455,7 +453,7 @@ ASM(LONG) /*__entry for vbcc*/ SAVEDS INTERRUPT handleInterrupt (
 #endif
       break;
     }
-    if ( AmiGUSBase->agb_BufferIndex[ *current ] < AmiGUSBase->agb_BufferMax[ *current] ) {
+    if ( AmiGUSBase->agb_BufferIndex[ *current ] < AmiGUSBase->agb_BufferMax ) {
 
       desired -= (* AmiGUSBase->agb_CopyFunction)(
         AmiGUSBase->agb_Buffer[ *current ],

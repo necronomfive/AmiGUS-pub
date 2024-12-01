@@ -78,4 +78,9 @@
 /* FIFO Reset */
 #define AMIGUS_FIFO_RESET                         0x0000
 
+/* FIFO size */
+#define AMIGUS_PLAYBACK_FIFO_BYTES                8192
+#define AMIGUS_PLAYBACK_FIFO_WORDS                4096
+#define AMIGUS_PLAYBACK_FIFO_LONGS                2048
+
 #endif

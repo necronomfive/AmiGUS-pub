@@ -128,8 +128,8 @@ VOID FillBuffer( BYTE buffer ) {
     // (ahiac_BuffSamples * bytes per sample * mono|stereo channels)
     // here: is in longs, 16bit = 2bytes x 2 for stereo
     AmiGUSBase->agb_BufferIndex[ buffer ] = 0;
-    AmiGUSBase->agb_BufferMax[ buffer ] = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples;
-    AmiGUSBase->agb_watermark = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples;
+    // AmiGUSBase->agb_BufferMax = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples; // TODO: can this change here actually?
+    // AmiGUSBase->agb_watermark = AmiGUSBase->agb_BufferMax; /* but in WORDs */ // TODO: can this change here actually?
   }
   /*
    * 5) Optionally call ahiac_PostTimerFunc().
@@ -163,7 +163,7 @@ VOID FillBuffer( BYTE buffer ) {
       ULONG k = AmiGUSBase->agb_currentBuffer;
       for ( i = 0; 2 > i; ++i ) {
         
-        if ( AmiGUSBase->agb_BufferIndex[ k ] >= AmiGUSBase->agb_BufferMax[ k ] ) {
+        if ( AmiGUSBase->agb_BufferIndex[ k ] >= AmiGUSBase->agb_BufferMax ) {
 
           FillBuffer( k );
         }

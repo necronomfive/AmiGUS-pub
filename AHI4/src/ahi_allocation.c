@@ -187,13 +187,21 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   aAudioCtrl->ahiac_BuffSamples = ahiBufferSamples;
 
   /* Buffers are ticking in LONGs! */
-  AmiGUSBase->agb_BufferMax[ 0 ] = ahiBufferBytes >> 2;
-  AmiGUSBase->agb_BufferMax[ 1 ] = ahiBufferBytes >> 2;
-  AmiGUSBase->agb_watermark = ahiBufferBytes >> 1;
-  LOG_D(("D: Mix %ld samples = %ld LONGs per pass, watermark %ld WORDs\n",
-         samplesPerPass,
-         longsPerPass,
-         AmiGUSBase->agb_watermark));
+  AmiGUSBase->agb_BufferMax = ahiBufferBytes >> 2;
+  /* Watermark is ticking in WORDs! */
+  if ( ( AMIGUS_PLAYBACK_FIFO_WORDS >> 1 ) > ( ( ahiBufferBytes >> 1 )) ) {
+
+    AmiGUSBase->agb_watermark = ahiBufferBytes >> 1;
+
+  } else {
+
+    AmiGUSBase->agb_watermark = AMIGUS_PLAYBACK_FIFO_WORDS >> 1;
+  }
+
+  LOG_D(( "D: Mix %ld samples = %ld LONGs per pass, watermark %ld WORDs\n",
+          ahiBufferSamples,
+          AmiGUSBase->agb_BufferMax,
+          AmiGUSBase->agb_watermark ));
 
   // TODO: Initialize AmiGUS with that information.
 

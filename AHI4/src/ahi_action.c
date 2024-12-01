@@ -17,7 +17,6 @@
 #include <exec/libraries.h>
 #include <proto/exec.h>
 
-#include "amigus_hardware.h"
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"

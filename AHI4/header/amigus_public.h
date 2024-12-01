@@ -21,6 +21,8 @@
 #include <exec/libraries.h>
 #endif
 
+#include "amigus_hardware.h"
+
 #define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Fassbach"
 #define AMIGUS_AHI_COPYRIGHT        "(c) 2024 Christoph Fassbach / LGPL3"
 #define AMIGUS_AHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
@@ -38,10 +40,6 @@
 #define AMIGUS_AHI_NUM_SAMPLE_RATES 9
 #define AMIGUS_AHI_NUM_OUTPUTS      1
 #define AMIGUS_AHI_NUM_INPUTS       4
-
-#define AMIGUS_PLAYBACK_FIFO_BYTES  8192
-#define AMIGUS_PLAYBACK_FIFO_WORDS  4096
-#define AMIGUS_PLAYBACK_FIFO_LONGS  2048
 
 #define AMIGUS_MEM_LOG_MARKER        "********************************"   \
                                      " AmiGUS "                           \

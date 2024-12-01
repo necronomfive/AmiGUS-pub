@@ -79,8 +79,8 @@ struct AmiGUSBasePrivate {
   /* Mixing double-buffers to be copied to FIFO alternatingly */
   ULONG                       * agb_Buffer[2];      /* Fully LONG aligned!   */
   ULONG                         agb_BufferIndex[2]; /* Next LONG index each  */
-  ULONG                         agb_BufferMax[2];   /* LONGs watermark each  */
-  ULONG                         agb_BufferSize;     /* LONGs allocated each  */
+  ULONG                         agb_BufferMax;      /* Max LONGs p. mix path */
+  ULONG                         agb_BufferSize;     /* BYTEs allocated each  */
   ULONG                         agb_currentBuffer;  /* Current playing buf.  */
 
   ULONG                         agb_watermark;      /* Counting in WORDs!    */

@@ -79,8 +79,7 @@ UWORD getBufferSamples(
  */
 ASM(LONG) SAVEDS PlainLongCopy(
   REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex)
-);
+  REG(a0, ULONG *bufferIndex) );
 
 /**
  * Reads 2 LONGs, a, and b,
@@ -94,8 +93,7 @@ ASM(LONG) SAVEDS PlainLongCopy(
  */
 ASM(LONG) SAVEDS Shift16LongCopy(
   REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex)
-);
+  REG(a0, ULONG *bufferIndex) );
 
 /**
  * Reads 4 LONGs, a, b, c, and d,
@@ -112,7 +110,6 @@ ASM(LONG) SAVEDS Shift16LongCopy(
  */
 ASM(LONG) SAVEDS Merge24LongCopy(
   REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex)
-);
+  REG(a0, ULONG *bufferIndex) );
 
 #endif /* COPY_FUNCTIONS_H */

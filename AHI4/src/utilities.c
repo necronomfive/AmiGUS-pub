@@ -31,15 +31,6 @@ ULONG lcm( ULONG a, ULONG b ) {
   return UMult32( d, b );
 }
 
-/**
- * @param sampleRate In samples per second, aka Hz, aka frequency by AHI.
- * @param sampleSize In bytes, independent from stereo and mono.
- * @param multipleOf Buffer size requirement by the avisioned copy function.
- * @param isStereo TRUE if stereo, FALSE if not.
- * @param isRealtime TRUE if the latency shall be 10ms or lower, FALSE if not.
- *
- * @return Desired buffer size in bytes.
- */
 UWORD getBufferBytes(
   LONG sampleRate,
   UBYTE sampleSize,
@@ -75,8 +66,7 @@ UWORD getBufferSamples(
 
 ASM(LONG) SAVEDS PlainLongCopy(
   REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex)
-) {
+  REG(a0, ULONG *bufferIndex) ) {
 
   ULONG addressIn = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
   ULONG in = *(( ULONG * ) addressIn);
@@ -90,8 +80,7 @@ ASM(LONG) SAVEDS PlainLongCopy(
 
 ASM(LONG) SAVEDS Shift16LongCopy(
   REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex)
-) {
+  REG(a0, ULONG *bufferIndex) ) {
 
   ULONG addressInA = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
   ULONG inA = *(( ULONG * ) addressInA);
@@ -107,8 +96,7 @@ ASM(LONG) SAVEDS Shift16LongCopy(
 
 ASM(LONG) SAVEDS Merge24LongCopy(
   REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex)
-) {
+  REG(a0, ULONG *bufferIndex) ) {
 
   ULONG addressInA = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
   ULONG inA = *(( ULONG * ) addressInA);

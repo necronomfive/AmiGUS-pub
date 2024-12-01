@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "amigus_private.h"
 #include "utilities.h"
@@ -8,9 +9,23 @@
  *****************************************************************************/
 struct AmiGUSBasePrivate * AmiGUSBase        = 0;
 
+char testFIFO[ 16 ][ 16 ];
+int nextTestFIFO = 0;
+
+VOID flushFIFO( VOID ) {
+
+  int i;
+  for ( i = 0; 16 > i; ++i ) {
+
+    testFIFO[ i ][ 0 ] = 0;
+  }
+  nextTestFIFO = 0;
+}
+
 VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
 
-  //sprintf( "0x%08lx", value );
+  sprintf( testFIFO[nextTestFIFO], "%08lx", value );
+  ++nextTestFIFO;
 }
 
 UWORD gcd( UWORD a, UWORD b );
@@ -20,7 +35,7 @@ ULONG lcm( ULONG a, ULONG b );
  * Test functions:
  *****************************************************************************/
 
-BOOL testGcd() {
+BOOL testGcd( VOID ) {
 
   BOOL failed = FALSE;
   int i;
@@ -55,7 +70,7 @@ BOOL testGcd() {
   return failed;
 }
 
-BOOL testLcm() {
+BOOL testLcm( VOID ) {
 
   BOOL failed = FALSE;
   int i;
@@ -92,7 +107,7 @@ BOOL testLcm() {
   return failed;
 }
 
-BOOL testGetBufferSizes() {
+BOOL testGetBufferSizes( VOID ) {
 
   BOOL failed = FALSE;
   #define NUM_SAMPLE_RATES 9
@@ -151,6 +166,65 @@ BOOL testGetBufferSizes() {
   return failed;
 }
 
+/*ASM(LONG) SAVEDS*/LONG PlainLongCopyTest(
+  /*REG(d0, */ULONG *bufferBase, 
+  /*REG(d1, */ULONG *bufferIndex ) {
+
+  //ULONG addressIn = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+  //ULONG in = *(( ULONG * ) addressIn);
+  //ULONG out = in;
+
+  printf( "%lx %lx %lx\n", bufferBase, bufferIndex, 0 );
+  //WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
+
+  ( *bufferIndex ) += 1;
+  return 4;
+}
+
+BOOL testPlainLongCopy( VOID ) {
+
+  BOOL failed = FALSE;
+  ULONG in[3] = { 0x00000000, 0x12345678, 0xffFFffFF };
+  ULONG index = 1;
+  LONG out;
+
+  flushFIFO();
+
+  printf( "%lx %lx %lx\n", in, &index, in[index] );
+
+  out = PlainLongCopyTest( in, &index );
+
+  printf( "Next buffer index: %ld\n"
+          "Bytes written: %ld - %s\n"
+          "Next FIFO index: %ld\n",
+          index, out, testFIFO[0], nextTestFIFO );
+
+  failed |= ( 2 != index );
+  failed |= ( 4 != out );
+  failed |= strcmp( testFIFO[0], "12345678" );
+  failed |= ( nextTestFIFO != 1 );
+
+  return failed;
+}
+
+BOOL testShift16LongCopy( VOID ) {
+
+  BOOL failed = FALSE;
+
+  flushFIFO();
+
+  return failed;
+}
+
+BOOL testMerge24LongCopy( VOID ) {
+
+  BOOL failed = FALSE;
+
+  flushFIFO();
+
+  return failed;
+}
+
 /******************************************************************************
  * Finally, main triggering all tests:
  *****************************************************************************/
@@ -161,7 +235,9 @@ int main(int argc, char const *argv[]) {
   failed |= testGcd();
   failed |= testLcm();
   failed |= testGetBufferSizes();
-
+  failed |= testPlainLongCopy();
+  failed |= testShift16LongCopy();
+  failed |= testMerge24LongCopy();
 
   return ( failed ) ? 15 : 0;
 }

@@ -80,7 +80,7 @@ install: all
 #	tools/FlushLibs
 #	AddAudioModes devs:AudioModes/AMIGUS
 
-tests: all 
+tests: $(LIB_OBJS)
 	$(CC) $(CFLAGS) test/test_utilities.o test/test_utilities.c
 	$(LD) $(LFLAGS) test/test_utilities $(LFLAGS1) LIB:c.o test/test_utilities.o $(BDIR)utilities.o LIBRARY LIB:sc.lib LIB:amiga.lib
 	@echo " "

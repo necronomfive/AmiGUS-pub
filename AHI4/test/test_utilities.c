@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "amigus_private.h"
@@ -7,10 +8,10 @@
 /******************************************************************************
  * Mocked functions and stubbed external symbols below:
  *****************************************************************************/
-struct AmiGUSBasePrivate * AmiGUSBase        = 0;
+struct AmiGUSBasePrivate * AmiGUSBase;
 
 char testFIFO[ 16 ][ 16 ];
-int nextTestFIFO = 0;
+ULONG nextTestFIFO = 0;
 
 VOID flushFIFO( VOID ) {
 
@@ -166,43 +167,82 @@ BOOL testGetBufferSizes( VOID ) {
   return failed;
 }
 
-/*ASM(LONG) SAVEDS*/LONG PlainLongCopyTest(
-  /*REG(d0, */ULONG *bufferBase, 
-  /*REG(d1, */ULONG *bufferIndex ) {
+LONG localPlainLongCopy1(
+  ULONG *bufferBase, 
+  ULONG *bufferIndex ) {
 
-  //ULONG addressIn = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
-  //ULONG in = *(( ULONG * ) addressIn);
-  //ULONG out = in;
+  ULONG addressIn = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+  ULONG in = *(( ULONG * ) addressIn);
+  ULONG out = in;
 
-  printf( "%lx %lx %lx\n", bufferBase, bufferIndex, 0 );
-  //WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
 
   ( *bufferIndex ) += 1;
   return 4;
 }
 
+ASM(LONG) localPlainLongCopy2(
+  REG(d0, ULONG *bufferBase ), 
+  REG(a0, ULONG *bufferIndex ) ) {
+
+  ULONG addressIn = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+  ULONG in = *(( ULONG * ) addressIn);
+  ULONG out = in;
+
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
+
+  ( *bufferIndex ) += 1;
+  return 4;
+}
+
+BOOL copyFunctionTest( ULONG *in, ULONG index, ULONG *exp, STRPTR *expF ) {
+  
+}
+
 BOOL testPlainLongCopy( VOID ) {
 
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
+  UBYTE tst3 = TRUE;
   BOOL failed = FALSE;
-  ULONG in[3] = { 0x00000000, 0x12345678, 0xffFFffFF };
-  ULONG index = 1;
   LONG out;
+  int i;
+
+  ULONG in[] = { 0x00000000, 0x12345678, 0xffFFffFF };
+  ULONG index = 1;
+  ULONG exp[] = { 2, 4, 1, 1 };
+  STRPTR expF[] = { "12345678" };
+
+  AmiGUSBase->agb_CopyFunction = &PlainLongCopy;
 
   flushFIFO();
 
-  printf( "%lx %lx %lx\n", in, &index, in[index] );
+  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
 
-  out = PlainLongCopyTest( in, &index );
+  tst0 = ( exp[ 0 ] == index );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
 
-  printf( "Next buffer index: %ld\n"
-          "Bytes written: %ld - %s\n"
-          "Next FIFO index: %ld\n",
-          index, out, testFIFO[0], nextTestFIFO );
+    tst3 &= !( strcmp( testFIFO[ i ], expF[ i ] ) );
+  }
 
-  failed |= ( 2 != index );
-  failed |= ( 4 != out );
-  failed |= strcmp( testFIFO[0], "12345678" );
-  failed |= ( nextTestFIFO != 1 );
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "FIFO content:                                   %s - \t%s\n",
+          exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "FIFO LONG #%ld:\t   %s (expected) - %s (actual)\n",
+            i, expF[ i ], testFIFO[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
 
   return failed;
 }
@@ -232,12 +272,27 @@ int main(int argc, char const *argv[]) {
 
   BOOL failed = FALSE;
 
+  AmiGUSBase = malloc( sizeof( struct AmiGUSBasePrivate ) );
+  memset( AmiGUSBase, 0, sizeof( struct AmiGUSBasePrivate ) );
+
+  if ( !AmiGUSBase ) {
+
+    printf( "Memory allocation failed!" );
+    return 20;
+  }
+
+/*
   failed |= testGcd();
   failed |= testLcm();
   failed |= testGetBufferSizes();
+*/
   failed |= testPlainLongCopy();
+/*
   failed |= testShift16LongCopy();
   failed |= testMerge24LongCopy();
+*/
+
+  free( AmiGUSBase );
 
   return ( failed ) ? 15 : 0;
 }

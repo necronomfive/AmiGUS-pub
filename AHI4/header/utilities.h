@@ -77,7 +77,7 @@ UWORD getBufferSamples(
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) SAVEDS PlainLongCopy(
+ASM(LONG) PlainLongCopy(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
 
@@ -91,7 +91,7 @@ ASM(LONG) SAVEDS PlainLongCopy(
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) SAVEDS Shift16LongCopy(
+ASM(LONG) Shift16LongCopy(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
 
@@ -108,7 +108,7 @@ ASM(LONG) SAVEDS Shift16LongCopy(
  *
  * @return Number of bytes written, i.e. 12.
  */
-ASM(LONG) SAVEDS Merge24LongCopy(
+ASM(LONG) Merge24LongCopy(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
 

@@ -123,7 +123,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     }
   }
 
-  if ( 0 < sampleFormat ) {
+  if ( 0 > sampleFormat ) {
 
     DisplayError( ESampleFormatMissingFromMode );
     return AHISF_ERROR;

@@ -49,6 +49,7 @@ BOOL testGcd( VOID ) {
     { 8,  4, 4}
   };
 
+  printf("\nTesting gcd - greatest common denominator ...\n");
   for( i = 0; i < NUM_CASES; ++i ) {
 
     int a = cases[i][0];
@@ -86,6 +87,7 @@ BOOL testLcm( VOID ) {
     { 4,  2, 4}
   };
 
+  printf("\nTesting lcm - least common multiple ...\n");
   for( i = 0; i < NUM_CASES; ++i ) {
 
     int a = cases[i][0];
@@ -137,6 +139,7 @@ BOOL testGetBufferSizes( VOID ) {
   int l;
   int m;
 
+  printf("\nTesting buffer size calculation in bytes and AHI samples ...\n");
   for ( j = 0; j < NUM_SAMPLE_SIZES; ++j ) {
     for ( k = 0; k < NUM_MULTIPLES; ++k ) {
       for ( l = 0; l < NUM_FLAGS; ++l ) {
@@ -167,6 +170,8 @@ BOOL testGetBufferSizes( VOID ) {
   return failed;
 }
 
+/*
+remainders from issues in calling the copy function caused by SAVEDS pragmas
 LONG localPlainLongCopy1(
   ULONG *bufferBase, 
   ULONG *bufferIndex ) {
@@ -194,10 +199,7 @@ ASM(LONG) localPlainLongCopy2(
   ( *bufferIndex ) += 1;
   return 4;
 }
-
-BOOL copyFunctionTest( ULONG *in, ULONG index, ULONG *exp, STRPTR *expF ) {
-  
-}
+*/
 
 BOOL testPlainLongCopy( VOID ) {
 
@@ -209,13 +211,16 @@ BOOL testPlainLongCopy( VOID ) {
   LONG out;
   int i;
 
+  /********* for copy function tests, just adapt the between section *********/
   ULONG in[] = { 0x00000000, 0x12345678, 0xffFFffFF };
   ULONG index = 1;
   ULONG exp[] = { 2, 4, 1, 1 };
   STRPTR expF[] = { "12345678" };
 
   AmiGUSBase->agb_CopyFunction = &PlainLongCopy;
-
+  printf("\nTesting PlainLongCopy ...\n");
+  /********* for copy function tests, just adapt the between section *********/
+  
   flushFIFO();
 
   out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
@@ -249,18 +254,111 @@ BOOL testPlainLongCopy( VOID ) {
 
 BOOL testShift16LongCopy( VOID ) {
 
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
+  UBYTE tst3 = TRUE;
   BOOL failed = FALSE;
+  LONG out;
+  int i;
 
+  /********* for copy function tests, just adapt the between section *********/
+  ULONG in[] = { 0x00000000, 0x12345678, 0x9abcdef0, 0xffFFffFF };
+  ULONG index = 1;
+  ULONG exp[] = { 3, 4, 1, 1 };
+  STRPTR expF[] = { "12349abc" };
+
+  AmiGUSBase->agb_CopyFunction = &Shift16LongCopy;
+  printf("\nTesting Shift16LongCopy ...\n");
+  /********* for copy function tests, just adapt the between section *********/
+  
   flushFIFO();
+
+  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
+
+  tst0 = ( exp[ 0 ] == index );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    tst3 &= !( strcmp( testFIFO[ i ], expF[ i ] ) );
+  }
+
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "FIFO content:                                   %s - \t%s\n",
+          exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "FIFO LONG #%ld:\t   %s (expected) - %s (actual)\n",
+            i, expF[ i ], testFIFO[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
 
   return failed;
 }
 
 BOOL testMerge24LongCopy( VOID ) {
 
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
+  UBYTE tst3 = TRUE;
   BOOL failed = FALSE;
+  LONG out;
+  int i;
 
+  /********* for copy function tests, just adapt the between section *********/
+  ULONG in[] = {
+    0x00000000,
+    0x12345678,
+    0x9abcdef0,
+    0x0fedcba9,
+    0x87654321,
+    0xffFFffFF };
+  ULONG index = 1;
+  ULONG exp[] = { 5, 12, 3, 3 };
+  STRPTR expF[] = {
+    "1234569a",
+    "bcde0fed",
+    "cb876543" };
+
+  AmiGUSBase->agb_CopyFunction = &Merge24LongCopy;
+  printf("\nTesting Merge24LongCopy ...\n");
+  /********* for copy function tests, just adapt the between section *********/
+  
   flushFIFO();
+
+  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
+
+  tst0 = ( exp[ 0 ] == index );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    tst3 &= !( strcmp( testFIFO[ i ], expF[ i ] ) );
+  }
+
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "FIFO content:                                   %s - \t%s\n",
+          exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "FIFO LONG #%ld:\t   %s (expected) - %s (actual)\n",
+            i, expF[ i ], testFIFO[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
 
   return failed;
 }
@@ -281,16 +379,12 @@ int main(int argc, char const *argv[]) {
     return 20;
   }
 
-/*
   failed |= testGcd();
   failed |= testLcm();
   failed |= testGetBufferSizes();
-*/
   failed |= testPlainLongCopy();
-/*
   failed |= testShift16LongCopy();
   failed |= testMerge24LongCopy();
-*/
 
   free( AmiGUSBase );
 

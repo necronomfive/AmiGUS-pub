@@ -64,6 +64,12 @@ UWORD getBufferSamples(
   return result;
 }
 
+// TODO: Need 16 > 8 bit copy function, AHI always giving 16 at least
+// TODO: Need 32 > 8 bit copy function, 8bit HiFi + modes
+// TODO: Switch copy names to modes used for?
+// TODO: Put copy mode selection dumbly into modefile + array
+// TODO: Switch copy functions to poll from multiple buffers if needed
+
 ASM(LONG) PlainLongCopy(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) ) {

@@ -232,7 +232,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   }
   AmiGUSBase->agb_WorkerReady = FALSE;
 
-  LOG_D(( "D: AHIsub_AllocAudio done, returning %ld.\n", result ));
+  LOG_D(( "D: AHIsub_AllocAudio done, returning 0x%lx.\n", result ));
 
   return result;
 }

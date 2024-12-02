@@ -47,13 +47,13 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   UWORD ahiBufferSamples;
 
   /* 
-   * Will rely on AHI provided mixing,
-   * will do own timing to be able to adjust buffer sizes.
+   * Will rely on AHI provided mixing and timing,
+   * trying out AHIsub_AllocAudio -> 1.
    */
-  ULONG result = AHISF_MIXING;
+  ULONG result = AHISF_MIXING | AHISF_TIMING;
 
-  LOG_D(("D: AHIsub_AllocAudio start\n"));
-  LogTicks(0x03);
+  LOG_D(( "D: AHIsub_AllocAudio start\n" ));
+  LogTicks( 0x03 );
 
   /*
    * ------------------------------------------------------
@@ -179,6 +179,8 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
           ahiBufferMultipleOf,
           isStereo,
           isRealtime ));
+/*
+  TODO: Does not work in Alloc -> 1
   ahiBufferBytes = getBufferBytes(
     sampleRate,
     ahiSampleBytes,
@@ -195,26 +197,9 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
           ahiBufferBytes,
           ahiBufferBytes >> 2,
           ahiBufferBytes >> 1 ));
-
-  aAudioCtrl->ahiac_MixFreq = sampleRate;
+  
   aAudioCtrl->ahiac_BuffSamples = ahiBufferSamples;
-
-  /* Buffers are ticking in LONGs! */
-  AmiGUSBase->agb_BufferMax = ahiBufferBytes >> 2;
-  /* Watermark is ticking in WORDs! */
-  if ( ( AMIGUS_PLAYBACK_FIFO_WORDS >> 1 ) > ( ( ahiBufferBytes >> 1 )) ) {
-
-    AmiGUSBase->agb_watermark = ahiBufferBytes >> 1;
-
-  } else {
-
-    AmiGUSBase->agb_watermark = AMIGUS_PLAYBACK_FIFO_WORDS >> 1;
-  }
-
-  LOG_D(( "D: Mix %ld samples = %ld LONGs per pass, watermark %ld WORDs\n",
-          ahiBufferSamples,
-          AmiGUSBase->agb_BufferMax,
-          AmiGUSBase->agb_watermark ));
+*/
 
   /*
    * ------------------------------------------------------

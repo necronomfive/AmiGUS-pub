@@ -75,26 +75,26 @@ VOID FillBuffer( BYTE buffer ) {
 #endif
 #if 1
 
-typedef ASM(BOOL) PreTimerPrototype( REG(a2, struct AHIAudioCtrlDrv *) );
-typedef ASM(VOID) PostTimerPrototype( REG(a2, struct AHIAudioCtrlDrv *) );
+typedef ASM(BOOL) PreTimerType( REG(a2, struct AHIAudioCtrlDrv *) );
+typedef ASM(VOID) PostTimerType( REG(a2, struct AHIAudioCtrlDrv *) );
 
 VOID FillBuffer( BYTE buffer ) {
 
 //  LOG_D(( "D: FB%1ld\n", buffer ));
-  PreTimerPrototype *preTimer = (PreTimerPrototype *)AmiGUSBase->agb_AudioCtrl->ahiac_PreTimer;
-  PostTimerPrototype *postTimer = (PostTimerPrototype *)AmiGUSBase->agb_AudioCtrl->ahiac_PostTimer;
+  struct AHIAudioCtrlDrv *audioCtrl = AmiGUSBase->agb_AudioCtrl;
+  PreTimerPrototype *preTimer = (PreTimerType *)audioCtrl->ahiac_PreTimer;
+  PostTimerPrototype *postTimer = (PostTimerType *)audioCtrl->ahiac_PostTimer;
+  ULONG maxTemp;
 
   /*
    * 1) Call user hook ahiac_PlayerFunc().
    */
-  CallHookPkt( AmiGUSBase->agb_AudioCtrl->ahiac_PlayerFunc,
-               AmiGUSBase->agb_AudioCtrl,
-               NULL );
+  CallHookPkt( audioCtrl->ahiac_PlayerFunc, audioCtrl, NULL );
 
   /*
    * 2) Optionally call ahiac_PreTimerFunc().
    */
-  if ( !( preTimer( AmiGUSBase->agb_AudioCtrl ) ) ) {
+  if ( !( preTimer( audioCtrl ) ) ) {
 
     /*
      * 3) Call user hook ahiac_MixerFunc().
@@ -114,8 +114,8 @@ VOID FillBuffer( BYTE buffer ) {
           AmiGUSBase->agb_AudioCtrl->ahiac_BuffType
        ));
     */
-    CallHookPkt( AmiGUSBase->agb_AudioCtrl->ahiac_MixerFunc,
-                 AmiGUSBase->agb_AudioCtrl,
+    CallHookPkt( audioCtrl->ahiac_MixerFunc,
+                 audioCtrl,
                  (APTR) AmiGUSBase->agb_Buffer[ buffer ] );
 
     /*
@@ -124,17 +124,34 @@ VOID FillBuffer( BYTE buffer ) {
      *    Well, it is a register... no caching here. :(
      *    The good news: the interrupt handler will take that responsibility.
      */
-    // To transform AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples to bytes by
-    // (ahiac_BuffSamples * bytes per sample * mono|stereo channels)
-    // here: is in longs, 16bit = 2bytes x 2 for stereo
-    AmiGUSBase->agb_BufferIndex[ buffer ] = 0;
-    // AmiGUSBase->agb_BufferMax = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples; // TODO: can this change here actually?
-    // AmiGUSBase->agb_watermark = AmiGUSBase->agb_BufferMax; /* but in WORDs */ // TODO: can this change here actually?
+    /* 
+     * Conversion happens during feeding to hardware, 
+     * just need to remember how much we got here.
+     *
+     * "How the buffer will be filled is indicated by ahiac_Flags.
+     * It is always filled with signed 16-bit 
+     * (32 bit if AHIACB_HIFI in in ahiac_Flags is set) words, 
+     * even if playback is 8 bit. 
+     * If AHIDBB_STEREO is set (in ahiac_Flags), 
+     * data for left and right channel are interleaved [...] "
+     */
+    maxTemp = audioCtrl->ahiac_BuffSamples;
+    if ( !( audioCtrl->ahiac_Flags & AHIACF_HIFI ) ) {
+
+      maxTemp >> 1;
+      // TODO: Do we ever lose samples here? can the # be odd?
+    }
+    if ( audioCtrl->ahiac_Flags & AHIACF_STEREO ) {
+
+      maxTemp << 1;
+    }
+    AmiGUSBase->agb_BufferMax[ buffer ] = maxTemp; /* in LONGs               */
+    AmiGUSBase->agb_BufferIndex[ buffer ] = 0;     /* buffer is full         */
   }
   /*
    * 5) Optionally call ahiac_PostTimerFunc().
    */
-  postTimer( AmiGUSBase->agb_AudioCtrl );
+  postTimer( audioCtrl );
 }
 
 #endif

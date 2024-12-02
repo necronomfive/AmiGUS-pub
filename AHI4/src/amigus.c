@@ -276,12 +276,15 @@ void stopAmiGUS(void) {
 // TRUE = failure
 BOOL CreatePlaybackBuffers( VOID ) {
 
+  LONG longSize;
+
   if ( AmiGUSBase->agb_Buffer[0] ) {
 
     LOG_D(("D: Playback buffers already exist!\n"));
     return FALSE;
   }
 
+  /* BufferSize is in BYTEs! */
   AmiGUSBase->agb_BufferSize = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize;
   LOG_D(( "D: Allocating playback buffers a %ld BYTEs\n",
           AmiGUSBase->agb_BufferSize ));
@@ -289,21 +292,36 @@ BOOL CreatePlaybackBuffers( VOID ) {
       AllocMem( AmiGUSBase->agb_BufferSize, MEMF_FAST | MEMF_CLEAR );
   if ( !AmiGUSBase->agb_Buffer[0] ) {
 
-    LOG_D(("Could not allocate FAST RAM for buffer 0!\n"));
+    LOG_E(("E: Could not allocate FAST RAM for buffer 0!\n"));
     return TRUE;
   }
   AmiGUSBase->agb_Buffer[1] = (ULONG *)
       AllocMem( AmiGUSBase->agb_BufferSize, MEMF_FAST | MEMF_CLEAR );
   if ( !AmiGUSBase->agb_Buffer[1] ) {
 
-    LOG_D(("Could not allocate FAST RAM for buffer 1!\n"));
+    LOG_E(("E: Could not allocate FAST RAM for buffer 1!\n"));
     return TRUE;
   }
 
-  /* All buffers are created empty - back to initial state! */
-  AmiGUSBase->agb_BufferIndex[ 0 ] = AmiGUSBase->agb_BufferMax;
-  AmiGUSBase->agb_BufferIndex[ 1 ] = AmiGUSBase->agb_BufferMax;
+  /* Buffers are ticking in LONGs! */
+  longSize = AmiGUSBase->agb_BufferSize >> 2;
+  AmiGUSBase->agb_BufferMax[ 0 ] = longSize;
+  AmiGUSBase->agb_BufferMax[ 1 ] = longSize;
+    /* All buffers are created empty - back to initial state! */
+  AmiGUSBase->agb_BufferIndex[ 0 ] = longSize;
+  AmiGUSBase->agb_BufferIndex[ 1 ] = longSize;
   AmiGUSBase->agb_currentBuffer = 0;
+
+  /* Watermark is ticking in WORDs! */
+  AmiGUSBase->agb_watermark = AmiGUSBase->agb_BufferSize >> 1;
+  if ( ( AMIGUS_PLAYBACK_FIFO_WORDS >> 1 ) < ( AmiGUSBase->agb_watermark ) ) {
+
+    AmiGUSBase->agb_watermark = AMIGUS_PLAYBACK_FIFO_WORDS >> 1;
+  }
+
+  LOG_D(( "D: Mix / copy up to %ld LONGs per pass, watermark %ld WORDs\n",
+          longSize,
+          AmiGUSBase->agb_watermark ));
 
   LOG_D(("D: All playback buffers created\n"));
   return FALSE;

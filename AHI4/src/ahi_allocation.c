@@ -145,17 +145,17 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     ahiSampleBytes = 4;
     if ( 16 == bitsPerAmiGusSample ) {
 
-      AmiGUSBase->agb_CopyFunction = &Shift16LongCopy;
+      AmiGUSBase->agb_CopyFunction = &Copy16to8;
       ahiBufferMultipleOf = 8;
 
     } else {
 
-      AmiGUSBase->agb_CopyFunction = &Merge24LongCopy;
+      AmiGUSBase->agb_CopyFunction = &Copy32to24;
       ahiBufferMultipleOf = 16;
     }
   } else {
 
-    AmiGUSBase->agb_CopyFunction = &PlainLongCopy;
+    AmiGUSBase->agb_CopyFunction = &Copy32to16;
     ahiBufferMultipleOf = 4;
 
     if ( 16 == bitsPerAmiGusSample ) {

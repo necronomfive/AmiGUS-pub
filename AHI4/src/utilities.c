@@ -64,13 +64,29 @@ UWORD getBufferSamples(
   return result;
 }
 
-// TODO: Need 16 > 8 bit copy function, AHI always giving 16 at least
-// TODO: Need 32 > 8 bit copy function, 8bit HiFi + modes
-// TODO: Switch copy names to modes used for?
 // TODO: Put copy mode selection dumbly into modefile + array
 // TODO: Switch copy functions to poll from multiple buffers if needed
 
-ASM(LONG) PlainLongCopy(
+ASM(LONG) Copy16to8(
+  REG(d0, ULONG *bufferBase), 
+  REG(a0, ULONG *bufferIndex) ) {
+
+  ULONG addressInA = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+  ULONG inA = *(( ULONG * ) addressInA);
+  ULONG addressInB = addressInA + sizeof( ULONG );
+  ULONG inB = *(( ULONG * ) addressInB);
+  ULONG out = ( inA & 0xFF000000 )       |
+              ( inA & 0x0000FF00 ) <<  8 |
+              ( inB & 0xFF000000 ) >> 16 |
+              ( inB & 0x0000FF00 ) >>  8;
+
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
+
+  ( *bufferIndex ) += 2;
+  return 4;
+}
+
+ASM(LONG) Copy16to16(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) ) {
 
@@ -84,7 +100,30 @@ ASM(LONG) PlainLongCopy(
   return 4;
 }
 
-ASM(LONG) Shift16LongCopy(
+ASM(LONG) Copy32to8(
+  REG(d0, ULONG *bufferBase), 
+  REG(a0, ULONG *bufferIndex) ) {
+
+  ULONG addressInA = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+  ULONG inA = *(( ULONG * ) addressInA);
+  ULONG addressInB = addressInA + sizeof( ULONG );
+  ULONG inB = *(( ULONG * ) addressInB);
+  ULONG addressInC = addressInB + sizeof( ULONG );
+  ULONG inC = *(( ULONG * ) addressInC);
+  ULONG addressInD = addressInC + sizeof( ULONG );
+  ULONG inD = *(( ULONG * ) addressInD);
+  ULONG out = ( inA & 0xff000000 )      |
+              ( inB & 0xff000000 ) >>  8 |
+              ( inC & 0xff000000 ) >> 16 |
+              ( inD & 0xff000000 ) >> 24;
+
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
+
+  ( *bufferIndex ) += 4;
+  return 4;
+}
+
+ASM(LONG) Copy32to16(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) ) {
 
@@ -100,7 +139,7 @@ ASM(LONG) Shift16LongCopy(
   return 4;
 }
 
-ASM(LONG) Merge24LongCopy(
+ASM(LONG) Copy32to24(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) ) {
 

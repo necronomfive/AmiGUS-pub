@@ -201,7 +201,58 @@ ASM(LONG) localPlainLongCopy2(
 }
 */
 
-BOOL testPlainLongCopy( VOID ) {
+BOOL testCopy16to8( VOID ) {
+
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
+  UBYTE tst3 = TRUE;
+  BOOL failed = FALSE;
+  LONG out;
+  int i;
+
+  /********* for copy function tests, just adapt the between section *********/
+  ULONG in[] = { 0x00000000, 0x12345678, 0x9abcdef0, 0xffFFffFF };
+  ULONG index = 1;
+  ULONG exp[] = { 3, 4, 1, 1 };
+  STRPTR expF[] = { "12569ade" };
+
+  AmiGUSBase->agb_CopyFunction = &Copy16to8;
+  printf("\nTesting Copy16to8 ...\n");
+  /********* for copy function tests, just adapt the between section *********/
+  
+  flushFIFO();
+
+  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
+
+  tst0 = ( exp[ 0 ] == index );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    tst3 &= !( strcmp( testFIFO[ i ], expF[ i ] ) );
+  }
+
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "FIFO content:                                   %s - \t%s\n",
+          exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "FIFO LONG #%ld:\t   %s (expected) - %s (actual)\n",
+            i, expF[ i ], testFIFO[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
+
+  return failed;
+}
+
+BOOL testCopy16to16( VOID ) {
 
   UBYTE tst0;
   UBYTE tst1;
@@ -217,8 +268,8 @@ BOOL testPlainLongCopy( VOID ) {
   ULONG exp[] = { 2, 4, 1, 1 };
   STRPTR expF[] = { "12345678" };
 
-  AmiGUSBase->agb_CopyFunction = &PlainLongCopy;
-  printf("\nTesting PlainLongCopy ...\n");
+  AmiGUSBase->agb_CopyFunction = &Copy16to16;
+  printf("\nTesting Copy16to16 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
@@ -252,7 +303,64 @@ BOOL testPlainLongCopy( VOID ) {
   return failed;
 }
 
-BOOL testShift16LongCopy( VOID ) {
+BOOL testCopy32to8( VOID ) {
+
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
+  UBYTE tst3 = TRUE;
+  BOOL failed = FALSE;
+  LONG out;
+  int i;
+
+  /********* for copy function tests, just adapt the between section *********/
+  ULONG in[] =  {
+    0x00000000,
+    0x12345678,
+    0x9abcdef0,
+    0x0fedcba9,
+    0x87654321,
+    0xffFFffFF };
+  ULONG index = 1;
+  ULONG exp[] = { 5, 4, 1, 1 };
+  STRPTR expF[] = { "129a0f87" };
+
+  AmiGUSBase->agb_CopyFunction = &Copy32to8;
+  printf("\nTesting Copy32to8 ...\n");
+  /********* for copy function tests, just adapt the between section *********/
+  
+  flushFIFO();
+
+  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
+
+  tst0 = ( exp[ 0 ] == index );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    tst3 &= !( strcmp( testFIFO[ i ], expF[ i ] ) );
+  }
+
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "FIFO content:                                   %s - \t%s\n",
+          exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "FIFO LONG #%ld:\t   %s (expected) - %s (actual)\n",
+            i, expF[ i ], testFIFO[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
+
+  return failed;
+}
+
+BOOL testCopy32to16( VOID ) {
 
   UBYTE tst0;
   UBYTE tst1;
@@ -268,8 +376,8 @@ BOOL testShift16LongCopy( VOID ) {
   ULONG exp[] = { 3, 4, 1, 1 };
   STRPTR expF[] = { "12349abc" };
 
-  AmiGUSBase->agb_CopyFunction = &Shift16LongCopy;
-  printf("\nTesting Shift16LongCopy ...\n");
+  AmiGUSBase->agb_CopyFunction = &Copy32to16;
+  printf("\nTesting Copy32to16 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
@@ -303,7 +411,7 @@ BOOL testShift16LongCopy( VOID ) {
   return failed;
 }
 
-BOOL testMerge24LongCopy( VOID ) {
+BOOL testCopy32to24( VOID ) {
 
   UBYTE tst0;
   UBYTE tst1;
@@ -328,8 +436,8 @@ BOOL testMerge24LongCopy( VOID ) {
     "bcde0fed",
     "cb876543" };
 
-  AmiGUSBase->agb_CopyFunction = &Merge24LongCopy;
-  printf("\nTesting Merge24LongCopy ...\n");
+  AmiGUSBase->agb_CopyFunction = &Copy32to24;
+  printf("\nTesting Copy32to24 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
@@ -382,9 +490,11 @@ int main(int argc, char const *argv[]) {
   failed |= testGcd();
   failed |= testLcm();
   failed |= testGetBufferSizes();
-  failed |= testPlainLongCopy();
-  failed |= testShift16LongCopy();
-  failed |= testMerge24LongCopy();
+  failed |= testCopy16to8();
+  failed |= testCopy16to16();
+  failed |= testCopy32to8();
+  failed |= testCopy32to16();
+  failed |= testCopy32to24();
 
   free( AmiGUSBase );
 

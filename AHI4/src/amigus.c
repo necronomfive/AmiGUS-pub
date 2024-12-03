@@ -409,7 +409,7 @@ ASM(LONG) /*__entry for vbcc*/ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
 ) {
 
-  ULONG *current;  
+  ULONG *current;
   BOOL canSwap;
   LONG reminder;
   LONG desired;
@@ -463,9 +463,22 @@ ASM(LONG) /*__entry for vbcc*/ SAVEDS INTERRUPT handleInterrupt (
     }
     if ( AmiGUSBase->agb_BufferIndex[ *current ] < AmiGUSBase->agb_BufferMax[ *current ] ) {
 
+#if 0
       desired -= (* AmiGUSBase->agb_CopyFunction)(
         AmiGUSBase->agb_Buffer[ *current ],
         &( AmiGUSBase->agb_BufferIndex[ *current ] ));
+#else
+      /* Old Version, needs 16bit, stereo */
+      ULONG sampleAddress = (
+          (( ULONG ) AmiGUSBase->agb_Buffer[ *current ])
+           + (AmiGUSBase->agb_BufferIndex[ *current ] << 2));
+      WriteReg32( AmiGUSBase->agb_CardBase,
+                  AMIGUS_MAIN_FIFO_WRITE,
+                  *(( ULONG * ) sampleAddress) );
+      ++AmiGUSBase->agb_BufferIndex[ *current ];
+      desired -= 4;
+#endif
+
       continue;
     }
     if ( canSwap ) {

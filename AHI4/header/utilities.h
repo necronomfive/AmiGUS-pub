@@ -60,7 +60,6 @@ UWORD getBufferSamples(
 /**
  * Type of the copy functions provided here.
  */
-//typedef __asm LONG CopyFunctionType( REG(d0, ULONG *), REG(a0, ULONG *) );
 typedef LONG ( ASM( * ) CopyFunctionType )(
   REG( d0, ULONG * ),
   REG( a0, ULONG * ) );
@@ -77,7 +76,6 @@ typedef LONG ( ASM( * ) CopyFunctionType )(
  * 4  32     24     16    12 bytes x    24   Copy32to24
  */
 extern CopyFunctionType CopyFunctionById[];
-//  LONG ( ASM(*) CopyFunctionById[] )( REG( d0, ULONG * ), REG( a0, ULONG * ) );
 
 /**
  * Reads 2 LONGs, a, and b,

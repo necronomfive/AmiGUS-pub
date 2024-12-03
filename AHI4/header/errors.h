@@ -44,7 +44,6 @@ enum TErrorCodes
   EDriverNotInUse,
   EOutOfMemory,/*
   EMixerBufferNotAligned,*/
-  ESampleFormatMissingFromMode,
   EWorkerProcessCreationFailed,
   EWorkerProcessDied,
   EWorkerProcessSignalsFailed,
@@ -67,6 +66,8 @@ enum TErrorCodes
   EHardwareControlNotImplemented,
   EAudioModeNotImplemented,
   ERecordingNotImplemented,
+  ESampleFormatMissingFromMode,
+  ECopyFunctionMissingFromMode,
   /* Hardware errors 200-300 */
   EAmiGUSNotFound = 200,
   EAmiGUSDetectError,

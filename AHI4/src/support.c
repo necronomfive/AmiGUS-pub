@@ -61,6 +61,7 @@ struct TErrorMessage errors[] =
     { EMixerBufferNotAligned, "Misaligned mixer buffer not yet handled.", "Ok" },
 */
     { ESampleFormatMissingFromMode, "AMIGUS mode file issue: Lacking AmiGUS_SampleFormat." "Will report issue!" },
+    { ECopyFunctionMissingFromMode, "AMIGUS mode file issue: Lacking AmiGUS_CopyFunction." "Will report issue!" },
     { EWorkerProcessCreationFailed, "Could not create playback worker.", "Damn." },
     { EWorkerProcessDied, "Playback worker died.", "RIP" },
     { EWorkerProcessSignalsFailed, "Worker does not like to communicate.", "Swine!" },

@@ -64,7 +64,14 @@ UWORD getBufferSamples(
   return result;
 }
 
-// TODO: Put copy mode selection dumbly into modefile + array
+//LONG ( ASM( * ) CopyFunctionById[] )( REG( d0, ULONG * ), REG( a0, ULONG * ) ) = {
+CopyFunctionType CopyFunctionById[] = {
+  &Copy16to8,
+  &Copy16to16,
+  &Copy32to8,
+  &Copy32to16,
+  &Copy32to24
+};
 // TODO: Switch copy functions to poll from multiple buffers if needed
 
 ASM(LONG) Copy16to8(

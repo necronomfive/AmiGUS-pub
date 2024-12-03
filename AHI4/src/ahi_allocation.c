@@ -37,6 +37,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   ULONG sampleRateId = 0;
   ULONG sampleRate = 0;
   WORD sampleFormat = -1;
+  WORD copyFunctionId = -1;
   UBYTE isStereo = FALSE;
   UBYTE isHifi = FALSE;
   UBYTE isRealtime = FALSE;
@@ -88,7 +89,6 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
          sampleRateId,
          aAudioCtrl->ahiac_MixFreq));
   aAudioCtrl->ahiac_MixFreq = sampleRate;
-  AmiGUSBase->agb_SampleRateId = sampleRateId;
 
   /* Parse aTagList */
   stateTag = aTagList;
@@ -117,89 +117,40 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         sampleFormat = (WORD)tag->ti_Data;
         break;
       }
+      case AHIDB_AmiGUS_CopyFunction: {
+        copyFunctionId = (WORD)tag->ti_Data;
+        break;
+      }
       default: {
         break;
       }
     }
   }
 
-  if ( 0 > sampleFormat ) {
-
-    DisplayError( ESampleFormatMissingFromMode );
-    return AHISF_ERROR;
-  }
-
-  AmiGUSBase->agb_SampleFormat = sampleFormat;
-  LOG_I(( "I: AmiGUS mode is format %ld, "
-          "%ldbit, %ld stereo, %ld HiFi, %ld Realtime, %ldHz\n",
-          AmiGUSBase->agb_SampleFormat,
-          bitsPerAmiGusSample, isStereo, isHifi, isRealtime, sampleRate ));
-
   /*
    * ------------------------------------------------------
    * Part 3: Apply information to AmiGUS & driver.
    * ------------------------------------------------------
    */
-  if ( isHifi ) {
+  LOG_I(( "I: AmiGUS mode is format %ld, "
+        "%ldbit, %ld stereo, %ld HiFi, %ld Realtime, %ldHz\n",
+        AmiGUSBase->agb_SampleFormat,
+        bitsPerAmiGusSample, isStereo, isHifi, isRealtime, sampleRate ));
 
-    ahiSampleBytes = 4;
-    if ( 16 == bitsPerAmiGusSample ) {
+  if ( 0 > sampleFormat ) {
 
-      AmiGUSBase->agb_CopyFunction = &Copy16to8;
-      ahiBufferMultipleOf = 8;
-
-    } else {
-
-      AmiGUSBase->agb_CopyFunction = &Copy32to24;
-      ahiBufferMultipleOf = 16;
-    }
-  } else {
-
-    AmiGUSBase->agb_CopyFunction = &Copy32to16;
-    ahiBufferMultipleOf = 4;
-
-    if ( 16 == bitsPerAmiGusSample ) {
-
-      ahiSampleBytes = 2;
-
-    } else {
-
-      ahiSampleBytes = 1;
-    }
+    DisplayError( ESampleFormatMissingFromMode );
+    return AHISF_ERROR;
   }
-  if ( isStereo ) {
+  if ( 0 > copyFunctionId ) {
 
-    ahiSampleBytes <<= 1;
+    DisplayError( ECopyFunctionMissingFromMode );
+    return AHISF_ERROR;
   }
 
-  LOG_D(( "D: Applying properties: "
-          "sample rate %ld ~ size %ld buf mult %ld stereo %ld realtime %ld\n",
-          sampleRate,
-          ahiSampleBytes,
-          ahiBufferMultipleOf,
-          isStereo,
-          isRealtime ));
-/*
-  TODO: Does not work in Alloc -> 1
-  ahiBufferBytes = getBufferBytes(
-    sampleRate,
-    ahiSampleBytes,
-    ahiBufferMultipleOf,
-    isStereo,
-    isRealtime );
-  ahiBufferSamples = getBufferSamples(
-    ahiBufferBytes,
-    ahiSampleBytes,
-    isStereo );
-  LOG_I(( "I: Setting mixing buffer properties to %ld samples,"
-          " %ld bytes, %ld longs and watermark %ld WORDs\n",
-          ahiBufferSamples,
-          ahiBufferBytes,
-          ahiBufferBytes >> 2,
-          ahiBufferBytes >> 1 ));
-  
-  aAudioCtrl->ahiac_BuffSamples = ahiBufferSamples;
-*/
+  AmiGUSBase->agb_SampleRateId = sampleRateId;
+  AmiGUSBase->agb_SampleFormat = sampleFormat;
+  AmiGUSBase->agb_CopyFunction = CopyFunctionById[ copyFunctionId ];
 
   /*
    * ------------------------------------------------------

@@ -45,6 +45,7 @@
 
 #include "amigus_public.h"
 #include "library.h"
+#include "utilities.h"
 #include "SDI_AHI4_protos.h"
 
 /******************************************************************************
@@ -73,10 +74,13 @@ struct AmiGUSBasePrivate {
   BYTE                          agb_MainSignal;
   BYTE                          agb_WorkerWorkSignal;
   BYTE                          agb_WorkerStopSignal;
-  BYTE                          agb_UsageCounter;    
   /* Only 1 AmiGUS supported per machine currently, sorry */
-  UWORD                         agb_SampleRateId;
-  UWORD                         agb_SampleFormat;
+  BYTE                          agb_UsageCounter;    
+
+  /* Driver settings */
+  UWORD                         agb_SampleRateId;   /* HW sample rate ID     */
+  UWORD                         agb_SampleFormat;   /* HW sample format ID   */
+  CopyFunctionType              agb_CopyFunction;   /* Magic AHI<->AmiGUS... */
 
   /* Mixing double-buffers to be copied to FIFO alternatingly */
   ULONG                       * agb_Buffer[2];      /* Fully LONG aligned!   */
@@ -90,8 +94,6 @@ struct AmiGUSBasePrivate {
   
   struct AHIAudioCtrlDrv      * agb_AudioCtrl;
   ULONG                         agb_State;         /* 0 stopped, 1 playing   */
-
-  LONG /* added to desired */(ASM(*) agb_CopyFunction )( REG(d0, ULONG *), REG(a0, ULONG *) );
 
   BPTR                          agb_LogFile;       /* Debug log file handle  */
   APTR                          agb_LogMem;        /* Debug log memory blob  */

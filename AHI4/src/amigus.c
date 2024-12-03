@@ -461,7 +461,7 @@ ASM(LONG) /*__entry for vbcc*/ SAVEDS INTERRUPT handleInterrupt (
 #endif
       break;
     }
-    if ( AmiGUSBase->agb_BufferIndex[ *current ] < AmiGUSBase->agb_BufferMax ) {
+    if ( AmiGUSBase->agb_BufferIndex[ *current ] < AmiGUSBase->agb_BufferMax[ *current ] ) {
 
       desired -= (* AmiGUSBase->agb_CopyFunction)(
         AmiGUSBase->agb_Buffer[ *current ],

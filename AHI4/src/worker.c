@@ -82,8 +82,8 @@ VOID FillBuffer( BYTE buffer ) {
 
 //  LOG_D(( "D: FB%1ld\n", buffer ));
   struct AHIAudioCtrlDrv *audioCtrl = AmiGUSBase->agb_AudioCtrl;
-  PreTimerPrototype *preTimer = (PreTimerType *)audioCtrl->ahiac_PreTimer;
-  PostTimerPrototype *postTimer = (PostTimerType *)audioCtrl->ahiac_PostTimer;
+  PreTimerType *preTimer = (PreTimerType *)audioCtrl->ahiac_PreTimer;
+  PostTimerType *postTimer = (PostTimerType *)audioCtrl->ahiac_PostTimer;
   ULONG maxTemp;
 
   /*
@@ -138,12 +138,12 @@ VOID FillBuffer( BYTE buffer ) {
     maxTemp = audioCtrl->ahiac_BuffSamples;
     if ( !( audioCtrl->ahiac_Flags & AHIACF_HIFI ) ) {
 
-      maxTemp >> 1;
+      maxTemp >>= 1;
       // TODO: Do we ever lose samples here? can the # be odd?
     }
     if ( audioCtrl->ahiac_Flags & AHIACF_STEREO ) {
 
-      maxTemp << 1;
+      maxTemp <<= 1;
     }
     AmiGUSBase->agb_BufferMax[ buffer ] = maxTemp; /* in LONGs               */
     AmiGUSBase->agb_BufferIndex[ buffer ] = 0;     /* buffer is full         */
@@ -180,7 +180,7 @@ VOID FillBuffer( BYTE buffer ) {
       ULONG k = AmiGUSBase->agb_currentBuffer;
       for ( i = 0; 2 > i; ++i ) {
         
-        if ( AmiGUSBase->agb_BufferIndex[ k ] >= AmiGUSBase->agb_BufferMax ) {
+        if ( AmiGUSBase->agb_BufferIndex[ k ] >= AmiGUSBase->agb_BufferMax[ k ] ) {
 
           FillBuffer( k );
         }

@@ -62,6 +62,8 @@ else
   LD            = slink
 endif
 
+.PHONY: all install test INCLUDES FOLDERS clean dist-clean dist
+
 all: FOLDERS $(MODE_FILE_DST) $(LIB_DST)
 
 $(MODE_FILE_DST): $(MODE_FILE_SRC)
@@ -80,7 +82,7 @@ install: all
 #	tools/FlushLibs
 #	AddAudioModes devs:AudioModes/AMIGUS
 
-tests: $(LIB_OBJS)
+test: $(LIB_OBJS)
 	$(CC) $(CFLAGS) test/test_utilities.o test/test_utilities.c
 	$(LD) $(LFLAGS) test/test_utilities $(LFLAGS1) LIB:c.o test/test_utilities.o $(BDIR)utilities.o LIBRARY LIB:sc.lib LIB:amiga.lib
 	@echo " "
@@ -99,3 +101,6 @@ clean:
 
 dist-clean: clean
 	make -f Makefile-Includes clean
+
+dist:
+	lha a target/AHI4bin.lha target/#?

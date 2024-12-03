@@ -5,6 +5,11 @@
 #include "amigus_private.h"
 #include "utilities.h"
 
+#if defined (__VBCC__)
+/* Don't care about ugly type issues with format strings! */
+#pragma dontwarn 214
+#endif
+
 /******************************************************************************
  * Mocked functions and stubbed external symbols below:
  *****************************************************************************/
@@ -471,6 +476,60 @@ BOOL testCopy32to24( VOID ) {
   return failed;
 }
 
+BOOL testCopyFunctionCalling( VOID ) {
+
+  UBYTE tst0 = FALSE;
+  UBYTE tst1 = FALSE;
+  UBYTE tst2 = FALSE;
+  UBYTE tst3 = TRUE;
+  BOOL failed = FALSE;
+  LONG out = 0;
+  int i;
+
+  /********* for copy function tests, just adapt the between section *********/
+  ULONG in[] = { 0x00000000, 0x12345678, 0xffFFffFF };
+  ULONG exp[] = { 2, 4, 1, 1 };
+  STRPTR expF[] = { "12345678" };
+
+  AmiGUSBase->agb_CopyFunction = &Copy16to16;
+  AmiGUSBase->agb_Buffer[ 0 ] = in;
+  AmiGUSBase->agb_BufferIndex[ 0 ] = 1;
+  printf("\nTesting CopyFunctionCalling ...\n");
+  /********* for copy function tests, just adapt the between section *********/
+  
+  flushFIFO();
+
+  out = (* AmiGUSBase->agb_CopyFunction)(
+    AmiGUSBase->agb_Buffer[ 0 ],
+    &( AmiGUSBase->agb_BufferIndex[ 0 ] ));
+
+  tst0 = ( exp[ 0 ] == AmiGUSBase->agb_BufferIndex[ 0 ] );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    tst3 &= !( strcmp( testFIFO[ i ], expF[ i ] ) );
+  }
+
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "FIFO content:                                   %s - \t%s\n",
+          exp[ 0 ], AmiGUSBase->agb_BufferIndex[ 0 ], (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "FIFO LONG #%ld:\t   %s (expected) - %s (actual)\n",
+            i, expF[ i ], testFIFO[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
+
+  return failed;
+}
+
 /******************************************************************************
  * Finally, main triggering all tests:
  *****************************************************************************/
@@ -495,6 +554,7 @@ int main(int argc, char const *argv[]) {
   failed |= testCopy32to8();
   failed |= testCopy32to16();
   failed |= testCopy32to24();
+  failed |= testCopyFunctionCalling();
 
   free( AmiGUSBase );
 

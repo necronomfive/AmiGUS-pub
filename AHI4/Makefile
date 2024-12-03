@@ -41,11 +41,13 @@ ifdef VBCC
   CFLAGS        = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR) -D__NOLIBBASE__ -o
   LFLAGS        = -nostdlib -o
   LFLAGS1       =
+  LFLAGST1      = vlibos3:startup.o
+  LFLAGST2      = vlibos3:auto.lib vlibos3:vc.lib
   CC            = vc
   LD            = vc
 else
   CFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
-                  PARAMETERS=REGISTER DATA=FARONLY CODE=FAR                 \
+                  PARAMETERS=REGISTER DATA=FAR CODE=FAR                     \
                   NOSTACKCHECK NOCHECKABORT NOICONS                         \
                   IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)  \
                   OBJNAME
@@ -58,6 +60,8 @@ else
   LFLAGS        = NOICONS SMALLDATA SMALLCODE STRIPDEBUG \
                   TO 
   LFLAGS1       = FROM
+  LFLAGST1      = LIB:c.o
+  LFLAGST2      = LIBRARY LIB:sc.lib LIB:amiga.lib
   CC            = sc
   LD            = slink
 endif
@@ -84,7 +88,7 @@ install: all
 
 test: $(LIB_OBJS)
 	$(CC) $(CFLAGS) test/test_utilities.o test/test_utilities.c
-	$(LD) $(LFLAGS) test/test_utilities $(LFLAGS1) LIB:c.o test/test_utilities.o $(BDIR)utilities.o LIBRARY LIB:sc.lib LIB:amiga.lib
+	$(LD) $(LFLAGS) test/test_utilities $(LFLAGS1) $(LFLAGST1) test/test_utilities.o $(BDIR)utilities.o $(LFLAGST2)
 	@echo " "
 	test/test_utilities
 	-@delete test/test_utilities test/test_utilities.o >NIL:

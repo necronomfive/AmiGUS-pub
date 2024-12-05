@@ -190,8 +190,8 @@ VOID initAmiGUS( VOID ) {
 
   ULONG i;
   // Working maybe:
-  ULONG prefillSize = AMIGUS_PLAYBACK_FIFO_LONGS;
-  //ULONG prefillSize = 6; /* in LONGs */ 
+//  ULONG prefillSize = AMIGUS_PLAYBACK_FIFO_LONGS;
+  ULONG prefillSize = 6; /* in LONGs */ 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   LOG_D(("D: Init AmiGUS @ 0x%08lx\n", amiGUS));
 
@@ -305,6 +305,10 @@ BOOL CreatePlaybackBuffers( VOID ) {
 
   /* Buffers are ticking in LONGs! */
   longSize = AmiGUSBase->agb_BufferSize >> 2;
+  
+  // TODO: remove alignment hack as not needed anywhere and to be fixed elsewhere
+  longSize &= 0xffFFfffd;
+  
   AmiGUSBase->agb_BufferMax[ 0 ] = longSize;
   AmiGUSBase->agb_BufferMax[ 1 ] = longSize;
     /* All buffers are created empty - back to initial state! */
@@ -463,7 +467,7 @@ ASM(LONG) /*__entry for vbcc*/ SAVEDS INTERRUPT handleInterrupt (
     }
     if ( AmiGUSBase->agb_BufferIndex[ *current ] < AmiGUSBase->agb_BufferMax[ *current ] ) {
 
-#if 0
+#if 1
       desired -= (* AmiGUSBase->agb_CopyFunction)(
         AmiGUSBase->agb_Buffer[ *current ],
         &( AmiGUSBase->agb_BufferIndex[ *current ] ));

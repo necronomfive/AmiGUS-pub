@@ -132,10 +132,10 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
    * Part 3: Apply information to AmiGUS & driver.
    * ------------------------------------------------------
    */
-  LOG_I(( "I: AmiGUS mode is format %ld, "
-        "%ldbit, %ld stereo, %ld HiFi, %ld Realtime, %ldHz\n",
-        AmiGUSBase->agb_SampleFormat,
-        bitsPerAmiGusSample, isStereo, isHifi, isRealtime, sampleRate ));
+  LOG_I(( "I: AmiGUS mode is format 0x%lx, %ldbit, %ld stereo, "
+          "%ld HiFi, %ld Realtime, %ldHz\n",
+          sampleFormat, bitsPerAmiGusSample, isStereo,
+          isHifi, isRealtime, sampleRate ));
 
   if ( 0 > sampleFormat ) {
 

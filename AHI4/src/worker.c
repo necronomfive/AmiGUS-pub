@@ -136,15 +136,29 @@ VOID FillBuffer( BYTE buffer ) {
      * data for left and right channel are interleaved [...] "
      */
     maxTemp = audioCtrl->ahiac_BuffSamples;
-    if ( !( audioCtrl->ahiac_Flags & AHIACF_HIFI ) ) {
-
-      maxTemp >>= 1;
-      // TODO: Do we ever lose samples here? can the # be odd?
-    }
     if ( audioCtrl->ahiac_Flags & AHIACF_STEREO ) {
 
       maxTemp <<= 1;
     }
+    if ( maxTemp & 0x00000001 ) {
+
+      LOG_W(( "W: Buffer has %ld, will reduce by 1 and blip.\n",
+              maxTemp ));
+      // TODO: fixed, learn to read buffers correctly!
+    }
+    if ( !( audioCtrl->ahiac_Flags & AHIACF_HIFI ) ) {
+
+      maxTemp >>= 1;
+    }
+    if ( maxTemp & 0x00000003 ) {
+
+      LOG_W(( "W: Evil alignment hack, using %ld instead %ld LONGs buffer\n",
+              maxTemp & 0xffFFffFC,
+              maxTemp ));
+      // TODO: fixed, learn to read buffers correctly!
+    }
+    maxTemp &= 0xffFFffFC;
+
     AmiGUSBase->agb_BufferMax[ buffer ] = maxTemp; /* in LONGs               */
     AmiGUSBase->agb_BufferIndex[ buffer ] = 0;     /* buffer is full         */
   }

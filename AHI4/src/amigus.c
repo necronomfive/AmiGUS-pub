@@ -311,8 +311,8 @@ BOOL CreatePlaybackBuffers( VOID ) {
             AmiGUSBase->agb_BufferSize ));
     // TODO: fixed, learn to read buffers correctly!
   }
+  longSize &= 0xffFFffF0;
   longSize = AmiGUSBase->agb_BufferSize >> 2;
-  longSize &= 0xffFFfffd;
 
   AmiGUSBase->agb_BufferMax[ 0 ] = longSize;
   AmiGUSBase->agb_BufferMax[ 1 ] = longSize;

@@ -538,6 +538,98 @@ BOOL testCopyFunctionCalling( VOID ) {
   return failed;
 }
 
+ULONG alignBufferSamplesRef( ULONG ahiBuffSamples ) {
+
+  ULONG mask = CopyFunctionRequirementById[ AmiGUSBase->agb_CopyFunctionId ];
+  UBYTE shift = AmiGUSBase->agb_SampleShift;
+  ULONG aligned = ahiBuffSamples;
+
+  aligned <<= shift;
+  aligned &= mask;
+  aligned >>= shift;
+
+  return aligned;
+}
+
+BOOL testAlignBuffSamples( VOID ) {
+
+  #define NUM_SAMPLE_RATES 9
+  const LONG sampleRates[ NUM_SAMPLE_RATES ] = {
+
+     8000, // AMIGUS_SAMPLE_RATE_8000  @ index 0x0000
+    11025, // AMIGUS_SAMPLE_RATE_11025 @ index 0x0001
+    16000, // AMIGUS_SAMPLE_RATE_16000 @ index 0x0002
+    22050, // AMIGUS_SAMPLE_RATE_22050 @ index 0x0003
+    24000, // AMIGUS_SAMPLE_RATE_24000 @ index 0x0004
+    32000, // AMIGUS_SAMPLE_RATE_32000 @ index 0x0005
+    44100, // AMIGUS_SAMPLE_RATE_44100 @ index 0x0006
+    48000, // AMIGUS_SAMPLE_RATE_48000 @ index 0x0007
+    96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0008
+  };
+  LONG shift;          /* 1 - 3 */
+  LONG copyFunctionId; /* 0 - 4 */
+  LONG suggestedBufferSize;
+  LONG alignedBufferSize;
+  LONG i;
+  BOOL failed = FALSE;
+  LONG ref;
+  BOOL exp0;
+  BOOL exp1;
+  BOOL exp2;
+
+  const char * h0 = "----+--------+-------+";
+  const char * h1 = "-------+-------+";
+  const char * h2 = "---+--------\n";
+  const char * h3 = "    | sample | BYTE  |      IN       |      OUT      |"
+                    "       MINUS       |\n";
+  const char * h4 = " ID |  rate  | shift |";
+  const char * h5 = " Smpls | BYTEs |";
+  const char * h6 = " % | result\n";
+
+  for ( copyFunctionId = 0; 5 > copyFunctionId; ++copyFunctionId ) {
+    printf( "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", 
+            h0, h1, h1, h1, h2,
+            h3,
+            h4, h5, h5, h5, h6,
+            h0, h1, h1, h1, h2 );
+    for ( shift = 1; 4 > shift; ++shift ) {
+      for ( i = 0; NUM_SAMPLE_RATES > i; ++i ) {
+
+        suggestedBufferSize = sampleRates[ i ] / 100;
+        AmiGUSBase->agb_CopyFunctionId = copyFunctionId;
+        AmiGUSBase->agb_SampleShift = shift;
+
+        alignedBufferSize = alignBufferSamples( suggestedBufferSize );
+        ref = alignBufferSamplesRef( suggestedBufferSize );
+
+        exp0 = ( alignedBufferSize <= suggestedBufferSize );
+        exp1 = ( suggestedBufferSize - alignedBufferSize <= 6 );
+        exp2 = ( ref == alignedBufferSize );
+
+        printf( "%3ld | %6ld | %5ld | %5ld | %5ld | %5ld | %5ld | %5ld |"
+                " %5ld | %1ld | %6s\n",
+                copyFunctionId, sampleRates[ i ], shift,
+                suggestedBufferSize, suggestedBufferSize << shift,
+                alignedBufferSize, alignedBufferSize << shift,
+                suggestedBufferSize - alignedBufferSize,
+                (suggestedBufferSize - alignedBufferSize) << shift,
+                (LONG)(
+                  ((suggestedBufferSize - alignedBufferSize) << shift) * 100)
+                  / (suggestedBufferSize << shift),
+                ( exp0 && exp1 && exp2 ) ? "passed" : "FAIL!!" );
+
+        failed |= !( exp0 && exp1 && exp2 );
+      }
+    }
+  }
+  printf( "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", 
+          h0, h1, h1, h1, h2,
+          h3,
+          h4, h5, h5, h5, h6,
+          h0, h1, h1, h1, h2 );
+  return failed;
+}
+
 /******************************************************************************
  * Finally, main triggering all tests:
  *****************************************************************************/
@@ -563,6 +655,7 @@ int main(int argc, char const *argv[]) {
   failed |= testCopy32to16();
   failed |= testCopy32to24();
   failed |= testCopyFunctionCalling();
+  failed |= testAlignBuffSamples();
 
   free( AmiGUSBase );
 

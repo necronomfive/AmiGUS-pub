@@ -37,15 +37,13 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   ULONG sampleRateId = 0;
   ULONG sampleRate = 0;
   WORD sampleFormat = -1;
-  WORD copyFunctionId = -1;
+  BYTE copyFunctionId = -1;
   UBYTE isStereo = FALSE;
   UBYTE isHifi = FALSE;
   UBYTE isRealtime = FALSE;
   UBYTE bitsPerAmiGusSample = 0;
-  UWORD ahiBufferMultipleOf;
-  UWORD ahiSampleBytes;
-  UWORD ahiBufferBytes;
-  UWORD ahiBufferSamples;
+  UWORD ahiSampleSizeBytes = 2;
+  UWORD ahiSampleBytesShift = 1;
 
   /* 
    * Will rely on AHI provided mixing and timing,
@@ -102,11 +100,15 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
       case AHIDB_Stereo: {
         isStereo = (UBYTE)tag->ti_Data;
         result |= ( isStereo << AHISB_KNOWSTEREO );
+        ahiSampleSizeBytes <<= 1;
+        ahiSampleBytesShift += 1;
         break;
       }
       case AHIDB_HiFi: {
         isHifi = (UBYTE)tag->ti_Data;
         result |= ( isHifi << AHISB_KNOWHIFI );
+        ahiSampleSizeBytes <<= 1;
+        ahiSampleBytesShift += 1;
         break;
       }
       case AHIDB_Realtime: {
@@ -118,7 +120,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         break;
       }
       case AHIDB_AmiGUS_CopyFunction: {
-        copyFunctionId = (WORD)tag->ti_Data;
+        copyFunctionId = (BYTE)tag->ti_Data;
         break;
       }
       default: {
@@ -136,6 +138,8 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
           "%ld HiFi, %ld Realtime, %ldHz\n",
           sampleFormat, bitsPerAmiGusSample, isStereo,
           isHifi, isRealtime, sampleRate ));
+  LOG_I(( "I: AHI mode is sample size %ld BYTEs, conversion by %ld shifts\n",
+          ahiSampleSizeBytes, ahiSampleBytesShift ));
 
   if ( 0 > sampleFormat ) {
 
@@ -148,8 +152,11 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     return AHISF_ERROR;
   }
 
+  AmiGUSBase->agb_SampleSize = ahiSampleSizeBytes;
+  AmiGUSBase->agb_SampleShift = ahiSampleBytesShift;
   AmiGUSBase->agb_SampleRateId = sampleRateId;
   AmiGUSBase->agb_SampleFormat = sampleFormat;
+  AmiGUSBase->agb_CopyFunctionId = copyFunctionId;
   AmiGUSBase->agb_CopyFunction = CopyFunctionById[ copyFunctionId ];
 
   /*

@@ -304,14 +304,6 @@ BOOL CreatePlaybackBuffers( VOID ) {
   }
 
   /* Buffers are ticking in LONGs! */
-  if ( AmiGUSBase->agb_BufferSize & 0x0000000F ) {
-
-    LOG_W(( "W: Evil alignment hack, using %ld instead %ld byte buffer\n",
-            AmiGUSBase->agb_BufferSize & 0xffFFffF0,
-            AmiGUSBase->agb_BufferSize ));
-    // TODO: fixed, learn to read buffers correctly!
-  }
-  longSize &= 0xffFFffF0;
   longSize = AmiGUSBase->agb_BufferSize >> 2;
 
   AmiGUSBase->agb_BufferMax[ 0 ] = longSize;

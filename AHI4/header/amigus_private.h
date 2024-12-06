@@ -78,9 +78,13 @@ struct AmiGUSBasePrivate {
   BYTE                          agb_UsageCounter;    
 
   /* Driver settings */
+  CopyFunctionType              agb_CopyFunction;   /* Magic AHI<->AmiGUS... */
   UWORD                         agb_SampleRateId;   /* HW sample rate ID     */
   UWORD                         agb_SampleFormat;   /* HW sample format ID   */
-  CopyFunctionType              agb_CopyFunction;   /* Magic AHI<->AmiGUS... */
+  UBYTE                         agb_SampleSize;     /* BYTE size of 1 sample */
+  UBYTE                         agb_SampleShift;    /* Sample <=> Byte shift */
+  UBYTE                         agb_CopyFunctionId; /* ID of CopyFunction    */
+  UBYTE                         agb_State;          /* 0 stopped, 1 playing  */
 
   /* Mixing double-buffers to be copied to FIFO alternatingly */
   ULONG                       * agb_Buffer[2];      /* Fully LONG aligned!   */
@@ -93,7 +97,6 @@ struct AmiGUSBasePrivate {
   LONG                          agb_WorkerReady;
   
   struct AHIAudioCtrlDrv      * agb_AudioCtrl;
-  ULONG                         agb_State;         /* 0 stopped, 1 playing   */
 
   BPTR                          agb_LogFile;       /* Debug log file handle  */
   APTR                          agb_LogMem;        /* Debug log memory blob  */
@@ -117,6 +120,7 @@ struct AmiGUSBasePrivate {
   #define UtilityBase               amiGUSBase->agb_UtilityBase
 #endif
 
+extern const LONG AmiGUSSampleRates[ AMIGUS_AHI_NUM_SAMPLE_RATES ];
 extern const STRPTR AmiGUSOutputs[ AMIGUS_AHI_NUM_OUTPUTS ];
 extern const STRPTR AmiGUSInputs[ AMIGUS_AHI_NUM_INPUTS ];
 

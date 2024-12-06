@@ -69,6 +69,26 @@ LONG getNextSampleData( VOID ) {
   return 0;
 }
 
+const ULONG CopyFunctionRequirementById[] = {
+  0xffFFffF8, /* Needs 2 LONGs to work properly, */
+  0xffFFffFC, /*       1 LONG,                   */
+  0xffFFffF0, /*       4 LONGs,                  */
+  0xffFFffF8, /*       2 LONGs                   */
+  0xffFFffF0  /*       4 LONGs                   */
+};
+
+ULONG alignBufferSamples( ULONG ahiBuffSamples ) {
+
+  ULONG index = AmiGUSBase->agb_CopyFunctionId;
+  ULONG mask = CopyFunctionRequirementById[ index ];
+  UBYTE shift = AmiGUSBase->agb_SampleShift;
+  ULONG aligned = ahiBuffSamples;
+
+  aligned &= ( mask >> shift );
+
+  return aligned;
+}
+
 CopyFunctionType CopyFunctionById[] = {
   &Copy16to8,
   &Copy16to16,
@@ -76,8 +96,6 @@ CopyFunctionType CopyFunctionById[] = {
   &Copy32to16,
   &Copy32to24
 };
-
-// TODO: Switch copy functions to poll from multiple buffers if needed
 
 ASM(LONG) Copy16to8(
   REG(d0, ULONG *bufferBase), 

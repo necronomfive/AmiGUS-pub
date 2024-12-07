@@ -88,17 +88,17 @@ ASM(ULONG) SAVEDS AHIsub_Start(
   LOG_D(("D: Creating worker process for AmiGUSBase @ %08lx\n", (LONG) AmiGUSBase));
   if ( CreateWorkerProcess() ) {
 
-    LOG_D(("D: No worker, failed.\n"));
+    LOG_D(( "D: No worker, failed.\n" ));
     return AHIE_UNKNOWN;
   }
   if ( CreateInterruptHandler() ) {
   
-    LOG_D(("D: No INT handler, failed.\n"));
+    LOG_D(( "D: No INT handler, failed.\n" ));
     return AHIE_UNKNOWN;
   }
 
   initAmiGUS();
-  LOG_D(("D: AHIsub_Start done\n"));
+  LOG_D(( "D: AHIsub_Start done\n" ));
   return AHIE_OK;
 }
 
@@ -140,7 +140,7 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
   aAudioCtrl->ahiac_BuffSamples = aligned;
   AmiGUSBase->agb_AudioCtrl = aAudioCtrl;
 
-  LOG_D(("D: AHIsub_Update done.\n"));
+  LOG_D(( "D: AHIsub_Update done.\n" ));
   return;
 }
 
@@ -149,19 +149,19 @@ ASM(VOID) SAVEDS AHIsub_Stop(
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {
-  LOG_D(("D: AHIsub_Stop start\n"));
+  LOG_D(( "D: AHIsub_Stop start\n" ));
 
-  LOG_D(("D: Read FIFO level %04lx\n",
-         ReadReg16(
-             AmiGUSBase->agb_CardBase,
-             AMIGUS_MAIN_FIFO_USAGE) ));
+  LOG_D(( "D: Read FIFO level %04lx\n ",
+          ReadReg16(
+            AmiGUSBase->agb_CardBase,
+            AMIGUS_MAIN_FIFO_USAGE ) ));
   stopAmiGUS();
 
   DestroyInterruptHandler();
   DestroyWorkerProcess();
   DestroyPlaybackBuffers();
 
+  LOG_D(( "D: AHIsub_Stop done\n" ));
 
-  LOG_D(("AHIsub_Stop done\n"));
   return;
 }

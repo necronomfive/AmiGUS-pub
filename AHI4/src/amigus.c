@@ -382,6 +382,7 @@ BOOL CreateInterruptHandler(VOID) {
 
   Enable();
   LOG_D(("D: Failed creating INT server\n"));
+  // TODO: Display error?
   return TRUE;
 }
 

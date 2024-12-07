@@ -113,10 +113,10 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
   LOG_D(( "D: AHIsub_Update start\n" ));
   LOG_V(( "V: Old ctrl 0x%08lx Size %lu Smpls %lu Min %lu Max %lu Type %lu\n",
           AmiGUSBase->agb_AudioCtrl,
+          AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize,
           AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples,
           AmiGUSBase->agb_AudioCtrl->ahiac_MinBuffSamples,
           AmiGUSBase->agb_AudioCtrl->ahiac_MaxBuffSamples,
-          AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize,
           AmiGUSBase->agb_AudioCtrl->ahiac_BuffType
        ));
   LOG_V(( "V: New ctrl 0x%08lx Size %lu Smpls %lu Min %lu Max %lu Type %lu\n",

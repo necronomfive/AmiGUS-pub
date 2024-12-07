@@ -123,6 +123,7 @@ struct AmiGUSBasePrivate {
 extern const LONG AmiGUSSampleRates[ AMIGUS_AHI_NUM_SAMPLE_RATES ];
 extern const STRPTR AmiGUSOutputs[ AMIGUS_AHI_NUM_OUTPUTS ];
 extern const STRPTR AmiGUSInputs[ AMIGUS_AHI_NUM_INPUTS ];
+extern const UWORD AmiGUSSampleSizes[ AMIGUS_SAMPLE_FORMAT_STEREO_24BIT + 1 ];
 
 /******************************************************************************
  * Library accessible function

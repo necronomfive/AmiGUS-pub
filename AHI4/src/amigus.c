@@ -91,6 +91,18 @@ const STRPTR AmiGUSInputs[ AMIGUS_AHI_NUM_INPUTS ] = {
   "Decoder"
 };
 
+/*
+ * Array of sample sizes in BYTE per hardware sample format.
+ */
+const UWORD AmiGUSSampleSizes[ AMIGUS_SAMPLE_FORMAT_STEREO_24BIT + 1 ] = {
+
+   1, // AMIGUS_SAMPLE_FORMAT_MONO_8BIT    @ index 0x0000
+   2, // AMIGUS_SAMPLE_FORMAT_STEREO_8BIT  @ index 0x0001
+   2, // AMIGUS_SAMPLE_FORMAT_MONO_16BIT   @ index 0x0002
+   4, // AMIGUS_SAMPLE_FORMAT_STEREO_16BIT @ index 0x0003
+   6, // AMIGUS_SAMPLE_FORMAT_MONO_24BIT   @ index 0x0004
+  12  // AMIGUS_SAMPLE_FORMAT_STEREO_24BIT @ index 0x0005
+};
 
 LONG FindAmiGUS(struct AmiGUSBasePrivate *amiGUSBase) {
 
@@ -320,8 +332,8 @@ BOOL CreatePlaybackBuffers( VOID ) {
     AmiGUSBase->agb_watermark = AMIGUS_PLAYBACK_FIFO_WORDS >> 1;
   }
 
-  LOG_D(( "D: Mix / copy up to %ld LONGs per pass, watermark %ld WORDs\n",
-          longSize,
+  LOG_D(( "D: Mix / copy up to %ld WORDs per pass, watermark %ld WORDs\n",
+          longSize << 1,
           AmiGUSBase->agb_watermark ));
 
   LOG_D(("D: All playback buffers created\n"));

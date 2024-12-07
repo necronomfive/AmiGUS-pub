@@ -108,18 +108,23 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {
 
-  ULONG aligned = alignBufferSamples( aAudioCtrl->ahiac_BuffSamples );
+  ULONG aligned;
 
   LOG_D(( "D: AHIsub_Update start\n" ));
-  LOG_V(( "V: Old ctrl 0x%08lx Size %lu Smpls %lu Min %lu Max %lu Type %lu\n",
-          AmiGUSBase->agb_AudioCtrl,
-          AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize,
-          AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples,
-          AmiGUSBase->agb_AudioCtrl->ahiac_MinBuffSamples,
-          AmiGUSBase->agb_AudioCtrl->ahiac_MaxBuffSamples,
-          AmiGUSBase->agb_AudioCtrl->ahiac_BuffType
-       ));
-  LOG_V(( "V: New ctrl 0x%08lx Size %lu Smpls %lu Min %lu Max %lu Type %lu\n",
+  if ( AmiGUSBase->agb_AudioCtrl ) {
+    LOG_V(( "V: Old ctrl 0x%08lx - "
+            "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
+            AmiGUSBase->agb_AudioCtrl,
+            AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize,
+            AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples,
+            AmiGUSBase->agb_AudioCtrl->ahiac_MinBuffSamples,
+            AmiGUSBase->agb_AudioCtrl->ahiac_MaxBuffSamples,
+            AmiGUSBase->agb_AudioCtrl->ahiac_BuffType
+        ));
+  }
+  aligned = alignBufferSamples( aAudioCtrl->ahiac_BuffSamples );
+  LOG_V(( "V: New ctrl 0x%08lx - "
+          "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
           aAudioCtrl,
           aAudioCtrl->ahiac_BuffSize,
           aAudioCtrl->ahiac_BuffSamples,

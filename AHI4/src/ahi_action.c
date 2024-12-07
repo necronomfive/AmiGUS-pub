@@ -122,7 +122,6 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
             AmiGUSBase->agb_AudioCtrl->ahiac_BuffType
         ));
   }
-  aligned = alignBufferSamples( aAudioCtrl->ahiac_BuffSamples );
   LOG_V(( "V: New ctrl 0x%08lx - "
           "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
           aAudioCtrl,
@@ -132,6 +131,7 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
           aAudioCtrl->ahiac_MaxBuffSamples,
           aAudioCtrl->ahiac_BuffType
        ));
+  aligned = alignBufferSamples( aAudioCtrl->ahiac_BuffSamples );
   if ( aAudioCtrl->ahiac_BuffSamples != aligned ) {
 
     LOG_I(( "I: Aligned buffer from %ld to %ld samples\n", 

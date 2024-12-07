@@ -99,16 +99,22 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
       }
       case AHIDB_Stereo: {
         isStereo = (UBYTE)tag->ti_Data;
-        result |= ( isStereo << AHISB_KNOWSTEREO );
-        ahiSampleSizeBytes <<= 1;
-        ahiSampleBytesShift += 1;
+        if ( isStereo ) {
+
+          result |= AHISF_KNOWSTEREO;
+          ahiSampleSizeBytes <<= 1;
+          ahiSampleBytesShift += 1;
+        }
         break;
       }
       case AHIDB_HiFi: {
         isHifi = (UBYTE)tag->ti_Data;
-        result |= ( isHifi << AHISB_KNOWHIFI );
-        ahiSampleSizeBytes <<= 1;
-        ahiSampleBytesShift += 1;
+        if ( isHifi ) {
+
+          result |= AHISF_KNOWHIFI;
+          ahiSampleSizeBytes <<= 1;
+          ahiSampleBytesShift += 1;
+        }
         break;
       }
       case AHIDB_Realtime: {

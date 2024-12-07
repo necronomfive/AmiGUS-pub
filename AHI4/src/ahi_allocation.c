@@ -144,8 +144,12 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
           "%ld HiFi, %ld Realtime, %ldHz\n",
           sampleFormat, bitsPerAmiGusSample, isStereo,
           isHifi, isRealtime, sampleRate ));
-  LOG_I(( "I: AHI mode is sample size %ld BYTEs, conversion by %ld shifts\n",
-          ahiSampleSizeBytes, ahiSampleBytesShift ));
+  LOG_I(( "I: AHI mode is sample size %ld BYTEs, "
+          "conversion AHI samples<->BYTEs by %ld shifts, "
+          "AmiGUS sample size is %ld BYTEs\n",
+          ahiSampleSizeBytes,
+          ahiSampleBytesShift,
+          AmiGUSSampleSizes[ sampleFormat  ] ));
 
   if ( 0 > sampleFormat ) {
 

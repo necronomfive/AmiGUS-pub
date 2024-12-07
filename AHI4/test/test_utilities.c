@@ -541,7 +541,7 @@ BOOL testCopyFunctionCalling( VOID ) {
 ULONG alignBufferSamplesRef( ULONG ahiBuffSamples ) {
 
   ULONG mask = CopyFunctionRequirementById[ AmiGUSBase->agb_CopyFunctionId ];
-  UBYTE shift = AmiGUSBase->agb_SampleShift;
+  UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
   ULONG aligned = ahiBuffSamples;
 
   aligned <<= shift;
@@ -597,7 +597,7 @@ BOOL testAlignBuffSamples( VOID ) {
 
         suggestedBufferSize = sampleRates[ i ] / 100;
         AmiGUSBase->agb_CopyFunctionId = copyFunctionId;
-        AmiGUSBase->agb_SampleShift = shift;
+        AmiGUSBase->agb_AhiSampleShift = shift;
 
         alignedBufferSize = alignBufferSamples( suggestedBufferSize );
         ref = alignBufferSamplesRef( suggestedBufferSize );

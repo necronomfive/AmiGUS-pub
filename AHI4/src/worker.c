@@ -138,7 +138,7 @@ VOID FillBuffer( BYTE buffer ) {
      * data for left and right channel are interleaved [...] "
      */
     maxTemp = audioCtrl->ahiac_BuffSamples;
-    maxTemp <<= AmiGUSBase->agb_SampleShift;               /* now: in BYTEs! */
+    maxTemp <<= AmiGUSBase->agb_AhiSampleShift;             /* now: in BYTEs! */
     if ( ( ~ bufferByteMask ) & maxTemp ) {
 
       LOG_W(( "W: Buffer NOT correct - will reduce %ld -> %ld and creak.\n",

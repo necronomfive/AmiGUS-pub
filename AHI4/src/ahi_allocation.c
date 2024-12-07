@@ -158,10 +158,10 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     return AHISF_ERROR;
   }
 
-  AmiGUSBase->agb_SampleSize = ahiSampleSizeBytes;
-  AmiGUSBase->agb_SampleShift = ahiSampleBytesShift;
-  AmiGUSBase->agb_SampleRateId = sampleRateId;
-  AmiGUSBase->agb_SampleFormat = sampleFormat;
+  AmiGUSBase->agb_AhiSampleSize = ahiSampleSizeBytes;
+  AmiGUSBase->agb_AhiSampleShift = ahiSampleBytesShift;
+  AmiGUSBase->agb_HwSampleRateId = sampleRateId;
+  AmiGUSBase->agb_HwSampleFormat = sampleFormat;
   AmiGUSBase->agb_CopyFunctionId = copyFunctionId;
   AmiGUSBase->agb_CopyFunction = CopyFunctionById[ copyFunctionId ];
 

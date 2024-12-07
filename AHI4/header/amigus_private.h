@@ -79,10 +79,10 @@ struct AmiGUSBasePrivate {
 
   /* Driver settings */
   CopyFunctionType              agb_CopyFunction;   /* Magic AHI<->AmiGUS... */
-  UWORD                         agb_SampleRateId;   /* HW sample rate ID     */
-  UWORD                         agb_SampleFormat;   /* HW sample format ID   */
-  UBYTE                         agb_SampleSize;     /* BYTE size of 1 sample */
-  UBYTE                         agb_SampleShift;    /* Sample <=> Byte shift */
+  UWORD                         agb_HwSampleRateId; /* HW sample rate ID     */
+  UWORD                         agb_HwSampleFormat; /* HW sample format ID   */
+  UBYTE                         agb_AhiSampleSize;  /* BYTE size of 1 sample */
+  UBYTE                         agb_AhiSampleShift; /* Sample <=> Byte shift */
   UBYTE                         agb_CopyFunctionId; /* ID of CopyFunction    */
   UBYTE                         agb_State;          /* 0 stopped, 1 playing  */
 

@@ -238,10 +238,10 @@ VOID initAmiGUS( VOID ) {
   }
   WriteReg16( amiGUS,
               AMIGUS_MAIN_SAMPLE_FORMAT,
-              AmiGUSBase->agb_SampleFormat );
+              AmiGUSBase->agb_HwSampleFormat );
   WriteReg16( amiGUS,
               AMIGUS_MAIN_SAMPLE_RATE,
-              AmiGUSBase->agb_SampleRateId
+              AmiGUSBase->agb_HwSampleRateId
             | AMIGUS_SAMPLE_RATE_FLAG_INTERPOLATION
             | AMIGUS_SAMPLE_RATE_FLAG_ENABLE );
   AmiGUSBase->agb_State = 1;

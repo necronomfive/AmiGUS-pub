@@ -110,7 +110,7 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
 
   ULONG alignedSamples;
   ULONG alignedBytes;
-  UBYTE sampleToByte = AmiGUSBase->agb_SampleShift;
+  UBYTE sampleToByte = AmiGUSBase->agb_AhiSampleShift;
 
   LOG_D(( "D: AHIsub_Update start\n" ));
   if ( AmiGUSBase->agb_AudioCtrl ) {
@@ -143,7 +143,7 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
             aAudioCtrl->ahiac_BuffSamples << sampleToByte,
             alignedBytes ));
   }
-  aAudioCtrl->ahiac_BuffSamples = aligned;
+  aAudioCtrl->ahiac_BuffSamples = alignedSamples;
 
   /* Watermark is ticking in WORDs! */
   AmiGUSBase->agb_watermark = alignedBytes >> 1;

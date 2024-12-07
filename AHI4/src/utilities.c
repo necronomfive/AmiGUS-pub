@@ -81,7 +81,7 @@ ULONG alignBufferSamples( ULONG ahiBuffSamples ) {
 
   ULONG index = AmiGUSBase->agb_CopyFunctionId;
   ULONG mask = CopyFunctionRequirementById[ index ];
-  UBYTE shift = AmiGUSBase->agb_SampleShift;
+  UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
   ULONG aligned = ahiBuffSamples;
 
   aligned &= ( mask >> shift );

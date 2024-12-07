@@ -627,6 +627,9 @@ BOOL testAlignBuffSamples( VOID ) {
           h3,
           h4, h5, h5, h5, h6,
           h0, h1, h1, h1, h2 );
+  printf( "Example mask: 0x%08lx, Example ~ mask: 0x%08lx\n",
+          CopyFunctionRequirementById[ AmiGUSBase->agb_CopyFunctionId ],
+          ~CopyFunctionRequirementById[ AmiGUSBase->agb_CopyFunctionId ] );
   return failed;
 }
 

@@ -108,7 +108,9 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {
 
-  ULONG aligned;
+  ULONG alignedSamples;
+  ULONG alignedBytes;
+  UBYTE sampleToByte = AmiGUSBase->agb_SampleShift;
 
   LOG_D(( "D: AHIsub_Update start\n" ));
   if ( AmiGUSBase->agb_AudioCtrl ) {
@@ -131,13 +133,29 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
           aAudioCtrl->ahiac_MaxBuffSamples,
           aAudioCtrl->ahiac_BuffType
        ));
-  aligned = alignBufferSamples( aAudioCtrl->ahiac_BuffSamples );
-  if ( aAudioCtrl->ahiac_BuffSamples != aligned ) {
+  alignedSamples = alignBufferSamples( aAudioCtrl->ahiac_BuffSamples );
+  alignedBytes = alignedSamples << sampleToByte;
+  if ( aAudioCtrl->ahiac_BuffSamples != alignedSamples ) {
 
-    LOG_I(( "I: Aligned buffer from %ld to %ld samples\n", 
-            aAudioCtrl->ahiac_BuffSamples, aligned ));
+    LOG_I(( "I: Aligned buffer %ld -> %ld samples or %ld -> %ld BYTEs\n",
+            aAudioCtrl->ahiac_BuffSamples,
+            alignedSamples,
+            aAudioCtrl->ahiac_BuffSamples << sampleToByte,
+            alignedBytes ));
   }
   aAudioCtrl->ahiac_BuffSamples = aligned;
+
+  /* Watermark is ticking in WORDs! */
+  AmiGUSBase->agb_watermark = alignedBytes >> 1;
+  if ( ( AMIGUS_PLAYBACK_FIFO_WORDS >> 1 ) < ( AmiGUSBase->agb_watermark ) ) {
+
+    AmiGUSBase->agb_watermark = AMIGUS_PLAYBACK_FIFO_WORDS >> 1;
+  }
+
+  LOG_D(( "D: Mix / copy up to %ld WORDs per pass, watermark %ld WORDs\n",
+          alignedBytes >> 1,
+          AmiGUSBase->agb_watermark ));
+
   AmiGUSBase->agb_AudioCtrl = aAudioCtrl;
 
   LOG_D(( "D: AHIsub_Update done.\n" ));

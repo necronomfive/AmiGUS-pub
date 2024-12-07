@@ -325,16 +325,8 @@ BOOL CreatePlaybackBuffers( VOID ) {
   AmiGUSBase->agb_BufferIndex[ 1 ] = longSize;
   AmiGUSBase->agb_currentBuffer = 0;
 
-  /* Watermark is ticking in WORDs! */
-  AmiGUSBase->agb_watermark = AmiGUSBase->agb_BufferSize >> 1;
-  if ( ( AMIGUS_PLAYBACK_FIFO_WORDS >> 1 ) < ( AmiGUSBase->agb_watermark ) ) {
-
-    AmiGUSBase->agb_watermark = AMIGUS_PLAYBACK_FIFO_WORDS >> 1;
-  }
-
-  LOG_D(( "D: Mix / copy up to %ld WORDs per pass, watermark %ld WORDs\n",
-          longSize << 1,
-          AmiGUSBase->agb_watermark ));
+  LOG_I(( "I: Mix / copy up to %ld WORDs from AHI per pass\n",
+          longSize << 1 ));
 
   LOG_D(("D: All playback buffers created\n"));
   return FALSE;

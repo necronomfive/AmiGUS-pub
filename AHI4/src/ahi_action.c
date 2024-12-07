@@ -16,6 +16,7 @@
 
 #include <exec/libraries.h>
 #include <proto/exec.h>
+#include <proto/utility.h>
 
 #include "amigus_private.h"
 #include "debug.h"
@@ -111,6 +112,7 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
   ULONG alignedSamples;
   UBYTE sampleToByte = AmiGUSBase->agb_AhiSampleShift;
   UWORD hwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
+  ULONG alignedSamplesHwWordSize;
 
   LOG_D(( "D: AHIsub_Update start\n" ));
   if ( AmiGUSBase->agb_AudioCtrl ) {
@@ -146,13 +148,20 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
   AmiGUSBase->agb_AudioCtrl = aAudioCtrl;
 
   /* Finally, adapt watermark, ticking in hardware samples in WORDs! */
-  AmiGUSBase->agb_watermark = UMult32( alignedSamples, hwSampleSize );
-  if ( ( AMIGUS_PLAYBACK_FIFO_WORDS >> 1 ) < ( AmiGUSBase->agb_watermark ) ) {
+  
+  alignedSamplesHwWordSize = UMult32( alignedSamples, hwSampleSize ) >> 1;
+  if ( ( AMIGUS_PLAYBACK_FIFO_WORDS >> 1 ) < alignedSamplesHwWordSize ) {
 
     AmiGUSBase->agb_watermark = AMIGUS_PLAYBACK_FIFO_WORDS >> 1;
+
+  } else {
+
+    AmiGUSBase->agb_watermark = alignedSamplesHwWordSize;
   }
-  LOG_D(( "D: Mix / copy up to %ld WORDs per pass, watermark %ld WORDs\n",
-          alignedBytes >> 1,
+  LOG_D(( "D: Mix / copy up to %ld WORDs from AHI per pass, "
+          "converts to %ld WORDs in AmiGUS, using watermark %ld WORDs\n",
+          ( alignedSamples << sampleToByte ) >> 1,
+          alignedSamplesHwWordSize,
           AmiGUSBase->agb_watermark ));
 
   LOG_D(( "D: AHIsub_Update done.\n" ));

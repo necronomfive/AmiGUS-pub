@@ -32,10 +32,10 @@
 #define AMIGUS_AHI_FULL_DUPLEX      FALSE
 
 #define AMIGUS_AHI_FIRMWARE_MINIMUM ( ( 2024 << 20 ) /* year   */ \
-                                    + (   11 << 16 ) /* month  */ \
-                                    + (   26 << 11 ) /* day    */ \
+                                    + (   12 << 16 ) /* month  */ \
+                                    + (    8 << 11 ) /* day    */ \
                                     + (   22 <<  6 ) /* hour   */ \
-                                    + (   49 <<  0 ) /* minute */ )
+                                    + (   38 <<  0 ) /* minute */ )
 
 #define AMIGUS_AHI_NUM_SAMPLE_RATES 9
 #define AMIGUS_AHI_NUM_OUTPUTS      1

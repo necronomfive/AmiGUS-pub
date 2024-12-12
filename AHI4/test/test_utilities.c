@@ -437,17 +437,9 @@ BOOL testCopy32to24( VOID ) {
   ULONG index = 1;
   ULONG exp[] = { 5, 12, 3, 3 };
   STRPTR expF[] = {
-#if 0
-    // Big Endian
     "1234569a",
     "bcde0fed",
     "cb876543" };
-#else
-    // Little Endian
-    "563412de",
-    "bc9acbed",
-    "0f436587" };
-#endif
 
   AmiGUSBase->agb_CopyFunction = &Copy32to24;
   printf("\nTesting Copy32to24 ...\n");

@@ -181,29 +181,9 @@ ASM(LONG) Copy32to24(
   ULONG inC = *(( ULONG * ) addressInC);
   ULONG addressInD = addressInC + sizeof( ULONG );
   ULONG inD = *(( ULONG * ) addressInD);
-
-#if 0
-
-  // Big Endian, seems buggy in Stereo (3rd word just grunting)
-  // Cannot get it work in Mono either...
   ULONG outA = (   inA         & 0xffFFff00 ) | ( inB >> 24 );
-  ULONG outB = /*( ( inB <<  8 ) & 0xffFF0000 ) |*/ ( inC >> 16 );
+  ULONG outB = ( ( inB <<  8 ) & 0xffFF0000 ) | ( inC >> 16 );
   ULONG outC = ( ( inC << 16 ) & 0xff000000 ) | ( inD >>  8 );
-#else
-  // Little Endian
-  ULONG outA = ( ( inA & 0xff000000 ) >> 16 ) |
-               ( ( inA & 0x00FF0000 ) >>  0 ) |
-               ( ( inA & 0x0000ff00 ) << 16 ) |
-               ( ( inB & 0x0000ff00 ) >>  8 );
-  ULONG outB = /*( ( inB & 0x00FF0000 ) <<  8 ) |
-               ( ( inB & 0xff000000 ) >>  8 ) |*/
-               ( ( inC & 0x0000ff00 )       ) |
-               ( ( inC & 0x00FF0000 ) >> 16 );
-  ULONG outC = ( ( inC & 0xff000000 )       ) |
-               ( ( inD & 0x0000ff00 ) <<  8 ) |
-               ( ( inD & 0x00FF0000 ) >>  8 ) |
-               ( ( inD & 0xff000000 ) >> 24 );
-#endif
 
   WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, outA );
   WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, outB );

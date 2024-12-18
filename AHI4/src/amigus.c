@@ -203,7 +203,7 @@ VOID initAmiGUS( VOID ) {
   ULONG i;
   // Working maybe:
 //  ULONG prefillSize = AMIGUS_PLAYBACK_FIFO_LONGS;
-  ULONG prefillSize = 6; /* in LONGs */ 
+  ULONG prefillSize = 6000; /* in LONGs */ 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   LOG_D(("D: Init AmiGUS @ 0x%08lx\n", amiGUS));
 

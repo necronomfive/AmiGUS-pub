@@ -65,6 +65,5 @@ dkms.conf
 Play16**
 Mixer**
 *.wav
-*.xlsx
 PlayWAV**
 ftp-*.sh

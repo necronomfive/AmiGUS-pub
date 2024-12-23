@@ -203,7 +203,7 @@ VOID initAmiGUS( VOID ) {
   ULONG i;
   // Working maybe:
 //  ULONG prefillSize = AMIGUS_PLAYBACK_FIFO_LONGS;
-  ULONG prefillSize = 12; // 6000; /* in LONGs */
+  ULONG prefillSize = 12; /* in LONGs */ 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   LOG_D(("D: Init AmiGUS @ 0x%08lx\n", amiGUS));
 
@@ -411,7 +411,7 @@ VOID DestroyInterruptHandler(VOID) {
 }
 
 ///#def ine INT_DEBUGGING
-ASM(LONG) /*__entry for vbcc*/ SAVEDS INTERRUPT handleInterrupt (
+ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
 ) {
 
@@ -419,6 +419,7 @@ ASM(LONG) /*__entry for vbcc*/ SAVEDS INTERRUPT handleInterrupt (
   BOOL canSwap;
   LONG reminder;
   LONG desired;
+  const LONG minHwSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
 
   UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
                             AMIGUS_MAIN_INT_CONTROL );
@@ -451,19 +452,20 @@ ASM(LONG) /*__entry for vbcc*/ SAVEDS INTERRUPT handleInterrupt (
   canSwap = TRUE;
   reminder = ReadReg16( AmiGUSBase->agb_CardBase,
                         AMIGUS_MAIN_FIFO_USAGE ) << 1; /* in BYTEs */
-  // was: desired = AmiGUSBase->agb_watermark << 2; /* x2 and in BYTES*/
-  desired = AMIGUS_PLAYBACK_FIFO_BYTES;
+  desired = AMIGUS_PLAYBACK_FIFO_BYTES;                /* in BYTEs */
   desired -= reminder;
-  desired -= AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
 
 #ifdef INT_DEBUGGING
-  LOG_D(("D: CB%01ld\n", *current));
+  LOG_D(( "D: CurBuf %01ld Des %ld rem %ld\n",
+          *current,
+          desired,
+          reminder ));
 #endif
   
   /* desired and buffers now counting BYTEs! */
   for ( ; ; ) {
 
-    if ( !desired ) {
+    if ( minHwSize > desired ) {
 #ifdef INT_DEBUGGING
       LOG_D(("D: Fff\n"));
 #endif

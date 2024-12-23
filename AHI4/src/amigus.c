@@ -410,7 +410,6 @@ VOID DestroyInterruptHandler(VOID) {
   LOG_D(("D: Destroyed INT server\n"));
 }
 
-///#def ine INT_DEBUGGING
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
 ) {
@@ -429,81 +428,33 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
     return 0;
   }
 
-#ifdef INT_DEBUGGING
-  /*
-   * Clear AmiGUS control flags here - 
-   * Hope I can haz LOGz now!!!
-   */
-  if ( status & AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY ) {
-    /* ... and yes, this causes buffer underruns. */
-    WriteReg16( AmiGUSBase->agb_CardBase,
-                AMIGUS_MAIN_INT_ENABLE,
-                AMIGUS_INT_FLAG_MASK_CLEAR
-              | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY );
-  }
-  WriteReg16( AmiGUSBase->agb_CardBase,
-              AMIGUS_MAIN_INT_CONTROL,
-              AMIGUS_INT_FLAG_MASK_CLEAR
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK );
-#endif
-
   current = &( AmiGUSBase->agb_currentBuffer );  
   canSwap = TRUE;
   reminder = ReadReg16( AmiGUSBase->agb_CardBase,
                         AMIGUS_MAIN_FIFO_USAGE ) << 1; /* in BYTEs */
   desired = AMIGUS_PLAYBACK_FIFO_BYTES;                /* in BYTEs */
   desired -= reminder;
-
-#ifdef INT_DEBUGGING
-  LOG_D(( "D: CurBuf %01ld Des %ld rem %ld\n",
-          *current,
-          desired,
-          reminder ));
-#endif
   
-  /* desired and buffers now counting BYTEs! */
-  for ( ; ; ) {
+  while ( minHwSize < desired ) {
 
-    if ( minHwSize > desired ) {
-#ifdef INT_DEBUGGING
-      LOG_D(("D: Fff\n"));
-#endif
-      break;
-    }
-    if ( AmiGUSBase->agb_BufferIndex[ *current ] < AmiGUSBase->agb_BufferMax[ *current ] ) {
+    if ( AmiGUSBase->agb_BufferIndex[ *current ] 
+         < AmiGUSBase->agb_BufferMax[ *current ] ) {
 
-#if 1
       desired -= (* AmiGUSBase->agb_CopyFunction)(
         AmiGUSBase->agb_Buffer[ *current ],
         &( AmiGUSBase->agb_BufferIndex[ *current ] ));
-#else
-      /* Old Version, needs 16bit, stereo */
-      ULONG sampleAddress = (
-          (( ULONG ) AmiGUSBase->agb_Buffer[ *current ])
-           + (AmiGUSBase->agb_BufferIndex[ *current ] << 2));
-      WriteReg32( AmiGUSBase->agb_CardBase,
-                  AMIGUS_MAIN_FIFO_WRITE,
-                  *(( ULONG * ) sampleAddress) );
-      ++AmiGUSBase->agb_BufferIndex[ *current ];
-      desired -= 4;
-#endif
 
-      continue;
-    }
-    if ( canSwap ) {
+    } else if ( canSwap ) {
 
-#ifdef INT_DEBUGGING
-      LOG_D(("D: BS\n"));
-#endif
       *current ^= 0x00000001;
       canSwap = FALSE;
-      continue;
+
+    } else {
+
+      // Playback buffers empty, but FIFO could take more.
+      // Not so good, Al...
+      break;
     }
-#ifdef INT_DEBUGGING
-    LOG_D(("D: Fmi\n"));
-#endif
-    break;
   }
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_MAIN_FIFO_WATERMARK,
@@ -521,9 +472,8 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
             1 << AmiGUSBase->agb_WorkerWorkSignal );
 
   } else {
-#ifdef INT_DEBUGGING
-    LOG_D(("D: SNR\n"));
-#endif
+
+    // TODO: How do we handle worker not ready here? Maybe crying?
   }
   return 1;
 }

@@ -257,7 +257,8 @@ VOID initAmiGUS( VOID ) {
               AmiGUSBase->agb_HwSampleRateId
             | AMIGUS_SAMPLE_RATE_FLAG_INTERPOLATION
             | AMIGUS_SAMPLE_RATE_FLAG_ENABLE );
-  AmiGUSBase->agb_State = 1;
+  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_STATUS_PLAYBACK_STOPPED_MASK;
+  AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_STATUS_PLAYBACK_STARTED;
 }
 
 void stopAmiGUS(void) {
@@ -283,7 +284,7 @@ void stopAmiGUS(void) {
   WriteReg16( amiGUS,
               AMIGUS_MAIN_FIFO_RESET,
               0x0000 );
-  AmiGUSBase->agb_State = 0;
+  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_STATUS_PLAYBACK_STOPPED_MASK;
 }
 
 // TRUE = failure
@@ -466,19 +467,12 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   }
   if ( status & AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY ) {
 
-    if ( 0 < copied ) {
-
-      // Need to set ENABLE again, 
-      // can only do so together with all others in same register.
-      WriteReg16( AmiGUSBase->agb_CardBase,
-                  AMIGUS_MAIN_SAMPLE_RATE,
-                  AmiGUSBase->agb_HwSampleRateId
-                | AMIGUS_SAMPLE_RATE_FLAG_INTERPOLATION
-                | AMIGUS_SAMPLE_RATE_FLAG_ENABLE );
-
-    } else {
-
-      LOG_E(( "E: Interrupt could not feed samples! Dead end.\n" ));
+      /*
+       Recovery from buffer underruns is a bit tricky.
+       DMA will stay disabled until worker task prepared some buffers and 
+       triggered a full playback init cycle to make us run again.
+       */
+      AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_STATUS_PLAYBACK_BUFFER_UNDERRUN;
     }
   }
   WriteReg16( AmiGUSBase->agb_CardBase,

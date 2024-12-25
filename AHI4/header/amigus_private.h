@@ -84,7 +84,7 @@ struct AmiGUSBasePrivate {
   UBYTE                         agb_AhiSampleSize;  /* BYTE size of 1 sample */
   UBYTE                         agb_AhiSampleShift; /* Sample <=> Byte shift */
   UBYTE                         agb_CopyFunctionId; /* ID of CopyFunction    */
-  UBYTE                         agb_State;          /* 0 stopped, 1 playing  */
+  UBYTE                         agb_StateFlags;     /* AmiGUS state as below */
 
   /* Mixing double-buffers to be copied to FIFO alternatingly */
   ULONG                       * agb_Buffer[2];      /* Fully LONG aligned!   */
@@ -119,6 +119,28 @@ struct AmiGUSBasePrivate {
   #define TimerBase                 amiGUSBase->TimerBase
   #define UtilityBase               amiGUSBase->agb_UtilityBase
 #endif
+
+/******************************************************************************
+ * Library flag definitions
+ *****************************************************************************/
+
+#define AMIGUS_AHI_STATUS_PLAYBACK_STARTED                0x01
+#define AMIGUS_AHI_STATUS_PLAYBACK_BUFFER_UNDERRUN        0x02
+#define AMIGUS_AHI_STATUS_PLAYBACK_0                      0x04
+#define AMIGUS_AHI_STATUS_PLAYBACK_1                      0x08
+#define AMIGUS_AHI_STATUS_RECORDING_STARTED               0x10
+#define AMIGUS_AHI_STATUS_RECORDING_0                     0x20
+#define AMIGUS_AHI_STATUS_RECORDING_1                     0x40
+#define AMIGUS_AHI_STATUS_RECORDING_2                     0x80
+
+#define AMIGUS_AHI_STATUS_PLAYBACK_MASK                   0x0F
+#define AMIGUS_AHI_STATUS_PLAYBACK_STOPPED_MASK           0xF0
+#define AMIGUS_AHI_STATUS_RECORDING_MASK                  0xF0
+#define AMIGUS_AHI_STATUS_RECORDING_STOPPED_MASK          0x0F
+
+/******************************************************************************
+ * Library data fields and lookup tables
+ *****************************************************************************/
 
 extern const LONG AmiGUSSampleRates[ AMIGUS_AHI_NUM_SAMPLE_RATES ];
 extern const STRPTR AmiGUSOutputs[ AMIGUS_AHI_NUM_OUTPUTS ];

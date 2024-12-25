@@ -188,20 +188,21 @@ VOID FillBuffer( BYTE buffer ) {
         }
         k ^= 0x00000001;
       }
-      /*
-      WriteReg16( AmiGUSBase->agb_CardBase,
-                  AMIGUS_MAIN_INT_CONTROL,
-                  AMIGUS_INT_FLAG_MASK_CLEAR
-                | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
-                | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-              );
-              */
-              /*
-      if ( !AmiGUSBase->agb_State ) {
+      if ( AMIGUS_AHI_STATUS_PLAYBACK_BUFFER_UNDERRUN 
+           & AmiGUSBase->agb_StateFlags ) {
+
+        LOG_W(( "W: Recovering from playback buffer underrun.\n" ));
+        /*
+         We suffered a full underrun before...
+         FIFO empty, both playback buffers empty...
+         so the playback and interrupt are kind of dead.
+         Just enabling playback again would un-align 24bit stereo playback,
+         so instead we can go through full playback init cycle.
+         Bonus: resets the plaback flag. :)
+         */
         initAmiGUS();
       }
-      */
-//      LOG_D(("D: STW\n"));
+
       AmiGUSBase->agb_WorkerReady = TRUE;
       signals = Wait(
           SIGBREAKF_CTRL_C
@@ -227,7 +228,7 @@ VOID FillBuffer( BYTE buffer ) {
   AmiGUSBase->agb_WorkerStopSignal = -1;
 
   /* Stop multitasking here - master will resume it TODO: ??? */
-//  Forbid();
+  //  Forbid();
 
   Signal(
       (struct Task *) AmiGUSBase->agb_MainProcess,
@@ -241,7 +242,7 @@ VOID FillBuffer( BYTE buffer ) {
 /*
  * TRUE = failure
  */
-BOOL CreateWorkerProcess(VOID) {
+BOOL CreateWorkerProcess( VOID ) {
 
   /* Prevent worker from waking up until we are ready. */
   Forbid();

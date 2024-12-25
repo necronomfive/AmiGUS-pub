@@ -47,9 +47,9 @@
  *****************************************************************************/
 #define LIBRARY_NAME      "AmiGUS.audio"
 #define LIBRARY_VERSION   4
-#define LIBRARY_REVISION  10
+#define LIBRARY_REVISION  11
 #define LIBRARY_DATETXT	  __AMIGADATE__
-#define LIBRARY_VERSTXT	  "4.010"
+#define LIBRARY_VERSTXT	  "4.011"
 
 #ifdef _M68060
   #define LIBRARY_ADDTXT  " 060"

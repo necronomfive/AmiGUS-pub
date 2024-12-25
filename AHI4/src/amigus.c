@@ -417,9 +417,10 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
   ULONG *current;
   BOOL canSwap;
-  LONG reminder;
-  LONG desired;
-  const LONG minHwSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
+  LONG reminder;          /* Read-back remaining FIFO samples in BYTES       */
+  LONG target;            /* Target amount of BYTEs to fill into FIFO        */
+  LONG copied;            /* Sum of BYTEs actually filled into FIFO this run */
+  LONG minHwSampleSize;   /* Size of a single (mono / stereo) sample in BYTEs*/
 
   UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
                             AMIGUS_MAIN_INT_CONTROL );
@@ -429,19 +430,25 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
     return 0;
   }
 
-  current = &( AmiGUSBase->agb_currentBuffer );  
-  canSwap = TRUE;
   reminder = ReadReg16( AmiGUSBase->agb_CardBase,
-                        AMIGUS_MAIN_FIFO_USAGE ) << 1; /* in BYTEs */
-  desired = AMIGUS_PLAYBACK_FIFO_BYTES;                /* in BYTEs */
-  desired -= reminder;
+                        AMIGUS_MAIN_FIFO_USAGE ) << 1;
+  minHwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
+
+  /* Now find out target size to copy into FIFO during this interrupt run    */
+  target = AMIGUS_PLAYBACK_FIFO_BYTES;             /* all counting in BYTEs! */
+  target -= reminder;                               /* deduct remaining FIFO */
+  target -= minHwSampleSize;   /* and provide headroom for ALL sample sizes! */
+
+  current = &( AmiGUSBase->agb_currentBuffer );
+  canSwap = TRUE;
+  copied = 0;
   
-  while ( minHwSize < desired ) {
+  while ( copied < target ) {
 
     if ( AmiGUSBase->agb_BufferIndex[ *current ] 
          < AmiGUSBase->agb_BufferMax[ *current ] ) {
 
-      desired -= (* AmiGUSBase->agb_CopyFunction)(
+      copied += (* AmiGUSBase->agb_CopyFunction)(
         AmiGUSBase->agb_Buffer[ *current ],
         &( AmiGUSBase->agb_BufferIndex[ *current ] ));
 
@@ -455,6 +462,23 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
       // Playback buffers empty, but FIFO could take more.
       // Not so good, Al...
       break;
+    }
+  }
+  if ( status & AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY ) {
+
+    if ( 0 < copied ) {
+
+      // Need to set ENABLE again, 
+      // can only do so together with all others in same register.
+      WriteReg16( amiGUS,
+                  AMIGUS_MAIN_SAMPLE_RATE,
+                  AmiGUSBase->agb_HwSampleRateId
+                | AMIGUS_SAMPLE_RATE_FLAG_INTERPOLATION
+                | AMIGUS_SAMPLE_RATE_FLAG_ENABLE );
+
+    } else {
+
+      LOG_E(( "E: Interrupt could not feed samples! Dead end.\n" ));
     }
   }
   WriteReg16( AmiGUSBase->agb_CardBase,

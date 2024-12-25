@@ -102,7 +102,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: 8 bit mono - LowLatency"
+    TEXT0 "AmiGUS: 8 bit mono - AHI Timing"
     ENDCHUNK
 
 MODE1:
@@ -121,7 +121,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: 8 bit stereo - LowLatency"
+    TEXT0 "AmiGUS: 8 bit stereo - AHI Timing"
     ENDCHUNK
 
 MODE2:
@@ -140,7 +140,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: 16 bit mono - LowLatency"
+    TEXT0 "AmiGUS: 16 bit mono - AHI Timing"
     ENDCHUNK
 
 MODE3:
@@ -159,7 +159,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: 16 bit stereo - LowLatency"
+    TEXT0 "AmiGUS: 16 bit stereo - AHI Timing"
     ENDCHUNK
 
 MODE4:
@@ -178,7 +178,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: HiFi 8 bit mono - LowLatency"
+    TEXT0 "AmiGUS: HiFi 8 bit mono - AHI Timing"
     ENDCHUNK
 
 MODE5:
@@ -197,7 +197,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: HiFi 8 bit stereo - LowLatency"
+    TEXT0 "AmiGUS: HiFi 8 bit stereo - AHI Timing"
     ENDCHUNK
 
 MODE6:
@@ -216,7 +216,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: HiFi 16 bit mono - LowLatency"
+    TEXT0 "AmiGUS: HiFi 16 bit mono - AHI Timing"
     ENDCHUNK
 
 MODE7:
@@ -235,7 +235,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: HiFi 16 bit stereo - LowLatency"
+    TEXT0 "AmiGUS: HiFi 16 bit stereo - AHI Timing"
     ENDCHUNK
 
 MODE8:
@@ -254,7 +254,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: HiFi 24 bit mono - LowLatency"
+    TEXT0 "AmiGUS: HiFi 24 bit mono - AHI Timing"
     ENDCHUNK
 
 MODE9:
@@ -273,7 +273,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: HiFi 24 bit stereo - LowLatency"
+    TEXT0 "AmiGUS: HiFi 24 bit stereo - AHI Timing"
     ENDCHUNK
 
 * All LowCPU modes de-activated while we will be using AHI provided timing,

@@ -467,13 +467,12 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   }
   if ( status & AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY ) {
 
-      /*
-       Recovery from buffer underruns is a bit tricky.
-       DMA will stay disabled until worker task prepared some buffers and 
-       triggered a full playback init cycle to make us run again.
-       */
-      AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_STATUS_PLAYBACK_BUFFER_UNDERRUN;
-    }
+    /*
+     Recovery from buffer underruns is a bit tricky.
+     DMA will stay disabled until worker task prepared some buffers and 
+     triggered a full playback init cycle to make us run again.
+     */
+    AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_STATUS_PLAYBACK_BUFFER_UNDERRUN;
   }
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_MAIN_FIFO_WATERMARK,

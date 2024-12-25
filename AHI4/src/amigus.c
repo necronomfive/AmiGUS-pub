@@ -85,10 +85,11 @@ const STRPTR AmiGUSOutputs[ AMIGUS_AHI_NUM_OUTPUTS ] = {
 
 const STRPTR AmiGUSInputs[ AMIGUS_AHI_NUM_INPUTS ] = {
 
-  "Line In",
-  "Paula",
-  "CD-ROM",
-  "Decoder"
+  "AHI / PCM",
+  "MHI / Codec",
+  "WaveTable",
+  "External / see Mixer",
+  "ALL / What-You-Hear"
 };
 
 /*

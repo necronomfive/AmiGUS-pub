@@ -470,7 +470,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
       // Need to set ENABLE again, 
       // can only do so together with all others in same register.
-      WriteReg16( amiGUS,
+      WriteReg16( AmiGUSBase->agb_CardBase,
                   AMIGUS_MAIN_SAMPLE_RATE,
                   AmiGUSBase->agb_HwSampleRateId
                 | AMIGUS_SAMPLE_RATE_FLAG_INTERPOLATION

@@ -39,7 +39,7 @@
 
 #define AMIGUS_AHI_NUM_SAMPLE_RATES 9
 #define AMIGUS_AHI_NUM_OUTPUTS      1
-#define AMIGUS_AHI_NUM_INPUTS       4
+#define AMIGUS_AHI_NUM_INPUTS       5
 
 #define AHIDB_AmiGUS_SampleFormat   ( AHIDB_UserBase + 0 )
 #define AHIDB_AmiGUS_CopyFunction   ( AHIDB_UserBase + 1 )

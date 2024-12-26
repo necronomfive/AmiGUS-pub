@@ -86,4 +86,8 @@
 #define AMIGUS_PLAYBACK_FIFO_WORDS                4096
 #define AMIGUS_PLAYBACK_FIFO_LONGS                2048
 
+#define AMIGUS_RECORD_FIFO_BYTES                  2048
+#define AMIGUS_RECORD_FIFO_WORDS                  1024
+#define AMIGUS_RECORD_FIFO_LONGS                   512
+
 #endif

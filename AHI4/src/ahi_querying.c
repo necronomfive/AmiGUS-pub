@@ -100,30 +100,49 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
     case AHIDB_MaxPlaySamples: {
 
       ULONG bits = GetTagData(AHIDB_Bits, 0, aTagList);
-      ULONG bytesPerSample = bits / 8;
+      ULONG bytesPerSample = bits >> 3;
       ULONG flags = aAudioCtrl->ahiac_Flags;
       ULONG stereo = AHISF_KNOWSTEREO & flags;
-      
-      LOG_V(("AHIDB_MaxPlaySamples bits %ld flags %lx stereo %lx bytes/sample %ld\n", 
-            bits, 
-            flags,
-            stereo,
-            bytesPerSample));
 
-      result = UDivMod32(AMIGUS_PLAYBACK_FIFO_BYTES, bytesPerSample);
+      LOG_V(( "AHIDB_MaxPlaySamples "
+              "bits %ld flags %lx stereo %lx bytes/sample %ld\n",
+              bits,
+              flags,
+              stereo,
+              bytesPerSample ));
+
+      result = UDivMod32( AMIGUS_PLAYBACK_FIFO_BYTES, bytesPerSample );
       /*
       Could get reminder by getRegD1(); like
         __reg("d1") ULONG __getRegD1()="\t";
         #define getRegD1() __getRegD1()
       */
       if ( stereo  ) {
+
         result >>= 1;
       }
       break;
     }
     case AHIDB_MaxRecordSamples: {
 
-      /* TODO: Ask how much record buffer we have!? */
+      ULONG bits = GetTagData(AHIDB_Bits, 0, aTagList);
+      ULONG bytesPerSample = bits >> 3;
+      ULONG flags = aAudioCtrl->ahiac_Flags;
+      ULONG stereo = AHISF_KNOWSTEREO & flags;
+
+      LOG_V(( "AHIDB_MaxRecordSamples "
+              "bits %ld flags %lx stereo %lx bytes/sample %ld\n",
+              bits,
+              flags,
+              stereo,
+              bytesPerSample ));
+
+      result = UDivMod32( AMIGUS_RECORD_FIFO_BYTES, bytesPerSample );
+
+      if ( stereo  ) {
+
+        result >>= 1;
+      }
       break;
     }
     case AHIDB_MinInputGain:
@@ -141,7 +160,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
       break;
     }
     case AHIDB_MaxOutputVolume: {
-      result = USHRT_MAX;
+      result = USHRT_MAX + 1;
       break;
     }
     case AHIDB_Inputs:
@@ -206,11 +225,20 @@ ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
 
       ULONG volume = ReadReg16( AmiGUSBase->agb_CardBase,
                                 AMIGUS_MAIN_PCM_OUT_VOLUME_LEFT );
+      if ( 0 != volume ) {
+
+        ++volume;
+      }
       result = (LONG) volume;
     }
     case AHIC_OutputVolume: {
 
-      ULONG volume = ( aArgument << 16 ) + aArgument;
+      ULONG volume = aArgument;
+      if ( 0 != volume ) {
+        --volume;
+      }
+      volume &= 0x0000FFff;
+      volume |= volume << 16;
       WriteReg32( AmiGUSBase->agb_CardBase,
                   AMIGUS_MAIN_PCM_OUT_VOLUME,
                   volume );

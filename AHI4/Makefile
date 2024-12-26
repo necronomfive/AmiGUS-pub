@@ -61,8 +61,8 @@ LIB_OBJS        = $(BDIR)library.o \
                   $(filter-out %/library.o,$(BDIR_OBJS))
 LIB_DST         = $(DDIR)AmiGUS.audio
 
-# activate VBCC builds by adding `VBCC=1` to the make call!
-ifdef USE_VBCC
+# activate VBCC builds by adding `USEVBCC=1` to the make call!
+ifdef USEVBCC
   ifdef AMIGAOS
     LDIR        = vlibos3:
   endif

@@ -14,22 +14,43 @@
 # along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+ifeq ($(findstring /home,$(HOME)), /home)
+  LINUX         = 1
+
+  NDK           = $(VBCC)/NDK3.2/
+  WILDCARD      = *
+
+  MKDIR         = mkdir -p
+  MKDIR_SUFFIX  =
+  RM            = rm -rf
+  RM_SUFFIX     =
+else
+  AMIGAOS       = 1
+  
+  NDK           = NDK_3.2:
+  WILDCARD      = \#?
+
+  MKDIR         = makedir
+  MKDIR_SUFFIX  = ALL >NIL:
+  RM            = delete
+  RM_SUFFIX     = ALL >NIL:
+endif
+
 DDIR   = target/
 BDIR   = build/
 SDIR   = src/
 HDIR   = header/
 
 AHI_INCLUDE     = include
-NDK             = NDK_3.2:
 NDK_ASM_INCLUDE = $(NDK)Include_I
 NDK_C_INCLUDE   = $(NDK)Include_H
 
 MODE_FILE_DST   = $(DDIR)AMIGUS
 MODE_FILE_SRC   = $(SDIR)audiomodes.asm
 MODE_FILE_ASM   = vasmm68k_mot
-MODE_FILE_FLAGS = -quiet -phxass -I$(NDK_ASM_INCLUDE) -I$(AHI_INCLUDE)/Asm -Fbin
+MODE_FILE_FLAGS = -quiet -phxass -I$(NDK_ASM_INCLUDE) -I$(AHI_INCLUDE)/ASM -Fbin
 
-SRCS            = $(wildcard $(SDIR)#?.c)
+SRCS            = $(wildcard $(SDIR)$(WILDCARD).c)
 BDIR_SRCS       = $(foreach SRC,$(SRCS),$(subst $(SDIR),$(BDIR),$(SRC)))
 BDIR_OBJS       = $(BDIR_SRCS:%c=%o)
 LIB_OBJS        = $(BDIR)library.o \
@@ -38,13 +59,20 @@ LIB_DST         = $(DDIR)AmiGUS.audio
 
 # activate VBCC builds by adding `VBCC=1` to the make call!
 ifdef VBCC
+  ifdef AMIGAOS
+    LDIR        = vlibos3:
+  endif
+  ifdef LINUX
+    LDIR        = $(VBCC)/targets/m68k-amigaos/lib/
+  endif
+  
   CFLAGS        = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR) -D__NOLIBBASE__ -o
   LFLAGS        = -nostdlib -o
   LFLAGS1       =
-  LFLAGST1      = vlibos3:startup.o
-  LFLAGST2      = vlibos3:auto.lib vlibos3:vc.lib
-  CC            = vc
-  LD            = vc
+  LFLAGST1      = $(LDIR)startup.o
+  LFLAGST2      = $(LDIR)auto.lib $(LDIR)vc.lib
+  CC            = vc +aos68k
+  LD            = vc +aos68k
 else
   CFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
                   PARAMETERS=REGISTER DATA=FAR CODE=FAR                     \
@@ -69,6 +97,9 @@ endif
 .PHONY: all install test INCLUDES FOLDERS clean dist-clean dist
 
 all: FOLDERS $(MODE_FILE_DST) $(LIB_DST)
+
+ECHO:
+	echo $(SRCS)
 
 $(MODE_FILE_DST): $(MODE_FILE_SRC)
 	$(MODE_FILE_ASM) $(MODE_FILE_FLAGS) $^ -o $@
@@ -97,11 +128,11 @@ INCLUDES:
 	make -f Makefile-Includes all 
 
 FOLDERS:
-	-@makedir $(DDIR) ALL >NIL:
-	-@makedir $(BDIR) ALL >NIL:
+	-@$(MKDIR) $(DDIR) $(MKDIR_SUFFIX)
+	-@$(MKDIR) $(BDIR) $(MKDIR_SUFFIX)
 
 clean:
-	-delete $(DDIR) $(BDIR) ALL >NIL:
+	-$(RM) $(DDIR) $(BDIR) $(RM_SUFFIX)
 
 dist-clean: clean
 	make -f Makefile-Includes clean

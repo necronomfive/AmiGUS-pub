@@ -105,7 +105,7 @@ ASM(LONG) Copy16to8(
               ( inB & 0xFF000000 ) >> 16 |
               ( inB & 0x0000FF00 ) >>  8;
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, out );
 
   ( *bufferIndex ) += 2;
   return 4;
@@ -119,7 +119,7 @@ ASM(LONG) Copy16to16(
   ULONG in = *(( ULONG * ) addressIn);
   ULONG out = in;
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, out );
 
   ( *bufferIndex ) += 1;
   return 4;
@@ -142,7 +142,7 @@ ASM(LONG) Copy32to8(
               ( inC & 0xff000000 ) >> 16 |
               ( inD & 0xff000000 ) >> 24;
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, out );
 
   ( *bufferIndex ) += 4;
   return 4;
@@ -158,7 +158,7 @@ ASM(LONG) Copy32to16(
   ULONG inB = *(( ULONG * ) addressInB);
   ULONG out = ( inA & 0xFFff0000 ) | ( inB >> 16 );
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, out );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, out );
 
   ( *bufferIndex ) += 2;
   return 4;
@@ -180,9 +180,9 @@ ASM(LONG) Copy32to24(
   ULONG outB = ( ( inB <<  8 ) & 0xffFF0000 ) | ( inC >> 16 );
   ULONG outC = ( ( inC << 16 ) & 0xff000000 ) | ( inD >>  8 );
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, outA );
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, outB );
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_MAIN_FIFO_WRITE, outC );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, outA );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, outB );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, outC );
 
   ( *bufferIndex ) += 4;
   return 12;

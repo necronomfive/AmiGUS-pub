@@ -94,7 +94,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   LONG minHwSampleSize;   /* Size of a single (mono / stereo) sample in BYTEs*/
 
   UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
-                            AMIGUS_MAIN_INT_CONTROL );
+                            AMIGUS_PCM_MAIN_INT_CONTROL );
   if ( !( status & ( AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
                    | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK ) ) ) {
     
@@ -102,7 +102,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   }
 
   reminder = ReadReg16( AmiGUSBase->agb_CardBase,
-                        AMIGUS_MAIN_FIFO_USAGE ) << 1;
+                        AMIGUS_PCM_PLAYBACK_FIFO_USAGE ) << 1;
   minHwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
 
   /* Now find out target size to copy into FIFO during this interrupt run    */
@@ -145,11 +145,11 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
     AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_STATUS_PLAYBACK_BUFFER_UNDERRUN;
   }
   WriteReg16( AmiGUSBase->agb_CardBase,
-              AMIGUS_MAIN_FIFO_WATERMARK,
+              AMIGUS_PCM_PLAYBACK_FIFO_WATERMARK,
               AmiGUSBase->agb_watermark );
   /* Clear AmiGUS control flags here!!! */
   WriteReg16( AmiGUSBase->agb_CardBase,
-              AMIGUS_MAIN_INT_CONTROL,
+              AMIGUS_PCM_MAIN_INT_CONTROL,
               AMIGUS_INT_FLAG_MASK_CLEAR
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
             | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK );

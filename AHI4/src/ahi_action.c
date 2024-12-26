@@ -180,7 +180,7 @@ ASM(VOID) SAVEDS AHIsub_Stop(
   LOG_D(( "D: Read FIFO level %04lx\n",
           ReadReg16(
             AmiGUSBase->agb_CardBase,
-            AMIGUS_MAIN_FIFO_USAGE ) ));
+            AMIGUS_PCM_PLAYBACK_FIFO_USAGE ) ));
   stopAmiGUS();
 
   DestroyInterruptHandler();

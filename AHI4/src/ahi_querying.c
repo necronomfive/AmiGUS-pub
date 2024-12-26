@@ -145,20 +145,17 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
       }
       break;
     }
-    case AHIDB_MinInputGain:
-    case AHIDB_MinMonitorVolume: {
-
-      break;
-    }
-    case AHIDB_MaxInputGain:
+    case AHIDB_MinMonitorVolume:
     case AHIDB_MaxMonitorVolume: {
 
       break;
     }
+    case AHIDB_MinInputGain:
     case AHIDB_MinOutputVolume: {
       result = 0;
       break;
     }
+    case AHIDB_MaxInputGain:
     case AHIDB_MaxOutputVolume: {
       result = USHRT_MAX + 1;
       break;
@@ -206,6 +203,27 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
 
 /* Mixer functions */
 
+Fixed getAhiVolumeFromAmiGUS( ULONG volumeRegisterOffset ) {
+
+  ULONG volume = ReadReg16( AmiGUSBase->agb_CardBase, volumeRegisterOffset );
+  if ( 0 != volume ) {
+
+    ++volume;
+  }
+  return (Fixed) volume;
+}
+
+VOID setAhiVolumeToAmiGUS( Fixed volume, ULONG volumeRegisterOffset ) {
+
+  if ( 0 != volume ) {
+
+    --volume;
+  }
+  volume &= 0x0000FFff;
+  volume |= volume << 16;
+  WriteReg32( AmiGUSBase->agb_CardBase, volumeRegisterOffset, volume );
+}
+
 ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
   REG(a6, struct Library* aBase),
   REG(d0, ULONG aAttribute),
@@ -223,31 +241,30 @@ ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
   switch ( aAttribute ) {
     case AHIC_OutputVolume_Query: {
 
-      ULONG volume = ReadReg16( AmiGUSBase->agb_CardBase,
-                                AMIGUS_MAIN_PCM_OUT_VOLUME_LEFT );
-      if ( 0 != volume ) {
-
-        ++volume;
-      }
-      result = (LONG) volume;
+      result =
+        (LONG) getAhiVolumeFromAmiGUS( AMIGUS_PCM_PLAYBACK_VOLUME_LEFT );
+      break;
     }
     case AHIC_OutputVolume: {
-
-      ULONG volume = aArgument;
-      if ( 0 != volume ) {
-        --volume;
-      }
-      volume &= 0x0000FFff;
-      volume |= volume << 16;
-      WriteReg32( AmiGUSBase->agb_CardBase,
-                  AMIGUS_MAIN_PCM_OUT_VOLUME,
-                  volume );
+      
+      setAhiVolumeToAmiGUS( aArgument, AMIGUS_PCM_PLAYBACK_VOLUME );
       result = TRUE;
+      break;
     }
     case AHIC_MonitorVolume:
     case AHIC_MonitorVolume_Query:
-    case AHIC_InputGain:
-    case AHIC_InputGain_Query:
+    case AHIC_InputGain_Query: {
+
+      result =
+        (LONG) getAhiVolumeFromAmiGUS( AMIGUS_PCM_RECORDING_VOLUME_LEFT );
+      break;
+    }
+    case AHIC_InputGain: {
+      
+      setAhiVolumeToAmiGUS( aArgument, AMIGUS_PCM_RECORDING_VOLUME );
+      result = TRUE;
+      break;
+    }
     case AHIC_Input:
     case AHIC_Input_Query:
     case AHIC_Output:

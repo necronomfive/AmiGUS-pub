@@ -24,6 +24,8 @@ ifeq ($(findstring /home,$(HOME)), /home)
   MKDIR_SUFFIX  =
   RM            = rm -rf
   RM_SUFFIX     =
+  RUNNER        = vamos
+  LHA           = jlha
 else
   AMIGAOS       = 1
   
@@ -34,6 +36,8 @@ else
   MKDIR_SUFFIX  = ALL >NIL:
   RM            = delete
   RM_SUFFIX     = ALL >NIL:
+  RUNNER        =
+  LHA           = lha
 endif
 
 DDIR   = target/
@@ -58,7 +62,7 @@ LIB_OBJS        = $(BDIR)library.o \
 LIB_DST         = $(DDIR)AmiGUS.audio
 
 # activate VBCC builds by adding `VBCC=1` to the make call!
-ifdef VBCC
+ifdef USE_VBCC
   ifdef AMIGAOS
     LDIR        = vlibos3:
   endif
@@ -91,8 +95,8 @@ else
   LFLAGS1       = FROM
   LFLAGST1      = LIB:c.o
   LFLAGST2      = LIBRARY LIB:sc.lib LIB:amiga.lib
-  CC            = sc
-  LD            = slink
+  CC            = $(RUNNER) sc
+  LD            = $(RUNNER) slink
 endif
 
 .PHONY: all install test INCLUDES FOLDERS clean dist-clean dist
@@ -122,8 +126,8 @@ test: $(LIB_OBJS)
 	$(CC) $(CFLAGS) test/test_utilities.o test/test_utilities.c
 	$(LD) $(LFLAGS) test/test_utilities $(LFLAGS1) $(LFLAGST1) test/test_utilities.o $(BDIR)utilities.o $(LFLAGST2)
 	@echo " "
-	test/test_utilities
-	-@delete test/test_utilities test/test_utilities.o >NIL:
+	$(RUNNER) test/test_utilities
+	-@$(RM) test/test_utilities test/test_utilities.o $(RM_SUFFIX)
 
 INCLUDES:
 	make -f Makefile-Includes all 
@@ -139,4 +143,4 @@ dist-clean: clean
 	make -f Makefile-Includes clean
 
 dist:
-	lha a target/AHI4bin.lha target/#?
+	$(LHA) a target/AHI4bin.lha target/$(WILDCARD)

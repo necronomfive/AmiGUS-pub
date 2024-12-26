@@ -71,6 +71,7 @@ ifdef VBCC
   LFLAGS1       =
   LFLAGST1      = $(LDIR)startup.o
   LFLAGST2      = $(LDIR)auto.lib $(LDIR)vc.lib
+  # add -v below to see what vbcc does under the hood :)
   CC            = vc +aos68k
   LD            = vc +aos68k
 else

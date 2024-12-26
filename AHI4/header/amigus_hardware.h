@@ -27,14 +27,17 @@
 
 /* AmiGUS Main Registers */
 
-#define AMIGUS_MAIN_INT_CONTROL     0x00
-#define AMIGUS_MAIN_INT_ENABLE      0x02
-#define AMIGUS_MAIN_SAMPLE_FORMAT   0x04
-#define AMIGUS_MAIN_SAMPLE_RATE     0x06
-#define AMIGUS_MAIN_FIFO_RESET      0x08
-#define AMIGUS_MAIN_FIFO_WATERMARK  0x0a
-#define AMIGUS_MAIN_FIFO_WRITE      0x0c
-#define AMIGUS_MAIN_FIFO_USAGE      0x10
+#define AMIGUS_MAIN_INT_CONTROL             0x00
+#define AMIGUS_MAIN_INT_ENABLE              0x02
+#define AMIGUS_MAIN_SAMPLE_FORMAT           0x04
+#define AMIGUS_MAIN_SAMPLE_RATE             0x06
+#define AMIGUS_MAIN_FIFO_RESET              0x08
+#define AMIGUS_MAIN_FIFO_WATERMARK          0x0a
+#define AMIGUS_MAIN_FIFO_WRITE              0x0c
+#define AMIGUS_MAIN_FIFO_USAGE              0x10
+#define AMIGUS_MAIN_PCM_OUT_VOLUME          0x12
+#define AMIGUS_MAIN_PCM_OUT_VOLUME_LEFT     0x12
+#define AMIGUS_MAIN_PCM_OUT_VOLUME_RIGHT    0x14
 
 /* AmiGUS Main Interrupt Flags */
 #define AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY       0x0001

@@ -17,6 +17,8 @@
 #include <exec/libraries.h>
 #include <proto/utility.h>
 
+#include <limits.h>
+
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
@@ -34,70 +36,69 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 ) {
   LONG result = aDefault;
-  switch ( aAttribute )
-    {
-    case AHIDB_Bits:
-      {
-      result = GetTagData(AHIDB_Bits, aDefault, aTagList);
+  switch ( aAttribute ) {
+    case AHIDB_Bits: {
+
+      result = GetTagData( AHIDB_Bits, aDefault, aTagList );
       break;
-      }
-    case AHIDB_MaxChannels:
-      {
+    }
+    case AHIDB_MaxChannels: {
+
       result = 1;
       break;
-      }
-    case AHIDB_Frequencies:
-      {
+    }
+    case AHIDB_Frequencies: {
+
       result = AMIGUS_AHI_NUM_SAMPLE_RATES;
       break;
-      }
-    case AHIDB_Frequency:
-      {
+    }
+    case AHIDB_Frequency: {
+
       result = FindSampleRateValueForId( aArgument );
       break;
-      }
-    case AHIDB_Index:
-      {
+    }
+    case AHIDB_Index: {
+
       result = FindSampleRateIdForValue( aArgument );
       break;
-      }
-    case AHIDB_Author:
-      {
+    }
+    case AHIDB_Author: {
+
       result = (LONG) AMIGUS_AHI_AUTHOR;
       break;
-      }
-    case AHIDB_Copyright:
-      {
+    }
+    case AHIDB_Copyright: {
+
       result = (LONG) AMIGUS_AHI_COPYRIGHT;
       break;
-      }
-    case AHIDB_Version:
-      {
+    }
+    case AHIDB_Version: {
+
       result = (LONG) AMIGUS_AHI_VERSION;
       break;
-      }
-    case AHIDB_Annotation:
-      {
+    }
+    case AHIDB_Annotation: {
+
       result = (LONG) AMIGUS_AHI_ANNOTATION;
       break;
-      }
-    case AHIDB_Record:
-      {
+    }
+    case AHIDB_Record: {
+
       result = AMIGUS_AHI_RECORD;
       break;
-      }
-    case AHIDB_FullDuplex:
-      {
+    }
+    case AHIDB_FullDuplex: {
+      
       result = AMIGUS_AHI_FULL_DUPLEX;
       break;
-      }
-    case AHIDB_Realtime:
-      {
+    }
+    case AHIDB_Realtime: {
+      
       result = GetTagData(AHIDB_Realtime, TRUE, aTagList);
       break;
-      }
-    case AHIDB_MaxPlaySamples:
-      {
+    }
+    case AHIDB_MaxPlaySamples: {
+
       ULONG bits = GetTagData(AHIDB_Bits, 0, aTagList);
       ULONG bytesPerSample = bits / 8;
       ULONG flags = aAudioCtrl->ahiac_Flags;
@@ -119,26 +120,30 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
         result >>= 1;
       }
       break;
-      }
-    case AHIDB_MaxRecordSamples:
-      {
+    }
+    case AHIDB_MaxRecordSamples: {
+
       /* TODO: Ask how much record buffer we have!? */
       break;
-      }
+    }
     case AHIDB_MinInputGain:
-    case AHIDB_MinMonitorVolume:
-    case AHIDB_MinOutputVolume:
-      {
-//      result = 0;
+    case AHIDB_MinMonitorVolume: {
+
       break;
-      }
+    }
     case AHIDB_MaxInputGain:
-    case AHIDB_MaxMonitorVolume:
-    case AHIDB_MaxOutputVolume:
-      {
-//      result = USHRT_MAX;
+    case AHIDB_MaxMonitorVolume: {
+
       break;
-      }
+    }
+    case AHIDB_MinOutputVolume: {
+      result = 0;
+      break;
+    }
+    case AHIDB_MaxOutputVolume: {
+      result = USHRT_MAX;
+      break;
+    }
     case AHIDB_Inputs:
       {
       result = AMIGUS_AHI_NUM_INPUTS;
@@ -159,17 +164,18 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
       result = ( LONG ) AmiGUSOutputs[ aArgument ];
       break;
       }
-    case AHIDB_PingPong:
-      {
+    case AHIDB_PingPong: {
+
+      /* Suspicion: Asks if we can play samples reversed!? */
       LOG_V(("V: PingPong\n"));
       break;
-      }
-    default:
-      {
+    }
+    default: {
+
       DisplayError( EGetAttrNotImplemented );
       break;
-      }
     }
+  }
 
   LOG_D(("D: AHIsub_GetAttr %ld %ld %ld => %ld\n", 
         aAttribute - AHI_TagBase,
@@ -187,8 +193,49 @@ ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
   REG(d1, LONG aArgument),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {
-  LOG_D(("AHIsub_HardwareControl\n"));
 
-  /* Not supported or unknown: */
-  return FALSE;
+  LONG result = FALSE;
+  if ( !AmiGUSBase->agb_CardBase ) {
+
+    /* No card - not supported! */
+    LOG_W(( "W: AHIsub_HardwareControl - No card found!\n" ));
+    return result;
+  }
+  switch ( aAttribute ) {
+    case AHIC_OutputVolume_Query: {
+
+      ULONG volume = ReadReg16( AmiGUSBase->agb_CardBase,
+                                AMIGUS_MAIN_PCM_OUT_VOLUME_LEFT );
+      result = (LONG) volume;
+    }
+    case AHIC_OutputVolume: {
+
+      ULONG volume = ( aArgument << 16 ) + aArgument;
+      WriteReg32( AmiGUSBase->agb_CardBase,
+                  AMIGUS_MAIN_PCM_OUT_VOLUME,
+                  volume );
+      result = TRUE;
+    }
+    case AHIC_MonitorVolume:
+    case AHIC_MonitorVolume_Query:
+    case AHIC_InputGain:
+    case AHIC_InputGain_Query:
+    case AHIC_Input:
+    case AHIC_Input_Query:
+    case AHIC_Output:
+    case AHIC_Output_Query: {
+
+      break;
+    }
+    default: {
+
+      DisplayError( EHardwareControlNotImplemented );
+      break;
+    }
+  }
+  LOG_D(( "D: AHIsub_HardwareControl %ld %ld => %ld\n",
+          aAttribute,
+          aArgument,
+          result ));
+  return result;
 }

@@ -198,10 +198,16 @@ VOID FillBuffer( BYTE buffer ) {
          so the playback and interrupt are kind of dead.
          Just enabling playback again would un-align 24bit stereo playback,
          so instead we can go through full playback init cycle.
-         Bonus: resets the plaback flag. :)
+         Bonus: resets the playback state flags. :)
          */
         initAmiGUS();
       }
+
+      LOG_V(( "V: Worker i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
+              AmiGUSBase->agb_BufferIndex[ 0 ],
+              AmiGUSBase->agb_BufferMax[ 0 ],
+              AmiGUSBase->agb_BufferIndex[ 1 ],
+              AmiGUSBase->agb_BufferMax[ 1 ] ));
 
       AmiGUSBase->agb_WorkerReady = TRUE;
       signals = Wait(

@@ -163,5 +163,10 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
     // TODO: How do we handle worker not ready here? Maybe crying?
   }
+  LOG_INT(( "INT: t %4ld c %4ld wm %4ld wr %ld\n",
+            target,
+            copied,
+            AmiGUSBase->agb_watermark,
+            AmiGUSBase->agb_WorkerReady ));
   return 1;
 }

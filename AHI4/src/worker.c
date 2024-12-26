@@ -203,11 +203,11 @@ VOID FillBuffer( BYTE buffer ) {
         initAmiGUS();
       }
 
-      LOG_V(( "V: Worker i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
-              AmiGUSBase->agb_BufferIndex[ 0 ],
-              AmiGUSBase->agb_BufferMax[ 0 ],
-              AmiGUSBase->agb_BufferIndex[ 1 ],
-              AmiGUSBase->agb_BufferMax[ 1 ] ));
+      LOG_INT(( "WORKER: i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
+                AmiGUSBase->agb_BufferIndex[ 0 ],
+                AmiGUSBase->agb_BufferMax[ 0 ],
+                AmiGUSBase->agb_BufferIndex[ 1 ],
+                AmiGUSBase->agb_BufferMax[ 1 ] ));
 
       AmiGUSBase->agb_WorkerReady = TRUE;
       signals = Wait(

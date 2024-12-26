@@ -142,5 +142,5 @@ clean:
 dist-clean: clean
 	make -f Makefile-Includes clean
 
-dist:
+dist: all
 	$(LHA) a target/AHI4bin.lha target/$(WILDCARD)

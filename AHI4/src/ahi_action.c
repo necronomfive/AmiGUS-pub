@@ -21,8 +21,10 @@
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
+#include "interrupt.h"
 #include "support.h"
 #include "SDI_AHI4_protos.h"
+#include "worker.h"
 
 /* Basic functions - Actions */
 

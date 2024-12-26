@@ -14,15 +14,17 @@
  * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORKER_H
-#define WORKER_H
+#ifndef INTERRUPT_H
+#define INTERRUPT_H
 
 #include "exec/types.h"
 #include "SDI_compiler.h"
 
-BOOL CreateWorkerProcess( VOID );
-VOID DestroyWorkerProcess( VOID );
+BOOL CreateInterruptHandler( VOID );
+VOID DestroyInterruptHandler( VOID );
 
-/*__entry for vbcc*/ SAVEDS VOID WorkerProcess( VOID );
+ASM(LONG) SAVEDS INTERRUPT handleInterrupt(
+  REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
+);
 
-#endif /* WORKER_H */
+#endif /* INTERRUPT_H */

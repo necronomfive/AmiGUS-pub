@@ -1,5 +1,5 @@
-#ifndef COPY_FUNCTIONS_H
-#define COPY_FUNCTIONS_H
+#ifndef UTILITIES_H
+#define UTILITIES_H
 
 #include <exec/types.h>
 
@@ -179,4 +179,4 @@ ASM(LONG) Copy32to24(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
 
-#endif /* COPY_FUNCTIONS_H */
+#endif /* UTILITIES_H */

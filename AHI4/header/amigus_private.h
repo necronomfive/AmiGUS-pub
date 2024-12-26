@@ -159,10 +159,6 @@ LONG FindSampleRateValueForId( LONG id );
 VOID initAmiGUS( VOID );
 VOID stopAmiGUS( VOID );
 
-ASM(LONG) SAVEDS INTERRUPT handleInterrupt(
-  REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
-);
-
 UWORD ReadReg16( APTR amiGUS, ULONG offset );
 VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
 ULONG ReadReg32( APTR amiGUS, ULONG offset );
@@ -170,11 +166,5 @@ VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
 
 BOOL CreatePlaybackBuffers( VOID );
 VOID DestroyPlaybackBuffers( VOID );
-
-BOOL CreateInterruptHandler( VOID );
-VOID DestroyInterruptHandler( VOID );
-
-BOOL CreateWorkerProcess( VOID );
-VOID DestroyWorkerProcess( VOID );
 
 #endif /* AMIGUS_PRIVATE_H */

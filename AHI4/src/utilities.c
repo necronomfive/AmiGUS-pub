@@ -64,11 +64,6 @@ UWORD getBufferSamples(
   return result;
 }
 
-LONG getNextSampleData( VOID ) {
-
-  return 0;
-}
-
 const ULONG CopyFunctionRequirementById[] = {
   0xffFFffF8, /* Needs 2 LONGs to work properly, */
   0xffFFffFC, /*       1 LONG,                   */

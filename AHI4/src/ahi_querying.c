@@ -234,7 +234,7 @@ ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
     }
   }
   LOG_D(( "D: AHIsub_HardwareControl %ld %ld => %ld\n",
-          aAttribute,
+          aAttribute - AHI_TagBase,
           aArgument,
           result ));
   return result;

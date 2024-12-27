@@ -58,21 +58,26 @@ UWORD getBufferSamples(
   UBYTE isStereo );
 
 /**
- * Alignment requirements of the copy functions encrypted into BYTE masks.
- * Order follows the same as CopyFunctionById[].
- */
-extern const ULONG CopyFunctionRequirementById[];
-
-/**
  * Returns an appropriately aligned/sized sample count for
  * a requested number of samples for use with the selected
  * copy function and playback mode properies.
  *
- * @param ahiBuffSamples Sample count suggested by AHI.
+ * @param ahiBufferSamples Sample count suggested by AHI.
  *
  * @return Adapted sample count to be fed to AHI.
  */
-ULONG alignBufferSamples( ULONG ahiBuffSamples );
+ULONG alignBufferSamples( ULONG ahiBufferSamples );
+
+/**
+ * Returns an appropriately aligned/sized buffer size in LONGs for
+ * a requested number of samples for use with the selected
+ * copy function and playback mode properies.
+ *
+ * @param ahiBufferSamples Sample count suggested by AHI.
+ *
+ * @return Adapted buffer size in LONGs.
+ */
+ULONG alignBufferSize( ULONG ahiBufferSamples );
 
 /**
  * Type of the copy functions provided here.

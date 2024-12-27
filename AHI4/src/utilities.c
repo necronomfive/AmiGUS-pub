@@ -2,6 +2,7 @@
 
 #include "amigus_hardware.h"
 #include "amigus_private.h" // WriteReg32
+#include "debug.h"
 #include "utilities.h"
 #include "SDI_compiler.h"
 
@@ -64,6 +65,10 @@ UWORD getBufferSamples(
   return result;
 }
 
+/**
+ * Alignment requirements of the copy functions encrypted into BYTE masks.
+ * Order follows the same as CopyFunctionById[].
+ */
 const ULONG CopyFunctionRequirementById[] = {
   0xffFFffF8, /* Needs 2 LONGs to work properly, */
   0xffFFffFC, /*       1 LONG,                   */
@@ -72,14 +77,34 @@ const ULONG CopyFunctionRequirementById[] = {
   0xffFFffF0  /*       4 LONGs                   */
 };
 
-ULONG alignBufferSamples( ULONG ahiBuffSamples ) {
+ULONG alignBufferSamples( ULONG ahiBufferSamples ) {
 
-  ULONG index = AmiGUSBase->agb_CopyFunctionId;
-  ULONG mask = CopyFunctionRequirementById[ index ];
-  UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
-  ULONG aligned = ahiBuffSamples;
+  const ULONG index = AmiGUSBase->agb_CopyFunctionId;
+  const ULONG mask = CopyFunctionRequirementById[ index ];
+  const UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
+  ULONG aligned = ahiBufferSamples;
 
   aligned &= ( mask >> shift );
+
+  return aligned;
+}
+
+ULONG alignBufferSize( ULONG ahiBufferSamples ) {
+
+  const ULONG index = AmiGUSBase->agb_CopyFunctionId;
+  const ULONG mask = CopyFunctionRequirementById[ index ];
+  const UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
+  ULONG aligned = ahiBufferSamples;
+
+  aligned <<= shift;    /* now: in BYTEs! */
+  if ( ( ~ mask ) & aligned ) {
+
+    LOG_W(( "W: Buffer NOT correct - will reduce %ld -> %ld and creak.\n",
+            aligned,
+            mask & aligned ));
+    aligned &= mask;
+  }
+  aligned >>= 2;        /* now: in LONGs! */
 
   return aligned;
 }

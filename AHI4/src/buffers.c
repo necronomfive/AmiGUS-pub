@@ -1,15 +1,40 @@
+/*
+ * This file is part of the AmiGUS.audio driver.
+ *
+ * AmiGUS.audio driver is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, version 3 of the License only.
+ *
+ * AmiGUS.audio driver is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU LesserGeneral Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <proto/exec.h>
 #include <proto/utility.h>
 
 #include "amigus_hardware.h"
-#include "amigus_private.h" // WriteReg32
+#include "amigus_private.h"
+#include "buffers.h"
 #include "debug.h"
-#include "utilities.h"
 #include "SDI_compiler.h"
 
 #define MILLIS_PER_SECOND      1000
 #define DIVISOR_10MS           ( MILLIS_PER_SECOND / 10 )
 #define DIVISOR_25MS           ( MILLIS_PER_SECOND / 40 )
 
+/**
+ * Function to return the greatest common denominator of two numbers.
+ *
+ * @param a The first number.
+ * @param b The other number.
+ *
+ * @return The result.
+ */
 UWORD gcd( UWORD a, UWORD b ) {
 
   UWORD x;
@@ -24,6 +49,14 @@ UWORD gcd( UWORD a, UWORD b ) {
   return gcd( b, x );
 }
 
+/** 
+ * Function to return the least common multiple of two numbers.
+ *
+ * @param a The first number.
+ * @param b The other number.
+ *
+ * @return The result.
+ */
 ULONG lcm( ULONG a, ULONG b ) {
 
   ULONG c = gcd( a, b );
@@ -65,6 +98,73 @@ UWORD getBufferSamples(
   return result;
 }
 
+// TRUE = failure
+BOOL CreatePlaybackBuffers( VOID ) {
+
+  LONG longSize;
+
+  if ( AmiGUSBase->agb_Buffer[0] ) {
+
+    LOG_D(("D: Playback buffers already exist!\n"));
+    return FALSE;
+  }
+
+  /* BufferSize is in BYTEs! */
+  AmiGUSBase->agb_BufferSize = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize;
+  LOG_D(( "D: Allocating playback buffers a %ld BYTEs\n",
+          AmiGUSBase->agb_BufferSize ));
+  AmiGUSBase->agb_Buffer[0] = (ULONG *)
+      AllocMem( AmiGUSBase->agb_BufferSize, MEMF_FAST | MEMF_CLEAR );
+  if ( !AmiGUSBase->agb_Buffer[0] ) {
+
+    LOG_E(("E: Could not allocate FAST RAM for buffer 0!\n"));
+    return TRUE;
+  }
+  AmiGUSBase->agb_Buffer[1] = (ULONG *)
+      AllocMem( AmiGUSBase->agb_BufferSize, MEMF_FAST | MEMF_CLEAR );
+  if ( !AmiGUSBase->agb_Buffer[1] ) {
+
+    LOG_E(("E: Could not allocate FAST RAM for buffer 1!\n"));
+    return TRUE;
+  }
+
+  /* Buffers are ticking in LONGs! */
+  longSize = AmiGUSBase->agb_BufferSize >> 2;
+
+  AmiGUSBase->agb_BufferMax[ 0 ] = longSize;
+  AmiGUSBase->agb_BufferMax[ 1 ] = longSize;
+    /* All buffers are created empty - back to initial state! */
+  AmiGUSBase->agb_BufferIndex[ 0 ] = longSize;
+  AmiGUSBase->agb_BufferIndex[ 1 ] = longSize;
+  AmiGUSBase->agb_currentBuffer = 0;
+
+  LOG_I(( "I: Mix / copy up to %ld WORDs from AHI per pass\n",
+          longSize << 1 ));
+
+  LOG_D(("D: All playback buffers created\n"));
+  return FALSE;
+}
+
+VOID DestroyPlaybackBuffers(VOID) {
+
+  if ( AmiGUSBase->agb_Buffer[0] ) {
+
+    FreeMem( AmiGUSBase->agb_Buffer[0], AmiGUSBase->agb_BufferSize );
+    AmiGUSBase->agb_Buffer[0] = NULL;
+    AmiGUSBase->agb_BufferIndex[0] = 0;
+    LOG_D(("D: Free`ed buffer 0!\n"));
+  }
+  if ( AmiGUSBase->agb_Buffer[1] ) {
+
+    FreeMem( AmiGUSBase->agb_Buffer[1], AmiGUSBase->agb_BufferSize );
+    AmiGUSBase->agb_Buffer[1] = NULL;
+    AmiGUSBase->agb_BufferIndex[1] = 0;
+    LOG_D(("D: Free`ed buffer 1!\n"));
+  }
+  AmiGUSBase->agb_BufferSize = 0;
+  LOG_D(("D: All playback buffers free`ed\n"));
+}
+
 /**
  * Alignment requirements of the copy functions encrypted into BYTE masks.
  * Order follows the same as CopyFunctionById[].
@@ -77,19 +177,7 @@ const ULONG CopyFunctionRequirementById[] = {
   0xffFFffF0  /*       4 LONGs                   */
 };
 
-ULONG alignBufferSamples( ULONG ahiBufferSamples ) {
-
-  const ULONG index = AmiGUSBase->agb_CopyFunctionId;
-  const ULONG mask = CopyFunctionRequirementById[ index ];
-  const UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
-  ULONG aligned = ahiBufferSamples;
-
-  aligned &= ( mask >> shift );
-
-  return aligned;
-}
-
-ULONG alignBufferSize( ULONG ahiBufferSamples ) {
+ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples ) {
 
   const ULONG index = AmiGUSBase->agb_CopyFunctionId;
   const ULONG mask = CopyFunctionRequirementById[ index ];
@@ -99,12 +187,12 @@ ULONG alignBufferSize( ULONG ahiBufferSamples ) {
   aligned <<= shift;    /* now: in BYTEs! */
   if ( ( ~ mask ) & aligned ) {
 
-    LOG_W(( "W: Buffer NOT correct - will reduce %ld -> %ld and creak.\n",
+    LOG_W(( "W: Correcting alignment of (%ld samples) %ld BYTEs to %ld.\n",
+            ahiBufferSamples,
             aligned,
             mask & aligned ));
     aligned &= mask;
   }
-  aligned >>= 2;        /* now: in LONGs! */
 
   return aligned;
 }
@@ -117,9 +205,9 @@ CopyFunctionType CopyFunctionById[] = {
   &Copy32to24
 };
 
-ASM(LONG) Copy16to8(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) ) {
+ASM( LONG ) Copy16to8(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
 
   ULONG addressInA = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
   ULONG inA = *(( ULONG * ) addressInA);
@@ -130,29 +218,29 @@ ASM(LONG) Copy16to8(
               ( inB & 0xFF000000 ) >> 16 |
               ( inB & 0x0000FF00 ) >>  8;
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, out );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_WRITE, out );
 
   ( *bufferIndex ) += 2;
   return 4;
 }
 
-ASM(LONG) Copy16to16(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) ) {
+ASM( LONG ) Copy16to16(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
 
   ULONG addressIn = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
   ULONG in = *(( ULONG * ) addressIn);
   ULONG out = in;
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, out );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_WRITE, out );
 
   ( *bufferIndex ) += 1;
   return 4;
 }
 
-ASM(LONG) Copy32to8(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) ) {
+ASM( LONG ) Copy32to8(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
 
   ULONG addressInA = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
   ULONG inA = *(( ULONG * ) addressInA);
@@ -167,15 +255,15 @@ ASM(LONG) Copy32to8(
               ( inC & 0xff000000 ) >> 16 |
               ( inD & 0xff000000 ) >> 24;
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, out );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_WRITE, out );
 
   ( *bufferIndex ) += 4;
   return 4;
 }
 
-ASM(LONG) Copy32to16(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) ) {
+ASM( LONG ) Copy32to16(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
 
   ULONG addressInA = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
   ULONG inA = *(( ULONG * ) addressInA);
@@ -183,15 +271,15 @@ ASM(LONG) Copy32to16(
   ULONG inB = *(( ULONG * ) addressInB);
   ULONG out = ( inA & 0xFFff0000 ) | ( inB >> 16 );
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, out );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_WRITE, out );
 
   ( *bufferIndex ) += 2;
   return 4;
 }
 
-ASM(LONG) Copy32to24(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) ) {
+ASM( LONG ) Copy32to24(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
 
   ULONG addressInA = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
   ULONG inA = *(( ULONG * ) addressInA);
@@ -205,9 +293,9 @@ ASM(LONG) Copy32to24(
   ULONG outB = ( ( inB <<  8 ) & 0xffFF0000 ) | ( inC >> 16 );
   ULONG outC = ( ( inC << 16 ) & 0xff000000 ) | ( inD >>  8 );
 
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, outA );
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, outB );
-  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAYBACK_FIFO_WRITE, outC );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_WRITE, outA );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_WRITE, outB );
+  WriteReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_WRITE, outC );
 
   ( *bufferIndex ) += 4;
   return 12;

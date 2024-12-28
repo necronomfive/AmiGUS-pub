@@ -21,8 +21,8 @@
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
+#include "samplerate.h"
 #include "support.h"
-#include "utilities.h"
 #include "SDI_AHI4_protos.h"
 
 /* Basic functions - Allocation */

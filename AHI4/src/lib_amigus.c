@@ -20,6 +20,7 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
+#include "amigus_pcm.h"
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
@@ -170,7 +171,7 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
 #endif
 
   LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", amiGUSBase));
-  error = FindAmiGUS( amiGUSBase );
+  error = FindAmiGusPcm( amiGUSBase );
   if ( error ) {
 
     DisplayError( error );

@@ -44,8 +44,8 @@
 #include <utility/hooks.h>
 
 #include "amigus_public.h"
+#include "buffers.h"
 #include "library.h"
-#include "utilities.h"
 #include "SDI_AHI4_protos.h"
 
 /******************************************************************************
@@ -124,47 +124,18 @@ struct AmiGUSBasePrivate {
  * Library flag definitions
  *****************************************************************************/
 
-#define AMIGUS_AHI_STATUS_PLAYBACK_STARTED                0x01
-#define AMIGUS_AHI_STATUS_PLAYBACK_BUFFER_UNDERRUN        0x02
-#define AMIGUS_AHI_STATUS_PLAYBACK_0                      0x04
-#define AMIGUS_AHI_STATUS_PLAYBACK_1                      0x08
-#define AMIGUS_AHI_STATUS_RECORDING_STARTED               0x10
-#define AMIGUS_AHI_STATUS_RECORDING_0                     0x20
-#define AMIGUS_AHI_STATUS_RECORDING_1                     0x40
-#define AMIGUS_AHI_STATUS_RECORDING_2                     0x80
+#define AMIGUS_AHI_F_PLAY_STARTED        0x01
+#define AMIGUS_AHI_F_PLAY_UNDERRUN       0x02
+#define AMIGUS_AHI_F_PLAY_0              0x04
+#define AMIGUS_AHI_F_PLAY_1              0x08
+#define AMIGUS_AHI_F_REC_STARTED         0x10
+#define AMIGUS_AHI_F_REC_0               0x20
+#define AMIGUS_AHI_F_REC_1               0x40
+#define AMIGUS_AHI_F_REC_2               0x80
 
-#define AMIGUS_AHI_STATUS_PLAYBACK_MASK                   0x0F
-#define AMIGUS_AHI_STATUS_PLAYBACK_STOPPED_MASK           0xF0
-#define AMIGUS_AHI_STATUS_RECORDING_MASK                  0xF0
-#define AMIGUS_AHI_STATUS_RECORDING_STOPPED_MASK          0x0F
-
-/******************************************************************************
- * Library data fields and lookup tables
- *****************************************************************************/
-
-extern const LONG AmiGUSSampleRates[ AMIGUS_AHI_NUM_SAMPLE_RATES ];
-extern const STRPTR AmiGUSOutputs[ AMIGUS_AHI_NUM_OUTPUTS ];
-extern const STRPTR AmiGUSInputs[ AMIGUS_AHI_NUM_INPUTS ];
-extern const UWORD AmiGUSSampleSizes[ AMIGUS_SAMPLE_FORMAT_STEREO_24BIT + 1 ];
-
-/******************************************************************************
- * Library accessible function
- *****************************************************************************/
-
-LONG FindAmiGUS( struct AmiGUSBasePrivate *amiGUSBase );
-
-LONG FindSampleRateIdForValue( LONG sampleRate );
-LONG FindSampleRateValueForId( LONG id );
-
-VOID initAmiGUS( VOID );
-VOID stopAmiGUS( VOID );
-
-UWORD ReadReg16( APTR amiGUS, ULONG offset );
-VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
-ULONG ReadReg32( APTR amiGUS, ULONG offset );
-VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
-
-BOOL CreatePlaybackBuffers( VOID );
-VOID DestroyPlaybackBuffers( VOID );
+#define AMIGUS_AHI_F_PLAY_MASK           0x0F
+#define AMIGUS_AHI_F_PLAY_STOP_MASK      0xF0
+#define AMIGUS_AHI_F_REC_MASK            0xF0
+#define AMIGUS_AHI_F_REC_STOP_MASK       0x0F
 
 #endif /* AMIGUS_PRIVATE_H */

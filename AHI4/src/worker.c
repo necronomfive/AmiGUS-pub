@@ -21,6 +21,7 @@
 #include <proto/utility.h>
 
 #include "amigus_hardware.h"
+#include "amigus_pcm.h"
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
@@ -133,9 +134,11 @@ VOID FillBuffer( BYTE buffer ) {
      * even if playback is 8 bit. 
      * If AHIDBB_STEREO is set (in ahiac_Flags), 
      * data for left and right channel are interleaved [...] "
+     *
+     * Remember: Buffers ticking in LONGs (hence the final shift) !!!
      */
     AmiGUSBase->agb_BufferMax[ buffer ] =
-      alignBufferSize( audioCtrl->ahiac_BuffSamples ); /* in LONGs           */
+      AlignByteSizeForSamples( audioCtrl->ahiac_BuffSamples ) >> 2;
     AmiGUSBase->agb_BufferIndex[ buffer ] = 0;         /* buffer is full     */
   }
   /*
@@ -176,8 +179,7 @@ VOID FillBuffer( BYTE buffer ) {
         }
         k ^= 0x00000001;
       }
-      if ( AMIGUS_AHI_STATUS_PLAYBACK_BUFFER_UNDERRUN 
-           & AmiGUSBase->agb_StateFlags ) {
+      if ( AMIGUS_AHI_F_PLAY_UNDERRUN & AmiGUSBase->agb_StateFlags ) {
 
         LOG_W(( "W: Recovering from playback buffer underrun.\n" ));
         /*
@@ -185,10 +187,10 @@ VOID FillBuffer( BYTE buffer ) {
          FIFO empty, both playback buffers empty...
          so the playback and interrupt are kind of dead.
          Just enabling playback again would un-align 24bit stereo playback,
-         so instead we can go through full playback init cycle.
+         so instead we can go through full playback init and start cycle.
          Bonus: resets the playback state flags. :)
          */
-        initAmiGUS();
+        StartAmiGusPcmPlayback();
       }
 
       LOG_INT(( "WORKER: i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",

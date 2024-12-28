@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "amigus_private.h"
-#include "utilities.h"
+#include "buffers.h"
 
 #if defined (__VBCC__)
 /* Don't care about ugly type issues with format strings! */
@@ -14,6 +14,17 @@
  * Mocked functions and stubbed external symbols below:
  *****************************************************************************/
 struct AmiGUSBasePrivate * AmiGUSBase;
+
+/* Taken over from lib_amigus.c */
+/*
+ defined in LIB:c.o:
+struct ExecBase          * SysBase           = 0;
+struct DosLibrary        * DOSBase           = 0;
+struct IntuitionBase     * IntuitionBase     = 0;
+struct Library           * UtilityBase       = 0;
+struct Library           * ExpansionBase     = 0;
+ */
+struct Device            * TimerBase         = 0;
 
 char testFIFO[ 16 ][ 16 ];
 ULONG nextTestFIFO = 0;
@@ -34,8 +45,13 @@ VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
   ++nextTestFIFO;
 }
 
+/******************************************************************************
+ * Private functions / fields under test:
+ *****************************************************************************/
+
 UWORD gcd( UWORD a, UWORD b );
 ULONG lcm( ULONG a, ULONG b );
+extern const ULONG CopyFunctionRequirementById[];
 
 /******************************************************************************
  * Test functions:
@@ -591,7 +607,8 @@ BOOL testAlignBuffSamples( VOID ) {
         AmiGUSBase->agb_CopyFunctionId = copyFunctionId;
         AmiGUSBase->agb_AhiSampleShift = shift;
 
-        alignedBufferSize = alignBufferSamples( suggestedBufferSize );
+        alignedBufferSize = AlignByteSizeForSamples( suggestedBufferSize )
+                            >> AmiGUSBase->agb_AhiSampleShift;
         ref = alignBufferSamplesRef( suggestedBufferSize );
 
         exp0 = ( alignedBufferSize <= suggestedBufferSize );

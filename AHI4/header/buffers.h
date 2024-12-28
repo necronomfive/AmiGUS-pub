@@ -1,29 +1,25 @@
-#ifndef UTILITIES_H
-#define UTILITIES_H
+/*
+ * This file is part of the AmiGUS.audio driver.
+ *
+ * AmiGUS.audio driver is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, version 3 of the License only.
+ *
+ * AmiGUS.audio driver is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU LesserGeneral Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef BUFFERS_H
+#define BUFFERS_H
 
 #include <exec/types.h>
 
 #include "SDI_compiler.h"
-
-/**
- * Function to return the greatest common denominator of two numbers.
- *
- * @param a The first number.
- * @param b The other number.
- *
- * @return The result.
- */
-UWORD gcd( UWORD a, UWORD b );
-
-/** 
- * Function to return the least common multiple of two numbers.
- *
- * @param a The first number.
- * @param b The other number.
- *
- * @return The result.
- */
-ULONG lcm( ULONG a, ULONG b );
 
 /**
  * Get the required mixing / playback buffer size in bytes.
@@ -58,26 +54,19 @@ UWORD getBufferSamples(
   UBYTE isStereo );
 
 /**
- * Returns an appropriately aligned/sized sample count for
+ * Returns an appropriately aligned BYTE size for
  * a requested number of samples for use with the selected
  * copy function and playback mode properies.
  *
  * @param ahiBufferSamples Sample count suggested by AHI.
  *
- * @return Adapted sample count to be fed to AHI.
+ * @return Byte size to be fed to AHI.
  */
-ULONG alignBufferSamples( ULONG ahiBufferSamples );
+ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples );
 
-/**
- * Returns an appropriately aligned/sized buffer size in LONGs for
- * a requested number of samples for use with the selected
- * copy function and playback mode properies.
- *
- * @param ahiBufferSamples Sample count suggested by AHI.
- *
- * @return Adapted buffer size in LONGs.
- */
-ULONG alignBufferSize( ULONG ahiBufferSamples );
+
+BOOL CreatePlaybackBuffers( VOID );
+VOID DestroyPlaybackBuffers( VOID );
 
 /**
  * Type of the copy functions provided here.
@@ -184,4 +173,4 @@ ASM(LONG) Copy32to24(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
 
-#endif /* UTILITIES_H */
+#endif /* BUFFERS_H */

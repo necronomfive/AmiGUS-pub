@@ -122,12 +122,12 @@ install: all
 #	tools/FlushLibs
 #	AddAudioModes devs:AudioModes/AMIGUS
 
-test: $(LIB_OBJS)
-	$(CC) $(CFLAGS) test/test_utilities.o test/test_utilities.c
-	$(LD) $(LFLAGS) test/test_utilities $(LFLAGS1) $(LFLAGST1) test/test_utilities.o $(BDIR)utilities.o $(LFLAGST2)
+test: FOLDERS $(LIB_OBJS)
+	$(CC) $(CFLAGS) test/test_buffers.o test/test_buffers.c
+	$(LD) $(LFLAGS) test/test_buffers $(LFLAGS1) $(LFLAGST1) test/test_buffers.o $(BDIR)buffers.o $(BDIR)debug.o $(BDIR)support.o $(LFLAGST2)
 	@echo " "
-	$(RUNNER) test/test_utilities
-	-@$(RM) test/test_utilities test/test_utilities.o $(RM_SUFFIX)
+	$(RUNNER) test/test_buffers
+	-@$(RM) test/test_buffers test/test_buffers.o $(RM_SUFFIX)
 
 INCLUDES:
 	make -f Makefile-Includes all 

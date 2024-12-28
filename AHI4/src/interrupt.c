@@ -95,18 +95,18 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
   UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
                             AMIGUS_PCM_MAIN_INT_CONTROL );
-  if ( !( status & ( AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
-                   | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK ) ) ) {
+  if ( !( status & ( AMIGUS_INT_F_PLAY_FIFO_EMPTY
+                   | AMIGUS_INT_F_PLAY_FIFO_WATERMARK ) ) ) {
     
     return 0;
   }
 
   reminder = ReadReg16( AmiGUSBase->agb_CardBase,
-                        AMIGUS_PCM_PLAYBACK_FIFO_USAGE ) << 1;
+                        AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
   minHwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
 
   /* Now find out target size to copy into FIFO during this interrupt run    */
-  target = AMIGUS_PLAYBACK_FIFO_BYTES;             /* all counting in BYTEs! */
+  target = AMIGUS_PCM_PLAY_FIFO_BYTES;             /* all counting in BYTEs! */
   target -= reminder;                               /* deduct remaining FIFO */
   target -= minHwSampleSize;   /* and provide headroom for ALL sample sizes! */
 
@@ -135,24 +135,24 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
       break;
     }
   }
-  if ( status & AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY ) {
+  if ( status & AMIGUS_INT_F_PLAY_FIFO_EMPTY ) {
 
     /*
      Recovery from buffer underruns is a bit tricky.
      DMA will stay disabled until worker task prepared some buffers and 
      triggered a full playback init cycle to make us run again.
      */
-    AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_STATUS_PLAYBACK_BUFFER_UNDERRUN;
+    AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
   }
   WriteReg16( AmiGUSBase->agb_CardBase,
-              AMIGUS_PCM_PLAYBACK_FIFO_WATERMARK,
+              AMIGUS_PCM_PLAY_FIFO_WATERMARK,
               AmiGUSBase->agb_watermark );
   /* Clear AmiGUS control flags here!!! */
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_PCM_MAIN_INT_CONTROL,
-              AMIGUS_INT_FLAG_MASK_CLEAR
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK );
+              AMIGUS_INT_F_MASK_CLEAR
+            | AMIGUS_INT_F_PLAY_FIFO_EMPTY
+            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
   /* Signal sub task */
   if ( AmiGUSBase->agb_WorkerReady ) {
 

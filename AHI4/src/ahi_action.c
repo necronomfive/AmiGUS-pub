@@ -18,6 +18,7 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
+#include "amigus_pcm.h"
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
@@ -100,7 +101,7 @@ ASM(ULONG) SAVEDS AHIsub_Start(
     return AHIE_UNKNOWN;
   }
 
-  initAmiGUS();
+  StartAmiGusPcmPlayback();
   LOG_D(( "D: AHIsub_Start done\n" ));
   return AHIE_OK;
 }
@@ -137,24 +138,17 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
           aAudioCtrl->ahiac_MaxBuffSamples,
           aAudioCtrl->ahiac_BuffType
        ));
-  alignedSamples = alignBufferSamples( aAudioCtrl->ahiac_BuffSamples );
-  if ( aAudioCtrl->ahiac_BuffSamples != alignedSamples ) {
-
-    LOG_I(( "I: Aligned buffer %ld -> %ld samples or %ld -> %ld BYTEs\n",
-            aAudioCtrl->ahiac_BuffSamples,
-            alignedSamples,
-            aAudioCtrl->ahiac_BuffSamples << sampleToByte,
-            alignedSamples << sampleToByte ));
-  }
+  alignedSamples = 
+    AlignByteSizeForSamples( aAudioCtrl->ahiac_BuffSamples ) >> sampleToByte;
   aAudioCtrl->ahiac_BuffSamples = alignedSamples;
   AmiGUSBase->agb_AudioCtrl = aAudioCtrl;
 
   /* Finally, adapt watermark, ticking in hardware samples in WORDs! */
   
   alignedSamplesHwWordSize = UMult32( alignedSamples, hwSampleSize ) >> 1;
-  if ( ( AMIGUS_PLAYBACK_FIFO_WORDS >> 1 ) < alignedSamplesHwWordSize ) {
+  if ( ( AMIGUS_PCM_PLAY_FIFO_WORDS >> 1 ) < alignedSamplesHwWordSize ) {
 
-    AmiGUSBase->agb_watermark = AMIGUS_PLAYBACK_FIFO_WORDS >> 1;
+    AmiGUSBase->agb_watermark = AMIGUS_PCM_PLAY_FIFO_WORDS >> 1;
 
   } else {
 
@@ -180,8 +174,8 @@ ASM(VOID) SAVEDS AHIsub_Stop(
   LOG_D(( "D: Read FIFO level %04lx\n",
           ReadReg16(
             AmiGUSBase->agb_CardBase,
-            AMIGUS_PCM_PLAYBACK_FIFO_USAGE ) ));
-  stopAmiGUS();
+            AMIGUS_PCM_PLAY_FIFO_USAGE ) ));
+  StopAmiGusPcmPlayback();
 
   DestroyInterruptHandler();
   DestroyWorkerProcess();

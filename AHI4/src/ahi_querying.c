@@ -22,6 +22,7 @@
 #include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
+#include "samplerate.h"
 #include "support.h"
 #include "SDI_AHI4_protos.h"
 
@@ -49,7 +50,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
     }
     case AHIDB_Frequencies: {
 
-      result = AMIGUS_AHI_NUM_SAMPLE_RATES;
+      result = AMIGUS_PCM_SAMPLE_RATE_COUNT;
       break;
     }
     case AHIDB_Frequency: {
@@ -111,7 +112,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
               stereo,
               bytesPerSample ));
 
-      result = UDivMod32( AMIGUS_PLAYBACK_FIFO_BYTES, bytesPerSample );
+      result = UDivMod32( AMIGUS_PCM_PLAY_FIFO_BYTES, bytesPerSample );
       /*
       Could get reminder by getRegD1(); like
         __reg("d1") ULONG __getRegD1()="\t";
@@ -137,7 +138,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
               stereo,
               bytesPerSample ));
 
-      result = UDivMod32( AMIGUS_RECORD_FIFO_BYTES, bytesPerSample );
+      result = UDivMod32( AMIGUS_PCM_REC_FIFO_BYTES, bytesPerSample );
 
       if ( stereo  ) {
 
@@ -162,7 +163,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
     }
     case AHIDB_Inputs:
       {
-      result = AMIGUS_AHI_NUM_INPUTS;
+      result = AMIGUS_INPUTS_COUNT;
       break;
       }
     case AHIDB_Input:
@@ -172,7 +173,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
       }
     case AHIDB_Outputs:
       {
-      result = AMIGUS_AHI_NUM_OUTPUTS;
+      result = AMIGUS_OUTPUTS_COUNT;
       break;
       }
     case AHIDB_Output:
@@ -242,12 +243,12 @@ ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
     case AHIC_OutputVolume_Query: {
 
       result =
-        (LONG) getAhiVolumeFromAmiGUS( AMIGUS_PCM_PLAYBACK_VOLUME_LEFT );
+        (LONG) getAhiVolumeFromAmiGUS( AMIGUS_PCM_PLAY_VOLUME_LEFT );
       break;
     }
     case AHIC_OutputVolume: {
       
-      setAhiVolumeToAmiGUS( aArgument, AMIGUS_PCM_PLAYBACK_VOLUME );
+      setAhiVolumeToAmiGUS( aArgument, AMIGUS_PCM_PLAY_VOLUME );
       result = TRUE;
       break;
     }
@@ -256,12 +257,12 @@ ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
     case AHIC_InputGain_Query: {
 
       result =
-        (LONG) getAhiVolumeFromAmiGUS( AMIGUS_PCM_RECORDING_VOLUME_LEFT );
+        (LONG) getAhiVolumeFromAmiGUS( AMIGUS_PCM_REC_VOLUME_LEFT );
       break;
     }
     case AHIC_InputGain: {
       
-      setAhiVolumeToAmiGUS( aArgument, AMIGUS_PCM_RECORDING_VOLUME );
+      setAhiVolumeToAmiGUS( aArgument, AMIGUS_PCM_REC_VOLUME );
       result = TRUE;
       break;
     }

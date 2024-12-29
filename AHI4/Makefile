@@ -123,11 +123,11 @@ install: all
 #	AddAudioModes devs:AudioModes/AMIGUS
 
 test: FOLDERS $(LIB_OBJS)
-#	$(CC) $(CFLAGS) test/test_buffers.o test/test_buffers.c
-#	$(LD) $(LFLAGS) test/test_buffers $(LFLAGS1) $(LFLAGST1) test/test_buffers.o $(BDIR)buffers.o $(BDIR)debug.o $(BDIR)support.o $(LFLAGST2)
-#	@echo " "
-#	$(RUNNER) test/test_buffers
-#	-@$(RM) test/test_buffers test/test_buffers.o $(RM_SUFFIX)
+	$(CC) $(CFLAGS) test/test_buffers.o test/test_buffers.c
+	$(LD) $(LFLAGS) test/test_buffers $(LFLAGS1) $(LFLAGST1) test/test_buffers.o $(BDIR)buffers.o $(BDIR)debug.o $(BDIR)support.o $(LFLAGST2)
+	@echo " "
+	$(RUNNER) test/test_buffers
+	-@$(RM) test/test_buffers test/test_buffers.o $(RM_SUFFIX)
 	@echo " "
 	$(CC) $(CFLAGS) test/test_support.o test/test_support.c
 	$(LD) $(LFLAGS) test/test_support $(LFLAGS1) $(LFLAGST1) test/test_support.o $(BDIR)support.o $(BDIR)debug.o $(LFLAGST2)

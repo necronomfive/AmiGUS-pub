@@ -19,6 +19,7 @@
 #include <proto/exec.h>
 #include <proto/intuition.h>
 #include <proto/timer.h>
+#include <proto/utility.h>
 
 #include "amigus_private.h"
 #include "debug.h"
@@ -115,10 +116,8 @@ VOID DisplayError( ULONG aError ) {
 
 VOID LogTicks( UBYTE bitmask ) {
 
-  ULONG ef;
   struct EClockVal ecv;
-  
-  ef = ReadEClock( &ecv );
+  ULONG ef = ReadEClock( &ecv );
 
   switch (bitmask) {
     case 0x00:
@@ -139,4 +138,36 @@ VOID LogTicks( UBYTE bitmask ) {
       LOG_I(("I: Tick freq %ld low %ld high %ld\n", ef, ecv.ev_lo, ecv.ev_hi));
       break;
   }
+}
+
+VOID Sleep( ULONG millis ) {
+
+  struct EClockVal ecv;
+  ULONG ef = ReadEClock( &ecv );
+  ULONG milli_ticks = UDivMod32( ef, 1000 );           // ef -> ticks / milli
+  ULONG needed_ticks = UMult32( milli_ticks, millis ); //    -> target inc
+  /*
+   * Higher precision, but 32bit not wide enough:
+   * ULONG second_ticks = UMult32( ef, millis );
+   * ULONG needed_ticks = UDivMod32( second_ticks, 1000 );
+  */
+  const ULONG current_lo = ecv.ev_lo;
+  const ULONG current_hi = ecv.ev_hi;
+  const ULONG target_lo = current_lo + needed_ticks;
+  const ULONG target_hi = ( current_lo > target_lo )
+                          ? ( current_hi + 1 )
+                          : ( current_hi );
+
+  LOG_V(( "V: Tick freq %ld current: %ld %ld needed: %ld target: %ld %ld\n",
+          ef,
+          current_hi,
+          current_lo,
+          needed_ticks,
+          target_hi,
+          target_lo ));
+  while (( target_lo > ecv.ev_lo ) || ( target_hi > ecv.ev_hi )) {
+
+    ReadEClock( &ecv );
+  }
+  LOG_V(( "V: Slept until %ld %ld\n", ecv.ev_hi, ecv.ev_lo ));
 }

@@ -37,4 +37,9 @@ VOID DisplayError( ULONG aError );
  */
 VOID LogTicks( UBYTE bitmask );
 
+/**
+ * Waits for some milli seconds.
+ */
+VOID Sleep( ULONG millis );
+
 #endif /* SUPPORT_H */

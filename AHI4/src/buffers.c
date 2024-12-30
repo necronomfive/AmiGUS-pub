@@ -102,41 +102,42 @@ UWORD getBufferSamples(
 BOOL CreatePlaybackBuffers( VOID ) {
 
   LONG longSize;
+  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
 
-  if ( AmiGUSBase->agb_Buffer[0] ) {
+  if ( playback->agpp_Buffer[0] ) {
 
     LOG_D(("D: Playback buffers already exist!\n"));
     return FALSE;
   }
 
   /* BufferSize is in BYTEs! */
-  AmiGUSBase->agb_BufferSize = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize;
+  playback->agpp_BufferSize = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize;
   LOG_D(( "D: Allocating playback buffers a %ld BYTEs\n",
-          AmiGUSBase->agb_BufferSize ));
-  AmiGUSBase->agb_Buffer[0] = (ULONG *)
-      AllocMem( AmiGUSBase->agb_BufferSize, MEMF_FAST | MEMF_CLEAR );
-  if ( !AmiGUSBase->agb_Buffer[0] ) {
+          playback->agpp_BufferSize ));
+  playback->agpp_Buffer[0] = (ULONG *)
+    AllocMem( playback->agpp_BufferSize, MEMF_FAST | MEMF_CLEAR );
+  if ( !playback->agpp_Buffer[0] ) {
 
     LOG_E(("E: Could not allocate FAST RAM for buffer 0!\n"));
     return TRUE;
   }
-  AmiGUSBase->agb_Buffer[1] = (ULONG *)
-      AllocMem( AmiGUSBase->agb_BufferSize, MEMF_FAST | MEMF_CLEAR );
-  if ( !AmiGUSBase->agb_Buffer[1] ) {
+  playback->agpp_Buffer[1] = (ULONG *)
+    AllocMem( playback->agpp_BufferSize, MEMF_FAST | MEMF_CLEAR );
+  if ( !playback->agpp_Buffer[1] ) {
 
     LOG_E(("E: Could not allocate FAST RAM for buffer 1!\n"));
     return TRUE;
   }
 
   /* Buffers are ticking in LONGs! */
-  longSize = AmiGUSBase->agb_BufferSize >> 2;
+  longSize = playback->agpp_BufferSize >> 2;
 
-  AmiGUSBase->agb_BufferMax[ 0 ] = longSize;
-  AmiGUSBase->agb_BufferMax[ 1 ] = longSize;
+  playback->agpp_BufferMax[ 0 ] = longSize;
+  playback->agpp_BufferMax[ 1 ] = longSize;
     /* All buffers are created empty - back to initial state! */
-  AmiGUSBase->agb_BufferIndex[ 0 ] = longSize;
-  AmiGUSBase->agb_BufferIndex[ 1 ] = longSize;
-  AmiGUSBase->agb_currentBuffer = 0;
+  playback->agpp_BufferIndex[ 0 ] = longSize;
+  playback->agpp_BufferIndex[ 1 ] = longSize;
+  playback->agpp_CurrentBuffer = 0;
 
   LOG_I(( "I: Mix / copy up to %ld WORDs from AHI per pass\n",
           longSize << 1 ));
@@ -147,21 +148,23 @@ BOOL CreatePlaybackBuffers( VOID ) {
 
 VOID DestroyPlaybackBuffers(VOID) {
 
-  if ( AmiGUSBase->agb_Buffer[0] ) {
+  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
 
-    FreeMem( AmiGUSBase->agb_Buffer[0], AmiGUSBase->agb_BufferSize );
-    AmiGUSBase->agb_Buffer[0] = NULL;
-    AmiGUSBase->agb_BufferIndex[0] = 0;
+  if ( playback->agpp_Buffer[0] ) {
+
+    FreeMem( playback->agpp_Buffer[0], playback->agpp_BufferSize );
+    playback->agpp_Buffer[0] = NULL;
+    playback->agpp_BufferIndex[0] = 0;
     LOG_D(("D: Free`ed buffer 0!\n"));
   }
-  if ( AmiGUSBase->agb_Buffer[1] ) {
+  if ( playback->agpp_Buffer[1] ) {
 
-    FreeMem( AmiGUSBase->agb_Buffer[1], AmiGUSBase->agb_BufferSize );
-    AmiGUSBase->agb_Buffer[1] = NULL;
-    AmiGUSBase->agb_BufferIndex[1] = 0;
+    FreeMem( playback->agpp_Buffer[1], playback->agpp_BufferSize );
+    playback->agpp_Buffer[1] = NULL;
+    playback->agpp_BufferIndex[1] = 0;
     LOG_D(("D: Free`ed buffer 1!\n"));
   }
-  AmiGUSBase->agb_BufferSize = 0;
+  playback->agpp_BufferSize = 0;
   LOG_D(("D: All playback buffers free`ed\n"));
 }
 
@@ -187,7 +190,7 @@ const ULONG CopyFunctionRequirementById[] = {
 
 ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples ) {
 
-  const ULONG index = AmiGUSBase->agb_CopyFunctionId;
+  const ULONG index = AmiGUSBase->agb_Playback.agpp_CopyFunctionId;
   const ULONG mask = CopyFunctionRequirementById[ index ];
   const UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
   ULONG aligned = ahiBufferSamples;

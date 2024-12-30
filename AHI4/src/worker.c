@@ -82,6 +82,7 @@ typedef ASM(VOID) PostTimerType( REG(a2, struct AHIAudioCtrlDrv *) );
 VOID FillBuffer( BYTE buffer ) {
 
 //  LOG_D(( "D: FB%1ld\n", buffer ));
+  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
   struct AHIAudioCtrlDrv *audioCtrl = AmiGUSBase->agb_AudioCtrl;
   PreTimerType *preTimer = (PreTimerType *)audioCtrl->ahiac_PreTimer;
   PostTimerType *postTimer = (PostTimerType *)audioCtrl->ahiac_PostTimer;
@@ -116,7 +117,7 @@ VOID FillBuffer( BYTE buffer ) {
     */
     CallHookPkt( audioCtrl->ahiac_MixerFunc,
                  audioCtrl,
-                 (APTR) AmiGUSBase->agb_Buffer[ buffer ] );
+                 (APTR) playback->agpp_Buffer[ buffer ] );
 
     /*
      * 4) Convert and feed the buffer into the audio hardware.
@@ -137,9 +138,9 @@ VOID FillBuffer( BYTE buffer ) {
      *
      * Remember: Buffers ticking in LONGs (hence the final shift) !!!
      */
-    AmiGUSBase->agb_BufferMax[ buffer ] =
+    playback->agpp_BufferMax[ buffer ] =
       AlignByteSizeForSamples( audioCtrl->ahiac_BuffSamples ) >> 2;
-    AmiGUSBase->agb_BufferIndex[ buffer ] = 0;         /* buffer is full     */
+    playback->agpp_BufferIndex[ buffer ] = 0; /* buffer full  */
   }
   /*
    * 5) Optionally call ahiac_PostTimerFunc().
@@ -152,6 +153,7 @@ VOID FillBuffer( BYTE buffer ) {
 /*__entry for vbcc*/ SAVEDS VOID WorkerProcess( VOID ) {
 
   ULONG signals = TRUE;
+  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
 
   LOG_D(("D: Worker for AmiGUSBase @ %08lx starting...\n", (LONG) AmiGUSBase));
   
@@ -170,10 +172,11 @@ VOID FillBuffer( BYTE buffer ) {
     while ( signals ) {
 
       ULONG i;
-      ULONG k = AmiGUSBase->agb_currentBuffer;
+      ULONG k = playback->agpp_CurrentBuffer;
       for ( i = 0; 2 > i; ++i ) {
         
-        if ( AmiGUSBase->agb_BufferIndex[ k ] >= AmiGUSBase->agb_BufferMax[ k ] ) {
+        if ( playback->agpp_BufferIndex[ k ] 
+             >= playback->agpp_BufferMax[ k ] ) {
 
           FillBuffer( k );
         }
@@ -194,10 +197,10 @@ VOID FillBuffer( BYTE buffer ) {
       }
 
       LOG_INT(( "WORKER: i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
-                AmiGUSBase->agb_BufferIndex[ 0 ],
-                AmiGUSBase->agb_BufferMax[ 0 ],
-                AmiGUSBase->agb_BufferIndex[ 1 ],
-                AmiGUSBase->agb_BufferMax[ 1 ] ));
+                playback->agpp_BufferIndex[ 0 ],
+                playback->agpp_BufferMax[ 0 ],
+                playback->agpp_BufferIndex[ 1 ],
+                playback->agpp_BufferMax[ 1 ] ));
 
       AmiGUSBase->agb_WorkerReady = TRUE;
       signals = Wait(

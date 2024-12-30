@@ -160,17 +160,17 @@ ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
   alignedSamplesHwWordSize = UMult32( alignedSamples, hwSampleSize ) >> 1;
   if ( ( AMIGUS_PCM_PLAY_FIFO_WORDS >> 1 ) < alignedSamplesHwWordSize ) {
 
-    AmiGUSBase->agb_watermark = AMIGUS_PCM_PLAY_FIFO_WORDS >> 1;
+    AmiGUSBase->agb_Playback.agpp_Watermark = AMIGUS_PCM_PLAY_FIFO_WORDS >> 1;
 
   } else {
 
-    AmiGUSBase->agb_watermark = alignedSamplesHwWordSize;
+    AmiGUSBase->agb_Playback.agpp_Watermark = alignedSamplesHwWordSize;
   }
   LOG_D(( "D: Mix / copy up to %ld WORDs from AHI per pass, "
           "converts to %ld WORDs in AmiGUS, using watermark %ld WORDs\n",
           ( alignedSamples << sampleToByte ) >> 1,
           alignedSamplesHwWordSize,
-          AmiGUSBase->agb_watermark ));
+          AmiGUSBase->agb_Playback.agpp_Watermark ));
 
   LOG_D(( "D: AHIsub_Update done.\n" ));
   return;

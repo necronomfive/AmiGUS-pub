@@ -49,6 +49,24 @@
 #include "SDI_AHI4_protos.h"
 
 /******************************************************************************
+ * Library base structure components
+ *****************************************************************************/
+
+struct AmiGUSPcmPlayback {
+  /* Mixing double-buffers to be copied to FIFO alternatingly */  
+  ULONG                       * agpp_Buffer[2];      /* Fully LONG aligned!  */
+  ULONG                         agpp_BufferIndex[2]; /* Next LONG index each */
+  ULONG                         agpp_BufferMax[2];   /* LONGs watermark each */
+  ULONG                         agpp_BufferSize;     /* BYTEs allocated each */
+  ULONG                         agpp_CurrentBuffer;  /* Current playing buf. */
+
+  CopyFunctionType              agpp_CopyFunction;   /* Magic AHI<->AmiGUS.. */
+  ULONG                         agpp_CopyFunctionId; /* ID of CopyFunction   */
+
+  ULONG                         agpp_Watermark;      /* Counting in WORDs!   */
+};
+
+/******************************************************************************
  * Library base structure
  *****************************************************************************/
 
@@ -71,6 +89,7 @@ struct AmiGUSBasePrivate {
   struct Interrupt            * agb_Interrupt;
   struct Process              * agb_MainProcess;
   struct Process              * agb_WorkerProcess;
+  LONG                          agb_WorkerReady;
   BYTE                          agb_MainSignal;
   BYTE                          agb_WorkerWorkSignal;
   BYTE                          agb_WorkerStopSignal;
@@ -78,27 +97,14 @@ struct AmiGUSBasePrivate {
   BYTE                          agb_UsageCounter;    
 
   /* Driver settings */
-  CopyFunctionType              agb_CopyFunction;   /* Magic AHI<->AmiGUS... */
   UWORD                         agb_HwSampleRateId; /* HW sample rate ID     */
   UWORD                         agb_HwSampleFormat; /* HW sample format ID   */
   UBYTE                         agb_AhiSampleSize;  /* BYTE size of 1 sample */
   UBYTE                         agb_AhiSampleShift; /* Sample <=> Byte shift */
-  UBYTE                         agb_CopyFunctionId; /* ID of CopyFunction    */
   UBYTE                         agb_CanRecord;      /* Can record? Yes / No  */
   UBYTE                         agb_StateFlags;     /* AmiGUS state as below */
-  UBYTE                         agb_Reserved0;
-  UBYTE                         agb_Reserved1;
-  UBYTE                         agb_Reserved2;
 
-  /* Mixing double-buffers to be copied to FIFO alternatingly */
-  ULONG                       * agb_Buffer[2];      /* Fully LONG aligned!   */
-  ULONG                         agb_BufferIndex[2]; /* Next LONG index each  */
-  ULONG                         agb_BufferMax[2];   /* LONGs watermark each  */
-  ULONG                         agb_BufferSize;     /* BYTEs allocated each  */
-  ULONG                         agb_currentBuffer;  /* Current playing buf.  */
-
-  ULONG                         agb_watermark;      /* Counting in WORDs!    */
-  LONG                          agb_WorkerReady;
+  struct AmiGUSPcmPlayback      agb_Playback;       /* Groups playback vars  */
   
   struct AHIAudioCtrlDrv      * agb_AudioCtrl;
 

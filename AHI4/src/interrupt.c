@@ -93,6 +93,8 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   LONG copied;            /* Sum of BYTEs actually filled into FIFO this run */
   LONG minHwSampleSize;   /* Size of a single (mono / stereo) sample in BYTEs*/
 
+  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
+
   UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
                             AMIGUS_PCM_MAIN_INT_CONTROL );
   if ( !( status & ( AMIGUS_INT_F_PLAY_FIFO_EMPTY
@@ -106,22 +108,22 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   minHwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
 
   /* Now find out target size to copy into FIFO during this interrupt run    */
-  target = AmiGUSBase->agb_watermark << 2; /* <<1 to BYTEs, <<1 2x watermark */
+  target = playback->agpp_Watermark << 2;  /* <<1 to BYTEs, <<1 2x watermark */
   target -= reminder;                               /* deduct remaining FIFO */
   target -= minHwSampleSize;   /* and provide headroom for ALL sample sizes! */
 
-  current = &( AmiGUSBase->agb_currentBuffer );
+  current = &( playback->agpp_CurrentBuffer );
   canSwap = TRUE;
   copied = 0;
   
   while ( copied < target ) {
 
-    if ( AmiGUSBase->agb_BufferIndex[ *current ] 
-         < AmiGUSBase->agb_BufferMax[ *current ] ) {
+    if ( playback->agpp_BufferIndex[ *current ] 
+        < playback->agpp_BufferMax[ *current ] ) {
 
-      copied += (* AmiGUSBase->agb_CopyFunction)(
-        AmiGUSBase->agb_Buffer[ *current ],
-        &( AmiGUSBase->agb_BufferIndex[ *current ] ));
+      copied += (* playback->agpp_CopyFunction)(
+        playback->agpp_Buffer[ *current ],
+        &( playback->agpp_BufferIndex[ *current ] ));
 
     } else if ( canSwap ) {
 
@@ -146,7 +148,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   }
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_PCM_PLAY_FIFO_WATERMARK,
-              AmiGUSBase->agb_watermark );
+              playback->agpp_Watermark );
   /* Clear AmiGUS control flags here!!! */
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_PCM_MAIN_INT_CONTROL,
@@ -166,7 +168,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   LOG_INT(( "INT: t %4ld c %4ld wm %4ld wr %ld\n",
             target,
             copied,
-            AmiGUSBase->agb_watermark,
+            playback->agb_watermark,
             AmiGUSBase->agb_WorkerReady ));
   return 1;
 }

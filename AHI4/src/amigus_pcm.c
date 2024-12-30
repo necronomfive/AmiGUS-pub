@@ -19,7 +19,6 @@
 #include "amigus_pcm.h"
 #include "debug.h"
 #include "errors.h"
-#include "support.h"
 
 LONG FindAmiGusPcm(struct AmiGUSBasePrivate *amiGUSBase) {
 
@@ -122,7 +121,6 @@ VOID StartAmiGusPcmPlayback( VOID ) {
                 AMIGUS_PCM_PLAY_FIFO_WRITE,
                 0L );
   }
-  Sleep( 500 );
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_FORMAT,
               AmiGUSBase->agb_HwSampleFormat );

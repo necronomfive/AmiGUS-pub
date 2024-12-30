@@ -22,6 +22,24 @@
 #include "SDI_compiler.h"
 
 /**
+ * Get an aligned buffer's size in bytes for holding a well defined fraction
+ * of a second.
+ *
+ * @param sampleRate In samples per second, aka Hz, aka frequency by AHI.
+ * @param secondFraction n in 1/n, defining how much of a second shall fit.
+ * @param sampleSize In bytes per AHI sample, including stereo / mono.
+ * @param multipleOf Buffer size requirement by the avisioned copy function.
+ *
+ * @return Desired buffer size in bytes.
+ */
+ULONG getBufferSize(
+  LONG sampleRate,
+  LONG secondFraction,
+  UBYTE sampleSize,
+  UBYTE multipleOf
+);
+
+/**
  * Get the required mixing / playback buffer size in bytes.
  *
  * @param sampleRate In samples per second, aka Hz, aka frequency by AHI.
@@ -32,7 +50,7 @@
  *
  * @return Desired buffer size in bytes.
  */
-UWORD getBufferBytes(
+ULONG getBufferBytes(
   LONG sampleRate,
   UBYTE sampleSize,
   UBYTE multipleOf,

@@ -70,7 +70,10 @@ struct AmiGUSPcmRecording {
   ULONG                       * agpr_Buffer[2];      /* Fully LONG aligned!  */
   ULONG                         agpr_BufferIndex[2]; /* Next LONG index each */
   ULONG                         agpr_BufferMax[2];   /* LONGs high mark each */
-  ULONG                         agpp_CurrentBuffer;  /* Current recording b. */
+
+  ULONG                         agpr_CurrentBuffer;  /* Current recording b. */
+
+  ULONG                         agpr_Watermark;      /* Counting in WORDs!   */
 };
 
 /******************************************************************************
@@ -111,7 +114,8 @@ struct AmiGUSBasePrivate {
   UBYTE                         agb_CanRecord;      /* Can record? Yes / No  */
   UBYTE                         agb_StateFlags;     /* AmiGUS state as below */
 
-  struct AmiGUSPcmPlayback      agb_Playback;       /* Groups playback vars  */
+  struct AmiGUSPcmPlayback      agb_Playback;       /* Playback vars group   */
+  struct AmiGUSPcmRecording     agb_Recording;      /* Recording vars group  */
   
   struct AHIAudioCtrlDrv      * agb_AudioCtrl;
 

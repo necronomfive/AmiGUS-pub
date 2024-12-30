@@ -65,7 +65,28 @@ ULONG lcm( ULONG a, ULONG b ) {
   return UMult32( d, b );
 }
 
-UWORD getBufferBytes(
+ULONG getBufferSize(
+  LONG sampleRate,
+  LONG secondFraction,
+  UBYTE sampleSize,
+  UBYTE multipleOf
+) {
+
+  const LONG fractionTarget = SDivMod32( sampleRate, secondFraction );
+  const LONG secondSize = SMult32( fractionTarget, sampleSize );
+  const LONG finalMultipleOf = lcm( sampleSize, multipleOf );
+
+  LONG remainder;
+  UWORD result;
+
+  SDivMod32( secondSize, finalMultipleOf );
+  remainder = GET_REG(REG_D1);
+  result = (UWORD)( secondSize - remainder );
+
+  return result;
+}
+
+ULONG getBufferBytes(
   LONG sampleRate,
   UBYTE sampleSize,
   UBYTE multipleOf,
@@ -74,17 +95,8 @@ UWORD getBufferBytes(
 
   const UBYTE finalSampleSize = isStereo ? sampleSize << 1 : sampleSize;
   const LONG divisor = isRealtime ? DIVISOR_10MS : DIVISOR_25MS;
-  const LONG sampleTarget = SDivMod32( sampleRate, divisor );
-  const LONG bytesTarget = SMult32( sampleTarget, finalSampleSize );
-  const LONG finalMultipleOf = lcm( finalSampleSize, multipleOf );
-  LONG remainder;
-  UWORD result;
 
-  SDivMod32( bytesTarget, finalMultipleOf );
-  remainder = GET_REG(REG_D1);
-  result = (UWORD)( bytesTarget - remainder );
-
-  return result;
+  return getBufferSize( sampleRate, divisor, finalSampleSize, multipleOf );
 }
 
 UWORD getBufferSamples(
@@ -117,14 +129,14 @@ BOOL CreatePlaybackBuffers( VOID ) {
     AllocVec( bufferSize, MEMF_FAST | MEMF_CLEAR );
   if ( !playback->agpp_Buffer[0] ) {
 
-    LOG_E(("E: Could not allocate FAST RAM for buffer 0!\n"));
+    LOG_E(("E: Could not allocate FAST RAM for playback buffer 0!\n"));
     return TRUE;
   }
   playback->agpp_Buffer[1] = (ULONG *)
     AllocVec( bufferSize, MEMF_FAST | MEMF_CLEAR );
   if ( !playback->agpp_Buffer[1] ) {
 
-    LOG_E(("E: Could not allocate FAST RAM for buffer 1!\n"));
+    LOG_E(("E: Could not allocate FAST RAM for playback buffer 1!\n"));
     return TRUE;
   }
 
@@ -151,24 +163,98 @@ VOID DestroyPlaybackBuffers(VOID) {
     FreeVec( playback->agpp_Buffer[0] );
     playback->agpp_Buffer[0] = NULL;
     playback->agpp_BufferIndex[0] = 0;
-    LOG_D(("D: Free`ed buffer 0!\n"));
+    LOG_D(("D: Free`ed playback buffer 0!\n"));
   }
   if ( playback->agpp_Buffer[1] ) {
 
     FreeVec( playback->agpp_Buffer[1] );
     playback->agpp_Buffer[1] = NULL;
     playback->agpp_BufferIndex[1] = 0;
-    LOG_D(("D: Free`ed buffer 1!\n"));
+    LOG_D(("D: Free`ed playback buffer 1!\n"));
   }
   LOG_D(("D: All playback buffers free`ed\n"));
 }
 
 BOOL CreateRecordingBuffers( VOID ) {
 
-  return TRUE;
+  const struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
+  const LONG sampleRate = AmiGUSSampleRates[ AmiGUSBase->agb_HwSampleRateId ];
+  const LONG recordingDevisor = 4;
+  const UBYTE sampleSize = AmiGUSBase->agb_AhiSampleSize;
+  /*
+   4 matching AHIST_S16S,
+   but we want AHIST_S32S = 8 at some point,
+   and it does not hurt
+   */
+  const UBYTE multipleOf = 8; 
+
+  ULONG byteSize;
+  
+  if ( recording->agpr_Buffer[0] ) {
+
+    LOG_D(("D: Recording buffers already exist!\n"));
+    return FALSE;
+  }
+  byteSize = getBufferSize(
+    sampleRate,
+    recordingDevisor,
+    sampleSize,
+    multipleOf );
+  LOG_D(( "D: Allocating %ld BYTEs recording buffer for %ldHz, 1/%ld second, "
+          "%ld BYTEs per AHI sample and enforcing %ld multiples.\n",
+          byteSize,
+          sampleRate,
+          recordingDevisor,
+          sampleSize,
+          multipleOf ));
+  recording->agpr_Buffer[0] = (ULONG *)
+    AllocVec( byteSize, MEMF_FAST | MEMF_CLEAR );
+  if ( !recording->agpr_Buffer[0] ) {
+
+    LOG_E(("E: Could not allocate FAST RAM for recording buffer 0!\n"));
+    return TRUE;
+  }
+  recording->agpr_Buffer[1] = (ULONG *)
+    AllocVec( byteSize, MEMF_FAST | MEMF_CLEAR );
+  if ( !recording->agpr_Buffer[1] ) {
+
+    LOG_E(("E: Could not allocate FAST RAM for recording buffer 1!\n"));
+    return TRUE;
+  }
+
+  recording->agpr_BufferMax[ 0 ] = byteSize >> 2;
+  recording->agpr_BufferMax[ 1 ] = byteSize >> 2;
+    /* All buffers are created empty - back to initial state! */
+  recording->agpr_BufferIndex[ 0 ] = 0;
+  recording->agpr_BufferIndex[ 1 ] = 0;
+  recording->agpr_CurrentBuffer = 0;
+
+  LOG_I(( "I: Record / copy up to %ld WORDs to AHI per pass\n",
+          byteSize >> 1 ));
+
+  LOG_D(("D: All recording buffers created\n"));
+  return FALSE;
 }
 
 VOID DestroyRecordingBuffers( VOID ) {
+
+  struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
+
+  if ( recording->agpr_Buffer[0] ) {
+
+    FreeVec( recording->agpr_Buffer[0] );
+    recording->agpr_Buffer[0] = NULL;
+    recording->agpr_BufferIndex[0] = 0;
+    LOG_D(("D: Free`ed recording buffer 0!\n"));
+  }
+  if ( recording->agpr_Buffer[1] ) {
+
+    FreeVec( recording->agpr_Buffer[1] );
+    recording->agpr_Buffer[1] = NULL;
+    recording->agpr_BufferIndex[1] = 0;
+    LOG_D(("D: Free`ed recording buffer 1!\n"));
+  }
+  LOG_D(("D: All recording buffers free`ed\n"));
 }
 
 /**

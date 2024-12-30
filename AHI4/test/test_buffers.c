@@ -39,6 +39,21 @@ VOID flushFIFO( VOID ) {
   nextTestFIFO = 0;
 }
 
+/* From amigus_hardware.c */
+
+const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
+
+   8000, // AMIGUS_PCM_SAMPLE_RATE_8000  @ index 0x0000
+  11025, // AMIGUS_PCM_SAMPLE_RATE_11025 @ index 0x0001
+  16000, // AMIGUS_PCM_SAMPLE_RATE_16000 @ index 0x0002
+  22050, // AMIGUS_PCM_SAMPLE_RATE_22050 @ index 0x0003
+  24000, // AMIGUS_PCM_SAMPLE_RATE_24000 @ index 0x0004
+  32000, // AMIGUS_PCM_SAMPLE_RATE_32000 @ index 0x0005
+  44100, // AMIGUS_PCM_SAMPLE_RATE_44100 @ index 0x0006
+  48000, // AMIGUS_PCM_SAMPLE_RATE_48000 @ index 0x0007
+  96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0008
+};
+
 VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
 
   sprintf( testFIFO[nextTestFIFO], "%08lx", value );

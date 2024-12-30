@@ -19,6 +19,7 @@
 #include "amigus_pcm.h"
 #include "debug.h"
 #include "errors.h"
+#include "support.h"
 
 LONG FindAmiGusPcm(struct AmiGUSBasePrivate *amiGUSBase) {
 

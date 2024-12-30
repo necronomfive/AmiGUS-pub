@@ -53,17 +53,24 @@
  *****************************************************************************/
 
 struct AmiGUSPcmPlayback {
-  /* Mixing double-buffers to be copied to FIFO alternatingly */  
+  /* Mixing/playback double-buffers to be copied to FIFO alternatingly       */
   ULONG                       * agpp_Buffer[2];      /* Fully LONG aligned!  */
   ULONG                         agpp_BufferIndex[2]; /* Next LONG index each */
-  ULONG                         agpp_BufferMax[2];   /* LONGs watermark each */
-  ULONG                         agpp_BufferSize;     /* BYTEs allocated each */
+  ULONG                         agpp_BufferMax[2];   /* LONGs high mark each */
   ULONG                         agpp_CurrentBuffer;  /* Current playing buf. */
 
   CopyFunctionType              agpp_CopyFunction;   /* Magic AHI<->AmiGUS.. */
   ULONG                         agpp_CopyFunctionId; /* ID of CopyFunction   */
 
   ULONG                         agpp_Watermark;      /* Counting in WORDs!   */
+};
+
+struct AmiGUSPcmRecording {
+  /* Recording double-buffers filled from FIFO/emptied by AHI alternatingly  */
+  ULONG                       * agpr_Buffer[2];      /* Fully LONG aligned!  */
+  ULONG                         agpr_BufferIndex[2]; /* Next LONG index each */
+  ULONG                         agpr_BufferMax[2];   /* LONGs high mark each */
+  ULONG                         agpp_CurrentBuffer;  /* Current recording b. */
 };
 
 /******************************************************************************

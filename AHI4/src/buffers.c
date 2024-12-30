@@ -101,8 +101,9 @@ UWORD getBufferSamples(
 // TRUE = failure
 BOOL CreatePlaybackBuffers( VOID ) {
 
-  LONG longSize;
   struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
+  const ULONG bufferSize = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize;
+  const LONG longSize = bufferSize >> 2; /* Buffers are ticking in LONGs! */
 
   if ( playback->agpp_Buffer[0] ) {
 
@@ -111,26 +112,21 @@ BOOL CreatePlaybackBuffers( VOID ) {
   }
 
   /* BufferSize is in BYTEs! */
-  playback->agpp_BufferSize = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize;
-  LOG_D(( "D: Allocating playback buffers a %ld BYTEs\n",
-          playback->agpp_BufferSize ));
+  LOG_D(( "D: Allocating playback buffers a %ld BYTEs\n", bufferSize ));
   playback->agpp_Buffer[0] = (ULONG *)
-    AllocMem( playback->agpp_BufferSize, MEMF_FAST | MEMF_CLEAR );
+    AllocVec( bufferSize, MEMF_FAST | MEMF_CLEAR );
   if ( !playback->agpp_Buffer[0] ) {
 
     LOG_E(("E: Could not allocate FAST RAM for buffer 0!\n"));
     return TRUE;
   }
   playback->agpp_Buffer[1] = (ULONG *)
-    AllocMem( playback->agpp_BufferSize, MEMF_FAST | MEMF_CLEAR );
+    AllocVec( bufferSize, MEMF_FAST | MEMF_CLEAR );
   if ( !playback->agpp_Buffer[1] ) {
 
     LOG_E(("E: Could not allocate FAST RAM for buffer 1!\n"));
     return TRUE;
   }
-
-  /* Buffers are ticking in LONGs! */
-  longSize = playback->agpp_BufferSize >> 2;
 
   playback->agpp_BufferMax[ 0 ] = longSize;
   playback->agpp_BufferMax[ 1 ] = longSize;
@@ -152,19 +148,18 @@ VOID DestroyPlaybackBuffers(VOID) {
 
   if ( playback->agpp_Buffer[0] ) {
 
-    FreeMem( playback->agpp_Buffer[0], playback->agpp_BufferSize );
+    FreeVec( playback->agpp_Buffer[0] );
     playback->agpp_Buffer[0] = NULL;
     playback->agpp_BufferIndex[0] = 0;
     LOG_D(("D: Free`ed buffer 0!\n"));
   }
   if ( playback->agpp_Buffer[1] ) {
 
-    FreeMem( playback->agpp_Buffer[1], playback->agpp_BufferSize );
+    FreeVec( playback->agpp_Buffer[1] );
     playback->agpp_Buffer[1] = NULL;
     playback->agpp_BufferIndex[1] = 0;
     LOG_D(("D: Free`ed buffer 1!\n"));
   }
-  playback->agpp_BufferSize = 0;
   LOG_D(("D: All playback buffers free`ed\n"));
 }
 

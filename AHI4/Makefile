@@ -26,6 +26,8 @@ ifeq ($(findstring /home,$(HOME)), /home)
   RM_SUFFIX     =
   RUNNER        = vamos
   LHA           = jlha
+
+  HOST_TOOLCHAIN = CROSS_TOOLCHAIN
 else
   AMIGAOS       = 1
   
@@ -38,6 +40,8 @@ else
   RM_SUFFIX     = ALL >NIL:
   RUNNER        =
   LHA           = lha
+
+  HOST_TOOLCHAIN = NATIVE_TOOLCHAIN
 endif
 
 DDIR   = target/
@@ -70,7 +74,8 @@ ifdef USEVBCC
     LDIR        = $(VBCC)/targets/m68k-amigaos/lib/
   endif
   
-  CFLAGS        = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR) -D__NOLIBBASE__ -o
+  CFLAGS        = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR)                          \
+                  -D__NOLIBBASE__ -D$(HOST_TOOLCHAIN) -o
   LFLAGS        = -nostdlib -o
   LFLAGS1       =
   LFLAGST1      = $(LDIR)startup.o
@@ -79,19 +84,19 @@ ifdef USEVBCC
   CC            = vc +aos68k
   LD            = vc +aos68k
 else
-  DEAC_CFLAGS   = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
-                  PARAMETERS=REGISTER DATA=FAR CODE=FAR                     \
-                  NOSTACKCHECK NOCHECKABORT NOICONS                         \
-                  IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)  \
+  DEAC_CFLAGS   = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(HOST_TOOLCHAIN)  \
+                  PARAMETERS=REGISTER DATA=FAR CODE=FAR                       \
+                  NOSTACKCHECK NOCHECKABORT NOICONS                           \
+                  IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)    \
                   OBJNAME
 
-  CFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
-                  PARAMETERS=REGISTER DATA=FAR CODE=FAR                     \
-                  NOSTACKCHECK NOCHECKABORT NOICONS                         \
-                  IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)  \
-                  STRINGMERGE UNSIGNEDCHAR                                  \
-                  OPTIMIZE OPTIMIZERGLOBAL OPTIMIZERINLINE OPTIMIZERINLOCAL \
-                  OPTIMIZERLOOP OPTIMIZERPEEPHOLE OPTIMIZERSCHEDULE         \
+  CFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(HOST_TOOLCHAIN)  \
+                  PARAMETERS=REGISTER DATA=FAR CODE=FAR                       \
+                  NOSTACKCHECK NOCHECKABORT NOICONS                           \
+                  IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)    \
+                  STRINGMERGE UNSIGNEDCHAR                                    \
+                  OPTIMIZE OPTIMIZERGLOBAL OPTIMIZERINLINE OPTIMIZERINLOCAL   \
+                  OPTIMIZERLOOP OPTIMIZERPEEPHOLE OPTIMIZERSCHEDULE           \
                   OBJNAME
 
   LFLAGS        = NOICONS SMALLDATA SMALLCODE STRIPDEBUG \

@@ -51,26 +51,39 @@
  *****************************************************************************/
 #define LIBRARY_NAME      "AmiGUS.audio"
 #define LIBRARY_VERSION   4
-#define LIBRARY_REVISION  13
+#define LIBRARY_REVISION  14
 #define LIBRARY_DATETXT	  __AMIGADATE__
 #define LIBRARY_VERSTXT	 GSTR( LIBRARY_VERSION ) ".0" GSTR( LIBRARY_REVISION )
 
-#ifdef _M68060
-  #define LIBRARY_ADDTXT  " 060"
-#elif defined(_M68040)
-  #define LIBRARY_ADDTXT  " 040"
-#elif defined(_M68030)
-  #define LIBRARY_ADDTXT  " 030"
-#elif defined(_M68020)
-  #define LIBRARY_ADDTXT  " 020"
-#elif defined(__MORPHOS__)
-  #define LIBRARY_ADDTXT  " MorphOS"
+#if defined( _M68060 )
+  #define LIBRARY_CPUTXT  " 060"
+#elif defined( _M68040 )
+  #define LIBRARY_CPUTXT  " 040"
+#elif defined( _M68030 )
+  #define LIBRARY_CPUTXT  " 030"
+#elif defined( _M68020 )
+  #define LIBRARY_CPUTXT  " 020"
+#elif defined( __MORPHOS__ )
+  #define LIBRARY_CPUTXT  " MorphOS"
 #else
-  #define LIBRARY_ADDTXT  ""
+  #define LIBRARY_CPUTXT  " 000"
+#endif
+
+#if defined( __VBCC__ )
+  #define LIBRARY_COMPILERTXT " vbcc"
+#elif defined( __SASC )
+  #define LIBRARY_COMPILERTXT " SAS/C"
+#endif
+
+#ifdef CROSS_TOOLCHAIN
+  #define LIBRARY_HOSTTXT " cross"
+#else
+  #define LIBRARY_HOSTTXT " native"
 #endif
 
 #define LIBRARY_IDSTRING \
-  LIBRARY_NAME " " LIBRARY_VERSTXT " " LIBRARY_DATETXT LIBRARY_ADDTXT "\r\n"
+  LIBRARY_NAME " " LIBRARY_VERSTXT " " LIBRARY_DATETXT \
+  LIBRARY_CPUTXT LIBRARY_COMPILERTXT LIBRARY_HOSTTXT "\r\n"
 
 /******************************************************************************
  * SegList pointer definition

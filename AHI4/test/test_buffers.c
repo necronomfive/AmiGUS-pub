@@ -238,13 +238,13 @@ BOOL testCopy16to8( VOID ) {
   ULONG exp[] = { 3, 4, 1, 1 };
   STRPTR expF[] = { "12569ade" };
 
-  AmiGUSBase->agb_CopyFunction = &Copy16to8;
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy16to8;
   printf("\nTesting Copy16to8 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
 
-  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
+  out = (* AmiGUSBase->agb_Playback.agpp_CopyFunction)( in, &index );
 
   tst0 = ( exp[ 0 ] == index );
   tst1 = ( exp[ 1 ] == out );
@@ -289,13 +289,13 @@ BOOL testCopy16to16( VOID ) {
   ULONG exp[] = { 2, 4, 1, 1 };
   STRPTR expF[] = { "12345678" };
 
-  AmiGUSBase->agb_CopyFunction = &Copy16to16;
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy16to16;
   printf("\nTesting Copy16to16 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
 
-  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
+  out = (* AmiGUSBase->agb_Playback.agpp_CopyFunction)( in, &index );
 
   tst0 = ( exp[ 0 ] == index );
   tst1 = ( exp[ 1 ] == out );
@@ -346,13 +346,13 @@ BOOL testCopy32to8( VOID ) {
   ULONG exp[] = { 5, 4, 1, 1 };
   STRPTR expF[] = { "129a0f87" };
 
-  AmiGUSBase->agb_CopyFunction = &Copy32to8;
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy32to8;
   printf("\nTesting Copy32to8 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
 
-  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
+  out = (* AmiGUSBase->agb_Playback.agpp_CopyFunction)( in, &index );
 
   tst0 = ( exp[ 0 ] == index );
   tst1 = ( exp[ 1 ] == out );
@@ -397,13 +397,13 @@ BOOL testCopy32to16( VOID ) {
   ULONG exp[] = { 3, 4, 1, 1 };
   STRPTR expF[] = { "12349abc" };
 
-  AmiGUSBase->agb_CopyFunction = &Copy32to16;
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy32to16;
   printf("\nTesting Copy32to16 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
 
-  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
+  out = (* AmiGUSBase->agb_Playback.agpp_CopyFunction)( in, &index );
 
   tst0 = ( exp[ 0 ] == index );
   tst1 = ( exp[ 1 ] == out );
@@ -457,13 +457,13 @@ BOOL testCopy32to24( VOID ) {
     "bcde0fed",
     "cb876543" };
 
-  AmiGUSBase->agb_CopyFunction = &Copy32to24;
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy32to24;
   printf("\nTesting Copy32to24 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
 
-  out = (* AmiGUSBase->agb_CopyFunction)( in, &index );
+  out = (* AmiGUSBase->agb_Playback.agpp_CopyFunction)( in, &index );
 
   tst0 = ( exp[ 0 ] == index );
   tst1 = ( exp[ 1 ] == out );
@@ -507,19 +507,19 @@ BOOL testCopyFunctionCalling( VOID ) {
   ULONG exp[] = { 2, 4, 1, 1 };
   STRPTR expF[] = { "12345678" };
 
-  AmiGUSBase->agb_CopyFunction = &Copy16to16;
-  AmiGUSBase->agb_Buffer[ 0 ] = in;
-  AmiGUSBase->agb_BufferIndex[ 0 ] = 1;
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy16to16;
+  AmiGUSBase->agb_Playback.agpp_Buffer[ 0 ] = in;
+  AmiGUSBase->agb_Playback.agpp_BufferIndex[ 0 ] = 1;
   printf("\nTesting CopyFunctionCalling ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
 
-  out = (* AmiGUSBase->agb_CopyFunction)(
-    AmiGUSBase->agb_Buffer[ 0 ],
-    &( AmiGUSBase->agb_BufferIndex[ 0 ] ));
+  out = (* AmiGUSBase->agb_Playback.agpp_CopyFunction)(
+    AmiGUSBase->agb_Playback.agpp_Buffer[ 0 ],
+    &( AmiGUSBase->agb_Playback.agpp_BufferIndex[ 0 ] ));
 
-  tst0 = ( exp[ 0 ] == AmiGUSBase->agb_BufferIndex[ 0 ] );
+  tst0 = ( exp[ 0 ] == AmiGUSBase->agb_Playback.agpp_BufferIndex[ 0 ] );
   tst1 = ( exp[ 1 ] == out );
   tst2 = ( exp[ 2 ] == nextTestFIFO );
   for ( i = 0; i < exp[ 3 ]; ++i ) {
@@ -531,7 +531,7 @@ BOOL testCopyFunctionCalling( VOID ) {
           "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
           "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
           "FIFO content:                                   %s - \t%s\n",
-          exp[ 0 ], AmiGUSBase->agb_BufferIndex[ 0 ], (tst0) ? "passed" : "FAIL!!",
+          exp[ 0 ], AmiGUSBase->agb_Playback.agpp_BufferIndex[ 0 ], (tst0) ? "passed" : "FAIL!!",
           exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
           exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
           "          ", (tst3) ? "passed" : "FAIL!!" );
@@ -548,7 +548,7 @@ BOOL testCopyFunctionCalling( VOID ) {
 
 ULONG alignBufferSamplesRef( ULONG ahiBuffSamples ) {
 
-  ULONG mask = CopyFunctionRequirementById[ AmiGUSBase->agb_CopyFunctionId ];
+  ULONG mask = CopyFunctionRequirementById[ AmiGUSBase->agb_Playback.agpp_CopyFunctionId ];
   UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
   ULONG aligned = ahiBuffSamples;
 
@@ -604,7 +604,7 @@ BOOL testAlignBuffSamples( VOID ) {
       for ( i = 0; NUM_SAMPLE_RATES > i; ++i ) {
 
         suggestedBufferSize = sampleRates[ i ] / 100;
-        AmiGUSBase->agb_CopyFunctionId = copyFunctionId;
+        AmiGUSBase->agb_Playback.agpp_CopyFunctionId = copyFunctionId;
         AmiGUSBase->agb_AhiSampleShift = shift;
 
         alignedBufferSize = AlignByteSizeForSamples( suggestedBufferSize )
@@ -637,8 +637,8 @@ BOOL testAlignBuffSamples( VOID ) {
           h4, h5, h5, h5, h6,
           h0, h1, h1, h1, h2 );
   printf( "Example mask: 0x%08lx, Example ~ mask: 0x%08lx\n",
-          CopyFunctionRequirementById[ AmiGUSBase->agb_CopyFunctionId ],
-          ~CopyFunctionRequirementById[ AmiGUSBase->agb_CopyFunctionId ] );
+          CopyFunctionRequirementById[ AmiGUSBase->agb_Playback.agpp_CopyFunctionId ],
+          ~CopyFunctionRequirementById[ AmiGUSBase->agb_Playback.agpp_CopyFunctionId ] );
   return failed;
 }
 

@@ -20,6 +20,10 @@
 #include <dos/dos.h>
 #include <exec/libraries.h>
 
+/* Need 2 staged helpers to concat version strings and ints together... :/   */
+#define GSTR_HELPER( x ) #x
+#define GSTR( x )        GSTR_HELPER( x )
+
 /******************************************************************************
  * Define your library's public functions here,
  * will be used in library.c.
@@ -47,9 +51,9 @@
  *****************************************************************************/
 #define LIBRARY_NAME      "AmiGUS.audio"
 #define LIBRARY_VERSION   4
-#define LIBRARY_REVISION  12
+#define LIBRARY_REVISION  13
 #define LIBRARY_DATETXT	  __AMIGADATE__
-#define LIBRARY_VERSTXT	  "4.012"
+#define LIBRARY_VERSTXT	 GSTR( LIBRARY_VERSION ) ".0" GSTR( LIBRARY_REVISION )
 
 #ifdef _M68060
   #define LIBRARY_ADDTXT  " 060"

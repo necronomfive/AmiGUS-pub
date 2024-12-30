@@ -67,9 +67,10 @@ struct TErrorMessage errors[] =
     { EWorkerProcessDied, "Playback worker died.", "RIP" },
     { EWorkerProcessSignalsFailed, "Worker does not like to communicate.", "Swine!" },
     { EMainProcessSignalsFailed, "Main process is deaf-mute, this won't work.", "Oh." },
-/*
+
     { ERecordingNotImplemented, "This driver does not support recording.", "Fine!" },
-*/
+    { ERecordingModeNotSupported, "The selected audio mode does not support recording.", "Understood" },
+
     /* Insert errors above. */
 
     { EUnknownError, "Unknown error.", "Shit!" }

@@ -68,6 +68,9 @@ ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples );
 BOOL CreatePlaybackBuffers( VOID );
 VOID DestroyPlaybackBuffers( VOID );
 
+BOOL CreateRecordingBuffers( VOID );
+VOID DestroyRecordingBuffers( VOID );
+
 /**
  * Type of the copy functions provided here.
  */

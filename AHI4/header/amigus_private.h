@@ -84,7 +84,11 @@ struct AmiGUSBasePrivate {
   UBYTE                         agb_AhiSampleSize;  /* BYTE size of 1 sample */
   UBYTE                         agb_AhiSampleShift; /* Sample <=> Byte shift */
   UBYTE                         agb_CopyFunctionId; /* ID of CopyFunction    */
+  UBYTE                         agb_CanRecord;      /* Can record? Yes / No  */
   UBYTE                         agb_StateFlags;     /* AmiGUS state as below */
+  UBYTE                         agb_Reserved0;
+  UBYTE                         agb_Reserved1;
+  UBYTE                         agb_Reserved2;
 
   /* Mixing double-buffers to be copied to FIFO alternatingly */
   ULONG                       * agb_Buffer[2];      /* Fully LONG aligned!   */

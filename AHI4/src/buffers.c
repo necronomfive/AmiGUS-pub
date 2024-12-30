@@ -165,6 +165,14 @@ VOID DestroyPlaybackBuffers(VOID) {
   LOG_D(("D: All playback buffers free`ed\n"));
 }
 
+BOOL CreateRecordingBuffers( VOID ) {
+
+  return TRUE;
+}
+
+VOID DestroyRecordingBuffers( VOID ) {
+}
+
 /**
  * Alignment requirements of the copy functions encrypted into BYTE masks.
  * Order follows the same as CopyFunctionById[].

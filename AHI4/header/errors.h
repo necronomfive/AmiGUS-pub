@@ -34,20 +34,16 @@ enum TErrorCodes
   EOpenTimerDevice,
   EOpenLogFile,
   EAllocateLogMem,
-  /*
-  EAllocateEssSoloBase,
-  ERegisterInterruptFailed,
-  EEnableBusMasterFailed,
-  EAllocDmaFailed,
-  EDmaLogicalToPhysicalFailed,*/
   EDriverInUse,
   EDriverNotInUse,
-  EOutOfMemory,/*
-  EMixerBufferNotAligned,*/
+  EOutOfMemory,
+  EAllocatePlaybackBuffers,
+  EAllocateRecordingBuffers,
   EWorkerProcessCreationFailed,
   EWorkerProcessDied,
   EWorkerProcessSignalsFailed,
   EMainProcessSignalsFailed,
+  ERecordingModeNotSupported,
   /* Missing implementation 100-199*/
   EAllocAudioNotImplemented = 100,  
   EFreeAudioNotImplemented,

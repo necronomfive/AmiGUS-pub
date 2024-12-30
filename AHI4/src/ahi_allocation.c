@@ -41,6 +41,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   UBYTE isStereo = FALSE;
   UBYTE isHifi = FALSE;
   UBYTE isRealtime = FALSE;
+  UBYTE canRecord = FALSE;
   UBYTE bitsPerAmiGusSample = 0;
   UWORD ahiSampleSizeBytes = 2;
   UWORD ahiSampleBytesShift = 1;
@@ -121,12 +122,24 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         isRealtime = (UBYTE)tag->ti_Data;
         break;
       }
-      case AHIDB_AmiGUS_SampleFormat: {
-        sampleFormat = (WORD)tag->ti_Data;
-        break;
-      }
       case AHIDB_AmiGUS_CopyFunction: {
         copyFunctionId = (BYTE)tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_Recording: {
+        canRecord = ( UBYTE )tag->ti_Data;
+        if ( canRecord ) {
+
+          result |= AHISF_CANRECORD;
+
+        } else {
+
+          result &= ( ~ AHISF_CANRECORD );
+        }
+        break;
+      }
+      case AHIDB_AmiGUS_SampleFormat: {
+        sampleFormat = (WORD)tag->ti_Data;
         break;
       }
       default: {
@@ -141,9 +154,9 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
    * ------------------------------------------------------
    */
   LOG_I(( "I: AmiGUS mode is format 0x%lx, %ldbit, %ld stereo, "
-          "%ld HiFi, %ld Realtime, %ldHz\n",
+          "%ld HiFi, %ld Realtime, %ldHz, %ld Recording\n",
           sampleFormat, bitsPerAmiGusSample, isStereo,
-          isHifi, isRealtime, sampleRate ));
+          isHifi, isRealtime, sampleRate, canRecord ));
   LOG_I(( "I: AHI sample size %ld BYTEs, "
           "conversion AHI samples<->BYTEs by %ld shifts, "
           "AmiGUS sample size %ld BYTEs\n",
@@ -167,6 +180,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   AmiGUSBase->agb_HwSampleRateId = sampleRateId;
   AmiGUSBase->agb_HwSampleFormat = sampleFormat;
   AmiGUSBase->agb_CopyFunctionId = copyFunctionId;
+  AmiGUSBase->agb_CanRecord = canRecord;
   AmiGUSBase->agb_CopyFunction = CopyFunctionById[ copyFunctionId ];
 
   /*

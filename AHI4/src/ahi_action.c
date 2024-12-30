@@ -75,21 +75,33 @@ ASM(ULONG) SAVEDS AHIsub_Start(
 
   if ( AHISF_PLAY & aFlags ) {
 
-    LOG_D(("D: Creating playback buffers\n", (LONG) AmiGUSBase));
+    LOG_D(("D: Creating playback buffers\n" ));
     if ( CreatePlaybackBuffers() ) {
 
       LOG_D(("D: No playback buffers, failed.\n"));
+      DisplayError( EAllocatePlaybackBuffers );
       return AHIE_UNKNOWN;
     }
   }
 
  if ( AHISF_RECORD & aFlags ) {
 
-    DisplayError( ERecordingNotImplemented );
-    return AHIE_UNKNOWN;
+    if ( !AmiGUSBase->agb_CanRecord ) {
+      
+      DisplayError( ERecordingModeNotSupported );
+      return AHIE_UNKNOWN;
+    }
+    LOG_D(("D: Creating recording buffers\n" ));
+    if ( CreateRecordingBuffers() ) {
+
+      LOG_D(("D: No recording buffers, failed.\n"));
+      DisplayError( EAllocateRecordingBuffers );
+      return AHIE_UNKNOWN;
+    }
   }
 
-  LOG_D(("D: Creating worker process for AmiGUSBase @ %08lx\n", (LONG) AmiGUSBase));
+  LOG_D(( "D: Creating worker process for AmiGUSBase @ %08lx\n",
+          (LONG) AmiGUSBase ));
   if ( CreateWorkerProcess() ) {
 
     LOG_D(( "D: No worker, failed.\n" ));

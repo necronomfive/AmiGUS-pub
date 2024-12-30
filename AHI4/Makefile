@@ -79,13 +79,17 @@ ifdef USEVBCC
   CC            = vc +aos68k
   LD            = vc +aos68k
 else
-  CFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
+  DEAC_CFLAGS   = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
                   PARAMETERS=REGISTER DATA=FAR CODE=FAR                     \
                   NOSTACKCHECK NOCHECKABORT NOICONS                         \
                   IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)  \
                   OBJNAME
-                  
-  xxx=            STRINGMERGE UNSIGNEDCHAR                                  \
+
+  CFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__                         \
+                  PARAMETERS=REGISTER DATA=FAR CODE=FAR                     \
+                  NOSTACKCHECK NOCHECKABORT NOICONS                         \
+                  IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)  \
+                  STRINGMERGE UNSIGNEDCHAR                                  \
                   OPTIMIZE OPTIMIZERGLOBAL OPTIMIZERINLINE OPTIMIZERINLOCAL \
                   OPTIMIZERLOOP OPTIMIZERPEEPHOLE OPTIMIZERSCHEDULE         \
                   OBJNAME

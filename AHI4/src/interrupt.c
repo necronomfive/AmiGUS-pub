@@ -106,7 +106,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   minHwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
 
   /* Now find out target size to copy into FIFO during this interrupt run    */
-  target = AMIGUS_PCM_PLAY_FIFO_BYTES;             /* all counting in BYTEs! */
+  target = AmiGUSBase->agb_watermark << 2; /* <<1 to BYTEs, <<1 2x watermark */
   target -= reminder;                               /* deduct remaining FIFO */
   target -= minHwSampleSize;   /* and provide headroom for ALL sample sizes! */
 

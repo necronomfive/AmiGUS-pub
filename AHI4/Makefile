@@ -25,6 +25,7 @@ ifeq ($(findstring /home,$(HOME)), /home)
   RM            = rm -rf
   RM_SUFFIX     =
   RUNNER        = vamos
+  IGNORE_VAMOS  = -
   LHA           = jlha
 
   HOST_TOOLCHAIN = CROSS_TOOLCHAIN
@@ -39,6 +40,7 @@ else
   RM            = delete
   RM_SUFFIX     = ALL >NIL:
   RUNNER        =
+  IGNORE_VAMOS  =
   LHA           = lha
 
   HOST_TOOLCHAIN = NATIVE_TOOLCHAIN
@@ -141,7 +143,7 @@ test: FOLDERS $(LIB_OBJS)
 	$(CC) $(CFLAGS) test/test_support.o test/test_support.c
 	$(LD) $(LFLAGS) test/test_support $(LFLAGS1) $(LFLAGST1) test/test_support.o $(BDIR)support.o $(BDIR)debug.o $(LFLAGST2)
 	@echo " "
-	$(RUNNER) test/test_support
+	$(IGNORE_VAMOS)$(RUNNER) test/test_support
 	-@$(RM) test/test_support test/test_support.o $(RM_SUFFIX)
 
 INCLUDES:

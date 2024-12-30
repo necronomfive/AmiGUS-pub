@@ -177,7 +177,7 @@ VOID DestroyPlaybackBuffers(VOID) {
 
 BOOL CreateRecordingBuffers( VOID ) {
 
-  const struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
+  struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
   const LONG sampleRate = AmiGUSSampleRates[ AmiGUSBase->agb_HwSampleRateId ];
   const LONG recordingDevisor = 4;
   const UBYTE sampleSize = AmiGUSBase->agb_AhiSampleSize;

@@ -85,12 +85,12 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
     }
     case AHIDB_Record: {
 
-      result = AMIGUS_AHI_RECORD;
+      result = GetTagData( AHIDB_Record, aDefault, aTagList );
       break;
     }
     case AHIDB_FullDuplex: {
       
-      result = AMIGUS_AHI_FULL_DUPLEX;
+      result = GetTagData( AHIDB_FullDuplex, aDefault, aTagList );
       break;
     }
     case AHIDB_Realtime: {

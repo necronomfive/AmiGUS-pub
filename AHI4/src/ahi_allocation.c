@@ -126,7 +126,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         copyFunctionId = (BYTE)tag->ti_Data;
         break;
       }
-      case AHIDB_AmiGUS_Recording: {
+      case AHIDB_Record: {
         canRecord = ( UBYTE )tag->ti_Data;
         if ( canRecord ) {
 

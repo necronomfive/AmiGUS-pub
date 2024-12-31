@@ -28,8 +28,6 @@
 #define AMIGUS_AHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
                                     "Frank Wille (vbcc), Martin Blom (AHI)"
 #define AMIGUS_AHI_VERSION          LIBRARY_IDSTRING
-#define AMIGUS_AHI_RECORD           FALSE
-#define AMIGUS_AHI_FULL_DUPLEX      FALSE
 
 #define AMIGUS_AHI_FIRMWARE_MINIMUM ( ( 2024 << 20 ) /* year   */ \
                                     + (   12 << 16 ) /* month  */ \
@@ -38,8 +36,7 @@
                                     + (   38 <<  0 ) /* minute */ )
 
 #define AHIDB_AmiGUS_CopyFunction   ( AHIDB_UserBase + 0 )
-#define AHIDB_AmiGUS_Recording      ( AHIDB_UserBase + 1 )
-#define AHIDB_AmiGUS_SampleFormat   ( AHIDB_UserBase + 2 )
+#define AHIDB_AmiGUS_SampleFormat   ( AHIDB_UserBase + 1 )
 
 #define AMIGUS_MEM_LOG_MARKER        "********************************"   \
                                      " AmiGUS "                           \

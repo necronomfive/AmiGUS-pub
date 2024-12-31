@@ -168,7 +168,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   LOG_INT(( "INT: t %4ld c %4ld wm %4ld wr %ld\n",
             target,
             copied,
-            playback->agb_watermark,
+            playback->agpp_Watermark,
             AmiGUSBase->agb_WorkerReady ));
   return 1;
 }

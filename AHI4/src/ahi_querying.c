@@ -153,34 +153,36 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
     }
     case AHIDB_MinInputGain:
     case AHIDB_MinOutputVolume: {
+
       result = 0;
       break;
     }
     case AHIDB_MaxInputGain:
     case AHIDB_MaxOutputVolume: {
+
       result = USHRT_MAX + 1;
       break;
     }
-    case AHIDB_Inputs:
-      {
+    case AHIDB_Inputs: {
+
       result = AMIGUS_INPUTS_COUNT;
       break;
-      }
-    case AHIDB_Input:
-      {
+    }
+    case AHIDB_Input: {
+
       result = ( LONG ) AmiGUSInputs[ aArgument ];
       break;
-      }
-    case AHIDB_Outputs:
-      {
+    }
+    case AHIDB_Outputs: {
+
       result = AMIGUS_OUTPUTS_COUNT;
       break;
-      }
-    case AHIDB_Output:
-      {
+    }
+    case AHIDB_Output: {
+
       result = ( LONG ) AmiGUSOutputs[ aArgument ];
       break;
-      }
+    }
     case AHIDB_PingPong: {
 
       /* Suspicion: Asks if we can play samples reversed!? */

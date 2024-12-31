@@ -189,6 +189,8 @@ VOID debug_mprintf( STRPTR format, ... ) {
       NULL,
       &debug_mPutChProc,
       &AmiGUSBase->agb_LogMem );
+    /* Move mem blob pointer back to overwrite trailing zero next comment */
+    AmiGUSBase->agb_LogMem = ( APTR )(( ULONG ) AmiGUSBase->agb_LogMem - 1 );
     debug_kprintf( "AmiGUS Log ready\n" );
   }
 
@@ -203,6 +205,8 @@ VOID debug_mprintf( STRPTR format, ... ) {
     (APTR) ((LONG) &format +4),
     &debug_mPutChProc,
     &AmiGUSBase->agb_LogMem );
+  /* Move mem blob pointer back to overwrite trailing zero next comment */
+  AmiGUSBase->agb_LogMem = ( APTR )(( ULONG ) AmiGUSBase->agb_LogMem - 1 );
 }
 
 #endif /* USE_MEM_LOGGING */

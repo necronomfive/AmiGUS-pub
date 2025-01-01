@@ -33,16 +33,19 @@ ASM(VOID) SAVEDS AHIsub_Disable(
   REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 ) {
-/*
-  LOG_D(("AHIsub_Disable\n"));
+
+  // LOG_D(("AHIsub_Disable\n"));
+#if 0
   WriteReg16( AmiGUSBase->agb_CardBase,
-              AMIGUS_MAIN_INT_ENABLE,
-              AMIGUS_INT_FLAG_MASK_CLEAR
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-            );
-*/
+              AMIGUS_PCM_MAIN_INT_ENABLE,
+              AMIGUS_INT_F_MASK_CLEAR
+            | AMIGUS_INT_F_PLAY_FIFO_EMPTY
+            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK
+            | AMIGUS_INT_F_REC_FIFO_FULL
+            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+#else
   Disable();
+#endif
   return;
 }
 
@@ -51,16 +54,28 @@ ASM(VOID) SAVEDS AHIsub_Enable(
   REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 ) {
-/*
-  LOG_D(("AHIsub_Enable\n"));
-  WriteReg16( AmiGUSBase->agb_CardBase,
-              AMIGUS_MAIN_INT_ENABLE,
-              AMIGUS_INT_FLAG_MASK_SET
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_EMPTY
-            | AMIGUS_INT_FLAG_PLAYBACK_FIFO_WATERMARK
-            );
-         */
+
+#if 0
+  UWORD targetState = AMIGUS_INT_F_MASK_SET;
+
+  // LOG_D(("AHIsub_Enable\n"));
+  if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUSBase->agb_StateFlags ) {
+
+    targetState |=
+      AMIGUS_INT_F_PLAY_FIFO_EMPTY | AMIGUS_INT_F_PLAY_FIFO_WATERMARK;
+  }
+  if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
+
+    targetState |=
+      AMIGUS_INT_F_REC_FIFO_FULL | AMIGUS_INT_F_REC_FIFO_WATERMARK;
+  }
+  WriteReg16(
+    AmiGUSBase->agb_CardBase,
+    AMIGUS_PCM_MAIN_INT_ENABLE,
+    targetState );
+#else
   Enable();
+#endif
   return;
 }
 
@@ -113,7 +128,16 @@ ASM(ULONG) SAVEDS AHIsub_Start(
     return AHIE_UNKNOWN;
   }
 
-  StartAmiGusPcmPlayback();
+  if ( AHISF_PLAY & aFlags ) {
+
+    LOG_D(("D: Starting playback\n" ));
+    StartAmiGusPcmPlayback();
+  }
+  if ( AHISF_RECORD & aFlags ) {
+
+    LOG_D(("D: Starting recording\n" ));
+    // TODO: StartAmiGusPcmRecording();
+  }
   LOG_D(( "D: AHIsub_Start done\n" ));
   return AHIE_OK;
 }
@@ -183,17 +207,36 @@ ASM(VOID) SAVEDS AHIsub_Stop(
 ) {
   LOG_D(( "D: AHIsub_Stop start\n" ));
 
-  LOG_D(( "D: Read FIFO level %04lx\n",
-          ReadReg16(
-            AmiGUSBase->agb_CardBase,
-            AMIGUS_PCM_PLAY_FIFO_USAGE ) ));
-  StopAmiGusPcmPlayback();
+  if ( AHISF_PLAY & aFlags ) {
+    LOG_D(( "D: Read final playback FIFO level %04lx, stopping now.\n",
+            ReadReg16(
+              AmiGUSBase->agb_CardBase,
+              AMIGUS_PCM_PLAY_FIFO_USAGE ) ));
 
-  DestroyInterruptHandler();
-  DestroyWorkerProcess();
-  DestroyPlaybackBuffers();
+    StopAmiGusPcmPlayback();
+    DestroyPlaybackBuffers();
+  }
+  if ( AHISF_RECORD & aFlags ) {
+    /*
+    TODO:
+    LOG_D(( "D: Read final recording FIFO level %04lx, stopping now.\n",
+            ReadReg16(
+              AmiGUSBase->agb_CardBase,
+              AMIGUS_PCM_REC_FIFO_USAGE ) ));
+    TODO:
+    StopAmiGusPcmPlayback();
+    */
+    DestroyRecordingBuffers();
+  }
+  if (!(( AMIGUS_AHI_F_PLAY_STARTED
+        | AMIGUS_AHI_F_REC_STARTED ) & AmiGUSBase->agb_StateFlags )) {
+
+    LOG_D(( "D: No playback or recording, "
+            "ending interrupt handler and worker task.\n" ));
+    DestroyInterruptHandler();
+    DestroyWorkerProcess();
+  }
 
   LOG_D(( "D: AHIsub_Stop done\n" ));
-
   return;
 }

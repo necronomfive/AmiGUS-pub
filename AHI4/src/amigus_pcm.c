@@ -113,24 +113,27 @@ VOID StartAmiGusPcmPlayback( VOID ) {
               AMIGUS_INT_F_MASK_SET
             | AMIGUS_INT_F_PLAY_FIFO_EMPTY
             | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
-  
-  // now write twice the amount of data into FIFO to kick off playback
+
+  // Now write twice the amount of data into FIFO to kick off playback
   for ( i = prefillSize; 0 < i; --i ) {
 
     WriteReg32( amiGUS,
                 AMIGUS_PCM_PLAY_FIFO_WRITE,
                 0L );
   }
+  // Use correct sample settings, prefill is selected to match all
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_FORMAT,
               AmiGUSBase->agb_HwSampleFormat );
+
+  // Start playback finally
+  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
+  AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_PLAY_STARTED;
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_RATE,
               AmiGUSBase->agb_HwSampleRateId
             | AMIGUS_PCM_SAMPLE_F_INTERPOLATE
             | AMIGUS_PCM_SAMPLE_F_ENABLE );
-  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
-  AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_PLAY_STARTED;
 }
 
 VOID StopAmiGusPcmPlayback( VOID ) {

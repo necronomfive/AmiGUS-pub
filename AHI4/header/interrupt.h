@@ -23,8 +23,4 @@
 BOOL CreateInterruptHandler( VOID );
 VOID DestroyInterruptHandler( VOID );
 
-ASM(LONG) SAVEDS INTERRUPT handleInterrupt(
-  REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
-);
-
 #endif /* INTERRUPT_H */

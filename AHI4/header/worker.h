@@ -23,6 +23,4 @@
 BOOL CreateWorkerProcess( VOID );
 VOID DestroyWorkerProcess( VOID );
 
-/*__entry for vbcc*/ SAVEDS VOID WorkerProcess( VOID );
-
 #endif /* WORKER_H */

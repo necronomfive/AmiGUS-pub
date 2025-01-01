@@ -187,4 +187,12 @@ extern long getreg(int);
 
 #endif
 
+#if defined(__VBCC__)
+
+#undef INLINE
+#define INLINE static 
+
+#elif defined(__SASC)
+#endif
+
 #endif /* SDI_COMPILER_H */

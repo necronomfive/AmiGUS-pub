@@ -30,14 +30,15 @@ INLINE VOID HandlePlayback( UWORD status ) {
   ULONG *current = &( playback->agpp_CurrentBuffer );
   BOOL canSwap = TRUE;
   LONG copied = 0;      /* Sum of BYTEs actually filled into FIFO this run */
+  ULONG watermark = playback->agpp_Watermark;
   LONG reminder =             /* Read-back remaining FIFO samples in BYTES */
     ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
   LONG minHwSampleSize =  /* Size of a single (mono/stereo) sample in BYTEs*/
     AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
 
   /* Target amount of BYTEs to fill into FIFO during this interrupt run,   */
-  LONG target =           /* taken from watermark, converted <<1 to BYTEs, */
-      playback->agpp_Watermark << 2               /* want <<1 2x watermark */
+  LONG target =                                   /* taken from watermark, */
+    ( watermark << 2 )    /* converted <<1 to BYTEs, want <<1 2x watermark */
     - reminder                                    /* deduct remaining FIFO */
     - minHwSampleSize;       /* and provide headroom for ALL sample sizes! */
 
@@ -46,7 +47,7 @@ INLINE VOID HandlePlayback( UWORD status ) {
     if ( playback->agpp_BufferIndex[ *current ] 
         < playback->agpp_BufferMax[ *current ] ) {
 
-      copied += (* playback->agpp_CopyFunction)(
+      copied += (* playback->agpp_CopyFunction )(
         playback->agpp_Buffer[ *current ],
         &( playback->agpp_BufferIndex[ *current ] ));
 
@@ -72,12 +73,12 @@ INLINE VOID HandlePlayback( UWORD status ) {
   }
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_PCM_PLAY_FIFO_WATERMARK,
-              playback->agpp_Watermark );
+              watermark );
 
   LOG_INT(( "INT: Playback t %4ld c %4ld wm %4ld wr %ld\n",
             target,
             copied,
-            playback->agpp_Watermark,
+            watermark,
             AmiGUSBase->agb_WorkerReady ));
 }
 
@@ -123,7 +124,9 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
               AMIGUS_PCM_MAIN_INT_CONTROL,
               AMIGUS_INT_F_MASK_CLEAR
             | AMIGUS_INT_F_PLAY_FIFO_EMPTY
-            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
+            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK
+            | AMIGUS_INT_F_REC_FIFO_FULL
+            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
   /* Signal sub task */
   if ( AmiGUSBase->agb_WorkerReady ) {
 

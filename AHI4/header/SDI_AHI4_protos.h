@@ -64,7 +64,7 @@ ASM(ULONG) SAVEDS AHIsub_Start(
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 );
 
-ASM(void) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
+ASM(void) SAVEDS AHIsub_Update(
   REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
@@ -138,7 +138,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
 
 /* Mixer functions */
 
-ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
+ASM(LONG) SAVEDS AHIsub_HardwareControl(
   REG(a6, struct Library* aBase),
   REG(d0, ULONG aAttribute),
   REG(d1, LONG aArgument),

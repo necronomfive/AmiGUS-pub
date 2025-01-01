@@ -118,7 +118,7 @@ ASM(ULONG) SAVEDS AHIsub_Start(
   return AHIE_OK;
 }
 
-ASM(VOID) SAVEDS AMIGA_INTERRUPT AHIsub_Update(
+ASM(VOID) SAVEDS AHIsub_Update(
   REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)

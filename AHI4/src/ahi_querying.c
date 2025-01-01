@@ -227,7 +227,7 @@ VOID setAhiVolumeToAmiGUS( Fixed volume, ULONG volumeRegisterOffset ) {
   WriteReg32( AmiGUSBase->agb_CardBase, volumeRegisterOffset, volume );
 }
 
-ASM(LONG) SAVEDS AMIGA_INTERRUPT AHIsub_HardwareControl(
+ASM(LONG) SAVEDS AHIsub_HardwareControl(
   REG(a6, struct Library* aBase),
   REG(d0, ULONG aAttribute),
   REG(d1, LONG aArgument),

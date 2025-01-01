@@ -15,6 +15,7 @@
  */
 
 #include <exec/interrupts.h>
+
 #include <hardware/intbits.h>
 
 #include <proto/exec.h>
@@ -23,31 +24,47 @@
 #include "debug.h"
 #include "interrupt.h"
 
-INLINE VOID HandlePlayback( UWORD status ) {
+
+ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
+  REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
+) {
+
+  ULONG *current;
+  BOOL canSwap;
+  LONG reminder;          /* Read-back remaining FIFO samples in BYTES       */
+  LONG target;            /* Target amount of BYTEs to fill into FIFO        */
+  LONG copied;            /* Sum of BYTEs actually filled into FIFO this run */
+  LONG minHwSampleSize;   /* Size of a single (mono / stereo) sample in BYTEs*/
 
   struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
 
-  ULONG *current = &( playback->agpp_CurrentBuffer );
-  BOOL canSwap = TRUE;
-  LONG copied = 0;      /* Sum of BYTEs actually filled into FIFO this run */
-  ULONG watermark = playback->agpp_Watermark;
-  LONG reminder =             /* Read-back remaining FIFO samples in BYTES */
-    ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
-  LONG minHwSampleSize =  /* Size of a single (mono/stereo) sample in BYTEs*/
-    AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
+  UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
+                            AMIGUS_PCM_MAIN_INT_CONTROL );
+  if ( !( status & ( AMIGUS_INT_F_PLAY_FIFO_EMPTY
+                   | AMIGUS_INT_F_PLAY_FIFO_WATERMARK ) ) ) {
+    
+    return 0;
+  }
 
-  /* Target amount of BYTEs to fill into FIFO during this interrupt run,   */
-  LONG target =                                   /* taken from watermark, */
-    ( watermark << 2 )    /* converted <<1 to BYTEs, want <<1 2x watermark */
-    - reminder                                    /* deduct remaining FIFO */
-    - minHwSampleSize;       /* and provide headroom for ALL sample sizes! */
+  reminder = ReadReg16( AmiGUSBase->agb_CardBase,
+                        AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
+  minHwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
 
+  /* Now find out target size to copy into FIFO during this interrupt run    */
+  target = playback->agpp_Watermark << 2;  /* <<1 to BYTEs, <<1 2x watermark */
+  target -= reminder;                               /* deduct remaining FIFO */
+  target -= minHwSampleSize;   /* and provide headroom for ALL sample sizes! */
+
+  current = &( playback->agpp_CurrentBuffer );
+  canSwap = TRUE;
+  copied = 0;
+  
   while ( copied < target ) {
 
     if ( playback->agpp_BufferIndex[ *current ] 
         < playback->agpp_BufferMax[ *current ] ) {
 
-      copied += (* playback->agpp_CopyFunction )(
+      copied += (* playback->agpp_CopyFunction)(
         playback->agpp_Buffer[ *current ],
         &( playback->agpp_BufferIndex[ *current ] ));
 
@@ -58,7 +75,8 @@ INLINE VOID HandlePlayback( UWORD status ) {
 
     } else {
 
-      // Playback buffers empty, but FIFO could take more. Not so good, Al...
+      // Playback buffers empty, but FIFO could take more.
+      // Not so good, Al...
       break;
     }
   }
@@ -73,60 +91,13 @@ INLINE VOID HandlePlayback( UWORD status ) {
   }
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_PCM_PLAY_FIFO_WATERMARK,
-              watermark );
-
-  LOG_INT(( "INT: Playback t %4ld c %4ld wm %4ld wr %ld\n",
-            target,
-            copied,
-            watermark,
-            AmiGUSBase->agb_WorkerReady ));
-}
-
-INLINE VOID HandleRecording( UWORD status ) {
-
-  struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
-
-  LONG copied = 0;
-  LONG target = 0;
-
-  LOG_INT(( "INT: Recording t %4ld c %4ld wm %4ld wr %ld\n",
-            target,
-            copied,
-            recording->agpr_Watermark,
-            AmiGUSBase->agb_WorkerReady ));
-}
-
-ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
-  REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
-) {
-
-  UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
-                            AMIGUS_PCM_MAIN_INT_CONTROL );
-  if ( !( status & ( AMIGUS_INT_F_PLAY_FIFO_EMPTY
-                   | AMIGUS_INT_F_PLAY_FIFO_WATERMARK
-                   | AMIGUS_INT_F_REC_FIFO_FULL
-                   | AMIGUS_INT_F_REC_FIFO_WATERMARK ) ) ) {
-
-    return 0;
-  }
-
-  if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUSBase->agb_StateFlags ) {
-
-    HandlePlayback( status );
-  }
-  if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
-
-    HandleRecording( status );
-  }
-
+              playback->agpp_Watermark );
   /* Clear AmiGUS control flags here!!! */
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_PCM_MAIN_INT_CONTROL,
               AMIGUS_INT_F_MASK_CLEAR
             | AMIGUS_INT_F_PLAY_FIFO_EMPTY
-            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK
-            | AMIGUS_INT_F_REC_FIFO_FULL
-            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
   /* Signal sub task */
   if ( AmiGUSBase->agb_WorkerReady ) {
 
@@ -137,6 +108,11 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
     // TODO: How do we handle worker not ready here? Maybe crying?
   }
+  LOG_INT(( "INT: t %4ld c %4ld wm %4ld wr %ld\n",
+            target,
+            copied,
+            playback->agpp_Watermark,
+            AmiGUSBase->agb_WorkerReady ));
   return 1;
 }
 

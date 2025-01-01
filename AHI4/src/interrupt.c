@@ -73,14 +73,26 @@ INLINE VOID HandlePlayback( UWORD status ) {
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_PCM_PLAY_FIFO_WATERMARK,
               playback->agpp_Watermark );
+
+  LOG_INT(( "INT: Playback t %4ld c %4ld wm %4ld wr %ld\n",
+            target,
+            copied,
+            playback->agpp_Watermark,
+            AmiGUSBase->agb_WorkerReady ));
 }
 
 INLINE VOID HandleRecording( UWORD status ) {
 
   struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
 
-  if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
-  }
+  LONG copied = 0;
+  LONG target = 0;
+
+  LOG_INT(( "INT: Recording t %4ld c %4ld wm %4ld wr %ld\n",
+            target,
+            copied,
+            recording->agpr_Watermark,
+            AmiGUSBase->agb_WorkerReady ));
 }
 
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
@@ -122,11 +134,6 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
     // TODO: How do we handle worker not ready here? Maybe crying?
   }
-  LOG_INT(( "INT: t %4ld c %4ld wm %4ld wr %ld\n",
-            target,
-            copied,
-            playback->agpp_Watermark,
-            AmiGUSBase->agb_WorkerReady ));
   return 1;
 }
 

@@ -154,53 +154,47 @@ INLINE VOID HandlePlayback( VOID ) {
 
   struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
 
-  if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUSBase->agb_StateFlags ) {
+  ULONG i;
+  ULONG k = playback->agpp_CurrentBuffer;
+  for ( i = 0; 2 > i; ++i ) {
+    
+    if ( playback->agpp_BufferIndex[ k ] 
+        >= playback->agpp_BufferMax[ k ] ) {
 
-    ULONG i;
-    ULONG k = playback->agpp_CurrentBuffer;
-    for ( i = 0; 2 > i; ++i ) {
-      
-      if ( playback->agpp_BufferIndex[ k ] 
-          >= playback->agpp_BufferMax[ k ] ) {
-
-        FillBuffer( k );
-      }
-      k ^= 0x00000001;
+      FillBuffer( k );
     }
-    if ( AMIGUS_AHI_F_PLAY_UNDERRUN & AmiGUSBase->agb_StateFlags ) {
-
-      LOG_W(( "W: Recovering from playback buffer underrun.\n" ));
-      /*
-      We suffered a full underrun before...
-      FIFO empty, both playback buffers empty...
-      so the playback and interrupt are kind of dead.
-      Just enabling playback again would un-align 24bit stereo playback,
-      so instead we can go through full playback init and start cycle.
-      Bonus: resets the playback state flags. :)
-      */
-      StartAmiGusPcmPlayback();
-    }
-
-    LOG_INT(( "WORKER: Playback i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
-              playback->agpp_BufferIndex[ 0 ],
-              playback->agpp_BufferMax[ 0 ],
-              playback->agpp_BufferIndex[ 1 ],
-              playback->agpp_BufferMax[ 1 ] ));
+    k ^= 0x00000001;
   }
+  if ( AMIGUS_AHI_F_PLAY_UNDERRUN & AmiGUSBase->agb_StateFlags ) {
+
+    LOG_W(( "W: Recovering from playback buffer underrun.\n" ));
+    /*
+    We suffered a full underrun before...
+    FIFO empty, both playback buffers empty...
+    so the playback and interrupt are kind of dead.
+    Just enabling playback again would un-align 24bit stereo playback,
+    so instead we can go through full playback init and start cycle.
+    Bonus: resets the playback state flags. :)
+    */
+    StartAmiGusPcmPlayback();
+  }
+
+  LOG_INT(( "WORKER: Playback i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
+            playback->agpp_BufferIndex[ 0 ],
+            playback->agpp_BufferMax[ 0 ],
+            playback->agpp_BufferIndex[ 1 ],
+            playback->agpp_BufferMax[ 1 ] ));
 }
 
 INLINE VOID HandleRecording( VOID ) {
 
   struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
 
-  if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
-
-    LOG_INT(( "WORKER: Recording i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
-              recording->agpr_BufferIndex[ 0 ],
-              recording->agpr_BufferMax[ 0 ],
-              recording->agpr_BufferIndex[ 1 ],
-              recording->agpr_BufferMax[ 1 ] ));
-  }
+  LOG_INT(( "WORKER: Recording i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
+            recording->agpr_BufferIndex[ 0 ],
+            recording->agpr_BufferMax[ 0 ],
+            recording->agpr_BufferIndex[ 1 ],
+            recording->agpr_BufferMax[ 1 ] ));
 }
 
 /*__entry for vbcc*/ SAVEDS VOID WorkerProcess( VOID ) {
@@ -223,8 +217,14 @@ INLINE VOID HandleRecording( VOID ) {
     // SetSignal(0, 1 << agb_WorkerStopSignal );
     while ( signals ) {
 
-      HandlePlayback();
-      HandleRecording();
+      if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUSBase->agb_StateFlags ) {
+
+        HandlePlayback();
+      }
+      if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
+
+        HandleRecording();
+      }
 
       AmiGUSBase->agb_WorkerReady = TRUE;
       signals = Wait(

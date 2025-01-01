@@ -29,18 +29,18 @@ INLINE VOID HandlePlayback( VOID ) {
 
   ULONG *current = &( playback->agpp_CurrentBuffer );
   BOOL canSwap = TRUE;
-  LONG copied = 0;      /* Sum of BYTEs actually filled into FIFO this run */
+  LONG copied = 0;        /* Sum of BYTEs actually filled into FIFO this run */
   ULONG watermark = playback->agpp_Watermark;
-  LONG reminder =             /* Read-back remaining FIFO samples in BYTES */
+  LONG reminder =               /* Read-back remaining FIFO samples in BYTES */
     ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
-  LONG minHwSampleSize =  /* Size of a single (mono/stereo) sample in BYTEs*/
+  LONG minHwSampleSize =  /* Size of a single (mono / stereo) sample in BYTEs*/
     AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
 
-  /* Target amount of BYTEs to fill into FIFO during this interrupt run,   */
-  LONG target =                                   /* taken from watermark, */
-    ( watermark << 2 )    /* converted <<1 to BYTEs, want <<1 2x watermark */
-    - reminder                                    /* deduct remaining FIFO */
-    - minHwSampleSize;       /* and provide headroom for ALL sample sizes! */
+  /* Target amount of BYTEs to fill into FIFO during this interrupt run,     */
+  LONG target =                                     /* taken from watermark, */
+    ( watermark << 2 )      /* converted <<1 to BYTEs, want <<1 2x watermark */
+    - reminder                                      /* deduct remaining FIFO */
+    - minHwSampleSize;         /* and provide headroom for ALL sample sizes! */
 
   while ( copied < target ) {
 
@@ -58,8 +58,7 @@ INLINE VOID HandlePlayback( VOID ) {
 
     } else {
 
-      // Playback buffers empty, but FIFO could take more.
-      // Not so good, Al...
+      // Playback buffers empty, but FIFO could take more. - Not so good, Al...
       break;
     }
   }
@@ -90,15 +89,15 @@ INLINE VOID HandleRecording( VOID ) {
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
 ) {
-  UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
-                            AMIGUS_PCM_MAIN_INT_CONTROL );
+  const UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
+                                  AMIGUS_PCM_MAIN_INT_CONTROL );
   if ( !( status & ( AMIGUS_INT_F_PLAY_FIFO_EMPTY
                    | AMIGUS_INT_F_PLAY_FIFO_WATERMARK ) ) ) {
 
     return 0;
   }
 
-  if ( AmiGUSBase->agb_StateFlags & AMIGUS_AHI_F_PLAY_STARTED ) {
+  if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUSBase->agb_StateFlags ) {
 
     HandlePlayback();
 
@@ -112,7 +111,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
       AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
     }
   }
-  if ( AmiGUSBase->agb_StateFlags & AMIGUS_AHI_F_REC_STARTED ) {
+  if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
 
     HandleRecording();
   }

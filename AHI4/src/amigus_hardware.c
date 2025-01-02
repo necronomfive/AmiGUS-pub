@@ -78,7 +78,7 @@ const STRPTR AmiGUSInputs[ AMIGUS_INPUTS_COUNT ] = {
 /*
  * Array of sample sizes in BYTE per hardware sample format.
  */
-const UWORD AmiGUSSampleSizes[ AMIGUS_PCM_SAMPLE_FORMAT_COUNT ] = {
+const UWORD AmiGUSSampleSizes[ AMIGUS_PCM_S_PLAY_FORMAT_COUNT ] = {
 
   1, // AMIGUS_PCM_SAMPLE_MONO_8BIT    @ index 0x0000
   2, // AMIGUS_PCM_SAMPLE_STEREO_8BIT  @ index 0x0001

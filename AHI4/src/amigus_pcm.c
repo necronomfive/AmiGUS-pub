@@ -132,7 +132,7 @@ VOID StartAmiGusPcmPlayback( VOID ) {
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_RATE,
               AmiGUSBase->agb_HwSampleRateId
-            | AMIGUS_PCM_SAMPLE_F_INTERPOLATE
+            | AMIGUS_PCM_S_PLAY_F_INTERPOLATE
             | AMIGUS_PCM_SAMPLE_F_ENABLE );
 }
 

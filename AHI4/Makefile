@@ -15,20 +15,28 @@
 #
 
 ifeq ($(findstring /home,$(HOME)), /home)
-  LINUX         = 1
+  LINUX          = 1
 
-  NDK           = $(VBCC)/NDK3.2/
-  WILDCARD      = *
+  NDK            = $(VBCC)/NDK3.2/
+  WILDCARD       = *
 
-  MKDIR         = mkdir -p
-  MKDIR_SUFFIX  =
-  RM            = rm -rf
-  RM_SUFFIX     =
-  RUNNER        = vamos
-  IGNORE_VAMOS  = -
-  LHA           = jlha
+  MKDIR          = mkdir -p
+  MKDIR_SUFFIX   =
+  RM             = rm -rf
+  RM_SUFFIX      =
+  RUNNER         = vamos
+  IGNORE_VAMOS   = -
+  LHA            = jlha
 
   HOST_TOOLCHAIN = CROSS_TOOLCHAIN
+
+  # Use .netrc to store passwords! 
+  # ~/.netrc format:
+  # machine <ip> login username password pass
+  # Could do --user username:pass instead - but not cool in repo ;)
+  INSTALL0       = curl --netrc --upload-file $(MODE_FILE_DST) ftp://192.168.0.4/cf0/Devs/AudioModes/
+  INSTALL1       = curl --netrc --upload-file $(LIB_DST)       ftp://192.168.0.4/cf0/Devs/AHI/
+  INSTALL2       =
 else
   AMIGAOS       = 1
   
@@ -44,6 +52,10 @@ else
   LHA           = lha
 
   HOST_TOOLCHAIN = NATIVE_TOOLCHAIN
+
+  INSTALL0       = copy FROM $(MODE_FILE_DST)     	TO	Devs:AudioModes/	CLONE 
+  INSTALL1       = copy FROM $(LIB_DST)	TO	Devs:AHI/		CLONE
+  INSTALL2       = avail flush >NIL:
 endif
 
 DDIR   = target/
@@ -127,11 +139,9 @@ $(BDIR)%.o: $(SDIR)%.c $(HDIR)*
 	$(CC) $(CFLAGS) $@ $<
 
 install: all
-	copy FROM $(MODE_FILE_DST)     	TO	Devs:AudioModes/	CLONE 
-	copy FROM $(LIB_DST)	TO	Devs:AHI/		CLONE
-	avail flush >NIL:
-#	tools/FlushLibs
-#	AddAudioModes devs:AudioModes/AMIGUS
+	$(INSTALL0)
+	$(INSTALL1)
+	$(INSTALL2)
 
 test: FOLDERS $(LIB_OBJS)
 	$(CC) $(CFLAGS) test/test_buffers.o test/test_buffers.c

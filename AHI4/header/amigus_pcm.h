@@ -24,4 +24,7 @@ LONG FindAmiGusPcm( struct AmiGUSBasePrivate *amiGUSBase );
 VOID StartAmiGusPcmPlayback( VOID );
 VOID StopAmiGusPcmPlayback( VOID );
 
+VOID StartAmiGusPcmRecording( VOID );
+VOID StopAmiGusPcmRecording( VOID );
+
 #endif /* AMIGUS_PCM_H */

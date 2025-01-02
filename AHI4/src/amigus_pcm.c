@@ -78,14 +78,14 @@ VOID StartAmiGusPcmPlayback( VOID ) {
   ULONG i;
   ULONG prefillSize = 12; /* in LONGs */ 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
-  LOG_D(("D: Init AmiGUS @ 0x%08lx\n", amiGUS));
+  LOG_D(("D: Init & start AmiGUS PCM playback @ 0x%08lx\n", amiGUS));
 
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_RATE,
               AMIGUS_PCM_SAMPLE_F_DISABLE );
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_FIFO_RESET,
-              AMIGUS_PCM_PLAY_FIFO_RESET );
+              AMIGUS_PCM_FIFO_RESET );
   // Idea: Watermark is here 6 words aka 3 longs,
   //       2 24bit samples, ... 
   // Cool, always a fit for all sample widths.
@@ -96,21 +96,21 @@ VOID StartAmiGusPcmPlayback( VOID ) {
   WriteReg16( amiGUS, 
               AMIGUS_PCM_MAIN_INT_CONTROL, 
               /* Clear interrupt flag bits */
-              AMIGUS_INT_F_MASK_CLEAR
+              AMIGUS_INT_F_CLEAR
             | AMIGUS_INT_F_PLAY_FIFO_EMPTY
             | AMIGUS_INT_F_PLAY_FIFO_FULL
             | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
   WriteReg16( amiGUS,
               AMIGUS_PCM_MAIN_INT_ENABLE,
               /* Clear interrupt mask bits */
-              AMIGUS_INT_F_MASK_CLEAR
+              AMIGUS_INT_F_CLEAR
             | AMIGUS_INT_F_PLAY_FIFO_EMPTY
             | AMIGUS_INT_F_PLAY_FIFO_FULL
             | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
   WriteReg16( amiGUS,
               AMIGUS_PCM_MAIN_INT_ENABLE,
               /* Now set some! */
-              AMIGUS_INT_F_MASK_SET
+              AMIGUS_INT_F_SET
             | AMIGUS_INT_F_PLAY_FIFO_EMPTY
             | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
 
@@ -139,7 +139,7 @@ VOID StartAmiGusPcmPlayback( VOID ) {
 VOID StopAmiGusPcmPlayback( VOID ) {
 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
-  LOG_D(("D: Stop AmiGUS @ 0x%08lx\n", amiGUS));
+  LOG_D(("D: Stop AmiGUS PCM playback @ 0x%08lx\n", amiGUS));
 
   WriteReg16( amiGUS, 
               AMIGUS_PCM_PLAY_SAMPLE_RATE, 
@@ -158,6 +158,87 @@ VOID StopAmiGusPcmPlayback( VOID ) {
             | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_FIFO_RESET,
-              0x0000 );
+              AMIGUS_PCM_FIFO_RESET );
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
+}
+
+VOID StartAmiGusPcmRecording( VOID ) {
+
+  APTR amiGUS = AmiGUSBase->agb_CardBase;
+  struct AmiGUSPcmRecording *recording = &AmiGUSBase->agb_Recording;
+  LOG_D(("D: Init & start AmiGUS PCM recording @ 0x%08lx\n", amiGUS));
+
+  WriteReg16( amiGUS,
+              AMIGUS_PCM_REC_SAMPLE_RATE,
+              AMIGUS_PCM_SAMPLE_F_DISABLE );
+  WriteReg16( amiGUS,
+              AMIGUS_PCM_REC_FIFO_RESET,
+              AMIGUS_PCM_FIFO_RESET );
+  // Idea: Watermark is half the FIFO size, much smaller here anyway
+  WriteReg16( amiGUS,
+              AMIGUS_PCM_PLAY_FIFO_WATERMARK,
+              // Watermark is WORDs, so using LONG value means half
+              AMIGUS_PCM_REC_FIFO_LONGS );
+  WriteReg16( amiGUS, 
+              AMIGUS_PCM_MAIN_INT_CONTROL, 
+              /* Clear interrupt flag bits */
+              AMIGUS_INT_F_CLEAR
+            | AMIGUS_INT_F_REC_FIFO_EMPTY
+            | AMIGUS_INT_F_REC_FIFO_FULL
+            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+  WriteReg16( amiGUS,
+              AMIGUS_PCM_MAIN_INT_ENABLE,
+              /* Clear interrupt mask bits */
+              AMIGUS_INT_F_CLEAR
+            | AMIGUS_INT_F_REC_FIFO_EMPTY
+            | AMIGUS_INT_F_REC_FIFO_FULL
+            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+  WriteReg16( amiGUS,
+              AMIGUS_PCM_MAIN_INT_ENABLE,
+              /* Now set some! */
+              AMIGUS_INT_F_SET
+            | AMIGUS_INT_F_REC_FIFO_FULL
+            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+
+  // Use correct sample settings, prefill is selected to match all
+  WriteReg16( amiGUS,
+              AMIGUS_PCM_REC_SAMPLE_FORMAT,
+              AmiGUSBase->agb_HwSampleFormat );
+
+  // Start recording finally
+  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;
+  AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_REC_STARTED;
+  WriteReg16( amiGUS,
+              AMIGUS_PCM_REC_SAMPLE_RATE,
+              recording->agpr_HwSampleRateId
+            | recording->agpr_HwSourceId
+            | AMIGUS_PCM_SAMPLE_F_ENABLE );
+}
+
+VOID StopAmiGusPcmRecording( VOID ) {
+
+  APTR amiGUS = AmiGUSBase->agb_CardBase;
+  LOG_D(("D: Stop AmiGUS PCM recording @ 0x%08lx\n", amiGUS));
+
+  WriteReg16( amiGUS, 
+              AMIGUS_PCM_REC_SAMPLE_RATE, 
+              AMIGUS_PCM_SAMPLE_F_DISABLE );
+  WriteReg16( amiGUS, 
+              AMIGUS_PCM_MAIN_INT_CONTROL, 
+              /* Clear interrupt flag bits */
+              AMIGUS_INT_F_CLEAR
+            | AMIGUS_INT_F_REC_FIFO_EMPTY
+            | AMIGUS_INT_F_REC_FIFO_FULL
+            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+  WriteReg16( amiGUS,
+              AMIGUS_PCM_MAIN_INT_ENABLE,
+              /* Clear interrupt mask bits */
+              AMIGUS_INT_F_CLEAR
+            | AMIGUS_INT_F_REC_FIFO_EMPTY
+            | AMIGUS_INT_F_REC_FIFO_FULL
+            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+  WriteReg16( amiGUS,
+              AMIGUS_PCM_REC_FIFO_RESET,
+              AMIGUS_PCM_FIFO_RESET );
+  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;
 }

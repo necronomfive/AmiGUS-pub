@@ -136,7 +136,7 @@ ASM(ULONG) SAVEDS AHIsub_Start(
   if ( AHISF_RECORD & aFlags ) {
 
     LOG_D(("D: Starting recording\n" ));
-    // TODO: StartAmiGusPcmRecording();
+    StartAmiGusPcmRecording();
   }
   LOG_D(( "D: AHIsub_Start done\n" ));
   return AHIE_OK;
@@ -148,53 +148,58 @@ ASM(VOID) SAVEDS AHIsub_Update(
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {
 
-  ULONG alignedSamples;
-  UBYTE sampleToByte = AmiGUSBase->agb_AhiSampleShift;
-  UWORD hwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
-  ULONG alignedSamplesHwWordSize;
+  if ( AHISF_PLAY & aFlags ) {
 
-  LOG_D(( "D: AHIsub_Update start\n" ));
-  if ( AmiGUSBase->agb_AudioCtrl ) {
-    LOG_V(( "V: Old ctrl 0x%08lx - "
+    ULONG alignedSamples;
+    UBYTE sampleToByte = AmiGUSBase->agb_AhiSampleShift;
+    UWORD hwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
+    ULONG alignedSamplesHwWordSize;
+
+    LOG_D(( "D: AHIsub_Update start\n" ));
+    if ( AmiGUSBase->agb_AudioCtrl ) {
+      LOG_V(( "V: Old ctrl 0x%08lx - "
+              "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
+              AmiGUSBase->agb_AudioCtrl,
+              AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize,
+              AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples,
+              AmiGUSBase->agb_AudioCtrl->ahiac_MinBuffSamples,
+              AmiGUSBase->agb_AudioCtrl->ahiac_MaxBuffSamples,
+              AmiGUSBase->agb_AudioCtrl->ahiac_BuffType
+          ));
+    }
+    LOG_V(( "V: New ctrl 0x%08lx - "
             "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
-            AmiGUSBase->agb_AudioCtrl,
-            AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize,
-            AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples,
-            AmiGUSBase->agb_AudioCtrl->ahiac_MinBuffSamples,
-            AmiGUSBase->agb_AudioCtrl->ahiac_MaxBuffSamples,
-            AmiGUSBase->agb_AudioCtrl->ahiac_BuffType
+            aAudioCtrl,
+            aAudioCtrl->ahiac_BuffSize,
+            aAudioCtrl->ahiac_BuffSamples,
+            aAudioCtrl->ahiac_MinBuffSamples,
+            aAudioCtrl->ahiac_MaxBuffSamples,
+            aAudioCtrl->ahiac_BuffType
         ));
+    alignedSamples = 
+      AlignByteSizeForSamples( aAudioCtrl->ahiac_BuffSamples ) >> sampleToByte;
+    aAudioCtrl->ahiac_BuffSamples = alignedSamples;
+    AmiGUSBase->agb_AudioCtrl = aAudioCtrl;
+
+    /* Finally, adapt watermark, ticking in hardware samples in WORDs! */
+    alignedSamplesHwWordSize = UMult32( alignedSamples, hwSampleSize ) >> 1;
+    if ( ( AMIGUS_PCM_PLAY_FIFO_WORDS >> 1 ) < alignedSamplesHwWordSize ) {
+
+      AmiGUSBase->agb_Playback.agpp_Watermark = AMIGUS_PCM_PLAY_FIFO_WORDS >> 1;
+
+    } else {
+
+      AmiGUSBase->agb_Playback.agpp_Watermark = alignedSamplesHwWordSize;
+    }
+    LOG_D(( "D: Mix / copy up to %ld WORDs from AHI per pass, "
+            "converts to %ld WORDs in AmiGUS, using watermark %ld WORDs\n",
+            ( alignedSamples << sampleToByte ) >> 1,
+            alignedSamplesHwWordSize,
+            AmiGUSBase->agb_Playback.agpp_Watermark ));
   }
-  LOG_V(( "V: New ctrl 0x%08lx - "
-          "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
-          aAudioCtrl,
-          aAudioCtrl->ahiac_BuffSize,
-          aAudioCtrl->ahiac_BuffSamples,
-          aAudioCtrl->ahiac_MinBuffSamples,
-          aAudioCtrl->ahiac_MaxBuffSamples,
-          aAudioCtrl->ahiac_BuffType
-       ));
-  alignedSamples = 
-    AlignByteSizeForSamples( aAudioCtrl->ahiac_BuffSamples ) >> sampleToByte;
-  aAudioCtrl->ahiac_BuffSamples = alignedSamples;
-  AmiGUSBase->agb_AudioCtrl = aAudioCtrl;
-
-  /* Finally, adapt watermark, ticking in hardware samples in WORDs! */
-  
-  alignedSamplesHwWordSize = UMult32( alignedSamples, hwSampleSize ) >> 1;
-  if ( ( AMIGUS_PCM_PLAY_FIFO_WORDS >> 1 ) < alignedSamplesHwWordSize ) {
-
-    AmiGUSBase->agb_Playback.agpp_Watermark = AMIGUS_PCM_PLAY_FIFO_WORDS >> 1;
-
-  } else {
-
-    AmiGUSBase->agb_Playback.agpp_Watermark = alignedSamplesHwWordSize;
+  if ( AHISF_RECORD & aFlags ) {
+    LOG_D(( "D: Anything to do for recording here?\n" ));
   }
-  LOG_D(( "D: Mix / copy up to %ld WORDs from AHI per pass, "
-          "converts to %ld WORDs in AmiGUS, using watermark %ld WORDs\n",
-          ( alignedSamples << sampleToByte ) >> 1,
-          alignedSamplesHwWordSize,
-          AmiGUSBase->agb_Playback.agpp_Watermark ));
 
   LOG_D(( "D: AHIsub_Update done.\n" ));
   return;
@@ -208,6 +213,7 @@ ASM(VOID) SAVEDS AHIsub_Stop(
   LOG_D(( "D: AHIsub_Stop start\n" ));
 
   if ( AHISF_PLAY & aFlags ) {
+
     LOG_D(( "D: Read final playback FIFO level %04lx, stopping now.\n",
             ReadReg16(
               AmiGUSBase->agb_CardBase,
@@ -217,15 +223,12 @@ ASM(VOID) SAVEDS AHIsub_Stop(
     DestroyPlaybackBuffers();
   }
   if ( AHISF_RECORD & aFlags ) {
-    /*
-    TODO:
+
     LOG_D(( "D: Read final recording FIFO level %04lx, stopping now.\n",
             ReadReg16(
               AmiGUSBase->agb_CardBase,
               AMIGUS_PCM_REC_FIFO_USAGE ) ));
-    TODO:
-    StopAmiGusPcmPlayback();
-    */
+    StopAmiGusPcmRecording();
     DestroyRecordingBuffers();
   }
   if (!(( AMIGUS_AHI_F_PLAY_STARTED
@@ -235,6 +238,11 @@ ASM(VOID) SAVEDS AHIsub_Stop(
             "ending interrupt handler and worker task.\n" ));
     DestroyInterruptHandler();
     DestroyWorkerProcess();
+
+  } else {
+
+    LOG_D(( "D: Driver still in used state, 0x%lx\n",
+            AmiGUSBase->agb_StateFlags ));
   }
 
   LOG_D(( "D: AHIsub_Stop done\n" ));

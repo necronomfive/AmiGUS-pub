@@ -65,8 +65,8 @@
 #define AMIGUS_INT_F_REC_FIFO_FULL       0x0020
 #define AMIGUS_INT_F_REC_FIFO_WATERMARK  0x0040
 #define AMIGUS_INT_F_TIMER_ENABLE        0x4000
-#define AMIGUS_INT_F_MASK_SET            0x8000
-#define AMIGUS_INT_F_MASK_CLEAR          0x0000
+#define AMIGUS_INT_F_SET                 0x8000
+#define AMIGUS_INT_F_CLEAR               0x0000
 
 /* AmiGUS PCM Playback Sample Formats */
 #define AMIGUS_PCM_S_PLAY_MONO_8BIT      0x0000

@@ -105,7 +105,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
       ULONG flags = aAudioCtrl->ahiac_Flags;
       ULONG stereo = AHISF_KNOWSTEREO & flags;
 
-      LOG_V(( "AHIDB_MaxPlaySamples "
+      LOG_V(( "V: AHIDB_MaxPlaySamples "
               "bits %ld flags %lx stereo %lx bytes/sample %ld\n",
               bits,
               flags,
@@ -131,7 +131,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
       ULONG flags = aAudioCtrl->ahiac_Flags;
       ULONG stereo = AHISF_KNOWSTEREO & flags;
 
-      LOG_V(( "AHIDB_MaxRecordSamples "
+      LOG_V(( "V: AHIDB_MaxRecordSamples "
               "bits %ld flags %lx stereo %lx bytes/sample %ld\n",
               bits,
               flags,
@@ -255,7 +255,10 @@ ASM(LONG) SAVEDS AHIsub_HardwareControl(
       break;
     }
     case AHIC_MonitorVolume:
-    case AHIC_MonitorVolume_Query:
+    case AHIC_MonitorVolume_Query: {
+
+      break;
+    }
     case AHIC_InputGain_Query: {
 
       result =
@@ -268,11 +271,22 @@ ASM(LONG) SAVEDS AHIsub_HardwareControl(
       result = TRUE;
       break;
     }
-    case AHIC_Input:
-    case AHIC_Input_Query:
+    case AHIC_Input: {
+
+      AmiGUSBase->agb_Recording.agpr_HwSourceId = ( UWORD )aArgument;
+      break;
+    }
+    case AHIC_Input_Query: {
+
+      result = AmiGUSBase->agb_Recording.agpr_HwSourceId;
+      result = TRUE;
+      break;
+    }
     case AHIC_Output:
     case AHIC_Output_Query: {
 
+      // So far: only 1 output available.
+      result = 0;
       break;
     }
     default: {

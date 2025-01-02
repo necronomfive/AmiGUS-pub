@@ -92,7 +92,9 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   const UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
                                   AMIGUS_PCM_MAIN_INT_CONTROL );
   if ( !( status & ( AMIGUS_INT_F_PLAY_FIFO_EMPTY
-                   | AMIGUS_INT_F_PLAY_FIFO_WATERMARK ) ) ) {
+                   | AMIGUS_INT_F_PLAY_FIFO_WATERMARK
+                   | AMIGUS_INT_F_REC_FIFO_FULL
+                   | AMIGUS_INT_F_REC_FIFO_WATERMARK ) ) ) {
 
     return 0;
   }
@@ -119,9 +121,11 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   /* Clear AmiGUS control flags here!!! */
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_PCM_MAIN_INT_CONTROL,
-              AMIGUS_INT_F_MASK_CLEAR
+              AMIGUS_INT_F_CLEAR
             | AMIGUS_INT_F_PLAY_FIFO_EMPTY
-            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
+            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK
+            | AMIGUS_INT_F_REC_FIFO_FULL
+            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
   /* Signal sub task */
   if ( AmiGUSBase->agb_WorkerReady ) {
 

@@ -309,21 +309,24 @@ BOOL CreateWorkerProcess( VOID ) {
 
 VOID DestroyWorkerProcess(VOID) {
 
-  if ( AmiGUSBase->agb_WorkerProcess ) {
+  if ( !AmiGUSBase->agb_WorkerProcess ) {
 
-    LOG_D(("D: Destroying Worker process\n"));
-    if ( -1 != AmiGUSBase->agb_WorkerStopSignal ) {
+    LOG_D(("D: No worker process to destroy!\n"));
+    return;
+  }
 
-      /* Kill the playback worker to stop the playback */
-      Signal(
-        (struct Task *) AmiGUSBase->agb_WorkerProcess,
-        1 << AmiGUSBase->agb_WorkerStopSignal
-      );
-      /* Wait for the worker to die and imply Permit() */
-      Wait( 1 << AmiGUSBase->agb_MainSignal );
-    }
-    if ( !AmiGUSBase->agb_WorkerProcess ) {
-      LOG_D(("D: Worker process gone\n"));
-    }
+  LOG_D(("D: Destroying worker process\n"));
+
+  if ( -1 != AmiGUSBase->agb_WorkerStopSignal ) {
+
+    /* Kill the playback worker to stop the playback */
+    Signal(( struct Task * ) AmiGUSBase->agb_WorkerProcess,
+          1 << AmiGUSBase->agb_WorkerStopSignal );
+
+    /* Wait for the worker to die and imply Permit() */
+    Wait( 1 << AmiGUSBase->agb_MainSignal );
+  }
+  if ( !AmiGUSBase->agb_WorkerProcess ) {
+    LOG_D(("D: Destroyed worker process\n"));
   }
 }

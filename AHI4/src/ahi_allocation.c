@@ -165,7 +165,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
    */
   LOG_I(( "I: AmiGUS playback mode is format 0x%lx, %ldbit, %ld stereo, "
           "%ld HiFi, %ld Realtime, %ldHz, %ld Recording\n",
-          AmiGUSPlaybackSampleFormat[ playHwSampleFormatId  ],
+          playHwSampleFormatId,
           bitsPerAmiGusSample, isStereo,
           isHifi, isRealtime, sampleRate, canRecord ));
   LOG_I(( "I: AHI playback sample size %ld BYTEs, "
@@ -177,7 +177,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   // TODO: may go out of bounds below for 24bit modes!
   LOG_I(( "I: AmiGUS recording mode is format 0x%lx, %ldbit, %ld stereo, "
           "%ld HiFi, %ld Realtime, %ldHz, %ld Recording\n",
-          AmiGUSRecordingSampleFormat[ recHwSampleFormatId  ],
+          recHwSampleFormatId,
           bitsPerAmiGusSample, isStereo,
           isHifi, isRealtime, sampleRate, canRecord ));
   LOG_I(( "I: AHI recording sample size %ld BYTEs, "

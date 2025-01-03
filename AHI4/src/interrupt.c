@@ -81,12 +81,11 @@ INLINE VOID HandleRecording( VOID ) {
   LONG copied = 0;        /* Sum of BYTEs actually filled into FIFO this run */
   LONG target =                 /* Read-back remaining FIFO samples in BYTES */
     ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_USAGE ) << 1;
-  LONG minHwSampleSize =  /* Size of a single (mono / stereo) sample in BYTEs*/
-    AmiGUSRecordingSampleSizes[ recording->agpr_HwSampleFormatId ];
 
   while ( copied < target ) {
 
-    if ( recording->agpr_BufferIndex[ *current ] 
+// TODO: may write over buffer end!!!! Somehow subtract AHI sample output inc and take care worker can handle
+    if ( recording->agpr_BufferIndex[ *current ]
         < recording->agpr_BufferMax[ *current ] ) {
 
       copied += (* recording->agpr_CopyFunction )(
@@ -105,13 +104,14 @@ INLINE VOID HandleRecording( VOID ) {
     }
   }
 
-  LOG_INT(( "INT: Recording t %4ld c %4ld wm %4ld wr %ld b %ld bi %ld\n",
-            target,
-            copied,
-            ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_WATERMARK ),
-            AmiGUSBase->agb_WorkerReady,
-            *current,
-            recording->agpr_BufferIndex[ *current ] ));
+  LOG_INT((
+    "INT: Recording t %4ld c %4ld wm %4ld wr %ld b%ld-i %ld\n",
+    target,
+    copied,
+    ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_WATERMARK ),
+    AmiGUSBase->agb_WorkerReady,
+    *current,
+    recording->agpr_BufferIndex[ *current ] ));
 }
 
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (

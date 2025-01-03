@@ -68,11 +68,20 @@ const STRPTR AmiGUSOutputs[ AMIGUS_OUTPUTS_COUNT ] = {
 
 const STRPTR AmiGUSInputs[ AMIGUS_INPUTS_COUNT ] = {
 
-  "AHI / PCM",
+  "External / see Mixer",
   "MHI / Codec",
   "WaveTable",
-  "External / see Mixer",
+  "AHI / PCM",
   "ALL / What-You-Hear"
+};
+
+const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ] = {
+
+  AMIGUS_PCM_S_REC_F_ADC_SRC,        // External above
+  AMIGUS_PCM_S_REC_F_CODEC_SRC,
+  AMIGUS_PCM_S_REC_F_WAVETABLE_SRC,
+  AMIGUS_PCM_S_REC_F_AHI_SRC,
+  AMIGUS_PCM_S_REC_F_MIXER_SRC       // What-You-Hear
 };
 
 /*

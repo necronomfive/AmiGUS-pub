@@ -124,8 +124,7 @@ VOID StartAmiGusPcmPlayback( VOID ) {
   // Use correct sample settings, prefill is selected to match all
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_FORMAT,
-              AmiGUSPlaybackSampleFormat[
-                AmiGUSBase->agb_Playback.agpp_HwSampleFormatId ]);
+              AmiGUSBase->agb_Playback.agpp_HwSampleFormatId );
 
   // Start playback finally
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
@@ -167,6 +166,9 @@ VOID StartAmiGusPcmRecording( VOID ) {
 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   struct AmiGUSPcmRecording *recording = &AmiGUSBase->agb_Recording;
+  UWORD flags16;
+  ULONG flags32;
+
   LOG_D(("D: Init & start AmiGUS PCM recording @ 0x%08lx\n", amiGUS));
 
   WriteReg16( amiGUS,
@@ -201,19 +203,23 @@ VOID StartAmiGusPcmRecording( VOID ) {
             | AMIGUS_INT_F_REC_FIFO_FULL
             | AMIGUS_INT_F_REC_FIFO_WATERMARK );
 
-  WriteReg16( amiGUS,
-              AMIGUS_PCM_REC_SAMPLE_FORMAT,
-              AmiGUSRecordingSampleFormat[
-                AmiGUSBase->agb_Recording.agpr_HwSampleFormatId ]);
+  flags32 = 0xffFFffFF; // TODO: Input Gain here!
+  WriteReg32( amiGUS, AMIGUS_PCM_REC_VOLUME, flags32 ); 
+  LOG_V(( "V: Set AMIGUS_PCM_REC_VOLUME = 0x%08lx\n", flags32 ));
+
+  flags16 = AmiGUSBase->agb_Recording.agpr_HwSampleFormatId;
+  WriteReg16( amiGUS, AMIGUS_PCM_REC_SAMPLE_FORMAT, flags16 );
+  LOG_V(( "V: Set AMIGUS_PCM_REC_SAMPLE_FORMAT = 0x%04lx\n", flags16 ));
 
   // Start recording finally
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;
   AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_REC_STARTED;
-  WriteReg16( amiGUS,
-              AMIGUS_PCM_REC_SAMPLE_RATE,
-              AmiGUSBase->agb_HwSampleRateId
-            | recording->agpr_HwSourceId
-            | AMIGUS_PCM_SAMPLE_F_ENABLE );
+
+  flags16 = AmiGUSBase->agb_HwSampleRateId
+          | AmiGUSInputFlags[ recording->agpr_HwSourceId ]
+          | AMIGUS_PCM_SAMPLE_F_ENABLE;
+  WriteReg16( amiGUS, AMIGUS_PCM_REC_SAMPLE_RATE, flags16 );
+  LOG_V(( "V: Set AMIGUS_PCM_REC_SAMPLE_RATE = 0x%04lx\n", flags16 ));
 }
 
 VOID StopAmiGusPcmRecording( VOID ) {

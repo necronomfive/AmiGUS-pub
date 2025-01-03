@@ -203,6 +203,16 @@ INLINE VOID HandleRecording( VOID ) {
                 k,
                 recording->agpr_Buffer[ k ],
                 recording->agpr_BufferIndex[ k ] ));
+      LOG_INT(( "WORKER: LONGs   0 -   3: %08lx %08lx %08lx %08lx\n",
+                recording->agpr_Buffer[ k ][ 0 ],
+                recording->agpr_Buffer[ k ][ 1 ],
+                recording->agpr_Buffer[ k ][ 2 ],
+                recording->agpr_Buffer[ k ][ 3 ] ));
+      LOG_INT(( "WORKER: LONGs 100 - 103: %08lx %08lx %08lx %08lx\n",
+                recording->agpr_Buffer[ k ][ 100 ],
+                recording->agpr_Buffer[ k ][ 101 ],
+                recording->agpr_Buffer[ k ][ 102 ],
+                recording->agpr_Buffer[ k ][ 103 ] ));
 
       message->ahirm_Type = AHIST_S16S;
       message->ahirm_Buffer = ( APTR ) recording->agpr_Buffer[ k ];
@@ -212,6 +222,7 @@ INLINE VOID HandleRecording( VOID ) {
                    ( APTR ) message );
 
       recording->agpr_BufferIndex[ k ] = 0; /* buffer empty  */
+
     } else {
 
       LOG_INT(( "WORKER: Skipping b %ld\n", k ));

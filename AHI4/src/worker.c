@@ -78,6 +78,7 @@ VOID FillBuffer( BYTE buffer ) {
 
 typedef ASM(BOOL) PreTimerType( REG(a2, struct AHIAudioCtrlDrv *) );
 typedef ASM(VOID) PostTimerType( REG(a2, struct AHIAudioCtrlDrv *) );
+typedef ASM(VOID) SamplerType( REG(a2, struct AHIAudioCtrlDrv *), REG(a1, struct AHIRecordMessage *) );
 
 INLINE VOID FillBuffer( BYTE buffer ) {
 
@@ -186,9 +187,55 @@ INLINE VOID HandlePlayback( VOID ) {
             playback->agpp_BufferMax[ 1 ] ));
 }
 
-INLINE VOID HandleRecording( VOID ) {
+/*INLINE*/ SAVEDS VOID HandleRecording( VOID ) {
 
-  struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
+  struct AmiGUSPcmRecording * recording = &( AmiGUSBase->agb_Recording );
+  struct AHIAudioCtrlDrv *audioCtrl = AmiGUSBase->agb_AudioCtrl;
+  SamplerType *sampler = (SamplerType *)audioCtrl->ahiac_SamplerFunc;
+  struct AHIRecordMessage *message = &( recording->agpr_RecordingMessage );
+
+  ULONG i;
+  ULONG k = recording->agpr_CurrentBuffer;
+  for ( i = 0; 2 > i; ++i ) {
+    
+    if ( recording->agpr_BufferIndex[ k ] 
+        >= recording->agpr_BufferMax[ k ] ) {
+
+//      DrainBuffer( k );
+      LOG_INT(( "WORKER: Draining b %ld b* 0x%08lx bl %ld\n",
+                k,
+                recording->agpr_Buffer[ k ],
+                recording->agpr_BufferIndex[ k ] ));
+
+      message->ahirm_Type = AHIST_S16S;
+      message->ahirm_Buffer = ( APTR ) recording->agpr_Buffer[ k ];
+      message->ahirm_Length = recording->agpr_BufferIndex[ k ];
+      // sampler( audioCtrl, &message );
+      CallHookPkt( audioCtrl->ahiac_SamplerFunc,
+                   audioCtrl,
+                   ( APTR ) message );
+
+      recording->agpr_BufferIndex[ k ] = 0; /* buffer empty  */
+    } else {
+
+      LOG_INT(( "WORKER: Skipping b %ld\n", k ));
+    }
+    k ^= 0x00000001;
+
+  }
+  /*
+  if ( AMIGUS_AHI_F_REC_OVERFLOW & AmiGUSBase->agb_StateFlags ) {
+
+    LOG_W(( "W: Recovering from recording buffer overflow.\n" ));
+    /*
+    We suffered a full overflow before...
+    FIFO full, both recording buffers full...
+    so the recording and interrupt are kind of dead.
+    Bonus: resets the recording state flags. :)
+    * /
+    StartAmiGusPcmRecording();
+  }
+  */
 
   LOG_INT(( "WORKER: Recording i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
             recording->agpr_BufferIndex[ 0 ],

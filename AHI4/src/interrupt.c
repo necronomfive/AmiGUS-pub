@@ -34,7 +34,7 @@ INLINE VOID HandlePlayback( VOID ) {
   LONG reminder =               /* Read-back remaining FIFO samples in BYTES */
     ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
   LONG minHwSampleSize =  /* Size of a single (mono / stereo) sample in BYTEs*/
-    AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
+    AmiGUSPlaybackSampleSizes[ AmiGUSBase->agb_HwSampleFormatId ];
 
   /* Target amount of BYTEs to fill into FIFO during this interrupt run,     */
   LONG target =                                     /* taken from watermark, */
@@ -76,14 +76,52 @@ INLINE VOID HandleRecording( VOID ) {
 
   struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
 
-  LONG copied = 0;
-  LONG target = 0;
+  ULONG *current = &( recording->agpr_CurrentBuffer );
+  BOOL canSwap = TRUE;
+  LONG copied = 0;        /* Sum of BYTEs actually filled into FIFO this run */
+  LONG target =                 /* Read-back remaining FIFO samples in BYTES */
+    ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_USAGE ) << 1;
+  LONG minHwSampleSize =  /* Size of a single (mono / stereo) sample in BYTEs*/
+    AmiGUSRecordingSampleSizes[ AmiGUSBase->agb_HwSampleFormatId ];
 
-  LOG_INT(( "INT: Recording t %4ld c %4ld wm %4ld wr %ld\n",
+  while ( copied < target ) {
+
+    if ( recording->agpr_BufferIndex[ *current ] 
+        < recording->agpr_BufferMax[ *current ] ) {
+/*
+      copied += (* recording->agpr_CopyFunction )(
+        recording->agpr_Buffer[ *current ],
+        &( recording->agpr_BufferIndex[ *current ] ));
+*/
+      // Works with 16Bit Stereo Non-HiFi only!!!!
+      ULONG *bufferBase = recording->agpr_Buffer[ *current ];
+      ULONG *bufferIndex = &( recording->agpr_BufferIndex[ *current ]);
+      ULONG addressOut = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+      ULONG in = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+      *(( ULONG * ) addressOut ) = in;
+      ( *bufferIndex ) += 1;
+      // return 4;
+      copied += 4;
+
+    } else if ( canSwap ) {
+
+      *current ^= 0x00000001;
+      canSwap = FALSE;
+
+    } else {
+
+      // Recording buffers full, but FIFO has had more. - Not so good, Al...
+      break;
+    }
+  }
+
+  LOG_INT(( "INT: Recording t %4ld c %4ld wm %4ld wr %ld b %ld bi %ld\n",
             target,
             copied,
-            recording->agpr_Watermark,
-            AmiGUSBase->agb_WorkerReady ));
+            ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_WATERMARK ),
+            AmiGUSBase->agb_WorkerReady,
+            *current,
+            recording->agpr_BufferIndex[ *current ] ));
 }
 
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (

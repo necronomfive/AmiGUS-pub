@@ -125,7 +125,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
       break;
     }
     case AHIDB_MaxRecordSamples: {
-
+// TODO: total falsch!
       ULONG bits = GetTagData(AHIDB_Bits, 0, aTagList);
       ULONG bytesPerSample = bits >> 3;
       ULONG flags = aAudioCtrl->ahiac_Flags;
@@ -144,6 +144,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
 
         result >>= 1;
       }
+      result = 1000000;
       break;
     }
     case AHIDB_MinMonitorVolume:

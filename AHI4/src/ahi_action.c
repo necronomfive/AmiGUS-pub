@@ -145,60 +145,65 @@ ASM(ULONG) SAVEDS AHIsub_Start(
 ASM(VOID) SAVEDS AHIsub_Update(
   REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
+  REG(a2, struct AHIAudioCtrlDrv *newAudioCtrl)
 ) {
+
+  const struct AHIAudioCtrlDrv *oldAudioCtrl = AmiGUSBase->agb_AudioCtrl;
+
+  LOG_D(( "D: AHIsub_Update start\n" ));
+  if ( oldAudioCtrl ) {
+
+    LOG_V(( "V: Old ctrl 0x%08lx - "
+            "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
+            oldAudioCtrl,
+            oldAudioCtrl->ahiac_BuffSize,
+            oldAudioCtrl->ahiac_BuffSamples,
+            oldAudioCtrl->ahiac_MinBuffSamples,
+            oldAudioCtrl->ahiac_MaxBuffSamples,
+            oldAudioCtrl->ahiac_BuffType ));
+  } else {
+
+    LOG_V(( "V: Old ctrl 0x%08lx\n", oldAudioCtrl ));
+  }
+  LOG_V(( "V: New ctrl 0x%08lx - "
+          "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
+          newAudioCtrl,
+          newAudioCtrl->ahiac_BuffSize,
+          newAudioCtrl->ahiac_BuffSamples,
+          newAudioCtrl->ahiac_MinBuffSamples,
+          newAudioCtrl->ahiac_MaxBuffSamples,
+          newAudioCtrl->ahiac_BuffType ));
+  AmiGUSBase->agb_AudioCtrl = newAudioCtrl;
 
   if ( AHISF_PLAY & aFlags ) {
 
-    ULONG alignedSamples;
-    UBYTE sampleToByte = AmiGUSBase->agb_AhiSampleShift;
-    UWORD hwSampleSize = AmiGUSSampleSizes[ AmiGUSBase->agb_HwSampleFormat ];
-    ULONG alignedSamplesHwWordSize;
+    struct AmiGUSPcmPlayback *playback = &AmiGUSBase->agb_Playback;
+    UBYTE sampleToByte = 
+      AmiGUSBase->agb_AhiSampleShift;
+    UWORD hwSampleSize = 
+      AmiGUSPlaybackSampleSizes[ AmiGUSBase->agb_HwSampleFormatId ];
+    ULONG alignedSamples = 
+      AlignByteSizeForSamples( newAudioCtrl->ahiac_BuffSamples )
+        >> sampleToByte;
+    ULONG alignedSamplesHwWordSize =
+      UMult32( alignedSamples, hwSampleSize ) >> 1;
 
-    LOG_D(( "D: AHIsub_Update start\n" ));
-    if ( AmiGUSBase->agb_AudioCtrl ) {
-      LOG_V(( "V: Old ctrl 0x%08lx - "
-              "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
-              AmiGUSBase->agb_AudioCtrl,
-              AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize,
-              AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples,
-              AmiGUSBase->agb_AudioCtrl->ahiac_MinBuffSamples,
-              AmiGUSBase->agb_AudioCtrl->ahiac_MaxBuffSamples,
-              AmiGUSBase->agb_AudioCtrl->ahiac_BuffType
-          ));
-    }
-    LOG_V(( "V: New ctrl 0x%08lx - "
-            "Size %lu Samples %lu Min %lu Max %lu Type %lu\n",
-            aAudioCtrl,
-            aAudioCtrl->ahiac_BuffSize,
-            aAudioCtrl->ahiac_BuffSamples,
-            aAudioCtrl->ahiac_MinBuffSamples,
-            aAudioCtrl->ahiac_MaxBuffSamples,
-            aAudioCtrl->ahiac_BuffType
-        ));
-    alignedSamples = 
-      AlignByteSizeForSamples( aAudioCtrl->ahiac_BuffSamples ) >> sampleToByte;
-    aAudioCtrl->ahiac_BuffSamples = alignedSamples;
-    AmiGUSBase->agb_AudioCtrl = aAudioCtrl;
-
+    newAudioCtrl->ahiac_BuffSamples = alignedSamples;
     /* Finally, adapt watermark, ticking in hardware samples in WORDs! */
-    alignedSamplesHwWordSize = UMult32( alignedSamples, hwSampleSize ) >> 1;
     if ( ( AMIGUS_PCM_PLAY_FIFO_WORDS >> 1 ) < alignedSamplesHwWordSize ) {
 
-      AmiGUSBase->agb_Playback.agpp_Watermark = AMIGUS_PCM_PLAY_FIFO_WORDS >> 1;
+      playback->agpp_Watermark = AMIGUS_PCM_PLAY_FIFO_WORDS >> 1;
 
     } else {
 
-      AmiGUSBase->agb_Playback.agpp_Watermark = alignedSamplesHwWordSize;
+      playback->agpp_Watermark = alignedSamplesHwWordSize;
     }
+
     LOG_D(( "D: Mix / copy up to %ld WORDs from AHI per pass, "
             "converts to %ld WORDs in AmiGUS, using watermark %ld WORDs\n",
             ( alignedSamples << sampleToByte ) >> 1,
             alignedSamplesHwWordSize,
-            AmiGUSBase->agb_Playback.agpp_Watermark ));
-  }
-  if ( AHISF_RECORD & aFlags ) {
-    LOG_D(( "D: Anything to do for recording here?\n" ));
+            playback->agpp_Watermark ));
   }
 
   LOG_D(( "D: AHIsub_Update done.\n" ));

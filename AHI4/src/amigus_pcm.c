@@ -124,7 +124,7 @@ VOID StartAmiGusPcmPlayback( VOID ) {
   // Use correct sample settings, prefill is selected to match all
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_FORMAT,
-              AmiGUSBase->agb_HwSampleFormat );
+              AmiGUSPlaybackSampleFormat[ AmiGUSBase->agb_HwSampleFormatId ]);
 
   // Start playback finally
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
@@ -176,7 +176,7 @@ VOID StartAmiGusPcmRecording( VOID ) {
               AMIGUS_PCM_FIFO_RESET );
   // Idea: Watermark is half the FIFO size, much smaller here anyway
   WriteReg16( amiGUS,
-              AMIGUS_PCM_PLAY_FIFO_WATERMARK,
+              AMIGUS_PCM_REC_FIFO_WATERMARK,
               // Watermark is WORDs, so using LONG value means half
               AMIGUS_PCM_REC_FIFO_LONGS );
   WriteReg16( amiGUS, 
@@ -200,10 +200,9 @@ VOID StartAmiGusPcmRecording( VOID ) {
             | AMIGUS_INT_F_REC_FIFO_FULL
             | AMIGUS_INT_F_REC_FIFO_WATERMARK );
 
-  // Use correct sample settings, prefill is selected to match all
   WriteReg16( amiGUS,
               AMIGUS_PCM_REC_SAMPLE_FORMAT,
-              AmiGUSBase->agb_HwSampleFormat );
+              AmiGUSRecordingSampleFormat[ AmiGUSBase->agb_HwSampleFormatId ]);
 
   // Start recording finally
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;

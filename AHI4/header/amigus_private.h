@@ -73,9 +73,8 @@ struct AmiGUSPcmRecording {
 
   ULONG                         agpr_CurrentBuffer;  /* Current recording b. */
 
-  ULONG                         agpr_Watermark;      /* Counting in WORDs!   */
+  struct AHIRecordMessage       agpr_RecordingMessage;
 
-  UWORD                         agpr_HwSampleFormat; /* HW sample format ID  */
   UWORD                         agpr_HwSampleRateId; /* HW sample rate ID    */
   UBYTE                         agpr_AhiSampleSize; /* BYTE size of 1 sample */
   UBYTE                         agpr_AhiSampleShift; /* Sample <> Byte shift */
@@ -115,7 +114,7 @@ struct AmiGUSBasePrivate {
   BYTE                          agb_UsageCounter;    
 
   /* Driver settings */
-  UWORD                         agb_HwSampleFormat; /* HW sample format ID  */
+  UWORD                         agb_HwSampleFormatId; /* Sample format lookup ID */
   UWORD                         agb_HwSampleRateId; /* HW sample rate ID    */
   UBYTE                         agb_AhiSampleSize; /* BYTE size of 1 sample */
   UBYTE                         agb_AhiSampleShift; /* Sample <> Byte shift */

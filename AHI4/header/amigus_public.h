@@ -35,8 +35,8 @@
                                     + (   22 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
-#define AHIDB_AmiGUS_CopyFunction   ( AHIDB_UserBase + 0 )
-#define AHIDB_AmiGUS_SampleFormat   ( AHIDB_UserBase + 1 )
+#define AHIDB_AmiGUS_CopyFunction       ( AHIDB_UserBase + 0 )
+#define AHIDB_AmiGUS_HwSampleFormatId   ( AHIDB_UserBase + 1 )
 
 #define AMIGUS_MEM_LOG_MARKER        "********************************"   \
                                      " AmiGUS "                           \

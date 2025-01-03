@@ -123,9 +123,9 @@
 #define AMIGUS_PCM_PLAY_FIFO_WORDS       4096
 #define AMIGUS_PCM_PLAY_FIFO_LONGS       2048
 
-#define AMIGUS_PCM_REC_FIFO_BYTES        2048
-#define AMIGUS_PCM_REC_FIFO_WORDS        1024
-#define AMIGUS_PCM_REC_FIFO_LONGS        512
+#define AMIGUS_PCM_REC_FIFO_BYTES        4096
+#define AMIGUS_PCM_REC_FIFO_WORDS        2048
+#define AMIGUS_PCM_REC_FIFO_LONGS        1024
 
 #define AMIGUS_OUTPUTS_COUNT             1
 #define AMIGUS_INPUTS_COUNT              5
@@ -146,6 +146,8 @@ VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
 extern const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ];
 extern const STRPTR AmiGUSOutputs[ AMIGUS_OUTPUTS_COUNT ];
 extern const STRPTR AmiGUSInputs[ AMIGUS_INPUTS_COUNT ];
-extern const UWORD AmiGUSSampleSizes[ AMIGUS_PCM_S_PLAY_FORMAT_COUNT ];
-
+extern const WORD AmiGUSPlaybackSampleFormat[ AMIGUS_PCM_S_PLAY_FORMAT_COUNT ];
+extern const UWORD AmiGUSPlaybackSampleSizes[ AMIGUS_PCM_S_PLAY_FORMAT_COUNT ];
+extern const WORD AmiGUSRecordingSampleFormat[ AMIGUS_PCM_S_REC_FORMAT_COUNT ];
+extern const UWORD AmiGUSRecordingSampleSizes[ AMIGUS_PCM_S_REC_FORMAT_COUNT ];
 #endif /* AMIGUS_HARDWARE_H */

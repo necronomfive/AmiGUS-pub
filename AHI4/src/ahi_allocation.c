@@ -36,7 +36,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   struct TagItem *tag = 0;
   ULONG sampleRateId = 0;
   ULONG sampleRate = 0;
-  WORD sampleFormat = -1;
+  WORD sampleFormatId = -1;
   BYTE copyFunctionId = -1;
   UBYTE isStereo = FALSE;
   UBYTE isHifi = FALSE;
@@ -138,8 +138,8 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         }
         break;
       }
-      case AHIDB_AmiGUS_SampleFormat: {
-        sampleFormat = (WORD)tag->ti_Data;
+      case AHIDB_AmiGUS_HwSampleFormatId: {
+        sampleFormatId = ( WORD )tag->ti_Data;
         break;
       }
       default: {
@@ -153,18 +153,31 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
    * Part 3: Apply information to AmiGUS & driver.
    * ------------------------------------------------------
    */
-  LOG_I(( "I: AmiGUS mode is format 0x%lx, %ldbit, %ld stereo, "
+  LOG_I(( "I: AmiGUS playback mode is format 0x%lx, %ldbit, %ld stereo, "
           "%ld HiFi, %ld Realtime, %ldHz, %ld Recording\n",
-          sampleFormat, bitsPerAmiGusSample, isStereo,
+          AmiGUSPlaybackSampleFormat[ sampleFormatId  ],
+          bitsPerAmiGusSample, isStereo,
           isHifi, isRealtime, sampleRate, canRecord ));
-  LOG_I(( "I: AHI sample size %ld BYTEs, "
+  LOG_I(( "I: AHI playback sample size %ld BYTEs, "
           "conversion AHI samples<->BYTEs by %ld shifts, "
           "AmiGUS sample size %ld BYTEs\n",
           ahiSampleSizeBytes,
           ahiSampleBytesShift,
-          AmiGUSSampleSizes[ sampleFormat  ] ));
+          AmiGUSPlaybackSampleSizes[ sampleFormatId  ] ));
+  // TODO: may go out of bounds below for 24bit modes!
+  LOG_I(( "I: AmiGUS recording mode is format 0x%lx, %ldbit, %ld stereo, "
+          "%ld HiFi, %ld Realtime, %ldHz, %ld Recording\n",
+          AmiGUSRecordingSampleFormat[ sampleFormatId  ],
+          bitsPerAmiGusSample, isStereo,
+          isHifi, isRealtime, sampleRate, canRecord ));
+  LOG_I(( "I: AHI recording sample size %ld BYTEs, "
+          "conversion AHI samples<->BYTEs by %ld shifts, "
+          "AmiGUS sample size %ld BYTEs\n",
+          ahiSampleSizeBytes, // TODO: wrong for recording!
+          ahiSampleBytesShift,
+          AmiGUSPlaybackSampleSizes[ sampleFormatId  ] ));
 
-  if ( 0 > sampleFormat ) {
+  if ( 0 > sampleFormatId ) {
 
     DisplayError( ESampleFormatMissingFromMode );
     return AHISF_ERROR;
@@ -178,7 +191,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   AmiGUSBase->agb_AhiSampleSize = ahiSampleSizeBytes;
   AmiGUSBase->agb_AhiSampleShift = ahiSampleBytesShift;
   AmiGUSBase->agb_HwSampleRateId = sampleRateId;
-  AmiGUSBase->agb_HwSampleFormat = sampleFormat;
+  AmiGUSBase->agb_HwSampleFormatId = sampleFormatId;
   AmiGUSBase->agb_CanRecord = canRecord;
   
   AmiGUSBase->agb_Playback.agpp_CopyFunctionId =

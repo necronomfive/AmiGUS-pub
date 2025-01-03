@@ -202,7 +202,7 @@ INLINE VOID HandlePlayback( VOID ) {
         >= recording->agpr_BufferMax[ k ] ) {
 
 //      DrainBuffer( k );
-      LOG_INT(( "WORKER: Draining b %ld b* 0x%08lx bl %ld\n",
+      LOG_INT(( "WORKER: Draining b%1ld b* 0x%08lx bl %5ld\n",
                 k,
                 recording->agpr_Buffer[ k ],
                 recording->agpr_BufferIndex[ k ] ));

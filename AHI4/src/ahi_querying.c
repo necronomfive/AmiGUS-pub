@@ -125,26 +125,13 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
       break;
     }
     case AHIDB_MaxRecordSamples: {
-// TODO: total falsch!
-      ULONG bits = GetTagData(AHIDB_Bits, 0, aTagList);
-      ULONG bytesPerSample = bits >> 3;
-      ULONG flags = aAudioCtrl->ahiac_Flags;
-      ULONG stereo = AHISF_KNOWSTEREO & flags;
 
-      LOG_V(( "V: AHIDB_MaxRecordSamples "
-              "bits %ld flags %lx stereo %lx bytes/sample %ld\n",
-              bits,
-              flags,
-              stereo,
-              bytesPerSample ));
-
-      result = UDivMod32( AMIGUS_PCM_REC_FIFO_BYTES, bytesPerSample );
-
-      if ( stereo  ) {
-
-        result >>= 1;
-      }
-      result = 1000000;
+      const LONG sampleRate = 
+        AmiGUSSampleRates[ AmiGUSBase->agb_HwSampleRateId ];
+      const ULONG byteSize = getRecordingBufferSize( sampleRate );
+      result = byteSize >> 2; /* in 16bit stereo AKA long samples */
+      LOG_V(( "V: AHIDB_MaxRecordSamples returning %ld BYTEs / %ld samples \n",
+        byteSize, result ));
       break;
     }
     case AHIDB_MinMonitorVolume:

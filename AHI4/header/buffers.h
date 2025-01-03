@@ -82,6 +82,17 @@ UWORD getBufferSamples(
  */
 ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples );
 
+/**
+ * As AHI suggests to only support AHIST_S16S for recording,
+ * everything is pretty fixed here, as sad as it is.
+ * We will aim for a buffer size 
+ * divisible by 8, 4 buffers per second, 4 bytes per sample.
+ *
+ * @param sampleRate Sample rate to use.
+ *
+ * @return Buffer byte size according to parameters above.
+ */
+ULONG getRecordingBufferSize( LONG sampleRate );
 
 BOOL CreatePlaybackBuffers( VOID );
 VOID DestroyPlaybackBuffers( VOID );

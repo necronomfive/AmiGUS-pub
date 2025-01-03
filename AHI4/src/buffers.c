@@ -110,6 +110,28 @@ UWORD getBufferSamples(
   return result;
 }
 
+ULONG getRecordingBufferSize( LONG sampleRate ) {
+
+  const LONG recordingDivisor = 4; /* 4 buffers per second */
+  const UBYTE sampleSize = 4;      /* 4 matching AHIST_S16S */
+  const UBYTE multipleOf = 8;      /* but AHIST_S32S = 8 for later */
+  const ULONG byteSize = getBufferSize(
+    sampleRate,
+    recordingDivisor,
+    sampleSize,
+    multipleOf );
+
+  LOG_D(( "V: Calculated %ld BYTEs recording buffer for %ldHz, 1/%ld second, "
+          "%ld BYTEs per AHI sample and enforcing %ld multiples.\n",
+          byteSize,
+          sampleRate,
+          recordingDivisor,
+          sampleSize,
+          multipleOf ));
+
+  return byteSize;
+}
+
 // TRUE = failure
 BOOL CreatePlaybackBuffers( VOID ) {
 
@@ -179,15 +201,6 @@ BOOL CreateRecordingBuffers( VOID ) {
 
   struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
   const LONG sampleRate = AmiGUSSampleRates[ AmiGUSBase->agb_HwSampleRateId ];
-  const LONG recordingDevisor = 4;
-  const UBYTE sampleSize = AmiGUSBase->agb_AhiSampleSize;
-  /*
-   4 matching AHIST_S16S,
-   but we want AHIST_S32S = 8 at some point,
-   and it does not hurt
-   */
-  const UBYTE multipleOf = 8; 
-
   ULONG byteSize;
   
   if ( recording->agpr_Buffer[0] ) {
@@ -195,18 +208,10 @@ BOOL CreateRecordingBuffers( VOID ) {
     LOG_D(("D: Recording buffers already exist!\n"));
     return FALSE;
   }
-  byteSize = getBufferSize(
-    sampleRate,
-    recordingDevisor,
-    sampleSize,
-    multipleOf );
-  LOG_D(( "D: Allocating %ld BYTEs recording buffer for %ldHz, 1/%ld second, "
-          "%ld BYTEs per AHI sample and enforcing %ld multiples.\n",
+  byteSize = getRecordingBufferSize( sampleRate );
+  LOG_D(( "D: Allocating %ld BYTEs recording buffer for %ldHz.\n",
           byteSize,
-          sampleRate,
-          recordingDevisor,
-          sampleSize,
-          multipleOf ));
+          sampleRate ));
   recording->agpr_Buffer[0] = (ULONG *)
     AllocVec( byteSize, MEMF_FAST | MEMF_CLEAR );
   if ( !recording->agpr_Buffer[0] ) {

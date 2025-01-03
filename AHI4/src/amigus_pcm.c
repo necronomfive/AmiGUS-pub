@@ -124,7 +124,8 @@ VOID StartAmiGusPcmPlayback( VOID ) {
   // Use correct sample settings, prefill is selected to match all
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_FORMAT,
-              AmiGUSPlaybackSampleFormat[ AmiGUSBase->agb_HwSampleFormatId ]);
+              AmiGUSPlaybackSampleFormat[
+                AmiGUSBase->agb_Playback.agpp_HwSampleFormatId ]);
 
   // Start playback finally
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
@@ -202,14 +203,15 @@ VOID StartAmiGusPcmRecording( VOID ) {
 
   WriteReg16( amiGUS,
               AMIGUS_PCM_REC_SAMPLE_FORMAT,
-              AmiGUSRecordingSampleFormat[ AmiGUSBase->agb_HwSampleFormatId ]);
+              AmiGUSRecordingSampleFormat[
+                AmiGUSBase->agb_Recording.agpr_HwSampleFormatId ]);
 
   // Start recording finally
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;
   AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_REC_STARTED;
   WriteReg16( amiGUS,
               AMIGUS_PCM_REC_SAMPLE_RATE,
-              recording->agpr_HwSampleRateId
+              AmiGUSBase->agb_HwSampleRateId
             | recording->agpr_HwSourceId
             | AMIGUS_PCM_SAMPLE_F_ENABLE );
 }

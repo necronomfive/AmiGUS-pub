@@ -34,7 +34,7 @@ INLINE VOID HandlePlayback( VOID ) {
   LONG reminder =               /* Read-back remaining FIFO samples in BYTES */
     ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
   LONG minHwSampleSize =  /* Size of a single (mono / stereo) sample in BYTEs*/
-    AmiGUSPlaybackSampleSizes[ AmiGUSBase->agb_HwSampleFormatId ];
+    AmiGUSPlaybackSampleSizes[ playback->agpp_HwSampleFormatId ];
 
   /* Target amount of BYTEs to fill into FIFO during this interrupt run,     */
   LONG target =                                     /* taken from watermark, */
@@ -82,26 +82,16 @@ INLINE VOID HandleRecording( VOID ) {
   LONG target =                 /* Read-back remaining FIFO samples in BYTES */
     ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_USAGE ) << 1;
   LONG minHwSampleSize =  /* Size of a single (mono / stereo) sample in BYTEs*/
-    AmiGUSRecordingSampleSizes[ AmiGUSBase->agb_HwSampleFormatId ];
+    AmiGUSRecordingSampleSizes[ recording->agpr_HwSampleFormatId ];
 
   while ( copied < target ) {
 
     if ( recording->agpr_BufferIndex[ *current ] 
         < recording->agpr_BufferMax[ *current ] ) {
-/*
+
       copied += (* recording->agpr_CopyFunction )(
         recording->agpr_Buffer[ *current ],
         &( recording->agpr_BufferIndex[ *current ] ));
-*/
-      // Works with 16Bit Stereo Non-HiFi only!!!!
-      ULONG *bufferBase = recording->agpr_Buffer[ *current ];
-      ULONG *bufferIndex = &( recording->agpr_BufferIndex[ *current ]);
-      ULONG addressOut = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
-      ULONG in = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
-      *(( ULONG * ) addressOut ) = in;
-      ( *bufferIndex ) += 1;
-      // return 4;
-      copied += 4;
 
     } else if ( canSwap ) {
 

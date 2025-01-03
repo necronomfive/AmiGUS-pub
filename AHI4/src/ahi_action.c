@@ -181,7 +181,7 @@ ASM(VOID) SAVEDS AHIsub_Update(
     UBYTE sampleToByte = 
       AmiGUSBase->agb_AhiSampleShift;
     UWORD hwSampleSize = 
-      AmiGUSPlaybackSampleSizes[ AmiGUSBase->agb_HwSampleFormatId ];
+      AmiGUSPlaybackSampleSizes[ playback->agpp_HwSampleFormatId ];
     ULONG alignedSamples = 
       AlignByteSizeForSamples( newAudioCtrl->ahiac_BuffSamples )
         >> sampleToByte;

@@ -294,15 +294,15 @@ ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples ) {
   return aligned;
 }
 
-CopyFunctionType CopyFunctionById[] = {
-  &Copy16to8,
-  &Copy16to16,
-  &Copy32to8,
-  &Copy32to16,
-  &Copy32to24
+CopyFunctionType PlaybackCopyFunctionById[] = {
+  &PlaybackCopy16to8,
+  &PlaybackCopy16to16,
+  &PlaybackCopy32to8,
+  &PlaybackCopy32to16,
+  &PlaybackCopy32to24
 };
 
-ASM( LONG ) Copy16to8(
+ASM( LONG ) PlaybackCopy16to8(
   REG( d0, ULONG *bufferBase ),
   REG( a0, ULONG *bufferIndex )) {
 
@@ -321,7 +321,7 @@ ASM( LONG ) Copy16to8(
   return 4;
 }
 
-ASM( LONG ) Copy16to16(
+ASM( LONG ) PlaybackCopy16to16(
   REG( d0, ULONG *bufferBase ),
   REG( a0, ULONG *bufferIndex )) {
 
@@ -335,7 +335,7 @@ ASM( LONG ) Copy16to16(
   return 4;
 }
 
-ASM( LONG ) Copy32to8(
+ASM( LONG ) PlaybackCopy32to8(
   REG( d0, ULONG *bufferBase ),
   REG( a0, ULONG *bufferIndex )) {
 
@@ -358,7 +358,7 @@ ASM( LONG ) Copy32to8(
   return 4;
 }
 
-ASM( LONG ) Copy32to16(
+ASM( LONG ) PlaybackCopy32to16(
   REG( d0, ULONG *bufferBase ),
   REG( a0, ULONG *bufferIndex )) {
 
@@ -374,7 +374,7 @@ ASM( LONG ) Copy32to16(
   return 4;
 }
 
-ASM( LONG ) Copy32to24(
+ASM( LONG ) PlaybackCopy32to24(
   REG( d0, ULONG *bufferBase ),
   REG( a0, ULONG *bufferIndex )) {
 
@@ -396,4 +396,91 @@ ASM( LONG ) Copy32to24(
 
   ( *bufferIndex ) += 4;
   return 12;
+}
+
+CopyFunctionType RecordingCopyFunctionById[] = {
+  &RecordingCopy8Mto16S,
+  &RecordingCopy8Sto16S,
+  &RecordingCopy16Mto16S,
+  &RecordingCopy16Sto16S
+};
+
+ASM( LONG ) RecordingCopy8Mto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
+
+  // AmiGUS 8Bit Mono => AHI 16Bit Stereo Non-HiFi
+  ULONG in = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+  ULONG outA = (( in & 0xff000000 )       ) | ( ( in & 0xff000000 ) >> 16 );
+  ULONG outB = (( in & 0x00FF0000 ) <<  8 ) | ( ( in & 0x00FF0000 ) >>  8 );
+  ULONG outC = (( in & 0x0000ff00 ) << 16 ) | ( ( in & 0x0000ff00 )       );
+  ULONG outD = (( in & 0x000000FF ) << 24 ) | ( ( in & 0x000000FF ) <<  8 );
+  ULONG addressOut = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+  
+  *( ULONG * ) addressOut = outA;
+  addressOut += 4;
+
+  *( ULONG * ) addressOut = outB;
+  addressOut += 4;
+
+  *( ULONG * ) addressOut = outC;
+  addressOut += 4;
+
+  *( ULONG * ) addressOut = outD;
+
+  ( *bufferIndex ) += 4;
+  return 16;
+}
+
+ASM( LONG ) RecordingCopy8Sto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
+
+  // AmiGUS 8Bit Stereo => AHI 16Bit Stereo Non-HiFi
+  ULONG in = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+  ULONG outA = (( in & 0xff000000 )       ) | ( ( in & 0x00FF0000 ) >> 8 );
+  ULONG outB = (( in & 0x0000ff00 ) << 16 ) | ( ( in & 0x000000FF ) << 8 );
+  ULONG addressOut = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+  
+  *( ULONG * ) addressOut = outA;
+  addressOut += 4;
+
+  *( ULONG * ) addressOut = outB;
+
+  ( *bufferIndex ) += 2;
+  return 8;
+}
+
+ASM( LONG ) RecordingCopy16Mto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
+
+  // AmiGUS 16Bit Mono => AHI 16Bit Stereo Non-HiFi
+  ULONG in = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+  ULONG outA = ( in & 0xffFF0000 ) | ( in >> 16 );
+  ULONG outB = ( in & 0x0000ffFF ) | ( in << 16 );
+  ULONG addressOut = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+
+  *( ULONG * ) addressOut = outA;
+  addressOut += 4;
+
+  *( ULONG * ) addressOut = outB;
+  
+  ( *bufferIndex ) += 2;
+  return 8;
+}
+
+ASM( LONG ) RecordingCopy16Sto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
+
+  // AmiGUS 16Bit Stereo => AHI 16Bit Stereo Non-HiFi
+  ULONG in = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+  ULONG out = in;
+  ULONG addressOut = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+  
+  *( ULONG * ) addressOut = out;
+
+  ( *bufferIndex ) += 1;
+  return 4;
 }

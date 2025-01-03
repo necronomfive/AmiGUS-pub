@@ -27,6 +27,7 @@ struct Library           * ExpansionBase     = 0;
 struct Device            * TimerBase         = 0;
 
 char testFIFO[ 16 ][ 16 ];
+ULONG * testLongFIFO = ( ULONG * )testFIFO;
 ULONG nextTestFIFO = 0;
 
 VOID flushFIFO( VOID ) {
@@ -34,7 +35,7 @@ VOID flushFIFO( VOID ) {
   int i;
   for ( i = 0; 16 > i; ++i ) {
 
-    testFIFO[ i ][ 0 ] = 0;
+    testLongFIFO[ i ] = 0;
   }
   nextTestFIFO = 0;
 }
@@ -54,9 +55,16 @@ const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
   96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0008
 };
 
+ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
+
+  ULONG result = testLongFIFO[ nextTestFIFO ];
+  ++nextTestFIFO;
+  return result;
+}
+
 VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
 
-  sprintf( testFIFO[nextTestFIFO], "%08lx", value );
+  sprintf( testFIFO[ nextTestFIFO], "%08lx", value );
   ++nextTestFIFO;
 }
 
@@ -237,7 +245,7 @@ ASM(LONG) localPlainLongCopy2(
 }
 */
 
-BOOL testCopy16to8( VOID ) {
+BOOL testPlaybackCopy16to8( VOID ) {
 
   UBYTE tst0;
   UBYTE tst1;
@@ -253,8 +261,8 @@ BOOL testCopy16to8( VOID ) {
   ULONG exp[] = { 3, 4, 1, 1 };
   STRPTR expF[] = { "12569ade" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy16to8;
-  printf("\nTesting Copy16to8 ...\n");
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy16to8;
+  printf("\nTesting PlaybackCopy16to8 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
@@ -288,7 +296,7 @@ BOOL testCopy16to8( VOID ) {
   return failed;
 }
 
-BOOL testCopy16to16( VOID ) {
+BOOL testPlaybackCopy16to16( VOID ) {
 
   UBYTE tst0;
   UBYTE tst1;
@@ -304,8 +312,8 @@ BOOL testCopy16to16( VOID ) {
   ULONG exp[] = { 2, 4, 1, 1 };
   STRPTR expF[] = { "12345678" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy16to16;
-  printf("\nTesting Copy16to16 ...\n");
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy16to16;
+  printf("\nTesting PlaybackCopy16to16 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
@@ -339,7 +347,7 @@ BOOL testCopy16to16( VOID ) {
   return failed;
 }
 
-BOOL testCopy32to8( VOID ) {
+BOOL testPlaybackCopy32to8( VOID ) {
 
   UBYTE tst0;
   UBYTE tst1;
@@ -361,8 +369,8 @@ BOOL testCopy32to8( VOID ) {
   ULONG exp[] = { 5, 4, 1, 1 };
   STRPTR expF[] = { "129a0f87" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy32to8;
-  printf("\nTesting Copy32to8 ...\n");
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy32to8;
+  printf("\nTesting PlaybackCopy32to8 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
@@ -396,7 +404,7 @@ BOOL testCopy32to8( VOID ) {
   return failed;
 }
 
-BOOL testCopy32to16( VOID ) {
+BOOL testPlaybackCopy32to16( VOID ) {
 
   UBYTE tst0;
   UBYTE tst1;
@@ -412,8 +420,8 @@ BOOL testCopy32to16( VOID ) {
   ULONG exp[] = { 3, 4, 1, 1 };
   STRPTR expF[] = { "12349abc" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy32to16;
-  printf("\nTesting Copy32to16 ...\n");
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy32to16;
+  printf("\nTesting PlaybackCopy32to16 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
@@ -447,7 +455,7 @@ BOOL testCopy32to16( VOID ) {
   return failed;
 }
 
-BOOL testCopy32to24( VOID ) {
+BOOL testPlaybackCopy32to24( VOID ) {
 
   UBYTE tst0;
   UBYTE tst1;
@@ -472,8 +480,8 @@ BOOL testCopy32to24( VOID ) {
     "bcde0fed",
     "cb876543" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy32to24;
-  printf("\nTesting Copy32to24 ...\n");
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy32to24;
+  printf("\nTesting PlaybackCopy32to24 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
@@ -507,7 +515,7 @@ BOOL testCopy32to24( VOID ) {
   return failed;
 }
 
-BOOL testCopyFunctionCalling( VOID ) {
+BOOL testPlaybackCopyFunctionCalling( VOID ) {
 
   UBYTE tst0 = FALSE;
   UBYTE tst1 = FALSE;
@@ -522,10 +530,10 @@ BOOL testCopyFunctionCalling( VOID ) {
   ULONG exp[] = { 2, 4, 1, 1 };
   STRPTR expF[] = { "12345678" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = &Copy16to16;
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy16to16;
   AmiGUSBase->agb_Playback.agpp_Buffer[ 0 ] = in;
   AmiGUSBase->agb_Playback.agpp_BufferIndex[ 0 ] = 1;
-  printf("\nTesting CopyFunctionCalling ...\n");
+  printf("\nTesting PlaybackCopyFunctionCalling ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
   flushFIFO();
@@ -657,6 +665,268 @@ BOOL testAlignBuffSamples( VOID ) {
   return failed;
 }
 
+BOOL testRecordingCopy8Mto16S( VOID ) {
+
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
+  UBYTE tst3 = TRUE;
+  BOOL failed = FALSE;
+  LONG out;
+  int i;
+
+  /**** for recording copy function tests, just adapt the between section ****/
+  ULONG in[] = {
+    0x12345678 };
+  ULONG target[] = {
+    0x00000000,
+    0x00000000,
+    0x00000000,
+    0x00000000,
+    0x00000000,
+    0x00000000 };
+  ULONG index = 1; // into target!
+  ULONG exp[] = { 5, 16, 1, 6 };
+  ULONG expF[] = {
+    0x00000000,
+    0x12001200,
+    0x34003400,
+    0x56005600,
+    0x78007800,
+    0x00000000 };
+
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy8Mto16S;
+  printf("\nTesting RecordingCopy8Mto16S ...\n");
+  /**** for recording copy function tests, just adapt the between section ****/
+
+  flushFIFO();
+  for ( i = 0; i < 1; ++i ) {
+
+    testLongFIFO[ i ] = in[ i ];
+  }
+
+  out = (* AmiGUSBase->agb_Recording.agpr_CopyFunction)( target, &index );
+
+  tst0 = ( exp[ 0 ] == index );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    tst3 &= ( target[ i ] == expF[ i ] );
+  }
+
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "AHI Buffer content:                             %s - \t%s\n",
+          exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "AHI Buf. LONG #%ld:  %08lx (expected) - %08lx (actual)\n",
+            i, expF[ i ], target[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
+
+  return failed;
+}
+
+BOOL testRecordingCopy8Sto16S( VOID ) {
+
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
+  UBYTE tst3 = TRUE;
+  BOOL failed = FALSE;
+  LONG out;
+  int i;
+
+  /**** for recording copy function tests, just adapt the between section ****/
+  ULONG in[] = {
+    0x12345678 };
+  ULONG target[] = {
+    0x00000000,
+    0x00000000,
+    0x00000000,
+    0x00000000 };
+  ULONG index = 1; // into target!
+  ULONG exp[] = { 3, 8, 1, 4 };
+  ULONG expF[] = {
+    0x00000000,
+    0x12003400,
+    0x56007800,
+    0x00000000 };
+
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy8Sto16S;
+  printf("\nTesting RecordingCopy8Sto16S ...\n");
+  /**** for recording copy function tests, just adapt the between section ****/
+
+  flushFIFO();
+  for ( i = 0; i < 1; ++i ) {
+
+    testLongFIFO[ i ] = in[ i ];
+  }
+
+  out = (* AmiGUSBase->agb_Recording.agpr_CopyFunction)( target, &index );
+
+  tst0 = ( exp[ 0 ] == index );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    tst3 &= ( target[ i ] == expF[ i ] );
+  }
+
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "AHI Buffer content:                             %s - \t%s\n",
+          exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "AHI Buf. LONG #%ld:  %08lx (expected) - %08lx (actual)\n",
+            i, expF[ i ], target[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
+
+  return failed;
+}
+
+BOOL testRecordingCopy16Mto16S( VOID ) {
+
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
+  UBYTE tst3 = TRUE;
+  BOOL failed = FALSE;
+  LONG out;
+  int i;
+
+  /**** for recording copy function tests, just adapt the between section ****/
+  ULONG in[] = {
+    0x12345678 }; // match line 824
+  ULONG target[] = {
+    0x00000000,
+    0x00000000,
+    0x00000000,
+    0x00000000 };
+  ULONG index = 1; // into target!
+  ULONG exp[] = { 3, 8, 1, 4 };
+  ULONG expF[] = {
+    0x00000000,
+    0x12341234,
+    0x56785678,
+    0x00000000 };
+
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy16Mto16S;
+  printf("\nTesting RecordingCopy16Mto16S ...\n");
+  /**** for recording copy function tests, just adapt the between section ****/
+
+  flushFIFO();
+  for ( i = 0; i < 1; ++i ) {
+
+    testLongFIFO[ i ] = in[ i ];
+  }
+
+  out = (* AmiGUSBase->agb_Recording.agpr_CopyFunction)( target, &index );
+
+  tst0 = ( exp[ 0 ] == index );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    tst3 &= ( target[ i ] == expF[ i ] );
+  }
+
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "AHI Buffer content:                             %s - \t%s\n",
+          exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "AHI Buf. LONG #%ld:  %08lx (expected) - %08lx (actual)\n",
+            i, expF[ i ], target[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
+
+  return failed;
+}
+
+BOOL testRecordingCopy16Sto16S( VOID ) {
+
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
+  UBYTE tst3 = TRUE;
+  BOOL failed = FALSE;
+  LONG out;
+  int i;
+
+  /**** for recording copy function tests, just adapt the between section ****/
+  ULONG in[] = {
+    0x12345678 };
+  ULONG target[] = {
+    0x00000000,
+    0x00000000,
+    0x00000000 };
+  ULONG index = 1; // into target!
+  ULONG exp[] = { 2, 4, 1, 3 };
+  ULONG expF[] = {
+    0x00000000,
+    0x12345678,
+    0x00000000 };
+
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy16Sto16S;
+  printf("\nTesting RecordingCopy16Sto16S ...\n");
+  /**** for recording copy function tests, just adapt the between section ****/
+
+  flushFIFO();
+  for ( i = 0; i < 1; ++i ) {
+
+    testLongFIFO[ i ] = in[ i ];
+  }
+
+  out = (* AmiGUSBase->agb_Recording.agpr_CopyFunction)( target, &index );
+
+  tst0 = ( exp[ 0 ] == index );
+  tst1 = ( exp[ 1 ] == out );
+  tst2 = ( exp[ 2 ] == nextTestFIFO );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    tst3 &= ( target[ i ] == expF[ i ] );
+  }
+
+  printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
+          "AHI Buffer content:                             %s - \t%s\n",
+          exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
+          exp[ 1 ], out, (tst1) ? "passed" : "FAIL!!",
+          exp[ 2 ], nextTestFIFO, (tst2) ? "passed" : "FAIL!!",
+          "          ", (tst3) ? "passed" : "FAIL!!" );
+  for ( i = 0; i < exp[ 3 ]; ++i ) {
+
+    printf( "AHI Buf. LONG #%ld:  %08lx (expected) - %08lx (actual)\n",
+            i, expF[ i ], target[ i ] );
+  }
+
+  failed |= !( tst0 & tst1 & tst2 & tst3 );
+
+  return failed;
+}
+
 /******************************************************************************
  * Finally, main triggering all tests:
  *****************************************************************************/
@@ -676,13 +946,17 @@ int main(int argc, char const *argv[]) {
   failed |= testGcd();
   failed |= testLcm();
   failed |= testGetBufferSizes();
-  failed |= testCopy16to8();
-  failed |= testCopy16to16();
-  failed |= testCopy32to8();
-  failed |= testCopy32to16();
-  failed |= testCopy32to24();
-  failed |= testCopyFunctionCalling();
+  failed |= testPlaybackCopy16to8();
+  failed |= testPlaybackCopy16to16();
+  failed |= testPlaybackCopy32to8();
+  failed |= testPlaybackCopy32to16();
+  failed |= testPlaybackCopy32to24();
+  failed |= testPlaybackCopyFunctionCalling();
   failed |= testAlignBuffSamples();
+  failed |= testRecordingCopy8Mto16S();
+  failed |= testRecordingCopy8Sto16S();
+  failed |= testRecordingCopy16Mto16S();
+  failed |= testRecordingCopy16Sto16S();
 
   free( AmiGUSBase );
 

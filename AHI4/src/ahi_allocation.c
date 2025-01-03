@@ -36,8 +36,10 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   struct TagItem *tag = 0;
   ULONG sampleRateId = 0;
   ULONG sampleRate = 0;
-  WORD sampleFormatId = -1;
-  BYTE copyFunctionId = -1;
+  WORD playHwSampleFormatId = -1;
+  WORD recHwSampleFormatId = -1;
+  BYTE playbackCopyFunctionId = -1;
+  BYTE recordingCopyFunctionId = -1;
   UBYTE isStereo = FALSE;
   UBYTE isHifi = FALSE;
   UBYTE isRealtime = FALSE;
@@ -122,8 +124,20 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         isRealtime = (UBYTE)tag->ti_Data;
         break;
       }
-      case AHIDB_AmiGUS_CopyFunction: {
-        copyFunctionId = (BYTE)tag->ti_Data;
+      case AHIDB_AmiGUS_PlayCopyFunction: {
+        playbackCopyFunctionId = (BYTE)tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_PlayHwSampleId: {
+        playHwSampleFormatId = ( WORD )tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_RecCopyFunction: {
+        recordingCopyFunctionId = (BYTE)tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_RecHwSampleId: {
+        recHwSampleFormatId = ( WORD )tag->ti_Data;
         break;
       }
       case AHIDB_Record: {
@@ -136,10 +150,6 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
 
           result &= ( ~ AHISF_CANRECORD );
         }
-        break;
-      }
-      case AHIDB_AmiGUS_HwSampleFormatId: {
-        sampleFormatId = ( WORD )tag->ti_Data;
         break;
       }
       default: {
@@ -155,7 +165,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
    */
   LOG_I(( "I: AmiGUS playback mode is format 0x%lx, %ldbit, %ld stereo, "
           "%ld HiFi, %ld Realtime, %ldHz, %ld Recording\n",
-          AmiGUSPlaybackSampleFormat[ sampleFormatId  ],
+          AmiGUSPlaybackSampleFormat[ playHwSampleFormatId  ],
           bitsPerAmiGusSample, isStereo,
           isHifi, isRealtime, sampleRate, canRecord ));
   LOG_I(( "I: AHI playback sample size %ld BYTEs, "
@@ -163,11 +173,11 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
           "AmiGUS sample size %ld BYTEs\n",
           ahiSampleSizeBytes,
           ahiSampleBytesShift,
-          AmiGUSPlaybackSampleSizes[ sampleFormatId  ] ));
+          AmiGUSPlaybackSampleSizes[ playHwSampleFormatId  ] ));
   // TODO: may go out of bounds below for 24bit modes!
   LOG_I(( "I: AmiGUS recording mode is format 0x%lx, %ldbit, %ld stereo, "
           "%ld HiFi, %ld Realtime, %ldHz, %ld Recording\n",
-          AmiGUSRecordingSampleFormat[ sampleFormatId  ],
+          AmiGUSRecordingSampleFormat[ recHwSampleFormatId  ],
           bitsPerAmiGusSample, isStereo,
           isHifi, isRealtime, sampleRate, canRecord ));
   LOG_I(( "I: AHI recording sample size %ld BYTEs, "
@@ -175,14 +185,14 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
           "AmiGUS sample size %ld BYTEs\n",
           ahiSampleSizeBytes, // TODO: wrong for recording!
           ahiSampleBytesShift,
-          AmiGUSPlaybackSampleSizes[ sampleFormatId  ] ));
+          AmiGUSPlaybackSampleSizes[ recHwSampleFormatId  ] )); // TODO: also wrong!!
 
-  if ( 0 > sampleFormatId ) {
+  if (( 0 > playHwSampleFormatId ) || ( 0 > recHwSampleFormatId )) {
 
     DisplayError( ESampleFormatMissingFromMode );
     return AHISF_ERROR;
   }
-  if ( 0 > copyFunctionId ) {
+  if (( 0 > playbackCopyFunctionId ) || ( 0 > recordingCopyFunctionId )) {
 
     DisplayError( ECopyFunctionMissingFromMode );
     return AHISF_ERROR;
@@ -191,13 +201,19 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   AmiGUSBase->agb_AhiSampleSize = ahiSampleSizeBytes;
   AmiGUSBase->agb_AhiSampleShift = ahiSampleBytesShift;
   AmiGUSBase->agb_HwSampleRateId = sampleRateId;
-  AmiGUSBase->agb_HwSampleFormatId = sampleFormatId;
   AmiGUSBase->agb_CanRecord = canRecord;
-  
+
+  AmiGUSBase->agb_Playback.agpp_HwSampleFormatId = playHwSampleFormatId;
   AmiGUSBase->agb_Playback.agpp_CopyFunctionId =
-    copyFunctionId;
+    playbackCopyFunctionId;
   AmiGUSBase->agb_Playback.agpp_CopyFunction =
-    CopyFunctionById[ copyFunctionId ];
+    PlaybackCopyFunctionById[ playbackCopyFunctionId ];
+
+  AmiGUSBase->agb_Recording.agpr_HwSampleFormatId = recHwSampleFormatId;
+  AmiGUSBase->agb_Recording.agpr_CopyFunctionId =
+    recordingCopyFunctionId;
+  AmiGUSBase->agb_Recording.agpr_CopyFunction =
+    RecordingCopyFunctionById[ recordingCopyFunctionId ];
 
   /*
    * ------------------------------------------------------

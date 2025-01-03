@@ -35,8 +35,11 @@
                                     + (   22 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
-#define AHIDB_AmiGUS_CopyFunction       ( AHIDB_UserBase + 0 )
-#define AHIDB_AmiGUS_HwSampleFormatId   ( AHIDB_UserBase + 1 )
+
+#define AHIDB_AmiGUS_PlayCopyFunction   ( AHIDB_UserBase + 0 )
+#define AHIDB_AmiGUS_PlayHwSampleId     ( AHIDB_UserBase + 1 )
+#define AHIDB_AmiGUS_RecCopyFunction    ( AHIDB_UserBase + 2 )
+#define AHIDB_AmiGUS_RecHwSampleId      ( AHIDB_UserBase + 3 )
 
 #define AMIGUS_MEM_LOG_MARKER        "********************************"   \
                                      " AmiGUS "                           \

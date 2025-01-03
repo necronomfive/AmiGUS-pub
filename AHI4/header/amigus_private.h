@@ -63,6 +63,8 @@ struct AmiGUSPcmPlayback {
   ULONG                         agpp_CopyFunctionId; /* ID of CopyFunction   */
 
   ULONG                         agpp_Watermark;      /* Counting in WORDs!   */
+
+  UWORD                         agpp_HwSampleFormatId; /* Sample format lookup ID */
 };
 
 struct AmiGUSPcmRecording {
@@ -73,9 +75,12 @@ struct AmiGUSPcmRecording {
 
   ULONG                         agpr_CurrentBuffer;  /* Current recording b. */
 
+  CopyFunctionType              agpr_CopyFunction;   /* Magic AmiGUS<->AHI.. */
+  ULONG                         agpr_CopyFunctionId; /* ID of CopyFunction   */
+
   struct AHIRecordMessage       agpr_RecordingMessage;
 
-  UWORD                         agpr_HwSampleRateId; /* HW sample rate ID    */
+  UWORD                         agpr_HwSampleFormatId; /* Sample format lookup ID */
   UBYTE                         agpr_AhiSampleSize; /* BYTE size of 1 sample */
   UBYTE                         agpr_AhiSampleShift; /* Sample <> Byte shift */
 
@@ -114,8 +119,9 @@ struct AmiGUSBasePrivate {
   BYTE                          agb_UsageCounter;    
 
   /* Driver settings */
-  UWORD                         agb_HwSampleFormatId; /* Sample format lookup ID */
   UWORD                         agb_HwSampleRateId; /* HW sample rate ID    */
+  UWORD                         agb_Reserved0; 
+
   UBYTE                         agb_AhiSampleSize; /* BYTE size of 1 sample */
   UBYTE                         agb_AhiSampleShift; /* Sample <> Byte shift */
   UBYTE                         agb_CanRecord;      /* Can record? Yes / No  */

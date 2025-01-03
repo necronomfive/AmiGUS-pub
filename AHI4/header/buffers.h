@@ -112,13 +112,13 @@ typedef LONG ( ASM( * ) CopyFunctionType )(
  *    AHI    AmiGUS Required            x    resulting
  *    Sample Sample Alignment      HiFi Bit  Copy
  * ID Size   Size   Input Output   Mode Mode Function
- * 0  16      8      8     4 bytes       8   Copy16to8
- * 1  16     16      4     4 bytes      16   Copy16to16
- * 2  32      8     16     4 bytes x     8   Copy32to8
- * 3  32     16      8     4 bytes x    16   Copy32to16
- * 4  32     24     16    12 bytes x    24   Copy32to24
+ * 0  16      8      8     4 bytes       8   PlaybackCopy16to8
+ * 1  16     16      4     4 bytes      16   PlaybackCopy16to16
+ * 2  32      8     16     4 bytes x     8   PlaybackCopy32to8
+ * 3  32     16      8     4 bytes x    16   PlaybackCopy32to16
+ * 4  32     24     16    12 bytes x    24   PlaybackCopy32to24
  */
-extern CopyFunctionType CopyFunctionById[];
+extern CopyFunctionType PlaybackCopyFunctionById[];
 
 /**
  * Reads 2 LONGs, a, and b,
@@ -135,7 +135,7 @@ extern CopyFunctionType CopyFunctionById[];
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) Copy16to8(
+ASM(LONG) PlaybackCopy16to8(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
 
@@ -149,7 +149,7 @@ ASM(LONG) Copy16to8(
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) Copy16to16(
+ASM(LONG) PlaybackCopy16to16(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
 
@@ -168,7 +168,7 @@ ASM(LONG) Copy16to16(
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) Copy32to8(
+ASM(LONG) PlaybackCopy32to8(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
 
@@ -183,7 +183,7 @@ ASM(LONG) Copy32to8(
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) Copy32to16(
+ASM(LONG) PlaybackCopy32to16(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
 
@@ -201,8 +201,76 @@ ASM(LONG) Copy32to16(
  *
  * @return Number of bytes written, i.e. 12.
  */
-ASM(LONG) Copy32to24(
+ASM(LONG) PlaybackCopy32to24(
   REG(d0, ULONG *bufferBase), 
   REG(a0, ULONG *bufferIndex) );
+
+/**
+ * so... MORE copy functions needed...
+ *    AHI    AmiGUS Required            x    resulting
+ *    Sample Sample Alignment      HiFi Bit  Copy
+ * ID Size   Size   Input Output   Mode Mode Function
+ * 0  32      8      4    16 bytes       8   RecordingCopy8Mto16S
+ * 1  32     16      4     8 bytes       8   RecordingCopy8Sto16S
+ * 2  32     16      4     8 bytes  16, 24   RecordingCopy16Mto16S
+ * 3  32     32      4     4 bytes  16, 24   RecordingCopy16Sto16S
+ */
+extern CopyFunctionType RecordingCopyFunctionById[];
+
+/**
+ * Reads 1 LONG aka 4 samples in 8Bit Mono from AmiGUS
+ * and prepares it for AHI 16Bit Stereo Non-HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 4 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
+ */
+ASM( LONG ) RecordingCopy8Mto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
+/**
+ * Reads 1 LONG aka 2 samples in 8Bit Stereo from AmiGUS
+ * and prepares it for AHI 16Bit Stereo Non-HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 4 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
+ */
+ASM( LONG ) RecordingCopy8Sto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
+/**
+ * Reads 1 LONG aka 2 samples in 16Bit Mono from AmiGUS
+ * and prepares it for AHI 16Bit Stereo Non-HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 4 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
+ */
+ASM( LONG ) RecordingCopy16Mto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
+/**
+ * Reads 1 LONG aka 1 sample in 16Bit Stereo from AmiGUS
+ * and prepares it for AHI 16Bit Stereo Non-HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 4 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
+ */
+ASM( LONG ) RecordingCopy16Sto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
 
 #endif /* BUFFERS_H */

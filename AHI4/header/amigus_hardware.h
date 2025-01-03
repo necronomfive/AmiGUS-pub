@@ -86,8 +86,6 @@
 #define AMIGUS_PCM_S_REC_STEREO_8BIT     0x0000
 #define AMIGUS_PCM_S_REC_MONO_16BIT      0x0007
 #define AMIGUS_PCM_S_REC_STEREO_16BIT    0x0001
-#define AMIGUS_PCM_S_REC_MONO_24BIT      Not Available
-#define AMIGUS_PCM_S_REC_STEREO_24BIT    Not Available
 #define AMIGUS_PCM_S_REC_FORMAT_COUNT    4
 
 /* AmiGUS PCM Sample Rates */

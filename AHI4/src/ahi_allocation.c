@@ -66,6 +66,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   Disable();
   if ( AmiGUSBase->agb_UsageCounter ) {
 
+    // TODO: Allow 2 clients here - 1 for recording, 1 for playback! Need to be super independent though and some rework before...
     Enable();
     DisplayError( EDriverInUse );
     return AHISF_ERROR;

@@ -175,7 +175,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
           ahiSampleSizeBytes,
           ahiSampleBytesShift,
           AmiGUSPlaybackSampleSizes[ playHwSampleFormatId  ] ));
-  // TODO: may go out of bounds below for 24bit modes!
+  // TODO: make sure the below works correctly!
   LOG_I(( "I: AmiGUS recording mode is format 0x%lx, %ldbit, %ld stereo, "
           "%ld HiFi, %ld Realtime, %ldHz, %ld Recording\n",
           recHwSampleFormatId,

@@ -100,21 +100,6 @@ INLINE VOID FillBuffer( BYTE buffer ) {
     /*
      * 3) Call user hook ahiac_MixerFunc().
      */
-    /*
-    LOG_D(("D: has %ld gets %ld\n",
-           AmiGUSBase->agb_BufferIndex[ buffer ],
-           AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples));
-     */
-    /*  
-    LOG_V(("V: longSize %ld, BuffSamples %lu, Min %lu, Max %lu, BuffSize %lu, BuffType %lu\n",
-          AmiGUSBase->agb_BufferSize,
-          AmiGUSBase->agb_AudioCtrl->ahiac_BuffSamples,
-          AmiGUSBase->agb_AudioCtrl->ahiac_MinBuffSamples,
-          AmiGUSBase->agb_AudioCtrl->ahiac_MaxBuffSamples,
-          AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize,
-          AmiGUSBase->agb_AudioCtrl->ahiac_BuffType
-       ));
-    */
     CallHookPkt( audioCtrl->ahiac_MixerFunc,
                  audioCtrl,
                  (APTR) playback->agpp_Buffer[ buffer ] );
@@ -124,8 +109,7 @@ INLINE VOID FillBuffer( BYTE buffer ) {
      *    Either can be non cache-able (bad) or flush the caches (better).
      *    Well, it is a register... no caching here. :(
      *    The good news: the interrupt handler will take that responsibility.
-     */
-    /* 
+     * ************************************************************************
      * Conversion happens during feeding to hardware, 
      * just need to remember how much we got here.
      *
@@ -230,6 +214,8 @@ INLINE VOID HandleRecording( VOID ) {
     k ^= 0x00000001;
   }
   /*
+  TODO: buffer overflow handling without flodding the interrupt handlers, plz?
+
   if ( AMIGUS_AHI_F_REC_OVERFLOW & AmiGUSBase->agb_StateFlags ) {
 
     LOG_W(( "W: Recovering from recording buffer overflow.\n" ));

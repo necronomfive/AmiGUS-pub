@@ -383,12 +383,12 @@ BOOL testPlaybackCopy32to24( VOID ) {
 
 BOOL testPlaybackCopyFunctionCalling( VOID ) {
 
-  UBYTE tst0 = FALSE;
-  UBYTE tst1 = FALSE;
-  UBYTE tst2 = FALSE;
+  UBYTE tst0;
+  UBYTE tst1;
+  UBYTE tst2;
   UBYTE tst3 = TRUE;
   BOOL failed = FALSE;
-  LONG out = 0;
+  LONG out;
   int i;
 
   /********* for copy function tests, just adapt the between section *********/

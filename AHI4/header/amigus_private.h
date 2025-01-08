@@ -44,7 +44,7 @@
 #include <utility/hooks.h>
 
 #include "amigus_public.h"
-#include "buffers.h"
+#include "copies.h"
 #include "library.h"
 #include "SDI_AHI4_protos.h"
 

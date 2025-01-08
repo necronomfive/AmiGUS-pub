@@ -20,6 +20,7 @@
 
 #include "amigus_pcm.h"
 #include "amigus_private.h"
+#include "buffers.h"
 #include "debug.h"
 #include "errors.h"
 #include "interrupt.h"

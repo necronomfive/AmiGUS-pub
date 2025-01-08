@@ -20,6 +20,7 @@
 #include <limits.h>
 
 #include "amigus_private.h"
+#include "buffers.h"
 #include "debug.h"
 #include "errors.h"
 #include "samplerate.h"

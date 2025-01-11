@@ -256,7 +256,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
 MODENAME$:
-    TEXT0 "AmiGUS: 16 bit mono - AHI Timing"
+    TEXT0 "AmiGUS: Fast 16 bit mono - AHI Timing"
     ENDCHUNK
 
 MODE7:

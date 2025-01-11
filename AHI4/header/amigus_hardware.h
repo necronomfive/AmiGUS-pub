@@ -149,4 +149,5 @@ extern const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ];
 extern const UWORD AmiGUSPlaybackSampleSizes[ AMIGUS_PCM_S_PLAY_FORMAT_COUNT ];
 //extern const WORD AmiGUSRecordingSampleFormat[ AMIGUS_PCM_S_REC_FORMAT_COUNT ];
 extern const UWORD AmiGUSRecordingSampleSizes[ AMIGUS_PCM_S_REC_FORMAT_COUNT ];
+
 #endif /* AMIGUS_HARDWARE_H */

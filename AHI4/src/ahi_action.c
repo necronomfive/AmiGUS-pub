@@ -32,7 +32,6 @@
 /* Basic functions - Actions */
 
 ASM(VOID) SAVEDS AHIsub_Disable(
-  REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 ) {
 
@@ -53,7 +52,6 @@ ASM(VOID) SAVEDS AHIsub_Disable(
 
 
 ASM(VOID) SAVEDS AHIsub_Enable(
-  REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 ) {
 
@@ -82,13 +80,12 @@ ASM(VOID) SAVEDS AHIsub_Enable(
 }
 
 ASM(ULONG) SAVEDS AHIsub_Start(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {
   LOG_D(("D: AHIsub_Start start\n"));
 
-  AHIsub_Update( aBase, aFlags, aAudioCtrl );
+  AHIsub_Update( aFlags, aAudioCtrl );
 
   if ( AHISF_PLAY & aFlags ) {
 
@@ -145,7 +142,6 @@ ASM(ULONG) SAVEDS AHIsub_Start(
 }
 
 ASM(VOID) SAVEDS AHIsub_Update(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *newAudioCtrl)
 ) {
@@ -213,7 +209,6 @@ ASM(VOID) SAVEDS AHIsub_Update(
 }
 
 ASM(VOID) SAVEDS AHIsub_Stop(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {

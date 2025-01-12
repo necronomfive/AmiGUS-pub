@@ -29,7 +29,6 @@
 /* Basic functions - Allocation */
 
 ASM(ULONG) SAVEDS AHIsub_AllocAudio(
-//  REG(a6, struct Library* aBase) works fine with vbcc, but not with SASC,
   REG(a1, struct TagItem* aTagList),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 ) {
@@ -239,7 +238,6 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
 }
 
 ASM(void) SAVEDS AHIsub_FreeAudio(
-  REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {
   LOG_D(("D: AHIsub_FreeAudio start\n"));

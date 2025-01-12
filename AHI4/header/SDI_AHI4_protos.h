@@ -38,40 +38,33 @@
 /* Basic functions */
 
 ASM(ULONG) SAVEDS AHIsub_AllocAudio(
-//  REG(a6, struct Library* aBase),
   REG(a1, struct TagItem* aTagList),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 );
 
 ASM(void) SAVEDS AHIsub_FreeAudio(
-  REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 );
 
 ASM(void) SAVEDS AHIsub_Disable(
-  REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 );
 
 ASM(void) SAVEDS AHIsub_Enable(
-  REG(a6, struct Library* aBase),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 );
 
 ASM(ULONG) SAVEDS AHIsub_Start(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 );
 
 ASM(void) SAVEDS AHIsub_Update(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 );
 
 ASM(void) SAVEDS AHIsub_Stop(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aFlags),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 );
@@ -79,7 +72,6 @@ ASM(void) SAVEDS AHIsub_Stop(
 /* Acceleration functions */
 
 ASM(ULONG) SAVEDS AHIsub_SetVol(
-  REG(a6, struct Library* aBase),
   REG(d0, UWORD aChannel),
   REG(d1, Fixed aVolume),
   REG(d2, sposition aPan),
@@ -88,7 +80,6 @@ ASM(ULONG) SAVEDS AHIsub_SetVol(
 );
 
 ASM(ULONG) SAVEDS AHIsub_SetFreq(
-  REG(a6, struct Library* aBase),
   REG(d0, UWORD aChannel),
   REG(d1, ULONG aFreq),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl),
@@ -96,7 +87,6 @@ ASM(ULONG) SAVEDS AHIsub_SetFreq(
 );
 
 ASM(ULONG) SAVEDS AHIsub_SetSound(
-  REG(a6, struct Library* aBase),
   REG(d0, UWORD aChannel),
   REG(d1, UWORD aSound),
   REG(d2, ULONG aOffset),
@@ -106,13 +96,11 @@ ASM(ULONG) SAVEDS AHIsub_SetSound(
 );
 
 ASM(ULONG) SAVEDS AHIsub_SetEffect(
-  REG(a6, struct Library* aBase),
   REG(a0, APTR aEffect),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 );
 
 ASM(ULONG) SAVEDS AHIsub_LoadSound(
-  REG(a6, struct Library* aBase),
   REG(d0, UWORD aSound),
   REG(d1, ULONG aType),
   REG(a0, APTR aInfo),
@@ -120,7 +108,6 @@ ASM(ULONG) SAVEDS AHIsub_LoadSound(
 );
 
 ASM(ULONG) SAVEDS AHIsub_UnloadSound(
-  REG(a6, struct Library* aBase),
   REG(d0, UWORD aSound),
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 );
@@ -128,7 +115,6 @@ ASM(ULONG) SAVEDS AHIsub_UnloadSound(
 /* Query functions */
 
 ASM(LONG) SAVEDS AHIsub_GetAttr(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aAttribute),
   REG(d1, LONG aArgument),
   REG(d2, LONG aDefault),
@@ -139,7 +125,6 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
 /* Mixer functions */
 
 ASM(LONG) SAVEDS AHIsub_HardwareControl(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aAttribute),
   REG(d1, LONG aArgument),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)

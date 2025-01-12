@@ -31,7 +31,6 @@
 /* Query functions */
 
 ASM(LONG) SAVEDS AHIsub_GetAttr(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aAttribute),
   REG(d1, LONG aArgument),
   REG(d2, LONG aDefault),
@@ -218,7 +217,6 @@ VOID setAhiVolumeToAmiGUS( Fixed volume, ULONG volumeRegisterOffset ) {
 }
 
 ASM(LONG) SAVEDS AHIsub_HardwareControl(
-  REG(a6, struct Library* aBase),
   REG(d0, ULONG aAttribute),
   REG(d1, LONG aArgument),
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)

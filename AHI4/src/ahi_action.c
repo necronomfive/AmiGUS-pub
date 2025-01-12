@@ -26,7 +26,7 @@
 #include "errors.h"
 #include "interrupt.h"
 #include "support.h"
-#include "SDI_AHI4_protos.h"
+#include "SDI_ahi_sub.h"
 #include "worker.h"
 
 /* Basic functions - Actions */

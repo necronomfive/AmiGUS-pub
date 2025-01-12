@@ -24,7 +24,7 @@
 #include "errors.h"
 #include "samplerate.h"
 #include "support.h"
-#include "SDI_AHI4_protos.h"
+#include "SDI_ahi_sub.h"
 
 /* Basic functions - Allocation */
 

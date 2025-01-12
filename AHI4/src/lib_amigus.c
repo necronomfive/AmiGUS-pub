@@ -20,8 +20,8 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
+#include "amigus_ahi_sub.h"
 #include "amigus_pcm.h"
-#include "amigus_private.h"
 #include "debug.h"
 #include "errors.h"
 #include "library.h"
@@ -35,14 +35,14 @@ struct IntuitionBase     * IntuitionBase     = 0;
 struct Library           * UtilityBase       = 0;
 struct Library           * ExpansionBase     = 0;
 struct Device            * TimerBase         = 0;
-struct AmiGUSBasePrivate * AmiGUSBase        = 0;
+struct AmiGUSBase        * AmiGUSBase        = 0;
 
 #endif
 
 /* Closes all the libraries opened by LibInit() */
 VOID CustomLibClose( struct BaseLibrary * base ) {
 
-  struct AmiGUSBasePrivate * amiGUSBase = (struct AmiGUSBasePrivate *)base;
+  struct AmiGUSBase * amiGUSBase = (struct AmiGUSBase *)base;
 
 #ifndef BASE_GLOBAL
   struct ExecBase *SysBase = AmiGUSBase->agb_SysBase;
@@ -89,7 +89,7 @@ VOID CustomLibClose( struct BaseLibrary * base ) {
 
 LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
 
-  struct AmiGUSBasePrivate * amiGUSBase = (struct AmiGUSBasePrivate *)base;
+  struct AmiGUSBase * amiGUSBase = (struct AmiGUSBase *)base;
   LONG error;
 
   /* Prevent use of customized library versions on CPUs not targetted. */

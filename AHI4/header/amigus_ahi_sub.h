@@ -14,11 +14,11 @@
  * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AMIGUS_PRIVATE_H
-#define AMIGUS_PRIVATE_H
+#ifndef AMIGUS_AHI_H
+#define AMIGUS_AHI_H
 
 /* 
-* Private library header.
+* AHI driver library header.
 *
 * To be used only internally - but there in all .c files!
 * If you are using some of the library base addresses from
@@ -39,14 +39,30 @@
 #endif
 #endif
 
-#include <dos/dos.h>
-#include <libraries/expansionbase.h>
-#include <utility/hooks.h>
-
-#include "amigus_public.h"
 #include "copies.h"
 #include "library.h"
 #include "SDI_AHI4_protos.h"
+
+#define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Fassbach"
+#define AMIGUS_AHI_COPYRIGHT        "(c) 2024 Christoph Fassbach / LGPL3"
+#define AMIGUS_AHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
+                                    "Frank Wille (vbcc), Martin Blom (AHI)"
+#define AMIGUS_AHI_VERSION          LIBRARY_IDSTRING
+
+#define AMIGUS_AHI_FIRMWARE_MINIMUM ( ( 2024 << 20 ) /* year   */ \
+                                    + (   12 << 16 ) /* month  */ \
+                                    + (    8 << 11 ) /* day    */ \
+                                    + (   22 <<  6 ) /* hour   */ \
+                                    + (   38 <<  0 ) /* minute */ )
+
+#define AHIDB_AmiGUS_PlayCopyFunction   ( AHIDB_UserBase + 0 )
+#define AHIDB_AmiGUS_PlayHwSampleId     ( AHIDB_UserBase + 1 )
+#define AHIDB_AmiGUS_RecCopyFunction    ( AHIDB_UserBase + 2 )
+#define AHIDB_AmiGUS_RecHwSampleId      ( AHIDB_UserBase + 3 )
+
+#define AMIGUS_MEM_LOG_MARKER        "********************************"   \
+                                     " AmiGUS "                           \
+                                     "********************************\n"
 
 /******************************************************************************
  * Library base structure components
@@ -94,7 +110,7 @@ struct AmiGUSPcmRecording {
 
 /* This is the private structure. The official one does not contain all
 the private fields! */
-struct AmiGUSBasePrivate {
+struct AmiGUSBase {
   /* Library base stuff */
   struct BaseLibrary            agb_BaseLibrary;
 
@@ -138,7 +154,7 @@ struct AmiGUSBasePrivate {
 };
 
 #if defined(BASE_GLOBAL)
-  extern struct AmiGUSBasePrivate * AmiGUSBase;
+  extern struct AmiGUSBase        * AmiGUSBase;
   extern struct DosLibrary        * DOSBase;
   extern struct Library           * ExpansionBase;
   extern struct IntuitionBase     * IntuitionBase;
@@ -173,4 +189,4 @@ struct AmiGUSBasePrivate {
 #define AMIGUS_AHI_F_REC_MASK            0xF0
 #define AMIGUS_AHI_F_REC_STOP_MASK       0x0F
 
-#endif /* AMIGUS_PRIVATE_H */
+#endif /* AMIGUS_AHI_H */

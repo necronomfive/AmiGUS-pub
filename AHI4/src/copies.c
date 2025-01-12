@@ -14,8 +14,8 @@
  * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
-#include "amigus_private.h"
 #include "copies.h"
 
 /*

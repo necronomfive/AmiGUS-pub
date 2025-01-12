@@ -18,7 +18,8 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
-#include "amigus_private.h"
+#include "amigus_ahi_sub.h"
+#include "amigus_hardware.h"
 #include "debug.h"
 #include "errors.h"
 #include "samplerate.h"

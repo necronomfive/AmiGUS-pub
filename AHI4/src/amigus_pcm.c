@@ -16,11 +16,13 @@
 
 #include <proto/expansion.h>
 
+#include "amigus_ahi_sub.h"
+#include "amigus_hardware.h"
 #include "amigus_pcm.h"
 #include "debug.h"
 #include "errors.h"
 
-LONG FindAmiGusPcm(struct AmiGUSBasePrivate *amiGUSBase) {
+LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase ) {
 
   struct ConfigDev *configDevice = 0;
   ULONG serial = 0;

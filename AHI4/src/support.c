@@ -21,7 +21,7 @@
 #include <proto/timer.h>
 #include <proto/utility.h>
 
-#include "amigus_private.h"
+#include "amigus_ahi_sub.h"
 #include "debug.h"
 #include "errors.h"
 #include "support.h"

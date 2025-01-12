@@ -19,7 +19,8 @@
 
 #include <limits.h>
 
-#include "amigus_private.h"
+#include "amigus_ahi_sub.h"
+#include "amigus_hardware.h"
 #include "buffers.h"
 #include "debug.h"
 #include "errors.h"

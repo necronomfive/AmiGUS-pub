@@ -17,9 +17,7 @@
 #ifndef AMIGUS_PCM_H
 #define AMIGUS_PCM_H
 
-#include "amigus_private.h"
-
-LONG FindAmiGusPcm( struct AmiGUSBasePrivate *amiGUSBase );
+LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase );
 
 VOID StartAmiGusPcmPlayback( VOID );
 VOID StopAmiGusPcmPlayback( VOID );

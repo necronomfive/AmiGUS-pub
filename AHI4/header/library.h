@@ -111,14 +111,14 @@ struct BaseLibrary {
 /******************************************************************************
  * Define your library's base type here, will be used in library.c.
  *****************************************************************************/
-#define LIBRARY_TYPE      struct AmiGUSBasePrivate
+#define LIBRARY_TYPE      struct AmiGUSBase
 
 /******************************************************************************
  * Your library's own base structure shall have its own include,
  * maybe together with your library specific functions.
  * Include it here!
  *****************************************************************************/
-#include "amigus_private.h"
+#include "amigus_ahi_sub.h"
 
 /******************************************************************************
  * Now go ahead and implement these functions in your library adapter code!

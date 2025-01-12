@@ -19,7 +19,7 @@
 
 #include "SDI_compiler.h"
 
-#include "amigus_private.h"
+#include "amigus_ahi_sub.h"
 #include "debug.h"
 #include "errors.h"
 #include "support.h"

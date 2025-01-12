@@ -17,8 +17,8 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
+#include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
-#include "amigus_private.h"
 #include "buffers.h"
 #include "debug.h"
 #include "SDI_compiler.h"

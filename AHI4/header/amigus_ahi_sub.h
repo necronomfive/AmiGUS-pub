@@ -41,7 +41,7 @@
 
 #include "copies.h"
 #include "library.h"
-#include "SDI_AHI4_protos.h"
+#include "SDI_ahi_sub.h"
 
 #define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Fassbach"
 #define AMIGUS_AHI_COPYRIGHT        "(c) 2024 Christoph Fassbach / LGPL3"

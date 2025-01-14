@@ -1,0 +1,5 @@
+- Fully split Recording + Playback parts in AHI to allow 1 client each
+- Test 32/24bit recording as AHIST_S32S in AHIRecord
+- Recording overflow handling similar to playback underrun handling
+- Calibration of all audio sources' volumes with each other
+- Mixer UI elements and their responsiveness

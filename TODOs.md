@@ -2,4 +2,5 @@
 - Test 32/24bit recording as AHIST_S32S in AHIRecord
 - Recording overflow handling similar to playback underrun handling
 - Calibration of all audio sources' volumes with each other
+- Calibrate volume AHI Mono vs Stereo
 - Mixer UI elements and their responsiveness

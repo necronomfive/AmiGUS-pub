@@ -166,6 +166,34 @@ ASM( LONG ) RecordingCopy16Sto16S(
   REG( d0, ULONG *bufferBase ),
   REG( a0, ULONG *bufferIndex ));
 
+/**
+ * Reads 3 LONG aka 4 samples in 24Bit Mono from AmiGUS
+ * and prepares it for AHI 32Bit Stereo HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 8 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 32.
+ */
+ASM( LONG ) RecordingCopy24Mto32S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
+/**
+ * Reads 6 LONG aka 8 samples in 24Bit Stereo from AmiGUS
+ * and prepares it for AHI 32Bit Stereo HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 8 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 32.
+ */
+ASM( LONG ) RecordingCopy24Sto32S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
 /* Public interface as announced above */
 
 const CopyFunctionType PlaybackCopyFunctionById[] = {
@@ -180,7 +208,36 @@ const CopyFunctionType RecordingCopyFunctionById[] = {
   &RecordingCopy8Mto16S,
   &RecordingCopy8Sto16S,
   &RecordingCopy16Mto16S,
-  &RecordingCopy16Sto16S
+  &RecordingCopy16Sto16S,
+  &RecordingCopy24Mto32S,
+  &RecordingCopy24Sto32S
+};
+
+const UBYTE RecordingSampleTypeById[] = {
+  AHIST_S16S,
+  AHIST_S16S,
+  AHIST_S16S,
+  AHIST_S16S,
+  AHIST_S32S,
+  AHIST_S32S
+};
+
+const UBYTE RecordingSampleShiftById[] = {
+  2,
+  2,
+  2,
+  2,
+  3,
+  3
+};
+
+const UBYTE RecordingSampleAlignmentById[] = {
+  4,
+  4,
+  4,
+  4,
+  16,
+  16
 };
 
 /* Private definition of the copy functions used for PLAYBACK first. */
@@ -361,4 +418,72 @@ ASM( LONG ) RecordingCopy16Sto16S(
 
   ( *bufferIndex ) += 1;
   return 4;
+}
+
+ASM( LONG ) RecordingCopy24Mto32S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
+
+  // TODO: Replace placeholder after test passing!
+  static UBYTE i = 0;
+  // AmiGUS 16Bit Mono => AHI 32Bit Stereo HiFi
+  ULONG inA = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+  UWORD inB = ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+  ULONG outA = (( inA & 0xffFF0000 )       ) | (( ++i ) << 8 );
+  ULONG outB = (( inA & 0x0000ffFF ) << 16 ) | (( ++i ) << 8 );
+  ULONG outC = (( inB & 0x0000ffFF ) << 16 ) | (( ++i ) << 8 );
+  ULONG addressOut = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+
+  *( ULONG * ) addressOut = outA;
+  addressOut += 4;
+  *( ULONG * ) addressOut = outA;
+  addressOut += 4;
+
+  *( ULONG * ) addressOut = outB;
+  addressOut += 4;
+  *( ULONG * ) addressOut = outB;
+  addressOut += 4;
+
+  *( ULONG * ) addressOut = outC;
+  addressOut += 4;
+  *( ULONG * ) addressOut = outC;
+  
+  ( *bufferIndex ) += 6;
+  return 24;
+}
+
+ASM( LONG ) RecordingCopy24Sto32S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex )) {
+
+  // TODO: Replace placeholder after test passing!
+  static UBYTE i = 0;
+  // AmiGUS 16Bit Stereo => AHI 32Bit Stereo HiFi
+  ULONG inA = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+  ULONG inB = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+  ULONG inC = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+  ULONG outA = (( inA & 0xffFF0000 )       ) | (( ++i ) << 8 );
+  ULONG outB = (( inA & 0x0000ffFF ) << 16 ) | (( ++i ) << 8 );
+  ULONG outC = (( inB & 0xffFF0000 )       ) | (( ++i ) << 8 );
+  ULONG outD = (( inB & 0x0000ffFF ) << 16 ) | (( ++i ) << 8 );
+  ULONG outE = (( inC & 0xffFF0000 )       ) | (( ++i ) << 8 );
+  ULONG outF = (( inC & 0x0000ffFF ) << 16 ) | (( ++i ) << 8 );
+  ULONG addressOut = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
+
+  *( ULONG * ) addressOut = outA;
+  addressOut += 4;
+  *( ULONG * ) addressOut = outB;
+  addressOut += 4;
+
+  *( ULONG * ) addressOut = outC;
+  addressOut += 4;
+  *( ULONG * ) addressOut = outD;
+  addressOut += 4;
+
+  *( ULONG * ) addressOut = outE;
+  addressOut += 4;
+  *( ULONG * ) addressOut = outF;
+  
+  ( *bufferIndex ) += 6;
+  return 24;
 }

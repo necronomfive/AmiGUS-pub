@@ -199,7 +199,8 @@ INLINE VOID HandleRecording( VOID ) {
                 recording->agpr_Buffer[ k ][ 102 ],
                 recording->agpr_Buffer[ k ][ 103 ] ));
 
-      message->ahirm_Type = AHIST_S16S;
+      message->ahirm_Type = // TODO: move to alloc?
+        RecordingSampleTypeById[ recording->agpr_CopyFunctionId ];
       message->ahirm_Buffer = ( APTR ) recording->agpr_Buffer[ k ];
       message->ahirm_Length = recording->agpr_BufferIndex[ k ];
       CallHookPkt( audioCtrl->ahiac_SamplerFunc,

@@ -48,9 +48,29 @@ extern const CopyFunctionType PlaybackCopyFunctionById[ 5 ];
  * ID Size   Size   Input Output   Mode Mode Function
  * 0  32      8      4    16 bytes       8   RecordingCopy8Mto16S
  * 1  32     16      4     8 bytes       8   RecordingCopy8Sto16S
- * 2  32     16      4     8 bytes  16, 24   RecordingCopy16Mto16S
- * 3  32     32      4     4 bytes  16, 24   RecordingCopy16Sto16S
+ * 2  32     16      4     8 bytes      16   RecordingCopy16Mto16S
+ * 3  32     32      4     4 bytes      16   RecordingCopy16Sto16S
+ * 4  64     24      12   16 bytes      24   RecordingCopy24Mto32S
+ * 5  64     48      12   16 bytes      24   RecordingCopy24Sto32S
  */
-extern const CopyFunctionType RecordingCopyFunctionById[ 4 ];
+extern const CopyFunctionType RecordingCopyFunctionById[ 6 ];
+
+/**
+ * Defines the AHI sample type to return for recording.
+ */
+extern const UBYTE RecordingSampleTypeById[ 6 ];
+
+/**
+ * Defines how far to shift left to translate 1 AHI sample to bytes.
+ */
+extern const UBYTE RecordingSampleShiftById[ 6 ];
+
+/**
+ * Defines how the recording buffer must be aligned,
+ * i.e. what multiple of bytes it need to hold to be
+ * nicely filled with hardware samples from AmiGUS.
+ */
+extern const UBYTE RecordingSampleAlignmentById[ 6 ];
+
 
 #endif /* COPIES_H */

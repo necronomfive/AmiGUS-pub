@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "amigus_private.h"
+#include "amigus_ahi_sub.h"
+#include "amigus_hardware.h"
 #include "buffers.h"
 
 #if defined (__VBCC__)
@@ -13,7 +14,7 @@
 /******************************************************************************
  * Mocked functions and stubbed external symbols below:
  *****************************************************************************/
-struct AmiGUSBasePrivate * AmiGUSBase;
+struct AmiGUSBase * AmiGUSBase;
 
 /* Taken over from lib_amigus.c */
 /*
@@ -290,8 +291,8 @@ int main(int argc, char const *argv[]) {
 
   BOOL failed = FALSE;
 
-  AmiGUSBase = malloc( sizeof( struct AmiGUSBasePrivate ) );
-  memset( AmiGUSBase, 0, sizeof( struct AmiGUSBasePrivate ) );
+  AmiGUSBase = malloc( sizeof( struct AmiGUSBase ) );
+  memset( AmiGUSBase, 0, sizeof( struct AmiGUSBase ) );
 
   if ( !AmiGUSBase ) {
 

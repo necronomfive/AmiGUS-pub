@@ -50,6 +50,8 @@ AHI_AmiGUS_RecordingCopy8Mto16S     EQU     0
 AHI_AmiGUS_RecordingCopy8Sto16S     EQU     1
 AHI_AmiGUS_RecordingCopy16Mto16S    EQU     2
 AHI_AmiGUS_RecordingCopy16Sto16S    EQU     3
+AHI_AmiGUS_RecordingCopy24Mto32S    EQU     4
+AHI_AmiGUS_RecordingCopy24Sto32S    EQU     5
 
     MACRO LONGVAL
         dc.l \1
@@ -528,7 +530,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Record, TRUE
     TAGVAL AHIDB_AmiGUS_PlayCopyFunction, AHI_AmiGUS_PlaybackCopy32to24
     TAGVAL AHIDB_AmiGUS_PlayHwFormatId, AMIGUS_PCM_S_PLAY_MONO_24BIT
-    TAGVAL AHIDB_AmiGUS_RecCopyFunction, AHI_AmiGUS_RecordingCopy16Mto16S
+    TAGVAL AHIDB_AmiGUS_RecCopyFunction, AHI_AmiGUS_RecordingCopy24Mto32S
     TAGVAL AHIDB_AmiGUS_RecHwFormatId, AMIGUS_PCM_S_REC_MONO_16BIT
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
@@ -551,7 +553,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Record, TRUE
     TAGVAL AHIDB_AmiGUS_PlayCopyFunction, AHI_AmiGUS_PlaybackCopy32to24
     TAGVAL AHIDB_AmiGUS_PlayHwFormatId, AMIGUS_PCM_S_PLAY_STEREO_24BIT
-    TAGVAL AHIDB_AmiGUS_RecCopyFunction, AHI_AmiGUS_RecordingCopy16Sto16S
+    TAGVAL AHIDB_AmiGUS_RecCopyFunction, AHI_AmiGUS_RecordingCopy24Sto32S
     TAGVAL AHIDB_AmiGUS_RecHwFormatId, AMIGUS_PCM_S_REC_STEREO_16BIT
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE
@@ -574,7 +576,7 @@ BEGINTAG$:
     TAGVAL AHIDB_Record, TRUE
     TAGVAL AHIDB_AmiGUS_PlayCopyFunction, AHI_AmiGUS_PlaybackCopy32to24
     TAGVAL AHIDB_AmiGUS_PlayHwFormatId, AMIGUS_PCM_S_PLAY_STEREO_24BIT
-    TAGVAL AHIDB_AmiGUS_RecCopyFunction, AHI_AmiGUS_RecordingCopy16Sto16S
+    TAGVAL AHIDB_AmiGUS_RecCopyFunction, AHI_AmiGUS_RecordingCopy24Sto32S
     TAGVAL AHIDB_AmiGUS_RecHwFormatId, AMIGUS_PCM_S_REC_STEREO_16BIT
     TAGVAL AHIDB_Name, MODENAME$-BEGINTAG$
     LONGVAL TAG_DONE

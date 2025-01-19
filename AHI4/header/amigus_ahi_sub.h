@@ -138,8 +138,7 @@ struct AmiGUSBase {
   UWORD                         agb_HwSampleRateId; /* HW sample rate ID    */
   UWORD                         agb_Reserved0; 
 
-  UBYTE                         agb_AhiSampleSize; /* BYTE size of 1 sample */
-  UBYTE                         agb_AhiSampleShift; /* Sample <> Byte shift */
+  UWORD                         agb_AhiSampleShift; /* Sample <> Byte shift */
   UBYTE                         agb_CanRecord;      /* Can record? Yes / No  */
   UBYTE                         agb_StateFlags;     /* AmiGUS state as below */
 

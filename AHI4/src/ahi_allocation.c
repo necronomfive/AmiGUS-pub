@@ -199,7 +199,6 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     return AHISF_ERROR;
   }
 
-  AmiGUSBase->agb_AhiSampleSize = ahiSampleSizeBytes;
   AmiGUSBase->agb_AhiSampleShift = ahiSampleBytesShift;
   AmiGUSBase->agb_HwSampleRateId = sampleRateId;
   AmiGUSBase->agb_CanRecord = canRecord;

@@ -114,8 +114,7 @@ ULONG getRecordingBufferSize( LONG sampleRate ) {
 
   struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
   const LONG recordingDivisor = 4; /* 4 buffers per second */
-  const UBYTE shift =
-    RecordingSampleShiftById[ recording->agpr_CopyFunctionId ];
+  const UBYTE shift = recording->agpr_AhiSampleShift;
   const UBYTE sampleSize = ( 1 << shift );
   const UBYTE multipleOf =
     RecordingSampleAlignmentById[ recording->agpr_CopyFunctionId ];

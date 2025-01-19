@@ -61,11 +61,6 @@ extern const CopyFunctionType RecordingCopyFunctionById[ 6 ];
 extern const UBYTE RecordingSampleTypeById[ 6 ];
 
 /**
- * Defines how far to shift left to translate 1 AHI sample to bytes.
- */
-extern const UBYTE RecordingSampleShiftById[ 6 ];
-
-/**
  * Defines how the recording buffer must be aligned,
  * i.e. what multiple of bytes it need to hold to be
  * nicely filled with hardware samples from AmiGUS.

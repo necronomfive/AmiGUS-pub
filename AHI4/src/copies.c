@@ -222,15 +222,6 @@ const UBYTE RecordingSampleTypeById[] = {
   AHIST_S32S
 };
 
-const UBYTE RecordingSampleShiftById[] = {
-  2,
-  2,
-  2,
-  2,
-  3,
-  3
-};
-
 const UBYTE RecordingSampleAlignmentById[] = {
   4,
   4,

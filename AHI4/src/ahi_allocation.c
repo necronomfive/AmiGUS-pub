@@ -33,9 +33,9 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
 ) {
   struct TagItem *stateTag = 0;
-  struct TagItem *tag = 0;
-  ULONG sampleRateId = 0;
-  ULONG sampleRate = 0;
+  struct TagItem *tag;
+  ULONG sampleRateId;
+  ULONG sampleRate;
   WORD playHwSampleFormatId = -1;
   WORD recHwSampleFormatId = -1;
   BYTE playbackCopyFunctionId = -1;
@@ -45,10 +45,8 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   UBYTE isRealtime = FALSE;
   UBYTE canRecord = FALSE;
   UBYTE bitsPerAmiGusSample = 0;
-  UWORD ahiSampleSizeBytes = 2;
-  UWORD ahiSampleBytesShift = 1;
-  BYTE ahiPlaybackSampleBytesShift = -1;
-  BYTE ahiRecordingSampleBytesShift = -1;
+  BYTE playSampleBytesShift = -1;
+  BYTE recSampleBytesShift = -1;
 
   /* 
    * Will rely on AHI provided mixing and timing,
@@ -108,8 +106,6 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         if ( isStereo ) {
 
           result |= AHISF_KNOWSTEREO;
-          ahiSampleSizeBytes <<= 1;
-          ahiSampleBytesShift += 1;
         }
         break;
       }
@@ -118,8 +114,6 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         if ( isHifi ) {
 
           result |= AHISF_KNOWHIFI;
-          ahiSampleSizeBytes <<= 1;
-          ahiSampleBytesShift += 1;
         }
         break;
       }
@@ -136,7 +130,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         break;
       }
       case AHIDB_AmiGUS_PlaySampleShift: {
-        ahiPlaybackSampleBytesShift = ( BYTE )tag->ti_Data;
+        playSampleBytesShift = ( BYTE )tag->ti_Data;
         break;
       }
       case AHIDB_AmiGUS_RecCopyFunction: {
@@ -148,7 +142,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         break;
       }
       case AHIDB_AmiGUS_RecSampleShift: {
-        ahiRecordingSampleBytesShift = ( BYTE )tag->ti_Data;
+        recSampleBytesShift = ( BYTE )tag->ti_Data;
         break;
       }
       case AHIDB_Record: {
@@ -182,10 +176,9 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   LOG_I(( "I: AHI playback sample size %ld BYTEs, "
           "conversion AHI samples<->BYTEs by %ld shifts, "
           "AmiGUS sample size %ld BYTEs\n",
-          ahiSampleSizeBytes,
-          ahiSampleBytesShift,
+          ( 1 << playSampleBytesShift ),
+          playSampleBytesShift,
           AmiGUSPlaybackSampleSizes[ playHwSampleFormatId  ] ));
-  // TODO: make sure the below works correctly!
   LOG_I(( "I: AmiGUS recording mode is format 0x%lx, %ldbit, %ld stereo, "
           "%ld HiFi, %ld Realtime, %ldHz, %ld Recording\n",
           recHwSampleFormatId,
@@ -194,9 +187,9 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   LOG_I(( "I: AHI recording sample size %ld BYTEs, "
           "conversion AHI samples<->BYTEs by %ld shifts, "
           "AmiGUS sample size %ld BYTEs\n",
-          ahiSampleSizeBytes, // TODO: wrong for recording!
-          ahiSampleBytesShift,
-          AmiGUSPlaybackSampleSizes[ recHwSampleFormatId  ] )); // TODO: also wrong!!
+          ( 1 << recSampleBytesShift ),
+          recSampleBytesShift,
+          AmiGUSPlaybackSampleSizes[ recHwSampleFormatId  ] )); // TODO: wrong - IDs misaligned!!
 
   if (( 0 > playHwSampleFormatId ) || ( 0 > recHwSampleFormatId )) {
 
@@ -208,10 +201,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     DisplayError( ECopyFunctionMissingFromMode );
     return AHISF_ERROR;
   }
-  if (( 0 > ahiPlaybackSampleBytesShift ) || ( 0 > ahiRecordingSampleBytesShift ) 
-  || (ahiPlaybackSampleBytesShift != ahiSampleBytesShift ) 
-  || (ahiRecordingSampleBytesShift != RecordingSampleShiftById[recordingCopyFunctionId])
-  ) {
+  if (( 0 > playSampleBytesShift ) || ( 0 > recSampleBytesShift )) {
 
     DisplayError( EShiftMissingFromMode );
     return AHISF_ERROR;
@@ -221,18 +211,20 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   AmiGUSBase->agb_CanRecord = canRecord;
 
   AmiGUSBase->agb_Playback.agpp_HwSampleFormatId = playHwSampleFormatId;
-  AmiGUSBase->agb_Playback.agpp_AhiSampleShift = ahiPlaybackSampleBytesShift;
+  AmiGUSBase->agb_Playback.agpp_AhiSampleShift = playSampleBytesShift;
   AmiGUSBase->agb_Playback.agpp_CopyFunctionId =
     playbackCopyFunctionId;
   AmiGUSBase->agb_Playback.agpp_CopyFunction =
     PlaybackCopyFunctionById[ playbackCopyFunctionId ];
 
   AmiGUSBase->agb_Recording.agpr_HwSampleFormatId = recHwSampleFormatId;
-  AmiGUSBase->agb_Recording.agpr_AhiSampleShift = ahiRecordingSampleBytesShift;
+  AmiGUSBase->agb_Recording.agpr_AhiSampleShift = recSampleBytesShift;
   AmiGUSBase->agb_Recording.agpr_CopyFunctionId =
     recordingCopyFunctionId;
   AmiGUSBase->agb_Recording.agpr_CopyFunction =
     RecordingCopyFunctionById[ recordingCopyFunctionId ];
+  AmiGUSBase->agb_Recording.agpr_RecordingMessage.ahirm_Type =
+        RecordingSampleTypeById[ recordingCopyFunctionId ];
 
   /*
    * ------------------------------------------------------

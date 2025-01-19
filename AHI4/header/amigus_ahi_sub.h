@@ -80,7 +80,7 @@ struct AmiGUSPcmPlayback {
 
   ULONG                         agpp_Watermark;      /* Counting in WORDs!   */
 
-  UWORD                         agpp_HwSampleFormatId; /* Sample format ID */
+  UWORD                         agpp_HwSampleFormatId;   /* Sample format ID */
 };
 
 struct AmiGUSPcmRecording {
@@ -96,7 +96,7 @@ struct AmiGUSPcmRecording {
 
   struct AHIRecordMessage       agpr_RecordingMessage;
 
-  UWORD                         agpr_HwSampleFormatId; /* Sample format ID */
+  UWORD                         agpr_HwSampleFormatId;   /* Sample format ID */
   UBYTE                         agpr_AhiSampleSize; /* BYTE size of 1 sample */
   UBYTE                         agpr_AhiSampleShift; /* Sample <> Byte shift */
 

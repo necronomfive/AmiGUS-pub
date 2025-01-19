@@ -42,6 +42,23 @@ const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
   96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0008
 };
 
+UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
+
+  printf("ReadReg16-mock not implemented!\n");
+  return 0;
+}
+
+ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
+
+  printf("ReadReg32-mock not implemented!\n");
+  return 0;
+}
+
+VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
+
+  printf("WriteReg32-mock not implemented!\n");
+}
+
 /******************************************************************************
  * Private functions / fields under test:
  *****************************************************************************/

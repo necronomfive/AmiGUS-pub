@@ -55,10 +55,12 @@
                                     + (   22 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
-#define AHIDB_AmiGUS_PlayCopyFunction   ( AHIDB_UserBase + 0 )
-#define AHIDB_AmiGUS_PlayHwSampleId     ( AHIDB_UserBase + 1 )
-#define AHIDB_AmiGUS_RecCopyFunction    ( AHIDB_UserBase + 2 )
-#define AHIDB_AmiGUS_RecHwSampleId      ( AHIDB_UserBase + 3 )
+#define AHIDB_AmiGUS_PlayCopyFunction   ( AHIDB_UserBase +  0 )
+#define AHIDB_AmiGUS_PlayHwSampleId     ( AHIDB_UserBase +  1 )
+#define AHIDB_AmiGUS_PlaySampleShift    ( AHIDB_UserBase +  2 )
+#define AHIDB_AmiGUS_RecCopyFunction    ( AHIDB_UserBase +  8 )
+#define AHIDB_AmiGUS_RecHwSampleId      ( AHIDB_UserBase +  9 )
+#define AHIDB_AmiGUS_RecSampleShift     ( AHIDB_UserBase + 10 )
 
 #define AMIGUS_MEM_LOG_MARKER        "********************************"   \
                                      " AmiGUS "                           \
@@ -137,7 +139,7 @@ struct AmiGUSBase {
 
   /* Driver settings */
   UWORD                         agb_HwSampleRateId; /* HW sample rate ID    */
-  UWORD                         agb_Reserved0; 
+  // UWORD                         agb_Reserved0; 
 
   UBYTE                         agb_CanRecord;      /* Can record? Yes / No  */
   UBYTE                         agb_StateFlags;     /* AmiGUS state as below */

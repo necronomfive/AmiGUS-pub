@@ -64,6 +64,7 @@ enum TErrorCodes
   ERecordingNotImplemented,
   ESampleFormatMissingFromMode,
   ECopyFunctionMissingFromMode,
+  EShiftMissingFromMode,
   /* Hardware errors 200-300 */
   EAmiGUSNotFound = 200,
   EAmiGUSDetectError,

@@ -47,6 +47,8 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   UBYTE bitsPerAmiGusSample = 0;
   UWORD ahiSampleSizeBytes = 2;
   UWORD ahiSampleBytesShift = 1;
+  BYTE ahiPlaybackSampleBytesShift = -1;
+  BYTE ahiRecordingSampleBytesShift = -1;
 
   /* 
    * Will rely on AHI provided mixing and timing,
@@ -112,7 +114,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         break;
       }
       case AHIDB_HiFi: {
-        isHifi = (UBYTE)tag->ti_Data;
+        isHifi = ( UBYTE )tag->ti_Data;
         if ( isHifi ) {
 
           result |= AHISF_KNOWHIFI;
@@ -122,23 +124,31 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         break;
       }
       case AHIDB_Realtime: {
-        isRealtime = (UBYTE)tag->ti_Data;
+        isRealtime = ( UBYTE )tag->ti_Data;
         break;
       }
       case AHIDB_AmiGUS_PlayCopyFunction: {
-        playbackCopyFunctionId = (BYTE)tag->ti_Data;
+        playbackCopyFunctionId = ( BYTE )tag->ti_Data;
         break;
       }
       case AHIDB_AmiGUS_PlayHwSampleId: {
         playHwSampleFormatId = ( WORD )tag->ti_Data;
         break;
       }
+      case AHIDB_AmiGUS_PlaySampleShift: {
+        ahiPlaybackSampleBytesShift = ( BYTE )tag->ti_Data;
+        break;
+      }
       case AHIDB_AmiGUS_RecCopyFunction: {
-        recordingCopyFunctionId = (BYTE)tag->ti_Data;
+        recordingCopyFunctionId = ( BYTE )tag->ti_Data;
         break;
       }
       case AHIDB_AmiGUS_RecHwSampleId: {
         recHwSampleFormatId = ( WORD )tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_RecSampleShift: {
+        ahiRecordingSampleBytesShift = ( BYTE )tag->ti_Data;
         break;
       }
       case AHIDB_Record: {
@@ -198,18 +208,27 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     DisplayError( ECopyFunctionMissingFromMode );
     return AHISF_ERROR;
   }
+  if (( 0 > ahiPlaybackSampleBytesShift ) || ( 0 > ahiRecordingSampleBytesShift ) 
+  || (ahiPlaybackSampleBytesShift != ahiSampleBytesShift ) 
+  || (ahiRecordingSampleBytesShift != RecordingSampleShiftById[recordingCopyFunctionId])
+  ) {
+
+    DisplayError( EShiftMissingFromMode );
+    return AHISF_ERROR;
+  }
 
   AmiGUSBase->agb_HwSampleRateId = sampleRateId;
   AmiGUSBase->agb_CanRecord = canRecord;
 
   AmiGUSBase->agb_Playback.agpp_HwSampleFormatId = playHwSampleFormatId;
-  AmiGUSBase->agb_Playback.agpp_AhiSampleShift = ahiSampleBytesShift;
+  AmiGUSBase->agb_Playback.agpp_AhiSampleShift = ahiPlaybackSampleBytesShift;
   AmiGUSBase->agb_Playback.agpp_CopyFunctionId =
     playbackCopyFunctionId;
   AmiGUSBase->agb_Playback.agpp_CopyFunction =
     PlaybackCopyFunctionById[ playbackCopyFunctionId ];
 
   AmiGUSBase->agb_Recording.agpr_HwSampleFormatId = recHwSampleFormatId;
+  AmiGUSBase->agb_Recording.agpr_AhiSampleShift = ahiRecordingSampleBytesShift;
   AmiGUSBase->agb_Recording.agpr_CopyFunctionId =
     recordingCopyFunctionId;
   AmiGUSBase->agb_Recording.agpr_CopyFunction =

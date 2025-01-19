@@ -81,6 +81,8 @@ struct AmiGUSPcmPlayback {
   ULONG                         agpp_Watermark;      /* Counting in WORDs!   */
 
   UWORD                         agpp_HwSampleFormatId;   /* Sample format ID */
+  UBYTE                         agpp_AhiSampleShift; /* Sample <> Byte shift */
+  UBYTE                         agpp_Reserved0;      /* for alignment        */
 };
 
 struct AmiGUSPcmRecording {
@@ -97,11 +99,10 @@ struct AmiGUSPcmRecording {
   struct AHIRecordMessage       agpr_RecordingMessage;
 
   UWORD                         agpr_HwSampleFormatId;   /* Sample format ID */
-  UBYTE                         agpr_AhiSampleSize; /* BYTE size of 1 sample */
   UBYTE                         agpr_AhiSampleShift; /* Sample <> Byte shift */
 
-  UWORD                         agpr_HwSourceId;          /* Input source ID */
-  UWORD                         agpr_Reserved0;      /* for alignment        */
+  UBYTE                         agpr_HwSourceId;          /* Input source ID */
+  //UWORD                         agpr_Reserved0;      /* for alignment        */
 };
 
 /******************************************************************************
@@ -138,7 +139,6 @@ struct AmiGUSBase {
   UWORD                         agb_HwSampleRateId; /* HW sample rate ID    */
   UWORD                         agb_Reserved0; 
 
-  UWORD                         agb_AhiSampleShift; /* Sample <> Byte shift */
   UBYTE                         agb_CanRecord;      /* Can record? Yes / No  */
   UBYTE                         agb_StateFlags;     /* AmiGUS state as below */
 

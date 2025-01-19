@@ -176,8 +176,7 @@ ASM(VOID) SAVEDS AHIsub_Update(
   if ( AHISF_PLAY & aFlags ) {
 
     struct AmiGUSPcmPlayback *playback = &AmiGUSBase->agb_Playback;
-    UBYTE sampleToByte = 
-      AmiGUSBase->agb_AhiSampleShift;
+    UBYTE sampleToByte = playback->agpp_AhiSampleShift;
     UWORD hwSampleSize = 
       AmiGUSPlaybackSampleSizes[ playback->agpp_HwSampleFormatId ];
     ULONG alignedSamples = 

@@ -282,7 +282,7 @@ ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples ) {
 
   const ULONG index = AmiGUSBase->agb_Playback.agpp_CopyFunctionId;
   const ULONG mask = CopyFunctionRequirementById[ index ];
-  const UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
+  const UBYTE shift = AmiGUSBase->agb_Playback.agpp_AhiSampleShift;
   ULONG aligned = ahiBufferSamples;
 
   aligned <<= shift;    /* now: in BYTEs! */

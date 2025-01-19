@@ -2,6 +2,7 @@ Next:
 - Fully split Recording + Playback parts in AHI to allow 1 client each
 - Recording overflow handling similar to playback underrun handling
 - Real 24bit recording
+- Left/right swapped in stereo 8bit vs 16bit + 24bit 
 - Calibration of all audio sources' volumes with each other
 - Calibrate volume AHI Mono vs Stereo
 - Mixer UI elements and their responsiveness

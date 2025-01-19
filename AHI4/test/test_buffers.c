@@ -208,7 +208,7 @@ BOOL testGetBufferSizes( VOID ) {
 ULONG alignBufferSamplesRef( ULONG ahiBuffSamples ) {
 
   ULONG mask = CopyFunctionRequirementById[ AmiGUSBase->agb_Playback.agpp_CopyFunctionId ];
-  UBYTE shift = AmiGUSBase->agb_AhiSampleShift;
+  UBYTE shift = AmiGUSBase->agb_Playback.agpp_AhiSampleShift;
   ULONG aligned = ahiBuffSamples;
 
   aligned <<= shift;
@@ -264,10 +264,10 @@ BOOL testAlignBuffSamples( VOID ) {
 
         suggestedBufferSize = sampleRates[ i ] / 100;
         AmiGUSBase->agb_Playback.agpp_CopyFunctionId = copyFunctionId;
-        AmiGUSBase->agb_AhiSampleShift = shift;
+        AmiGUSBase->agb_Playback.agpp_AhiSampleShift = shift;
 
         alignedBufferSize = AlignByteSizeForSamples( suggestedBufferSize )
-                            >> AmiGUSBase->agb_AhiSampleShift;
+                            >> AmiGUSBase->agb_Playback.agpp_AhiSampleShift;
         ref = alignBufferSamplesRef( suggestedBufferSize );
 
         exp0 = ( alignedBufferSize <= suggestedBufferSize );

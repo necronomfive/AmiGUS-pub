@@ -203,6 +203,9 @@ INLINE VOID HandleRecording( VOID ) {
         RecordingSampleTypeById[ recording->agpr_CopyFunctionId ];
       message->ahirm_Buffer = ( APTR ) recording->agpr_Buffer[ k ];
       message->ahirm_Length = recording->agpr_BufferIndex[ k ];
+      message->ahirm_Length <<= 2; // LONGs to BYTEs
+      message->ahirm_Length >>= // BYTEs to samples
+        RecordingSampleShiftById[ recording->agpr_CopyFunctionId ];
 
       LOG_INT(( "WORKER: Using CopyFuncId  %ld sending sample type %ld\n", 
                 recording->agpr_CopyFunctionId,

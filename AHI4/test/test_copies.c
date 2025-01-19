@@ -60,7 +60,7 @@ UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
 
   ULONG result = testLongFIFO[ nextTestFIFO ];
   ++nextTestFIFO;
-  return ( UWORD )( result >> 16 );
+  return ( UWORD )( result & 0xffFF );
 }
 
 ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
@@ -718,7 +718,7 @@ BOOL testRecordingCopy24Mto32S( VOID ) {
   /**** for recording copy function tests, just adapt the between section ****/
   ULONG in[] = {
     0x12345678,
-    0x9abcdef0 };
+    0x00009abc }; // ReadReg16 just returns lower WORD!
   ULONG target[] = {
     0x00000000,
     0x00000000,

@@ -459,14 +459,9 @@ ASM( LONG ) RecordingCopy24Sto32S(
   // TODO: Replace placeholder after test passing!
   static UBYTE i = 0;
   // AmiGUS 16Bit Stereo => AHI 32Bit Stereo HiFi
-  /*
   ULONG inA = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
   ULONG inB = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
   ULONG inC = ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
-  */
-  ULONG inA = 0x12345678;
-  ULONG inB = 0x9abcdef0;
-  ULONG inC = 0xfedcba98;
   ULONG outA = (( inA & 0xffFF0000 )       ) | (( ++i ) << 8 );
   ULONG outB = (( inA & 0x0000ffFF ) << 16 ) | (( ++i ) << 8 );
   ULONG outC = (( inB & 0xffFF0000 )       ) | (( ++i ) << 8 );
@@ -474,9 +469,7 @@ ASM( LONG ) RecordingCopy24Sto32S(
   ULONG outE = (( inC & 0xffFF0000 )       ) | (( ++i ) << 8 );
   ULONG outF = (( inC & 0x0000ffFF ) << 16 ) | (( ++i ) << 8 );
   ULONG addressOut = ((( ULONG ) bufferBase ) + ( ( *bufferIndex ) << 2 ));
-ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
-ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
-ReadReg32( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_READ );
+
   *( ULONG * ) addressOut = outA;
   addressOut += 4;
   *( ULONG * ) addressOut = outB;

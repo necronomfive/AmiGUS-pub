@@ -1,5 +1,4 @@
 Next:
-- Get AHI4/Developer/examples/Low-level/HardDiskRecord compiling and try fixing AHIST_S32S recording in it
 - Test DigiBooster panning as per https://www.a1k.org/forum/index.php?threads/90990/post-1826163
 - Fully split Recording + Playback parts in AHI to allow 1 client each
 - Recording overflow handling similar to playback underrun handling
@@ -11,4 +10,4 @@ Next:
 - Make CAMD on https://aminet.net/package/mus/midi/camd / https://aminet.net/package/mus/play/projectomega / https://aminet.net/package/driver/other/uaemidi / https://aminet.net/package/mus/midi/camd40 / https://aminet.net/package/driver/other/mmp
 
 Done:
-- Test 32/24bit recording as AHIST_S32S in AHIRecord -> Failed
+- Test 32/24bit recording as AHIST_S32S in AHIRecord -> Working

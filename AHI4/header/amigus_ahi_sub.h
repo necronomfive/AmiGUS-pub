@@ -14,8 +14,8 @@
  * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AMIGUS_AHI_H
-#define AMIGUS_AHI_H
+#ifndef AMIGUS_AHI_SUB_H
+#define AMIGUS_AHI_SUB_H
 
 /* 
 * AHI driver library header.
@@ -104,7 +104,6 @@ struct AmiGUSPcmRecording {
   UBYTE                         agpr_AhiSampleShift; /* Sample <> Byte shift */
 
   UBYTE                         agpr_HwSourceId;          /* Input source ID */
-  //UWORD                         agpr_Reserved0;      /* for alignment        */
 };
 
 /******************************************************************************
@@ -138,8 +137,7 @@ struct AmiGUSBase {
   BYTE                          agb_UsageCounter;    
 
   /* Driver settings */
-  UWORD                         agb_HwSampleRateId; /* HW sample rate ID    */
-  // UWORD                         agb_Reserved0; 
+  UWORD                         agb_HwSampleRateId;  /* HW sample rate ID    */
 
   UBYTE                         agb_CanRecord;      /* Can record? Yes / No  */
   UBYTE                         agb_StateFlags;     /* AmiGUS state as below */
@@ -190,4 +188,4 @@ struct AmiGUSBase {
 #define AMIGUS_AHI_F_REC_MASK            0xF0
 #define AMIGUS_AHI_F_REC_STOP_MASK       0x0F
 
-#endif /* AMIGUS_AHI_H */
+#endif /* AMIGUS_AHI_SUB_H */

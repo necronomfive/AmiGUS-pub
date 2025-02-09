@@ -85,6 +85,12 @@ ASM(ULONG) SAVEDS AHIsub_Start(
 ) {
   LOG_D(("D: AHIsub_Start start\n"));
 
+  if ( aAudioCtrl->ahiac_DriverData != AmiGUSBase->agb_CardBase ) {
+
+    LOG_W(( "W: Cannot start anything on a card not alloc'ed!\n" ));
+    return AHIE_UNKNOWN;
+  }
+
   AHIsub_Update( aFlags, aAudioCtrl );
 
   if ( AHISF_PLAY & aFlags ) {
@@ -149,6 +155,13 @@ ASM(VOID) SAVEDS AHIsub_Update(
   const struct AHIAudioCtrlDrv *oldAudioCtrl = AmiGUSBase->agb_AudioCtrl;
 
   LOG_D(( "D: AHIsub_Update start\n" ));
+
+  if ( newAudioCtrl->ahiac_DriverData != AmiGUSBase->agb_CardBase ) {
+
+    LOG_W(( "W: Cannot update anything on a card not alloc'ed!\n" ));
+    return;
+  }
+
   if ( oldAudioCtrl ) {
 
     LOG_V(( "V: Old ctrl 0x%08lx - "
@@ -212,6 +225,12 @@ ASM(VOID) SAVEDS AHIsub_Stop(
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {
   LOG_D(( "D: AHIsub_Stop start\n" ));
+
+  if ( aAudioCtrl->ahiac_DriverData != AmiGUSBase->agb_CardBase ) {
+
+    LOG_W(( "W: Cannot stop anything on a card not alloc'ed!\n" ));
+    return;
+  }
 
   if ( AHISF_PLAY & aFlags ) {
 

@@ -76,6 +76,8 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
     ++AmiGUSBase->agb_UsageCounter;
     Enable();
   }
+  // Magic: AudioControl of client "owns" this card :)
+  aAudioCtrl->ahiac_DriverData = AmiGUSBase->agb_CardBase;
   LOG_D(("D: Alloc`ed AmiGUS AHI hardware\n"));
 
   /*
@@ -247,10 +249,16 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   return result;
 }
 
-ASM(void) SAVEDS AHIsub_FreeAudio(
+ASM( VOID ) SAVEDS AHIsub_FreeAudio(
   REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
 ) {
   LOG_D(("D: AHIsub_FreeAudio start\n"));
+
+  if ( aAudioCtrl->ahiac_DriverData != AmiGUSBase->agb_CardBase ) {
+
+    LOG_W(( "W: Cannot free a card not alloc'ed!\n" ));
+    return;
+  }
 
   /*
    * ------------------------------------------------------
@@ -280,6 +288,7 @@ ASM(void) SAVEDS AHIsub_FreeAudio(
     --AmiGUSBase->agb_UsageCounter;
     Enable();
   }
+  aAudioCtrl->ahiac_DriverData = NULL;
   LOG_D(("D: Free`ed AmiGUS AHI hardware\n"));
 
   LOG_D(("D: AHIsub_FreeAudio done\n"));

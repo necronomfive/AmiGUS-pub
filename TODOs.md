@@ -1,5 +1,4 @@
 Next:
-- Deactivate AHI recording SRC!
 - Move to mode file: RecordingSampleTypeById, RecordingSampleAlignmentById, AmiGUSPlaybackSampleSizes
 - Recording overflow handling similar to playback underrun handling
 - Real 24bit recording
@@ -15,3 +14,4 @@ Next:
 Done:
 - Test 32/24bit recording as AHIST_S32S in AHIRecord -> Working
 - Test DigiBooster panning as per https://www.a1k.org/forum/index.php?threads/90990/post-1826163 -> Working
+- Deactivate AHI recording SRC!

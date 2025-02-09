@@ -126,7 +126,7 @@
 #define AMIGUS_PCM_REC_FIFO_LONGS        1024
 
 #define AMIGUS_OUTPUTS_COUNT             1
-#define AMIGUS_INPUTS_COUNT              5
+#define AMIGUS_INPUTS_COUNT              4
 
 /******************************************************************************
  * Low-Level hardware access functions

@@ -1,4 +1,6 @@
 Next:
+- Prevent crashes when 2 AHI clients try allocating single AmiGUS
+- Try snap upward 96kHz Mode
 - Move to mode file: RecordingSampleTypeById, RecordingSampleAlignmentById, AmiGUSPlaybackSampleSizes
 - Recording overflow handling similar to playback underrun handling
 - Real 24bit recording

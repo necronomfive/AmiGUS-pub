@@ -35,14 +35,14 @@ LONG FindSampleRateIdForValue( LONG sampleRate ) {
       next = -next;
     }
 
-    LOG_D(("D: Frequency diff was %ld, next %ld\n", prev, next));
+    LOG_V(("D: Frequency diff was %ld, next %ld\n", prev, next));
     if ( prev < next ) {
       /* Since frequencies are ordered, stop when difference is increasing. */
       break;
     }
     ++i;
   }
-  LOG_I(("I: Using %ldHz aka ID %ld = 0x%02lx for requested %ldHz\n", 
+  LOG_D(("I: Using %ldHz aka ID %ld = 0x%02lx for requested %ldHz\n",
          AmiGUSSampleRates[ i - 1 ],
          i - 1,
          i - 1,
@@ -58,6 +58,6 @@ LONG FindSampleRateValueForId( LONG id ) {
 
     result = AmiGUSSampleRates[ id ];
   }
-  LOG_D(("D: Using %ldHz for ID %ld = 0x%02lx\n", result, id, id));
+  LOG_V(("D: Using %ldHz for ID %ld = 0x%02lx\n", result, id, id));
   return result;
 }

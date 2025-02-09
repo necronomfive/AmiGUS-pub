@@ -58,7 +58,7 @@ VOID RawPutChar(BYTE putCh);
 #if defined (USE_SERIAL_LOGGING)
 
 // LOG_INT(X) would deadlock
-#define LOG_V(X) debug_kprintf X
+// #define LOG_V(X) debug_kprintf X
 #define LOG_D(X) debug_kprintf X
 #define LOG_I(X) debug_kprintf X
 #define LOG_W(X) debug_kprintf X

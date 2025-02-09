@@ -86,7 +86,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   /* Find nearest supported frequency and provide it back */
   sampleRateId = FindSampleRateIdForValue( aAudioCtrl->ahiac_MixFreq );
   sampleRate = FindSampleRateValueForId( sampleRateId );
-  LOG_V(("D: Using %ldHz = 0x%02lx for requested %ldHz\n",
+  LOG_I(("D: Using %ldHz = 0x%02lx for requested %ldHz\n",
          sampleRate,
          sampleRateId,
          aAudioCtrl->ahiac_MixFreq));

@@ -25,12 +25,12 @@
 LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase ) {
 
   struct ConfigDev *configDevice = 0;
-  ULONG serial = 0;
-  UBYTE minute = 0;
-  UBYTE hour   = 0;
-  UBYTE day    = 0;
-  UBYTE month  = 0;
-  UWORD year   = 0;
+  ULONG serial;
+  UBYTE minute;
+  UBYTE hour;
+  UBYTE day;
+  UBYTE month;
+  UWORD year;
 
   configDevice = FindConfigDev( configDevice,
                                 AMIGUS_MANUFACTURER_ID,

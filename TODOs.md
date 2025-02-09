@@ -1,7 +1,7 @@
 Next:
+- Recording overflow handling similar to playback underrun handling
 - Try snap upward 96kHz Mode
 - Move to mode file: RecordingSampleTypeById, RecordingSampleAlignmentById, AmiGUSPlaybackSampleSizes
-- Recording overflow handling similar to playback underrun handling
 - Real 24bit recording
 - Left/right swapped in stereo 8bit vs 16bit + 24bit 
 - Calibration of all audio sources' volumes with each other

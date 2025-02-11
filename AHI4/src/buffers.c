@@ -23,9 +23,11 @@
 #include "debug.h"
 #include "SDI_compiler.h"
 
-#define MILLIS_PER_SECOND      1000
-#define DIVISOR_10MS           ( MILLIS_PER_SECOND / 10 )
-#define DIVISOR_25MS           ( MILLIS_PER_SECOND / 40 )
+#define MILLIS_PER_SECOND   1000
+#define DIVISOR_10MS        ( MILLIS_PER_SECOND / 10 )  /* TODO: correct? */
+#define DIVISOR_25MS        ( MILLIS_PER_SECOND / 40 )  /* TODO: correct? */
+#define DIVISOR_250MS       ( MILLIS_PER_SECOND / 250 )
+#define RECORDING_BUFFER_DIVISOR  DIVISOR_250MS  /* =   4 buffers per second */
 
 /**
  * Function to return the greatest common denominator of two numbers.
@@ -73,15 +75,15 @@ ULONG getBufferSize(
 ) {
 
   const LONG fractionTarget = SDivMod32( sampleRate, secondFraction );
-  const LONG secondSize = SMult32( fractionTarget, sampleSize );
+  const LONG fractionSize = SMult32( fractionTarget, sampleSize );
   const LONG finalMultipleOf = lcm( sampleSize, multipleOf );
 
   LONG remainder;
   UWORD result;
 
-  SDivMod32( secondSize, finalMultipleOf );
+  SDivMod32( fractionSize, finalMultipleOf );
   remainder = GET_REG(REG_D1);
-  result = (UWORD)( secondSize - remainder );
+  result = (UWORD)( fractionSize - remainder );
 
   return result;
 }
@@ -113,7 +115,7 @@ UWORD getBufferSamples(
 ULONG getRecordingBufferSize( LONG sampleRate ) {
 
   struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
-  const LONG recordingDivisor = 4; /* 4 buffers per second */
+  const LONG recordingDivisor = RECORDING_BUFFER_DIVISOR;
   const UBYTE shift = recording->agpr_AhiSampleShift;
   const UBYTE sampleSize = ( 1 << shift );
   const UBYTE multipleOf =

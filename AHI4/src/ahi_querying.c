@@ -262,12 +262,12 @@ ASM(LONG) SAVEDS AHIsub_HardwareControl(
     case AHIC_Input: {
 
       AmiGUSBase->agb_Recording.agpr_HwSourceId = ( UWORD )aArgument;
+      result = TRUE;
       break;
     }
     case AHIC_Input_Query: {
 
       result = AmiGUSBase->agb_Recording.agpr_HwSourceId;
-      result = TRUE;
       break;
     }
     case AHIC_Output:

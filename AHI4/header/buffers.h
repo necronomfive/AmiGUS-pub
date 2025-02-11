@@ -92,7 +92,7 @@ ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples );
  */
 ULONG getRecordingBufferSize( LONG sampleRate );
 
-BOOL CreatePlaybackBuffers( VOID );
+BOOL CreatePlaybackBuffers( ULONG bufferSize );
 VOID DestroyPlaybackBuffers( VOID );
 
 BOOL CreateRecordingBuffers( VOID );

@@ -138,10 +138,9 @@ ULONG getRecordingBufferSize( LONG sampleRate ) {
 }
 
 // TRUE = failure
-BOOL CreatePlaybackBuffers( VOID ) {
+BOOL CreatePlaybackBuffers( ULONG bufferSize ) {
 
   struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
-  const ULONG bufferSize = AmiGUSBase->agb_AudioCtrl->ahiac_BuffSize;
   const LONG longSize = bufferSize >> 2; /* Buffers are ticking in LONGs! */
 
   if ( playback->agpp_Buffer[0] ) {
@@ -181,7 +180,7 @@ BOOL CreatePlaybackBuffers( VOID ) {
   return FALSE;
 }
 
-VOID DestroyPlaybackBuffers(VOID) {
+VOID DestroyPlaybackBuffers( VOID ) {
 
   struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
 

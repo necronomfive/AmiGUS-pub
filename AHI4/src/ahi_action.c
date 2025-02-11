@@ -95,8 +95,9 @@ ASM(ULONG) SAVEDS AHIsub_Start(
 
   if ( AHISF_PLAY & aFlags ) {
 
+    const ULONG bufferSize = aAudioCtrl->ahiac_BuffSize;
     LOG_D(("D: Creating playback buffers\n" ));
-    if ( CreatePlaybackBuffers() ) {
+    if ( CreatePlaybackBuffers( bufferSize ) ) {
 
       LOG_D(("D: No playback buffers, failed.\n"));
       DisplayError( EAllocatePlaybackBuffers );

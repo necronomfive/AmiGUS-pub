@@ -78,7 +78,11 @@ LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase ) {
 VOID StartAmiGusPcmPlayback( VOID ) {
 
   ULONG i;
-  ULONG prefillSize = 12; /* in LONGs */ 
+#ifdef USE_MEM_LOGGING
+  ULONG prefillSize = 1200; /* in LONGs */
+#else
+  ULONG prefillSize = 12; /* in LONGs */
+#endif
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   LOG_D(("D: Init & start AmiGUS PCM playback @ 0x%08lx\n", amiGUS));
 

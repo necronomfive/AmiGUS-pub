@@ -179,7 +179,7 @@ struct AmiGUSBase {
 #define AMIGUS_AHI_F_PLAY_0              0x04
 #define AMIGUS_AHI_F_PLAY_1              0x08
 #define AMIGUS_AHI_F_REC_STARTED         0x10
-#define AMIGUS_AHI_F_REC_0               0x20
+#define AMIGUS_AHI_F_REC_OVERFLOW        0x20
 #define AMIGUS_AHI_F_REC_1               0x40
 #define AMIGUS_AHI_F_REC_2               0x80
 

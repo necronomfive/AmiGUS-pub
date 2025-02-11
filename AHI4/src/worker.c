@@ -222,7 +222,7 @@ INLINE VOID HandleRecording( VOID ) {
   }
   /*
   TODO: buffer overflow handling without flodding the interrupt handlers, plz?
-
+*/
   if ( AMIGUS_AHI_F_REC_OVERFLOW & AmiGUSBase->agb_StateFlags ) {
 
     LOG_W(( "W: Recovering from recording buffer overflow.\n" ));
@@ -233,8 +233,8 @@ INLINE VOID HandleRecording( VOID ) {
     Bonus: resets the recording state flags. :)
     * /
     StartAmiGusPcmRecording();
+    */
   }
-  */
 
   LOG_INT(( "WORKER: Recording i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
             recording->agpr_BufferIndex[ 0 ],

@@ -27,7 +27,7 @@
 #define DIVISOR_10MS        ( MILLIS_PER_SECOND / 10 )  /* TODO: correct? */
 #define DIVISOR_25MS        ( MILLIS_PER_SECOND / 40 )  /* TODO: correct? */
 #define DIVISOR_250MS       ( MILLIS_PER_SECOND / 250 )
-#define RECORDING_BUFFER_DIVISOR  DIVISOR_250MS  /* =   4 buffers per second */
+#define RECORDING_BUFFER_DIVISOR  40 // DIVISOR_250MS  /* =   4 buffers per second */
 
 /**
  * Function to return the greatest common denominator of two numbers.

@@ -145,6 +145,14 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
 
     HandleRecording();
+
+     if ( status & AMIGUS_INT_F_REC_FIFO_FULL ) {
+      LOG_INT(( "INT: Signaling recording buffer overflow.\n" ));
+      /*
+       Recovery from buffer overflow - experimenting still...
+      */
+      AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_REC_OVERFLOW;
+    }
   }
 
   /* Clear AmiGUS control flags here!!! */

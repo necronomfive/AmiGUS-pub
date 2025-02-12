@@ -7,7 +7,7 @@ Next:
 - Calibration of all audio sources' volumes with each other
 - Calibrate volume AHI Mono vs Stereo
 - Mixer UI elements and their responsiveness
-- Get MHI implemented as per https://bitbucket.org/supernobby/mhimdev/src/main/
+- Get MHI implemented as per https://bitbucket.org/supernobby/mhimdev/src/main/ and https://aminet.net/package/driver/audio/mhimasplayer
 - Get mpeg.device working as per https://aminet.net/package/mus/play/dmdev
 - Make CAMD on https://aminet.net/package/mus/midi/camd / https://aminet.net/package/mus/play/projectomega / https://aminet.net/package/driver/other/uaemidi / https://aminet.net/package/mus/midi/camd40 / https://aminet.net/package/driver/other/mmp
 - Fully split Recording + Playback parts in AHI to allow 1 client each

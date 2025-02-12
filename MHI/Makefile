@@ -34,7 +34,7 @@ ifeq ($(findstring /home,$(HOME)), /home)
   # ~/.netrc format:
   # machine <ip> login username password pass
   # Could do --user username:pass instead - but not cool in repo ;)
-  INSTALL0       = curl --netrc --upload-file $(LIB_DST)       ftp://192.168.0.4/cf0/Devs/AHI/
+  INSTALL0       = curl --netrc --upload-file $(LIB_DST)       ftp://192.168.0.4/cf0/Libs/MHI/
   INSTALL1       =
 else
   AMIGAOS       = 1
@@ -52,7 +52,7 @@ else
 
   HOST_TOOLCHAIN = NATIVE_TOOLCHAIN
 
-  INSTALL0       = copy FROM $(LIB_DST)	TO	Devs:AHI/		CLONE
+  INSTALL0       = copy FROM $(LIB_DST)	TO	Libs:MHI/		CLONE
   INSTALL1       = avail flush >NIL:
 endif
 

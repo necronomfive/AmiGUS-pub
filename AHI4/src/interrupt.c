@@ -136,8 +136,8 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
       /*
        Recovery from buffer underruns is a bit tricky.
-       DMA will stay disabled until worker task prepared some buffers and
-       triggered a full playback init cycle to make us run again.
+       DMA from FIFO to DAC will stay disabled until worker task prepared some
+       buffers and triggered a full playback init cycle to make it run again.
       */
       AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
     }
@@ -149,7 +149,9 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
      if ( status & AMIGUS_INT_F_REC_FIFO_FULL ) {
       LOG_INT(( "INT: Signaling recording buffer overflow.\n" ));
       /*
-       Recovery from buffer overflow - experimenting still...
+       Recovery from buffer overflow is not so bad...
+       DMA from ADC to FIFO will stay disabled until worker task cleared up
+       some buffers and triggered a record init cycle to make it run again.
       */
       AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_REC_OVERFLOW;
     }

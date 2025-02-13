@@ -223,12 +223,12 @@ const UBYTE RecordingSampleTypeById[] = {
 };
 
 const UBYTE RecordingSampleAlignmentById[] = {
-  4,
-  4,
-  4,
-  4,
-  16,
-  16
+  8,  // RecordingCopy8Mto16S  : 4x1 BYTE in, 8x2 BYTE out
+  4,  // RecordingCopy8Sto16S  : 4x1 BYTE in, 4x2 BYTE out
+  8,  // RecordingCopy16Mto16S : 2x2 BYTE in, 4x2 BYTE out
+  4,  // RecordingCopy16Sto16S : 2x2 BYTE in, 2x2 BYTE out
+  32, // RecordingCopy24Mto32S : 4x3 BYTE in, 8x4 BYTE out
+  16  // RecordingCopy24Sto32S : 4x3 BYTE in, 4x4 BYTE out
 };
 
 /* Private definition of the copy functions used for PLAYBACK first. */

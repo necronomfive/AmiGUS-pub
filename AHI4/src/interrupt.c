@@ -85,7 +85,8 @@ INLINE VOID HandleRecording( VOID ) {
 
   while ( copied < target ) {
 
-// TODO: may write over buffer end!!!! Somehow subtract AHI sample output inc and take care worker can handle
+    // Would actually write over buffer end, if buffer would not be be a
+    // multiple of RecordingSampleAlignmentById - but it is :)
     if ( recording->agpr_BufferIndex[ *current ]
         < recording->agpr_BufferMax[ *current ] ) {
 

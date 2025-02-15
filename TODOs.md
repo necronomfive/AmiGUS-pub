@@ -1,6 +1,5 @@
 Next:
 - Try snap upward 96kHz Mode
-- Move to mode file: RecordingSampleTypeById, RecordingSampleAlignmentById, AmiGUSPlaybackSampleSizes
 - Real 24bit recording
 - Left/right swapped in stereo 8bit vs 16bit + 24bit 
 - Calibration of all audio sources' volumes with each other
@@ -17,3 +16,4 @@ Done:
 - Deactivate AHI recording SRC!
 - Prevent crashes when 2 AHI clients try allocating single AmiGUS
 - Recording overflow handling similar to playback underrun handling
+- Move to mode file: RecordingSampleTypeById, RecordingSampleAlignmentById, AmiGUSPlaybackSampleSizes -> moved all tables to lookup based on mode id

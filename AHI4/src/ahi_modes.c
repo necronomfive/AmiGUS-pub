@@ -1,0 +1,146 @@
+/*
+ * This file is part of the AmiGUS.audio driver.
+ *
+ * AmiGUS.audio driver is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, version 3 of the License only.
+ *
+ * AmiGUS.audio driver is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU LesserGeneral Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#if defined (__VBCC__)
+#pragma dontwarn 61
+#endif
+
+#include <devices/ahi.h>
+
+#if defined (__VBCC__)
+#pragma popwarn
+#endif
+
+#include "ahi_modes.h"
+#include "amigus_hardware.h"
+
+struct PlaybackProperties PlaybackPropertiesById[] = {
+  /* 8bit mono */
+  { &PlaybackCopy16to8,  AMIGUS_PCM_S_PLAY_MONO_8BIT,    1, 1, 0xffFFffF8 },
+  /* 8bit stereo */
+  { &PlaybackCopy16to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  2, 2, 0xffFFffF8 },
+  /* 8bit stereo++ */
+  { &PlaybackCopy16to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  2, 2, 0xffFFffF8 },
+  /* 16bit mono */
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_MONO_16BIT,   1, 2, 0xffFFffFC },
+  /* 16bit stereo */
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 2, 4, 0xffFFffFC },
+  /* 16bit stereo++ */
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 2, 4, 0xffFFffFC },
+  /* Fast 8 bit mono */
+  { &PlaybackCopy16to8,  AMIGUS_PCM_S_PLAY_MONO_8BIT,    1, 1, 0xffFFffF8 },
+  /* Fast 8 bit stereo */
+  { &PlaybackCopy16to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  2, 2, 0xffFFffF8 },
+  /* Fast 8 bit stereo++ */
+  { &PlaybackCopy16to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  2, 2, 0xffFFffF8 },
+  /* Fast 16 bit mono */
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_MONO_16BIT,   1, 2, 0xffFFffFC },
+  /* Fast 16 bit stereo */
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 2, 4, 0xffFFffFC },
+  /* Fast 16 bit stereo++ */
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 2, 4, 0xffFFffFC },
+  /* HiFi 8 bit mono */
+  { &PlaybackCopy32to8,  AMIGUS_PCM_S_PLAY_MONO_8BIT,    2, 1, 0xffFFffF0 },
+  /* HiFi 8 bit stereo */
+  { &PlaybackCopy32to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  3, 2, 0xffFFffF0 },
+  /* HiFi 8 bit stereo++ */
+  { &PlaybackCopy32to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  3, 2, 0xffFFffF0 },
+  /* HiFi 16 bit mono */
+  { &PlaybackCopy32to16, AMIGUS_PCM_S_PLAY_MONO_16BIT,   2, 2, 0xffFFffF8 },
+  /* HiFi 16 bit stereo */
+  { &PlaybackCopy32to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 3, 4, 0xffFFffF8 },
+  /* HiFi 16 bit stereo++ */
+  { &PlaybackCopy32to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 3, 4, 0xffFFffF8 },
+  /* HiFi 24 bit mono */
+  { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_MONO_24BIT,   2, 3, 0xffFFffF0 },
+  /* HiFi 24 bit stereo */
+  { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_STEREO_24BIT, 3, 6, 0xffFFffF0 },
+  /* HiFi 24 bit stereo++ */
+  { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_STEREO_24BIT, 3, 6, 0xffFFffF0 }
+/*  ^                    ^                               ^  ^  ^
+ *  |                    |                               |  |  |
+ *  |                    |    +--------------------------+  |  Buffer alignment
+ *  |                    |    |                             |
+ *  |                    |    |   Byte size of [stereo] sample in AmiGUS format
+ *  |                    |    |   
+ *  |                    | Number of bit shifts to translate AHI Sample to BYTE
+ *  |                    |
+ *  |      AmiGUS PCM Playback Sample Format as understood in amigus_hardware.h
+ *  |
+ *  +------------- Playback copy function to copy AHI buffer to AmiGUS PCM FiFo
+ */
+};
+
+struct RecordingProperties RecordingPropertiesById[] = {
+  /* 8bit mono */
+  { &RecordingCopy8Mto16S,  AMIGUS_PCM_S_REC_MONO_8BIT,    AHIST_S16S, 2,  8 },
+  /* 8bit stereo */
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  /* 8bit stereo++ */
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  /* 16bit mono */
+  { &RecordingCopy16Mto16S, AMIGUS_PCM_S_REC_MONO_16BIT,   AHIST_S16S, 2,  8 },
+  /* 16bit stereo */
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  /* 16bit stereo++ */
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  /* Fast 8 bit mono */
+  { &RecordingCopy8Mto16S,  AMIGUS_PCM_S_REC_MONO_8BIT,    AHIST_S16S, 2,  8 },
+  /* Fast 8 bit stereo */
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  /* Fast 8 bit stereo++ */
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  /* Fast 16 bit mono */
+  { &RecordingCopy16Mto16S, AMIGUS_PCM_S_REC_MONO_16BIT,   AHIST_S16S, 2,  8 },
+  /* Fast 16 bit stereo */
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  /* Fast 16 bit stereo++ */
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  /* HiFi 8 bit mono */
+  { &RecordingCopy8Mto16S,  AMIGUS_PCM_S_REC_MONO_8BIT,    AHIST_S16S, 2,  8 },
+  /* HiFi 8 bit stereo */
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  /* HiFi 8 bit stereo++ */
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  /* HiFi 16 bit mono */
+  { &RecordingCopy16Mto16S, AMIGUS_PCM_S_REC_MONO_16BIT,   AHIST_S16S, 2,  8 },
+  /* HiFi 16 bit stereo */
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  /* HiFi 16 bit stereo++ */
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  /* HiFi 24 bit mono */
+  { &RecordingCopy24Mto32S, AMIGUS_PCM_S_REC_MONO_24BIT,   AHIST_S32S, 3, 32 },
+  /* HiFi 24 bit stereo */
+  { &RecordingCopy24Sto32S, AMIGUS_PCM_S_REC_STEREO_24BIT, AHIST_S32S, 3, 16 },
+  /* HiFi 24 bit stereo++ */
+  { &RecordingCopy24Sto32S, AMIGUS_PCM_S_REC_STEREO_24BIT, AHIST_S32S, 3, 16 }
+/*  ^                       ^                              ^           ^  ^
+ *  |                       |                              |           |  |
+ *  |   +-------------------+                              |           |  |
+ *  |   |   +----------------------------------------------+           |  |
+ *  |   |   |   +------------------------------------------------------+  |
+ *  |   |   |   |                                                         |
+ *  |   |   |   |        Number of BYTEs output per single copy function call
+ *  |   |   |   |
+ *  |   |   |   Number of bit shifts translating one mono AHI Sample to BYTEs
+ *  |   |   |
+ *  |   |   AHI sample type output when recording
+ *  |   |
+ *  |   AmiGUS PCM Recording Sample Format as understood in amigus_hardware.h
+ *  |
+ *  Playback copy function to copy AmiGUS PCM FiFo to AHI buffer
+ */
+};

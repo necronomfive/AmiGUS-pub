@@ -52,7 +52,7 @@ struct TErrorMessage errors[] =
     { EAmiGUSDetectError, "AmiGUS card detection mess.", "Damn!" },
     { EAmiGUSFirmwareOutdated, "AmiGUS card firmware outdated.", "Will update, promised!" },
 
-    { EAudioModeNotImplemented, "Right now implemented, 16bit, stereo, no Hifi", "Coming soon..." },
+    { EAudioModeNotImplemented, "Mode not implemented - are mode file and AmiGUS.audio in sync?", "Will check" },
 
     { EOpenLogFile, "Can not create log file RAM:AmiGUS-AHI.log.", "Oops!" },
     { EAllocateLogMem, "Can not allocate memory blob for extra-dirty logging.", "Meh." },
@@ -61,8 +61,6 @@ struct TErrorMessage errors[] =
     { EOutOfMemory, "You are out of memory!", "Shit!" },
     { EMixerBufferNotAligned, "Misaligned mixer buffer not yet handled.", "Ok" },
 */
-    { ESampleFormatMissingFromMode, "AMIGUS mode file issue: Lacking AmiGUS_SampleFormat." "Will report issue!" },
-    { ECopyFunctionMissingFromMode, "AMIGUS mode file issue: Lacking AmiGUS_CopyFunction." "Will report issue!" },
     { EWorkerProcessCreationFailed, "Could not create playback worker.", "Damn." },
     { EWorkerProcessDied, "Playback worker died.", "RIP" },
     { EWorkerProcessSignalsFailed, "Worker does not like to communicate.", "Swine!" },

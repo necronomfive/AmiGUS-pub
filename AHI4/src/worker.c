@@ -204,10 +204,6 @@ INLINE VOID HandleRecording( VOID ) {
       message->ahirm_Length <<= 2;                            // LONGs to BYTEs
       message->ahirm_Length >>= recording->agpr_AhiSampleShift;   // to samples
 
-      LOG_INT(( "WORKER: Using CopyFuncId  %ld sending sample type %ld\n", 
-                recording->agpr_CopyFunctionId,
-                message->ahirm_Type ));
-
       CallHookPkt( audioCtrl->ahiac_SamplerFunc,
                    audioCtrl,
                    ( APTR ) message );

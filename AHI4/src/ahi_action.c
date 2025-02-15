@@ -18,6 +18,7 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
+#include "ahi_modes.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_pcm.h"
 #include "amigus_hardware.h"
@@ -189,10 +190,11 @@ ASM(VOID) SAVEDS AHIsub_Update(
 
   if ( AHISF_PLAY & aFlags ) {
 
-    struct AmiGUSPcmPlayback *playback = &AmiGUSBase->agb_Playback;
-    UBYTE sampleToByte = playback->agpp_AhiSampleShift;
-    UWORD hwSampleSize = 
-      AmiGUSPlaybackSampleSizes[ playback->agpp_HwSampleFormatId ];
+    struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
+    UBYTE modeOffset = AmiGUSBase->agb_AhiModeOffset;
+    struct PlaybackProperties * mode = &PlaybackPropertiesById[ modeOffset ];
+    UBYTE sampleToByte = mode->pp_AhiSampleShift;
+    UWORD hwSampleSize = mode->pp_HwSampleSize;
     ULONG alignedSamples = 
       AlignByteSizeForSamples( newAudioCtrl->ahiac_BuffSamples )
         >> sampleToByte;

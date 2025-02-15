@@ -54,7 +54,7 @@ VOID RawPutChar(BYTE putCh);
  * All of these will need double ((...)) to workaround a SAS/C insufficiency!
  */
 
-#define USE_MEM_LOGGING
+#define USE_FILE_LOGGING
 #if defined (USE_SERIAL_LOGGING)
 
 // LOG_INT(X) would deadlock

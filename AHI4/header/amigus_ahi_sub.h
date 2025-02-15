@@ -55,13 +55,6 @@
                                     + (   22 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
-#define AHIDB_AmiGUS_PlayCopyFunction   ( AHIDB_UserBase +  0 )
-#define AHIDB_AmiGUS_PlayHwSampleId     ( AHIDB_UserBase +  1 )
-#define AHIDB_AmiGUS_PlaySampleShift    ( AHIDB_UserBase +  2 )
-#define AHIDB_AmiGUS_RecCopyFunction    ( AHIDB_UserBase +  8 )
-#define AHIDB_AmiGUS_RecHwSampleId      ( AHIDB_UserBase +  9 )
-#define AHIDB_AmiGUS_RecSampleShift     ( AHIDB_UserBase + 10 )
-
 #define AMIGUS_MEM_LOG_MARKER        "********************************"   \
                                      " AmiGUS "                           \
                                      "********************************\n"
@@ -78,13 +71,10 @@ struct AmiGUSPcmPlayback {
   ULONG                         agpp_CurrentBuffer;  /* Current playing buf. */
 
   CopyFunctionType              agpp_CopyFunction;   /* Magic AHI<->AmiGUS.. */
-  ULONG                         agpp_CopyFunctionId; /* ID of CopyFunction   */
 
   ULONG                         agpp_Watermark;      /* Counting in WORDs!   */
 
-  UWORD                         agpp_HwSampleFormatId;   /* Sample format ID */
-  UBYTE                         agpp_AhiSampleShift; /* Sample <> Byte shift */
-  UBYTE                         agpp_Reserved0;      /* for alignment        */
+  ULONG                         agpp_HwSampleSize; /* Size a [stereo] sample */
 };
 
 struct AmiGUSPcmRecording {
@@ -96,14 +86,12 @@ struct AmiGUSPcmRecording {
   ULONG                         agpr_CurrentBuffer;  /* Current recording b. */
 
   CopyFunctionType              agpr_CopyFunction;   /* Magic AmiGUS<->AHI.. */
-  ULONG                         agpr_CopyFunctionId; /* ID of CopyFunction   */
 
   struct AHIRecordMessage       agpr_RecordingMessage;
 
-  UWORD                         agpr_HwSampleFormatId;   /* Sample format ID */
-  UBYTE                         agpr_AhiSampleShift; /* Sample <> Byte shift */
+  ULONG                         agpr_AhiSampleShift; /* Sample <> Byte shift */
 
-  UBYTE                         agpr_HwSourceId;          /* Input source ID */
+  ULONG                         agpr_HwSourceId;          /* Input source ID */
 };
 
 /******************************************************************************
@@ -137,11 +125,10 @@ struct AmiGUSBase {
   BYTE                          agb_UsageCounter;    
 
   /* Driver settings */
-  UWORD                         agb_HwSampleRateId;  /* HW sample rate ID    */
-
+  UBYTE                         agb_AhiModeOffset;
+  UBYTE                         agb_HwSampleRateId; /* HW sample rate ID     */
   UBYTE                         agb_CanRecord;      /* Can record? Yes / No  */
   UBYTE                         agb_StateFlags;     /* AmiGUS state as below */
-
 
   struct AmiGUSPcmPlayback      agb_Playback;       /* Playback vars group   */
   struct AmiGUSPcmRecording     agb_Recording;      /* Recording vars group  */

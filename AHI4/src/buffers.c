@@ -17,6 +17,7 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
+#include "ahi_modes.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
 #include "buffers.h"
@@ -114,12 +115,12 @@ UWORD getBufferSamples(
 
 ULONG getRecordingBufferSize( LONG sampleRate ) {
 
-  struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
+  UBYTE modeOffset = AmiGUSBase->agb_AhiModeOffset;
+  struct RecordingProperties * mode = &RecordingPropertiesById[ modeOffset ];
   const LONG recordingDivisor = RECORDING_BUFFER_DIVISOR;
-  const UBYTE shift = recording->agpr_AhiSampleShift;
+  const UBYTE shift = mode->rp_AhiSampleShift;
   const UBYTE sampleSize = ( 1 << shift );
-  const UBYTE multipleOf =
-    RecordingSampleAlignmentById[ recording->agpr_CopyFunctionId ];
+  const UBYTE multipleOf = mode->rp_AhiBufferMultiples;
   const ULONG byteSize = getBufferSize(
     sampleRate,
     recordingDivisor,
@@ -266,23 +267,12 @@ VOID DestroyRecordingBuffers( VOID ) {
   LOG_D(("D: All recording buffers free`ed\n"));
 }
 
-/**
- * Alignment requirements of the copy functions encrypted into BYTE masks.
- * Order follows the same as CopyFunctionById[].
- */
-const ULONG CopyFunctionRequirementById[] = {
-  0xffFFffF8, /* Needs 2 LONGs to work properly, */
-  0xffFFffFC, /*       1 LONG,                   */
-  0xffFFffF0, /*       4 LONGs,                  */
-  0xffFFffF8, /*       2 LONGs                   */
-  0xffFFffF0  /*       4 LONGs                   */
-};
-
 ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples ) {
 
-  const ULONG index = AmiGUSBase->agb_Playback.agpp_CopyFunctionId;
-  const ULONG mask = CopyFunctionRequirementById[ index ];
-  const UBYTE shift = AmiGUSBase->agb_Playback.agpp_AhiSampleShift;
+  UBYTE modeOffset = AmiGUSBase->agb_AhiModeOffset;
+  struct PlaybackProperties * mode = &PlaybackPropertiesById[ modeOffset ];
+  const ULONG mask = mode->pp_AhiBufferMask;
+  const UBYTE shift = mode->pp_AhiSampleShift;
   ULONG aligned = ahiBufferSamples;
 
   aligned <<= shift;    /* now: in BYTEs! */

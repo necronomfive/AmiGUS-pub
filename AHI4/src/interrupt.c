@@ -32,10 +32,11 @@ INLINE VOID HandlePlayback( VOID ) {
   BOOL canSwap = TRUE;
   LONG copied = 0;        /* Sum of BYTEs actually filled into FIFO this run */
   ULONG watermark = playback->agpp_Watermark;
-  LONG reminder =               /* Read-back remaining FIFO samples in BYTES */
-    ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
-  LONG minHwSampleSize =  /* Size of a single (mono / stereo) sample in BYTEs*/
-    AmiGUSPlaybackSampleSizes[ playback->agpp_HwSampleFormatId ];
+  /* Read-back remaining FIFO samples in BYTES */
+  LONG reminder = ReadReg16( AmiGUSBase->agb_CardBase,
+                             AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
+  /* Size of a single (mono / stereo) sample in BYTEs*/
+  LONG minHwSampleSize =  playback->agpp_HwSampleSize; 
 
   /* Target amount of BYTEs to fill into FIFO during this interrupt run,     */
   LONG target =                                     /* taken from watermark, */

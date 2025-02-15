@@ -28,44 +28,178 @@ typedef LONG ( ASM( * ) CopyFunctionType )(
   REG( d0, ULONG * ),
   REG( a0, ULONG * ) );
 
-/**
- * so... playback copy functions needed...
- *    AHI    AmiGUS Required            x    resulting
- *    Sample Sample Alignment      HiFi Bit  Copy
- * ID Size   Size   Input Output   Mode Mode Function
- * 0  16      8      8     4 bytes       8   PlaybackCopy16to8
- * 1  16     16      4     4 bytes      16   PlaybackCopy16to16
- * 2  32      8     16     4 bytes x     8   PlaybackCopy32to8
- * 3  32     16      8     4 bytes x    16   PlaybackCopy32to16
- * 4  32     24     16    12 bytes x    24   PlaybackCopy32to24
+/*
+ * Declaring the copy functions here - but the real external interfaces
+ * are the playback and recording AHI mode lookups in ahi_modes.h .
  */
-extern const CopyFunctionType PlaybackCopyFunctionById[ 5 ];
 
 /**
- * so... MORE copy functions needed... for recording...
- *    AHI    AmiGUS Required            x    resulting
- *    Sample Sample Alignment      HiFi Bit  Copy
- * ID Size   Size   Input Output   Mode Mode Function
- * 0  32      8      4    16 bytes       8   RecordingCopy8Mto16S
- * 1  32     16      4     8 bytes       8   RecordingCopy8Sto16S
- * 2  32     16      4     8 bytes      16   RecordingCopy16Mto16S
- * 3  32     32      4     4 bytes      16   RecordingCopy16Sto16S
- * 4  64     24      12   16 bytes      24   RecordingCopy24Mto32S
- * 5  64     48      12   16 bytes      24   RecordingCopy24Sto32S
+ * Reads 2 LONGs, a, and b,
+ * writes 1 LONG, 
+ *   ( a & 0xff000000 )       |
+ *   ( a & 0x0000ff00 ) <<  8 | 
+ *   ( b & 0xff000000 ) >> 16 |
+ *   ( b & 0x0000ff00 ) >>  8.
+ * Used for 8bit non-HiFi modes.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 2 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
  */
-extern const CopyFunctionType RecordingCopyFunctionById[ 6 ];
+ASM(LONG) PlaybackCopy16to8(
+  REG(d0, ULONG *bufferBase), 
+  REG(a0, ULONG *bufferIndex) );
 
 /**
- * Defines the AHI sample type to return for recording.
+ * Reads 1 LONG, writes the same 1 LONG.
+ * Used for 16bit non-HiFi modes.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 1 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
  */
-extern const UBYTE RecordingSampleTypeById[ 6 ];
+ASM(LONG) PlaybackCopy16to16(
+  REG(d0, ULONG *bufferBase), 
+  REG(a0, ULONG *bufferIndex) );
 
 /**
- * Defines how the recording buffer must be aligned,
- * i.e. what multiple of bytes it need to hold to be
- * nicely filled with hardware samples from AmiGUS.
+ * Reads 4 LONGs, a, b, c, and d,
+ * writes 1 LONG, 
+ *   ( a & 0xff000000 )       |
+ *   ( b & 0xff000000 ) >>  8 | 
+ *   ( c & 0xff000000 ) >> 16 |
+ *   ( d & 0xff000000 ) >> 24.
+ * Used for 8bit HiFi modes.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 2 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
  */
-extern const UBYTE RecordingSampleAlignmentById[ 6 ];
+ASM(LONG) PlaybackCopy32to8(
+  REG(d0, ULONG *bufferBase), 
+  REG(a0, ULONG *bufferIndex) );
 
+/**
+ * Reads 2 LONGs, a, and b,
+ * writes 1 LONG, a & 0xffFF0000 | b >> 16.
+ * Used for 16bit HiFi modes.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 2 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
+ */
+ASM(LONG) PlaybackCopy32to16(
+  REG(d0, ULONG *bufferBase), 
+  REG(a0, ULONG *bufferIndex) );
+
+/**
+ * Reads 4 LONGs, a, b, c, and d,
+ * writes 3 LONGs,
+ * 1:         a & 0xffFFff00 | b >> 24, 
+ * 2:  (b << 8) & 0xffFF0000 | c >> 16,
+ * 3: (c << 16) & 0xFF000000 | d >> 8
+ * Used for 24bit HiFi modes.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 4 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 12.
+ */
+ASM(LONG) PlaybackCopy32to24(
+  REG(d0, ULONG *bufferBase), 
+  REG(a0, ULONG *bufferIndex) );
+
+/**
+ * Reads 1 LONG aka 4 samples in 8Bit Mono from AmiGUS
+ * and prepares it for AHI 16Bit Stereo Non-HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 4 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
+ */
+ASM( LONG ) RecordingCopy8Mto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
+/**
+ * Reads 1 LONG aka 2 samples in 8Bit Stereo from AmiGUS
+ * and prepares it for AHI 16Bit Stereo Non-HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 4 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
+ */
+ASM( LONG ) RecordingCopy8Sto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
+/**
+ * Reads 1 LONG aka 2 samples in 16Bit Mono from AmiGUS
+ * and prepares it for AHI 16Bit Stereo Non-HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 4 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
+ */
+ASM( LONG ) RecordingCopy16Mto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
+/**
+ * Reads 1 LONG aka 1 sample in 16Bit Stereo from AmiGUS
+ * and prepares it for AHI 16Bit Stereo Non-HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 4 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 4.
+ */
+ASM( LONG ) RecordingCopy16Sto16S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
+/**
+ * Reads 3 LONG aka 4 samples in 24Bit Mono from AmiGUS
+ * and prepares it for AHI 32Bit Stereo HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 8 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 32.
+ */
+ASM( LONG ) RecordingCopy24Mto32S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
+
+/**
+ * Reads 6 LONG aka 8 samples in 24Bit Stereo from AmiGUS
+ * and prepares it for AHI 32Bit Stereo HiFi consumption.
+ *
+ * @param[in]      bufferBase  Buffer's base address
+ * @param[in, out] bufferIndex Index applied onto the buffer already,
+ *                             increased by 8 as counting LONGs here.
+ *
+ * @return Number of bytes written, i.e. 32.
+ */
+ASM( LONG ) RecordingCopy24Sto32S(
+  REG( d0, ULONG *bufferBase ),
+  REG( a0, ULONG *bufferIndex ));
 
 #endif /* COPIES_H */

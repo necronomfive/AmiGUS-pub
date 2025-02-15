@@ -16,6 +16,7 @@
 
 #include <proto/expansion.h>
 
+#include "ahi_modes.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
 #include "amigus_pcm.h"
@@ -83,6 +84,7 @@ VOID StartAmiGusPcmPlayback( VOID ) {
 #else
   ULONG prefillSize = 12; /* in LONGs */
 #endif
+  UWORD modeOffset = AmiGUSBase->agb_AhiModeOffset;
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   LOG_D(("D: Init & start AmiGUS PCM playback @ 0x%08lx\n", amiGUS));
 
@@ -130,7 +132,7 @@ VOID StartAmiGusPcmPlayback( VOID ) {
   // Use correct sample settings, prefill is selected to match all
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_FORMAT,
-              AmiGUSBase->agb_Playback.agpp_HwSampleFormatId );
+              PlaybackPropertiesById[ modeOffset ].pp_HwFormatId );
 
   // Start playback finally
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
@@ -213,7 +215,8 @@ VOID StartAmiGusPcmRecording( VOID ) {
   WriteReg32( amiGUS, AMIGUS_PCM_REC_VOLUME, flags32 ); 
   LOG_V(( "V: Set AMIGUS_PCM_REC_VOLUME = 0x%08lx\n", flags32 ));
 
-  flags16 = AmiGUSBase->agb_Recording.agpr_HwSampleFormatId;
+  flags16 = AmiGUSBase->agb_AhiModeOffset;
+  flags16 = RecordingPropertiesById[ flags16 ].rp_HwFormatId;
   WriteReg16( amiGUS, AMIGUS_PCM_REC_SAMPLE_FORMAT, flags16 );
   LOG_V(( "V: Set AMIGUS_PCM_REC_SAMPLE_FORMAT = 0x%04lx\n", flags16 ));
 

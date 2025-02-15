@@ -27,10 +27,10 @@ struct PlaybackProperties {
     CopyFunctionType    pp_CopyFunction;
     /** AmiGUS hardware register content defining playback sample type       */
     ULONG               pp_HwFormatId;
-    /** Translates size of "1" AHI sample to BYTE size of that sample        */
-    ULONG               pp_AhiSampleShift;
     /** Byte size of a single (potentially stereo) AmiGUS hardware sample    */
     ULONG               pp_HwSampleSize;
+    /** Translates size of "1" AHI sample to BYTE size of that sample        */
+    ULONG               pp_AhiSampleShift;
     /** Copy function required alignment encoded as bit mask                 */
     ULONG               pp_AhiBufferMask;
 };

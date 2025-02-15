@@ -35,11 +35,11 @@ struct PlaybackProperties PlaybackPropertiesById[] = {
   /* 8bit stereo++ */
   { &PlaybackCopy16to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  2, 2, 0xffFFffF8 },
   /* 16bit mono */
-  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_MONO_16BIT,   1, 2, 0xffFFffFC },
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_MONO_16BIT,   2, 1, 0xffFFffFC },
   /* 16bit stereo */
-  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 2, 4, 0xffFFffFC },
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 4, 2, 0xffFFffFC },
   /* 16bit stereo++ */
-  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 2, 4, 0xffFFffFC },
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 4, 2, 0xffFFffFC },
   /* Fast 8 bit mono */
   { &PlaybackCopy16to8,  AMIGUS_PCM_S_PLAY_MONO_8BIT,    1, 1, 0xffFFffF8 },
   /* Fast 8 bit stereo */
@@ -47,36 +47,36 @@ struct PlaybackProperties PlaybackPropertiesById[] = {
   /* Fast 8 bit stereo++ */
   { &PlaybackCopy16to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  2, 2, 0xffFFffF8 },
   /* Fast 16 bit mono */
-  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_MONO_16BIT,   1, 2, 0xffFFffFC },
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_MONO_16BIT,   2, 1, 0xffFFffFC },
   /* Fast 16 bit stereo */
-  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 2, 4, 0xffFFffFC },
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 4, 2, 0xffFFffFC },
   /* Fast 16 bit stereo++ */
-  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 2, 4, 0xffFFffFC },
+  { &PlaybackCopy16to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 4, 2, 0xffFFffFC },
   /* HiFi 8 bit mono */
-  { &PlaybackCopy32to8,  AMIGUS_PCM_S_PLAY_MONO_8BIT,    2, 1, 0xffFFffF0 },
+  { &PlaybackCopy32to8,  AMIGUS_PCM_S_PLAY_MONO_8BIT,    1, 2, 0xffFFffF0 },
   /* HiFi 8 bit stereo */
-  { &PlaybackCopy32to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  3, 2, 0xffFFffF0 },
+  { &PlaybackCopy32to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  2, 3, 0xffFFffF0 },
   /* HiFi 8 bit stereo++ */
-  { &PlaybackCopy32to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  3, 2, 0xffFFffF0 },
+  { &PlaybackCopy32to8,  AMIGUS_PCM_S_PLAY_STEREO_8BIT,  2, 3, 0xffFFffF0 },
   /* HiFi 16 bit mono */
   { &PlaybackCopy32to16, AMIGUS_PCM_S_PLAY_MONO_16BIT,   2, 2, 0xffFFffF8 },
   /* HiFi 16 bit stereo */
-  { &PlaybackCopy32to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 3, 4, 0xffFFffF8 },
+  { &PlaybackCopy32to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 4, 3, 0xffFFffF8 },
   /* HiFi 16 bit stereo++ */
-  { &PlaybackCopy32to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 3, 4, 0xffFFffF8 },
+  { &PlaybackCopy32to16, AMIGUS_PCM_S_PLAY_STEREO_16BIT, 4, 3, 0xffFFffF8 },
   /* HiFi 24 bit mono */
-  { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_MONO_24BIT,   2, 3, 0xffFFffF0 },
+  { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_MONO_24BIT,   3, 2, 0xffFFffF0 },
   /* HiFi 24 bit stereo */
-  { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_STEREO_24BIT, 3, 6, 0xffFFffF0 },
+  { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_STEREO_24BIT, 6, 3, 0xffFFffF0 },
   /* HiFi 24 bit stereo++ */
-  { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_STEREO_24BIT, 3, 6, 0xffFFffF0 }
+  { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_STEREO_24BIT, 6, 3, 0xffFFffF0 }
 /*  ^                    ^                               ^  ^  ^
  *  |                    |                               |  |  |
- *  |                    |    +--------------------------+  |  Buffer alignment
- *  |                    |    |                             |
- *  |                    |    |   Byte size of [stereo] sample in AmiGUS format
- *  |                    |    |   
- *  |                    | Number of bit shifts to translate AHI Sample to BYTE
+ *  |                    |   +---------------------------+  |  Buffer alignment
+ *  |                    |   |                              |
+ *  |                    |   | Number of shifts to translate AHI Sample to BYTE
+ *  |                    |   |   
+ *  |                    |   Byte size of mono / stereo sample in AmiGUS format
  *  |                    |
  *  |      AmiGUS PCM Playback Sample Format as understood in amigus_hardware.h
  *  |

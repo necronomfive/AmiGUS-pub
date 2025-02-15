@@ -27,6 +27,73 @@
 #include "support.h"
 #include "SDI_ahi_sub.h"
 
+#define AHIDB_AmiGUS_PlayCopyFunction   ( AHIDB_UserBase +  0 )
+#define AHIDB_AmiGUS_PlayHwSampleId     ( AHIDB_UserBase +  1 )
+#define AHIDB_AmiGUS_PlaySampleShift    ( AHIDB_UserBase +  2 )
+#define AHIDB_AmiGUS_RecCopyFunction    ( AHIDB_UserBase +  8 )
+#define AHIDB_AmiGUS_RecHwSampleId      ( AHIDB_UserBase +  9 )
+#define AHIDB_AmiGUS_RecSampleShift     ( AHIDB_UserBase + 10 )
+
+/*
+ * Array of sample sizes in BYTE per hardware sample format ID - for playback.
+ */
+const UWORD AmiGUSPlaybackSampleSizes[ 6 ] = {
+
+  1, // AMIGUS_PCM_S_PLAY_MONO_8BIT    @ index 0 = value 0x0000
+  2, // AMIGUS_PCM_S_PLAY_STEREO_8BIT  @ index 1 = value 0x0001
+  2, // AMIGUS_PCM_S_PLAY_MONO_16BIT   @ index 2 = value 0x0002
+  4, // AMIGUS_PCM_S_PLAY_STEREO_16BIT @ index 3 = value 0x0003
+  3, // AMIGUS_PCM_S_PLAY_MONO_24BIT   @ index 4 = value 0x0004
+  6  // AMIGUS_PCM_S_PLAY_STEREO_24BIT @ index 5 = value 0x0005
+};
+
+/**
+ * Alignment requirements of the copy functions encrypted into BYTE masks.
+ * Order follows the same as CopyFunctionById[].
+ */
+const ULONG CopyFunctionRequirementById[] = {
+  0xffFFffF8, /* Needs 2 LONGs to work properly, */
+  0xffFFffFC, /*       1 LONG,                   */
+  0xffFFffF0, /*       4 LONGs,                  */
+  0xffFFffF8, /*       2 LONGs                   */
+  0xffFFffF0  /*       4 LONGs                   */
+};
+
+const CopyFunctionType PlaybackCopyFunctionById[] = {
+  &PlaybackCopy16to8,
+  &PlaybackCopy16to16,
+  &PlaybackCopy32to8,
+  &PlaybackCopy32to16,
+  &PlaybackCopy32to24
+};
+
+const CopyFunctionType RecordingCopyFunctionById[] = {
+  &RecordingCopy8Mto16S,
+  &RecordingCopy8Sto16S,
+  &RecordingCopy16Mto16S,
+  &RecordingCopy16Sto16S,
+  &RecordingCopy24Mto32S,
+  &RecordingCopy24Sto32S
+};
+
+const UBYTE RecordingSampleTypeById[] = {
+  AHIST_S16S,
+  AHIST_S16S,
+  AHIST_S16S,
+  AHIST_S16S,
+  AHIST_S32S,
+  AHIST_S32S
+};
+
+const UBYTE RecordingSampleAlignmentById[] = {
+  8,  // RecordingCopy8Mto16S  : 4x1 BYTE in, 8x2 BYTE out
+  4,  // RecordingCopy8Sto16S  : 4x1 BYTE in, 4x2 BYTE out
+  8,  // RecordingCopy16Mto16S : 2x2 BYTE in, 4x2 BYTE out
+  4,  // RecordingCopy16Sto16S : 2x2 BYTE in, 2x2 BYTE out
+  32, // RecordingCopy24Mto32S : 4x3 BYTE in, 8x4 BYTE out
+  16  // RecordingCopy24Sto32S : 4x3 BYTE in, 4x4 BYTE out
+};
+
 /* Basic functions - Allocation */
 
 ASM(ULONG) SAVEDS AHIsub_AllocAudio(
@@ -46,6 +113,14 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   UBYTE isRealtime = FALSE;
   UBYTE canRecord = FALSE;
   UBYTE bitsPerAmiGusSample = 0;
+
+
+  WORD playHwSampleFormatId = -1;
+  WORD recHwSampleFormatId = -1;
+  BYTE playbackCopyFunctionId = -1;
+  BYTE recordingCopyFunctionId = -1;
+  BYTE playSampleBytesShift = -1;
+  BYTE recSampleBytesShift = -1;
 
   /* 
    * Will rely on AHI provided mixing and timing,
@@ -126,6 +201,32 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
         modeId = ( ULONG )tag->ti_Data;
         break;
       }
+
+      case AHIDB_AmiGUS_PlayCopyFunction: {
+        playbackCopyFunctionId = ( BYTE )tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_PlayHwSampleId: {
+        playHwSampleFormatId = ( WORD )tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_PlaySampleShift: {
+        playSampleBytesShift = ( BYTE )tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_RecCopyFunction: {
+        recordingCopyFunctionId = ( BYTE )tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_RecHwSampleId: {
+        recHwSampleFormatId = ( WORD )tag->ti_Data;
+        break;
+      }
+      case AHIDB_AmiGUS_RecSampleShift: {
+        recSampleBytesShift = ( BYTE )tag->ti_Data;
+        break;
+      }
+
       case AHIDB_Record: {
         canRecord = ( UBYTE )tag->ti_Data;
         if ( canRecord ) {
@@ -188,6 +289,32 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   AmiGUSBase->agb_Recording.agpr_CopyFunction = recProps->rp_CopyFunction;
   AmiGUSBase->agb_Recording.agpr_RecordingMessage.ahirm_Type = 
     recProps->rp_AhiFormatId;
+///////////77
+  LOG_D((
+    "%ld %ld %ld %ld %ld ||| %ld %ld %ld %ld %ld \n",
+    playProps->pp_CopyFunction    == PlaybackCopyFunctionById[ playbackCopyFunctionId ],
+    playProps->pp_HwFormatId      == playHwSampleFormatId,
+    playProps->pp_HwSampleSize    == AmiGUSPlaybackSampleSizes[ playHwSampleFormatId ],
+    playProps->pp_AhiSampleShift  == playSampleBytesShift,
+    playProps->pp_AhiBufferMask   == CopyFunctionRequirementById[ playbackCopyFunctionId ],
+
+    recProps->rp_CopyFunction       == RecordingCopyFunctionById[ recordingCopyFunctionId ],
+    recProps->rp_HwFormatId         == recHwSampleFormatId,
+    recProps->rp_AhiFormatId        == RecordingSampleTypeById[ recordingCopyFunctionId ],
+    recProps->rp_AhiSampleShift     == recSampleBytesShift,
+    recProps->rp_AhiBufferMultiples == RecordingSampleAlignmentById[ recordingCopyFunctionId ]
+  ));
+
+  LOG_D(( 
+    "%ld %ld %ld %ld \n",
+    playProps->pp_HwSampleSize, AmiGUSPlaybackSampleSizes[ playHwSampleFormatId ],
+    playProps->pp_AhiSampleShift, playSampleBytesShift
+  ));
+  LOG_D(( 
+    "%ld %ld \n",
+   recProps->rp_HwFormatId , recHwSampleFormatId
+  ));
+/////////////////////
 
   /*
    * ------------------------------------------------------

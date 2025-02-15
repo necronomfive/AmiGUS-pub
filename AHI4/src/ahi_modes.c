@@ -70,18 +70,22 @@ struct PlaybackProperties PlaybackPropertiesById[] = {
   { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_STEREO_24BIT, 6, 3, 0xffFFffF0 },
   /* HiFi 24 bit stereo++ */
   { &PlaybackCopy32to24, AMIGUS_PCM_S_PLAY_STEREO_24BIT, 6, 3, 0xffFFffF0 }
-/*  ^                    ^                               ^  ^  ^
- *  |                    |                               |  |  |
- *  |                    |   +---------------------------+  |  Buffer alignment
- *  |                    |   |                              |
- *  |                    |   | Number of shifts to translate AHI Sample to BYTE
- *  |                    |   |   
- *  |                    |   Byte size of mono / stereo sample in AmiGUS format
- *  |                    |
- *  |      AmiGUS PCM Playback Sample Format as understood in amigus_hardware.h
- *  |
- *  +------------- Playback copy function to copy AHI buffer to AmiGUS PCM FiFo
- */
+/*  ^1                   ^2                              ^3 ^4 ^5
+ *
+ * Note ^1:
+ *   Playback copy function to copy AHI buffer to AmiGUS PCM FiFo.
+ * Note ^2:
+ *   AmiGUS PCM Playback Sample Format as understood in amigus_hardware.h,
+ *   obviously needs to understand the output of the copy function.
+ * Note ^3:
+ *   Byte size of mono / stereo samples in AmiGUS format as expected by the
+ *   hardware, respectively AmiGUS PCM Playback Sample Format.
+ * Note ^4:
+ *   Number of shifts to translate a single AHI Sample to its BYTE size.
+ *   Example: Stereo HiFi has 2 x 32 bit = 2 x 4 bytes = 8 bytes = 1<<3.
+ * Note ^5:
+ *   Buffer alignment as required by the selected copy function.
+  */
 };
 
 struct RecordingProperties RecordingPropertiesById[] = {
@@ -127,20 +131,22 @@ struct RecordingProperties RecordingPropertiesById[] = {
   { &RecordingCopy24Sto32S, AMIGUS_PCM_S_REC_STEREO_24BIT, AHIST_S32S, 3, 16 },
   /* HiFi 24 bit stereo++ */
   { &RecordingCopy24Sto32S, AMIGUS_PCM_S_REC_STEREO_24BIT, AHIST_S32S, 3, 16 }
-/*  ^                       ^                              ^           ^  ^
- *  |                       |                              |           |  |
- *  |   +-------------------+                              |           |  |
- *  |   |   +----------------------------------------------+           |  |
- *  |   |   |   +------------------------------------------------------+  |
- *  |   |   |   |                                                         |
- *  |   |   |   |        Number of BYTEs output per single copy function call
- *  |   |   |   |
- *  |   |   |   Number of bit shifts translating one mono AHI Sample to BYTEs
- *  |   |   |
- *  |   |   AHI sample type output when recording
- *  |   |
- *  |   AmiGUS PCM Recording Sample Format as understood in amigus_hardware.h
- *  |
- *  Playback copy function to copy AmiGUS PCM FiFo to AHI buffer
+/*  ^1                      ^2                             ^3          ^4 ^5
+ *
+ * Note ^1:
+ *   Playback copy function to copy AmiGUS PCM FiFo to AHI buffer.
+ * Note ^2:
+ *   AmiGUS PCM Recording Sample Format as understood in amigus_hardware.h,
+ *   obviously needs to deliver the input of the copy function and provide
+ *   the correct AHI sample type as output.
+ * Note ^3:
+ *   AHI sample type output when recording.
+ * Note ^4:
+ *   Number of shifts to translate a single AHI Sample to its BYTE size.
+ *   Example: Stereo 16bit has 2 x 16 bit = 2 x 2 bytes = 4 bytes = 1<<2.
+ * Note ^5:
+ *   Number of BYTEs output per single copy function call, depends on the
+ *   AmiGUS hardware sample format and mainly of the requirement to read only
+ *   LONGs from AmiGUS.
  */
 };

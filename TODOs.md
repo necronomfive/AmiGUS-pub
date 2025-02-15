@@ -1,5 +1,4 @@
 Next:
-- Recording overflow handling similar to playback underrun handling
 - Try snap upward 96kHz Mode
 - Move to mode file: RecordingSampleTypeById, RecordingSampleAlignmentById, AmiGUSPlaybackSampleSizes
 - Real 24bit recording
@@ -17,3 +16,4 @@ Done:
 - Test DigiBooster panning as per https://www.a1k.org/forum/index.php?threads/90990/post-1826163 -> Working
 - Deactivate AHI recording SRC!
 - Prevent crashes when 2 AHI clients try allocating single AmiGUS
+- Recording overflow handling similar to playback underrun handling

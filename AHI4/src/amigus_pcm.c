@@ -16,7 +16,7 @@
 
 #include <proto/expansion.h>
 
-#include "ahi_modes.h"
+#include "amigus_ahi_modes.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
 #include "amigus_pcm.h"

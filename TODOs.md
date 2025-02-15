@@ -1,4 +1,5 @@
 Next:
+- Test Recording and release alpha15
 - Try snap upward 96kHz Mode
 - Real 24bit recording
 - Left/right swapped in stereo 8bit vs 16bit + 24bit 

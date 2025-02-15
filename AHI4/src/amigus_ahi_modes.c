@@ -24,7 +24,7 @@
 #pragma popwarn
 #endif
 
-#include "ahi_modes.h"
+#include "amigus_ahi_modes.h"
 #include "amigus_hardware.h"
 
 struct PlaybackProperties PlaybackPropertiesById[] = {

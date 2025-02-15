@@ -18,7 +18,7 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
-#include "ahi_modes.h"
+#include "amigus_ahi_modes.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
 #include "debug.h"

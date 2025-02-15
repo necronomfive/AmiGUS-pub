@@ -14,8 +14,8 @@
  * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AHI_MODES_H
-#define AHI_MODES_H
+#ifndef AMIGUS_AHI_MODES_H
+#define AMIGUS_AHI_MODES_H
 
 #include "copies.h"
 
@@ -51,4 +51,4 @@ struct RecordingProperties {
 extern struct PlaybackProperties PlaybackPropertiesById[];
 extern struct RecordingProperties RecordingPropertiesById[];
 
-#endif /* AHI_MODES_H */
+#endif /* AMIGUS_AHI_MODES_H */

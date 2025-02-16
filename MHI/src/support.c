@@ -54,7 +54,7 @@ struct TErrorMessage errors[] =
 
     { EAudioModeNotImplemented, "Right now implemented, 16bit, stereo, no Hifi", "Coming soon..." },
 
-    { EOpenLogFile, "Can not create log file RAM:AmiGUS-AHI.log.", "Oops!" },
+    { EOpenLogFile, "Can not create log file RAM:AmiGUS-MHI.log.", "Oops!" },
     { EAllocateLogMem, "Can not allocate memory blob for extra-dirty logging.", "Meh." },
     { EDriverInUse, "Currently only one client is supported.", "Shame!" },
     /*

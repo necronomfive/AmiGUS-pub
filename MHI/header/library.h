@@ -45,10 +45,10 @@
  * will be used in library.c.
  *****************************************************************************/
 #define LIBRARY_NAME      "mhiAmiGUS.library"
-#define LIBRARY_VERSION   0
+#define LIBRARY_VERSION   1
 #define LIBRARY_REVISION  1
 #define LIBRARY_DATETXT	  __AMIGADATE__
-#define LIBRARY_VERSTXT	 GSTR( LIBRARY_VERSION ) ".0" GSTR( LIBRARY_REVISION )
+#define LIBRARY_VERSTXT	 GSTR( LIBRARY_VERSION ) ".00" GSTR( LIBRARY_REVISION )
 
 #if defined( _M68060 )
   #define LIBRARY_CPUTXT  " 060"
@@ -78,7 +78,7 @@
 
 #define LIBRARY_IDSTRING \
   LIBRARY_NAME " " LIBRARY_VERSTXT " " LIBRARY_DATETXT \
-  LIBRARY_CPUTXT LIBRARY_COMPILERTXT LIBRARY_HOSTTXT "\r\n"
+  LIBRARY_CPUTXT LIBRARY_COMPILERTXT LIBRARY_HOSTTXT
 
 /******************************************************************************
  * SegList pointer definition

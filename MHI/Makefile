@@ -61,7 +61,7 @@ BDIR   = build/
 SDIR   = src/
 HDIR   = header/
 
-AHI_INCLUDE     = include
+MHI_INCLUDE     = include
 NDK_ASM_INCLUDE = $(NDK)Include_I
 NDK_C_INCLUDE   = $(NDK)Include_H
 
@@ -81,7 +81,7 @@ ifdef USEVBCC
     LDIR        = $(VBCC)/targets/m68k-amigaos/lib/
   endif
   
-  CFLAGS        = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR)                          \
+  CFLAGS        = -O2 -c -I$(MHI_INCLUDE) -I$(HDIR)                          \
                   -D__NOLIBBASE__ -D$(HOST_TOOLCHAIN) -o
   LFLAGS        = -nostdlib -o
   LFLAGS1       =
@@ -94,13 +94,13 @@ else
   DEAC_CFLAGS   = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(HOST_TOOLCHAIN)  \
                   PARAMETERS=REGISTER DATA=FAR CODE=FAR                       \
                   NOSTACKCHECK NOCHECKABORT NOICONS                           \
-                  IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)    \
+                  IDIR=$(MHI_INCLUDE) IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)    \
                   OBJNAME
 
   CFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(HOST_TOOLCHAIN)  \
                   PARAMETERS=REGISTER DATA=FAR CODE=FAR                       \
                   NOSTACKCHECK NOCHECKABORT NOICONS                           \
-                  IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)    \
+                  IDIR=$(MHI_INCLUDE) IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)    \
                   STRINGMERGE UNSIGNEDCHAR                                    \
                   OPTIMIZE OPTIMIZERGLOBAL OPTIMIZERINLINE OPTIMIZERINLOCAL   \
                   OPTIMIZERLOOP OPTIMIZERPEEPHOLE OPTIMIZERSCHEDULE           \

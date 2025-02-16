@@ -85,7 +85,7 @@ VOID debug_fprintf( STRPTR format, ... ) {
   UBYTE buffer[512];
   LONG i;
   
-  i = GetVar( "AmiGUS-LOG-FILEPATH", buffer, sizeof(buffer), 0 );
+  i = GetVar( "AmiGUS-AHI-LOG-FILEPATH", buffer, sizeof(buffer), 0 );
   if (( i > 0 ) && (i <= 512 )) {
     logFilePath = buffer;
   }
@@ -141,21 +141,21 @@ VOID debug_mprintf( STRPTR format, ... ) {
     }    
     attempted = TRUE;
 
-    i = GetVar( "AmiGUS-LOG-ADDRESS", buffer, sizeof(buffer), 0 );
+    i = GetVar( "AmiGUS-AHI-LOG-ADDRESS", buffer, sizeof(buffer), 0 );
     if ( i > 0 ) {
       StrToLong( buffer, (LONG *) &where );
     }
     /*
-     * UAE:  setenv AmiGUS-LOG-ADDRESS 1207959552 -> 0x48000000
-     * 3/4k: setenv AmiGUS-LOG-ADDRESS 201326591  -> 0x0bffFFff
+     * UAE:  setenv AmiGUS-AHI-LOG-ADDRESS 1207959552 -> 0x48000000
+     * 3/4k: setenv AmiGUS-AHI-LOG-ADDRESS 201326591  -> 0x0bffFFff
      */
-    i = GetVar( "AmiGUS-LOG-SIZE", buffer, sizeof(buffer), 0 );
+    i = GetVar( "AmiGUS-AHI-LOG-SIZE", buffer, sizeof(buffer), 0 );
     if ( i > 0 ) {
       StrToLong( buffer, &size );
     }
 
     debug_kprintf(
-      "AmiGUS-LOG-ADDRESS %lx = %lu (requested)\nAmiGUS-LOG-SIZE %ld\n", 
+      "AmiGUS-AHI-LOG-ADDRESS %lx = %lu (requested)\nAmiGUS-AHI-LOG-SIZE %ld\n", 
       (ULONG)where,
       (ULONG)where,
       size

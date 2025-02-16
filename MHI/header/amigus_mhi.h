@@ -43,9 +43,10 @@
 #include "SDI_mhi_protos.h"
 
 #define AMIGUS_MHI_AUTHOR           "Christoph `Chritoph` Fassbach"
-#define AMIGUS_MHI_COPYRIGHT        "(c) 2024 Christoph Fassbach / LGPL3"
+#define AMIGUS_MHI_COPYRIGHT        "(c) 2025 Christoph Fassbach / LGPL3"
 #define AMIGUS_MHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
-                                    "Frank Wille (vbcc), xyz (MHI)"
+                                    "Frank Wille (vbcc), "                \
+                                    "Thomas Wenzel et al. (MHI)"
 #define AMIGUS_MHI_VERSION          LIBRARY_IDSTRING
 
 #define AMIGUS_MHI_FIRMWARE_MINIMUM ( ( 2024 << 20 ) /* year   */ \
@@ -61,6 +62,11 @@
 /******************************************************************************
  * Library base structure components
  *****************************************************************************/
+
+struct AmiGUSClientHandle {
+  struct Task                 * agch_Task;
+  ULONG                         agch_Signal;
+};
 
 /******************************************************************************
  * Library base structure
@@ -82,6 +88,9 @@ struct AmiGUSBase {
   struct IORequest            * agb_TimerRequest;
   /* AmiGUS specific member variables */
   APTR                          agb_CardBase;
+
+  /* Client info */
+  struct AmiGUSClientHandle     agb_ClientHandle;
 
   /* Only 1 AmiGUS supported per machine currently, sorry */
   BYTE                          agb_UsageCounter;    

@@ -32,7 +32,7 @@ struct AmiGUSBase;
 
 ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a0, struct Task * task ),
-  REG( d0, ULONG mhisignal ),
+  REG( d0, ULONG signal ),
   REG( a6, struct AmiGUSBase * amiGUSBase ) 
 );
 

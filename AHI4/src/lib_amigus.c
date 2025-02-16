@@ -170,11 +170,12 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
   AmiGUSBase    = amiGUSBase;
 #endif
 
-  LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", amiGUSBase));
+  LOG_D(( "D: AmiGUS base ready @ 0x%08lx\n", amiGUSBase ));
   error = FindAmiGusPcm( amiGUSBase );
   if ( error ) {
 
     DisplayError( error );
   }
+  LOG_I(( "I: %s\n", LIBRARY_IDSTRING ));
   return ENoError;
 }

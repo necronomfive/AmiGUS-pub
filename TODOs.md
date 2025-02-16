@@ -1,5 +1,8 @@
 Next:
-- Test Recording and release alpha15
+- Test Recording and release alpha15 / beta 15
+- Switch to AmiGUS ints instead AHI timing
+- Unify recording and playback buffer sizing 
+  (as the buffer sizing can then be steered)
 - Try snap upward 96kHz Mode
 - Real 24bit recording
 - Left/right swapped in stereo 8bit vs 16bit + 24bit 

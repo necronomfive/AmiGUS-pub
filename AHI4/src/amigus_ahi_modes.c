@@ -84,7 +84,7 @@ struct PlaybackProperties PlaybackPropertiesById[] = {
  *   Number of shifts to translate a single AHI Sample to its BYTE size.
  *   Example: Stereo HiFi has 2 x 32 bit = 2 x 4 bytes = 8 bytes = 1<<3.
  * Note ^5:
- *   Buffer alignment as required by the selected copy function.
+ *   Buffer alignment as required by the selected copy function encoded as bit mask.
   */
 };
 
@@ -134,7 +134,7 @@ struct RecordingProperties RecordingPropertiesById[] = {
 /*  ^1                      ^2                             ^3          ^4 ^5
  *
  * Note ^1:
- *   Playback copy function to copy AmiGUS PCM FiFo to AHI buffer.
+ *   Recording copy function to copy AmiGUS PCM FiFo to AHI buffer.
  * Note ^2:
  *   AmiGUS PCM Recording Sample Format as understood in amigus_hardware.h,
  *   obviously needs to deliver the input of the copy function and provide
@@ -147,6 +147,7 @@ struct RecordingProperties RecordingPropertiesById[] = {
  * Note ^5:
  *   Number of BYTEs output per single copy function call, depends on the
  *   AmiGUS hardware sample format and mainly of the requirement to read only
- *   LONGs from AmiGUS.
+ *   LONGs from AmiGUS.The recording buffers' BYTE size needs to be 
+ *   multiples of these.
  */
 };

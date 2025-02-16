@@ -206,11 +206,12 @@ BOOL testGetBufferSizes( VOID ) {
   return failed;
 }
 
-#if 0
 ULONG alignBufferSamplesRef( ULONG ahiBuffSamples ) {
 
-  ULONG mask = CopyFunctionRequirementById[ AmiGUSBase->agb_Playback.agpp_CopyFunctionId ];
-  UBYTE shift = AmiGUSBase->agb_Playback.agpp_AhiSampleShift;
+  struct PlaybackProperties * mode = 
+    &PlaybackPropertiesById[ AmiGUSBase->agb_AhiModeOffset ];
+  ULONG mask = mode->pp_AhiBufferMask;
+  UBYTE shift = mode->pp_AhiSampleShift;
   ULONG aligned = ahiBuffSamples;
 
   aligned <<= shift;
@@ -236,7 +237,7 @@ BOOL testAlignBuffSamples( VOID ) {
     96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0008
   };
   LONG shift;          /* 1 - 3 */
-  LONG copyFunctionId; /* 0 - 4 */
+  UBYTE modeId;         /* 0 - 20 */
   LONG suggestedBufferSize;
   LONG alignedBufferSize;
   LONG i;
@@ -255,7 +256,7 @@ BOOL testAlignBuffSamples( VOID ) {
   const char * h5 = " Smpls | BYTEs |";
   const char * h6 = " % | result\n";
 
-  for ( copyFunctionId = 0; 5 > copyFunctionId; ++copyFunctionId ) {
+  for ( modeId = 0; 21 > modeId; ++modeId ) {
     printf( "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", 
             h0, h1, h1, h1, h2,
             h3,
@@ -265,11 +266,10 @@ BOOL testAlignBuffSamples( VOID ) {
       for ( i = 0; NUM_SAMPLE_RATES > i; ++i ) {
 
         suggestedBufferSize = sampleRates[ i ] / 100;
-        AmiGUSBase->agb_Playback.agpp_CopyFunctionId = copyFunctionId;
-        AmiGUSBase->agb_Playback.agpp_AhiSampleShift = shift;
+        AmiGUSBase->agb_AhiModeOffset = modeId;
 
-        alignedBufferSize = AlignByteSizeForSamples( suggestedBufferSize )
-                            >> AmiGUSBase->agb_Playback.agpp_AhiSampleShift;
+        alignedBufferSize = AlignByteSizeForSamples( suggestedBufferSize ) >>
+          PlaybackPropertiesById[ modeId ].pp_AhiSampleShift;
         ref = alignBufferSamplesRef( suggestedBufferSize );
 
         exp0 = ( alignedBufferSize <= suggestedBufferSize );
@@ -278,7 +278,7 @@ BOOL testAlignBuffSamples( VOID ) {
 
         printf( "%3ld | %6ld | %5ld | %5ld | %5ld | %5ld | %5ld | %5ld |"
                 " %5ld | %1ld | %6s\n",
-                copyFunctionId, sampleRates[ i ], shift,
+                modeId, sampleRates[ i ], shift,
                 suggestedBufferSize, suggestedBufferSize << shift,
                 alignedBufferSize, alignedBufferSize << shift,
                 suggestedBufferSize - alignedBufferSize,
@@ -297,12 +297,13 @@ BOOL testAlignBuffSamples( VOID ) {
           h3,
           h4, h5, h5, h5, h6,
           h0, h1, h1, h1, h2 );
+
   printf( "Example mask: 0x%08lx, Example ~ mask: 0x%08lx\n",
-          CopyFunctionRequirementById[ AmiGUSBase->agb_Playback.agpp_CopyFunctionId ],
-          ~CopyFunctionRequirementById[ AmiGUSBase->agb_Playback.agpp_CopyFunctionId ] );
+          PlaybackPropertiesById[ AmiGUSBase->agb_AhiModeOffset ].pp_AhiBufferMask,
+          ~PlaybackPropertiesById[ AmiGUSBase->agb_AhiModeOffset ].pp_AhiBufferMask );
   return failed;
 }
-#endif
+
 /******************************************************************************
  * Finally, main triggering all tests:
  *****************************************************************************/

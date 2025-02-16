@@ -147,27 +147,37 @@ test: test_buffers test_copies test_support
 
 test_buffers: FOLDERS $(LIB_OBJS)
 	@echo " "
-	$(CC) $(CFLAGS) test/test_buffers.o test/test_buffers.c
-	$(LD) $(LFLAGS) test/test_buffers $(LFLAGS1) $(LFLAGST1) test/test_buffers.o $(BDIR)buffers.o $(BDIR)copies.o $(BDIR)debug.o $(BDIR)support.o $(BDIR)amigus_ahi_modes.o $(LFLAGST2)
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
+            $(BDIR)buffers.o \
+            $(BDIR)amigus_ahi_modes.o $(BDIR)copies.o \
+            $(BDIR)debug.o $(BDIR)support.o \
+            $(LFLAGST2)
 	@echo " "
-	$(RUNNER) test/test_buffers
-	-@$(RM) test/test_buffers test/test_buffers.o $(RM_SUFFIX)
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
 
 test_copies: FOLDERS $(LIB_OBJS)
 	@echo " "
-	$(CC) $(CFLAGS) test/test_copies.o test/test_copies.c
-	$(LD) $(LFLAGS) test/test_copies $(LFLAGS1) $(LFLAGST1) test/test_copies.o $(BDIR)copies.o $(BDIR)amigus_ahi_modes.o $(LFLAGST2)
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
+            $(BDIR)copies.o \
+            $(BDIR)amigus_ahi_modes.o \
+            $(LFLAGST2)
 	@echo " "
-	$(RUNNER) test/test_copies
-	-@$(RM) test/test_copies test/test_copies.o $(RM_SUFFIX)
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
 
 test_support: FOLDERS $(LIB_OBJS)
 	@echo " "
-	$(CC) $(CFLAGS) test/test_support.o test/test_support.c
-	$(LD) $(LFLAGS) test/test_support $(LFLAGS1) $(LFLAGST1) test/test_support.o $(BDIR)support.o $(BDIR)debug.o $(LFLAGST2)
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
+            $(BDIR)support.o \
+            $(BDIR)debug.o \
+            $(LFLAGST2)
 	@echo " "
-	$(IGNORE_VAMOS)$(RUNNER) test/test_support
-	-@$(RM) test/test_support test/test_support.o $(RM_SUFFIX)
+	$(IGNORE_VAMOS)$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
 
 INCLUDES:
 	make -f Makefile-Includes all 

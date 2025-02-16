@@ -1,4 +1,5 @@
 Next:
+- Decide on debug + cpu variants
 - Switch to AmiGUS ints instead AHI timing
 - Unify recording and playback buffer sizing 
   (as the buffer sizing can then be steered)

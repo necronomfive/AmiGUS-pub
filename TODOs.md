@@ -1,5 +1,4 @@
 Next:
-- Test Recording and release alpha15 / beta 15
 - Switch to AmiGUS ints instead AHI timing
 - Unify recording and playback buffer sizing 
   (as the buffer sizing can then be steered)
@@ -21,3 +20,4 @@ Done:
 - Prevent crashes when 2 AHI clients try allocating single AmiGUS
 - Recording overflow handling similar to playback underrun handling
 - Move to mode file: RecordingSampleTypeById, RecordingSampleAlignmentById, AmiGUSPlaybackSampleSizes -> moved all tables to lookup based on mode id
+- Test Recording and release alpha15 / beta 15

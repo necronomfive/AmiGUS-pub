@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "amigus_ahi_modes.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
 #include "copies.h"
@@ -135,7 +136,7 @@ BOOL testPlaybackCopy16to8( VOID ) {
   ULONG exp[] = { 3, 4, 1, 1 };
   STRPTR expF[] = { "12569ade" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = PlaybackCopyFunctionById[ 0 ];
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy16to8;
   printf("\nTesting PlaybackCopy16to8 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
@@ -186,7 +187,7 @@ BOOL testPlaybackCopy16to16( VOID ) {
   ULONG exp[] = { 2, 4, 1, 1 };
   STRPTR expF[] = { "12345678" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = PlaybackCopyFunctionById[ 1 ];
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy16to16;
   printf("\nTesting PlaybackCopy16to16 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
@@ -243,7 +244,7 @@ BOOL testPlaybackCopy32to8( VOID ) {
   ULONG exp[] = { 5, 4, 1, 1 };
   STRPTR expF[] = { "129a0f87" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = PlaybackCopyFunctionById[ 2 ];
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy32to8;
   printf("\nTesting PlaybackCopy32to8 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
@@ -294,7 +295,7 @@ BOOL testPlaybackCopy32to16( VOID ) {
   ULONG exp[] = { 3, 4, 1, 1 };
   STRPTR expF[] = { "12349abc" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = PlaybackCopyFunctionById[ 3 ];
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy32to16;
   printf("\nTesting PlaybackCopy32to16 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
@@ -354,7 +355,7 @@ BOOL testPlaybackCopy32to24( VOID ) {
     "bcde0fed",
     "cb876543" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = PlaybackCopyFunctionById[ 4 ];
+  AmiGUSBase->agb_Playback.agpp_CopyFunction = &PlaybackCopy32to24;
   printf("\nTesting PlaybackCopy32to24 ...\n");
   /********* for copy function tests, just adapt the between section *********/
   
@@ -404,7 +405,8 @@ BOOL testPlaybackCopyFunctionCalling( VOID ) {
   ULONG exp[] = { 2, 4, 1, 1 };
   STRPTR expF[] = { "12345678" };
 
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = PlaybackCopyFunctionById[ 1 ];
+  AmiGUSBase->agb_Playback.agpp_CopyFunction =
+    PlaybackPropertiesById[ 4 ].pp_CopyFunction;
   AmiGUSBase->agb_Playback.agpp_Buffer[ 0 ] = in;
   AmiGUSBase->agb_Playback.agpp_BufferIndex[ 0 ] = 1;
   printf("\nTesting PlaybackCopyFunctionCalling ...\n");
@@ -473,7 +475,7 @@ BOOL testRecordingCopy8Mto16S( VOID ) {
     0x78007800,
     0x00000000 };
 
-  AmiGUSBase->agb_Recording.agpr_CopyFunction = RecordingCopyFunctionById[ 0 ];
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy8Mto16S;
   printf("\nTesting RecordingCopy8Mto16S ...\n");
   /**** for recording copy function tests, just adapt the between section ****/
 
@@ -538,7 +540,7 @@ BOOL testRecordingCopy8Sto16S( VOID ) {
     0x56007800,
     0x00000000 };
 
-  AmiGUSBase->agb_Recording.agpr_CopyFunction = RecordingCopyFunctionById[ 1 ];
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy8Sto16S;
   printf("\nTesting RecordingCopy8Sto16S ...\n");
   /**** for recording copy function tests, just adapt the between section ****/
 
@@ -603,7 +605,7 @@ BOOL testRecordingCopy16Mto16S( VOID ) {
     0x56785678,
     0x00000000 };
 
-  AmiGUSBase->agb_Recording.agpr_CopyFunction = RecordingCopyFunctionById[ 2 ];
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy16Mto16S;
   printf("\nTesting RecordingCopy16Mto16S ...\n");
   /**** for recording copy function tests, just adapt the between section ****/
 
@@ -666,7 +668,7 @@ BOOL testRecordingCopy16Sto16S( VOID ) {
     0x12345678,
     0x00000000 };
 
-  AmiGUSBase->agb_Recording.agpr_CopyFunction = RecordingCopyFunctionById[ 3 ];
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy16Sto16S;
   printf("\nTesting RecordingCopy16Sto16S ...\n");
   /**** for recording copy function tests, just adapt the between section ****/
 
@@ -740,7 +742,7 @@ BOOL testRecordingCopy24Mto32S( VOID ) {
     0x9abc0300,
     0x00000000 };
 
-  AmiGUSBase->agb_Recording.agpr_CopyFunction = RecordingCopyFunctionById[ 4 ];
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy24Mto32S;
   printf("\nTesting RecordingCopy24Mto32S ...\n");
   /**** for recording copy function tests, just adapt the between section ****/
 
@@ -819,7 +821,7 @@ BOOL testRecordingCopy24Sto32S( VOID ) {
     0x43210800,
     0x00000000 };
 
-  AmiGUSBase->agb_Recording.agpr_CopyFunction = RecordingCopyFunctionById[ 5 ];
+  AmiGUSBase->agb_Recording.agpr_CopyFunction = &RecordingCopy24Sto32S;
   printf("\nTesting RecordingCopy24Sto32S ...\n");
   /**** for recording copy function tests, just adapt the between section ****/
 

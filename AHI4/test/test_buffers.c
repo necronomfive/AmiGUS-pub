@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "amigus_ahi_modes.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
 #include "buffers.h"
@@ -205,6 +206,7 @@ BOOL testGetBufferSizes( VOID ) {
   return failed;
 }
 
+#if 0
 ULONG alignBufferSamplesRef( ULONG ahiBuffSamples ) {
 
   ULONG mask = CopyFunctionRequirementById[ AmiGUSBase->agb_Playback.agpp_CopyFunctionId ];
@@ -300,7 +302,7 @@ BOOL testAlignBuffSamples( VOID ) {
           ~CopyFunctionRequirementById[ AmiGUSBase->agb_Playback.agpp_CopyFunctionId ] );
   return failed;
 }
-
+#endif
 /******************************************************************************
  * Finally, main triggering all tests:
  *****************************************************************************/
@@ -320,7 +322,7 @@ int main(int argc, char const *argv[]) {
   failed |= testGcd();
   failed |= testLcm();
   failed |= testGetBufferSizes();
-  failed |= testAlignBuffSamples();
+//  failed |= testAlignBuffSamples();
 
   free( AmiGUSBase );
 

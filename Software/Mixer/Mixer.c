@@ -111,6 +111,8 @@ int chkabort(void) { return(0); }  /* really */
 #define	FLASH_CTRL_READ_DATA	0x6a
 #define	FLASH_CONFIG_STATUS		0x6e
 
+#define	MAIN_TOSLINK_CTRL		0x70
+
 
 /* Gadget defines of our choosing, to be used as GadgetID's,
 ** also used as the index into the gadget array my_gads[].
@@ -145,6 +147,7 @@ int chkabort(void) { return(0); }  /* really */
 #define MYGAD_BUTTON_RESET    	(21)
 
 #define MYGAD_CYCLE_LEVELS		(22)
+#define MYGAD_CYCLE_TOSLINK		(23)
 
 /* Range for the slider: */
 #define SLIDER_MIN  (0)
@@ -206,6 +209,8 @@ struct MixData {
 	UWORD	mhi_mix_lr;
 	UWORD	wav_mix_lr;
 	UWORD	ahi_mix_lr;
+	
+	UWORD	toslink_srate;
 
 	UBYTE	adc_enable;
 	
@@ -298,6 +303,8 @@ void setMixer(APTR base,struct MixData *mixdat)
 	WriteReg16(base,MAIN_MHI_MIX_LR,mixdat->mhi_mix_lr);
 	WriteReg16(base,MAIN_WAV_MIX_LR,mixdat->wav_mix_lr);
 	WriteReg16(base,MAIN_AHI_MIX_LR,mixdat->ahi_mix_lr);
+
+	WriteReg16(base,MAIN_TOSLINK_CTRL,mixdat->toslink_srate);
 	
 	WriteSPI(base, 0x06, mixdat->adc_enable);	// Enable PAULA Left
 	WriteSPI(base, 0x07, mixdat->adc_enable);	// Enable PAULA Right
@@ -452,14 +459,20 @@ void drawBorders(struct RastPort *rp,UWORD topborder,struct TextFont *font)
 	  myIText.IText       = "Wave Sound";
 	  PrintIText(rp,&myIText,startx,topborder+4);	  
 	  startx +=118;
-	  myIText.IText       = "External Inputs";
+	  myIText.IText       = "External Sound";
 	  PrintIText(rp,&myIText,startx,topborder+4);	
 	  startx +=146;
 	  myIText.IText       = "Levels";
 	  PrintIText(rp,&myIText,startx,topborder+4);	
 	  startx+=8;
 	  myIText.IText       = "L  R";
-	  PrintIText(rp,&myIText,startx,topborder+20);		  
+	  PrintIText(rp,&myIText,startx,topborder+20);	
+		startx-=82;
+	  myIText.IText       = "Inputs";
+	  PrintIText(rp,&myIText,startx,topborder+20);
+		startx-=4;
+	  myIText.IText       = "TOSLINK";
+	  PrintIText(rp,&myIText,startx,topborder+84);		  
 }
 
 /* Print any error message.  We could do more fancy handling (like
@@ -542,8 +555,12 @@ void initCfgMem (APTR cfg_mem)
 	*((ULONG *)((ULONG)cfg_mem+0x0080)) = 0x00000044;	// MAIN_WAV_MIX_LR
 	*((ULONG *)((ULONG)cfg_mem+0x0084)) = 0x00000046;	// MAIN_AHI_MIX_LR
 
+/* TOSLINK Settings */
+
+	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0x00000070;	// MAIN_TOSLINK_CTRL
+
 /* End of Stream */
-	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0xffffffff;
+	*((ULONG *)((ULONG)cfg_mem+0x008c)) = 0xffffffff;
 }
 
 
@@ -650,7 +667,6 @@ void initGadgets(struct Window *win, struct Gadget *my_gads[], struct MixData *m
 	mixdat->ahi_vol_rr = regval;
 	*((ULONG *)((ULONG)cfg_mem+0x0074)) = 0x0000003e | (ULONG)((ULONG)regval << 16);	// MAIN_AHI_VOLUME_RR
 
-	
 	regval = ReadReg16(base,MAIN_ADC_MIX_LR);
 	mixdat->adc_mix_lr = regval;
 	*((ULONG *)((ULONG)cfg_mem+0x0078)) = 0x00000040 | (ULONG)((ULONG)regval << 16);	
@@ -670,6 +686,8 @@ void initGadgets(struct Window *win, struct Gadget *my_gads[], struct MixData *m
 	/* Initialise sliders from config structure */
 	
 	updateSliders(win,my_gads,mixdat);
+	
+	/* Initialise checkboxes from ADC settings */
 							
 	regval = (ReadSPI(base,0x06)&0xe);
 	mixdat->adc_enable = regval;
@@ -761,7 +779,19 @@ void initGadgets(struct Window *win, struct Gadget *my_gads[], struct MixData *m
 	else
 	{
 		mixdat->adc_locked = FALSE;
-	}		
+	}	
+
+	/* Initialise Cycle Gadget from TOSLINK settings */
+	
+	regval = ReadReg16(base,MAIN_TOSLINK_CTRL);
+	mixdat->toslink_srate = regval;
+	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0x00000070 | (ULONG)((ULONG)regval << 16);	// MAIN_TOSLINK_CTRL
+	
+	regval = regval < 3 ? regval : 0;
+	
+	GT_SetGadgetAttrs(my_gads[MYGAD_CYCLE_TOSLINK], win, NULL,
+				GTCY_Active, regval,
+				TAG_END);	
 }
 
 /*
@@ -1106,6 +1136,12 @@ switch (gad->GadgetID)
 				intdata->counter = 0;			
 				break;
 		}
+		break;
+	case MYGAD_CYCLE_TOSLINK:
+		mixdat->toslink_srate = (UWORD)code;
+		*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0x00000070 |(ULONG)((ULONG)mixdat->toslink_srate << 16);	// MAIN_TOSLINK_CTRL
+		break;
+	
     }
 	setMixer(board_base,mixdat);
 }
@@ -1165,6 +1201,14 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	"SLOW",
 	"NORM",
 	"FAST",
+	NULL
+    };
+	
+	static const char *toslink_options[] =
+    {
+	"48kHz",
+	"96kHz",
+	"192kHz",
 	NULL
     };
 
@@ -1451,7 +1495,7 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	/* ========== Checkbox Gadgets =========== */
 
 	ng.ng_LeftEdge  += 30;
-	ng.ng_TopEdge   += 8;
+	ng.ng_TopEdge   += 0;
 	ng.ng_Width      = 100;
 	ng.ng_Height     = 12;
 	ng.ng_GadgetText = "Paula";
@@ -1565,6 +1609,19 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	ng.ng_Flags      = 0;
 	gad = CreateGadget(CYCLE_KIND, gad, &ng,
 						GTCY_Labels, (ULONG)levels_options,
+						GTCY_Active, 0,
+						GA_Disabled, FALSE,
+						TAG_END);		
+
+	ng.ng_LeftEdge  -= 76;
+	ng.ng_TopEdge   -= 42;
+	ng.ng_Width      = 72;
+	ng.ng_Height     = 12;
+	ng.ng_GadgetText = "";
+	ng.ng_GadgetID   = MYGAD_CYCLE_TOSLINK;
+	ng.ng_Flags      = 0;
+	gad = CreateGadget(CYCLE_KIND, gad, &ng,
+						GTCY_Labels, (ULONG)toslink_options,
 						GTCY_Active, 0,
 						GA_Disabled, FALSE,
 						TAG_END);							
@@ -1696,7 +1753,7 @@ VOID gadtoolsWindow(VOID)
 	struct TextFont *font;
 	struct Screen   *mysc;
 	struct Window   *mywin;
-	struct Gadget   *glist, *my_gads[23];
+	struct Gadget   *glist, *my_gads[24];
 	void            *vi;
 	WORD            slider_level = 50;
 	UWORD           topborder;
@@ -1768,9 +1825,11 @@ VOID gadtoolsWindow(VOID)
 		mixdat->ahi_mix_lr = 0x0000;
 		mixdat->mhi_mix_lr = 0x0000;
 		mixdat->wav_mix_lr = 0x0000;
-		mixdat->adc_mix_lr = 0x0000;	
-		mixdat->adc_enable = 0x2;
+		mixdat->adc_mix_lr = 0x0000;
 		
+		mixdat->toslink_srate = 0x0000;
+		
+		mixdat->adc_enable = 0x2;		
 	}
 	else
 	{
@@ -1863,7 +1922,7 @@ VOID gadtoolsWindow(VOID)
 				else
 					{
 					if (NULL == (mywin = OpenWindowTags(NULL,
-							WA_Title,     "AmiGUS Mixer V0.54 - (c)2025 by O. Achten",
+							WA_Title,     "AmiGUS Mixer V0.61 - (c)2025 by O. Achten",
 							WA_Gadgets,   glist,      WA_AutoAdjust,    TRUE,
 							WA_Width,       528,      WA_MinWidth,        50,
 							WA_InnerHeight, 154,      WA_MinHeight,       50,

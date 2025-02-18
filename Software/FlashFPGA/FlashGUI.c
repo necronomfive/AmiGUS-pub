@@ -488,8 +488,12 @@ void initCfgMem (APTR cfg_mem)
 	*((ULONG *)((ULONG)cfg_mem+0x0080)) = 0x00000044;	// MAIN_WAV_MIX_LR
 	*((ULONG *)((ULONG)cfg_mem+0x0084)) = 0x00000046;	// MAIN_AHI_MIX_LR
 
+/* TOSLINK Settings */
+
+	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0x00000070;	// MAIN_TOSLINK_CTRL
+
 /* End of Stream */
-	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0xffffffff;
+	*((ULONG *)((ULONG)cfg_mem+0x008c)) = 0xffffffff;
 }
 
 
@@ -796,7 +800,7 @@ VOID process_window_events(struct Window *mywin,
 
 	myCD = NULL;
 	
-	wPrintF(0,"AmiGUS Flash Tool V0.3", TRUE,topborder,font,mywin);
+	wPrintF(0,"AmiGUS Flash Tool V0.31", TRUE,topborder,font,mywin);
 	wPrintF(1,"(C)2025 by Oliver Achten", FALSE,topborder,font,mywin);
 	
 	/* Find AmiGus Card */

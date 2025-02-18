@@ -176,7 +176,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Credits / Thanks
-* **Oliver Achten** - product idea, concept, PCB design, FPGA logic, docs, support code
+* **Oliver Achten** - product idea, concept, PCB design, FPGA logic, docs, base software
 * **Christoph Faßbach** - AHI & MHI driver framework
 * **Torsten Hees** - AmiGUS prototype production coordination & support
 * **Kari-Pekka Koljonen** - lots of help for HippoPlayer support

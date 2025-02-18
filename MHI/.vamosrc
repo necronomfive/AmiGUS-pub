@@ -11,7 +11,7 @@ quiet=True
 
 [volumes]
 sys=~/Documents/dev/amigaos-vamos-env
-gus=~/Documents/dev/amigaos-AmiGUS
+gus=~/Documents/dev/AmiGUS/mine
 
 [path]
 auto_assign=sys:

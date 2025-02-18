@@ -16,14 +16,14 @@
 
 #include <proto/expansion.h>
 
-// TODO # include "amigus_hardware.h"
 #include "amigus_codec.h"
+#include "amigus_hardware.h"
 #include "amigus_mhi.h"
 #include "debug.h"
 #include "errors.h"
 
 LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
-/*
+
   struct ConfigDev *configDevice = 0;
   ULONG serial;
   UBYTE minute;
@@ -34,7 +34,7 @@ LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
 
   configDevice = FindConfigDev( configDevice,
                                 AMIGUS_MANUFACTURER_ID,
-                                AMIGUS_MAIN_PRODUCT_ID );
+                                AMIGUS_CODEC_PRODUCT_ID );
   if ( !configDevice ) {
 
     LOG_E(("E: AmiGUS not found\n"));
@@ -49,10 +49,10 @@ LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
   }
 
   serial = configDevice->cd_Rom.er_SerialNumber;
-  if ( AMIGUS_AHI_FIRMWARE_MINIMUM > serial ) {
+  if ( AMIGUS_MHI_FIRMWARE_MINIMUM > serial ) {
 
-    LOG_E(("E: AmiGUS firmware expected %08lx, actual %08lx\n",
-           AMIGUS_AHI_FIRMWARE_MINIMUM, serial));
+    LOG_E(( "E: AmiGUS firmware expected %08lx, actual %08lx\n",
+            AMIGUS_MHI_FIRMWARE_MINIMUM, serial ));
     return EAmiGUSFirmwareOutdated;
   }
 
@@ -71,6 +71,6 @@ LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
   LOG_V(( "V: AmiGUS address stored at 0x%08lx\n",
           &(amiGUSBase->agb_CardBase )));
   amiGUSBase->agb_UsageCounter = 0;
-*/
+
   return ENoError;
 }

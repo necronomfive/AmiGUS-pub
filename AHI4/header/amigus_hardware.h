@@ -30,7 +30,7 @@
 
 #define AMIGUS_MAIN_PRODUCT_ID           16
 #define AMIGUS_HAGEN_PRODUCT_ID          17
-#define AMIGUS_MP3_PRODUCT_ID            18
+#define AMIGUS_CODEC_PRODUCT_ID          18
 
 /* AmiGUS PCM Registers */
 #define AMIGUS_PCM_MAIN_INT_CONTROL      0x00

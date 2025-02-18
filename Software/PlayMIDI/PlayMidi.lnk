@@ -1,0 +1,4 @@
+FROM LIB:c.o "PlayMidi.o"+"asmroutines.o"
+TO "PlayMidi"
+LIB LIB:sc.lib LIB:amiga.lib
+

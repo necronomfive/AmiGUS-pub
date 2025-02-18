@@ -1,0 +1,52 @@
+; AmiGUS Assembler Routines
+; (C) 2024 by Oliver Achten
+
+	INCLUDE "exec/types.i"
+	INCLUDE "exec/execbase.i"
+	INCLUDE "exec/memory.i"
+	INCLUDE "exec/macros.i"
+	
+	xdef _intServer
+
+	section text,code
+
+*******************************************************************************
+
+       STRUCTURE INTDATA,0
+		ULONG	int_rate
+		ULONG	counter
+		ULONG	rd_signal
+		APTR   	rd_task
+        LABEL RBFDATA_SIZEOF
+
+* Entered with:       A0 == scratch (execpt for highest pri vertb server)
+*  D0 == scratch      A1 == is_Data
+*  D1 == scratch      A5 == vector to interrupt code (scratch)
+*                     A6 == scratch
+*
+
+_intServer:
+	move.l	int_rate(a1),d0		; Get interrupt rate
+	cmp.l	#0,d0				; Check if enabled
+	beq		intNoSendSignal		; No, so we quit here
+	move.l	counter(a1),d1		; Get interrupt counter
+	cmp.l	#0,d1				; Underflow occured?
+	beq		countUnderflow		; Yes!
+	sub.l	#1,d1				; No, we decrease counter by 1
+	move.l	d1,counter(a1)
+	bra	 	intNoSendSignal		; And we are finshed here
+countUnderflow:	
+	move.l	d0,d1				; In case of underflow, we reload the counter
+	move.l	d1,counter(a1)	
+intSendSignal:					; And we send a signal
+	move.l	rd_signal(a1),d0	; get signal
+	move.l	rd_task(a1),a1		; get pointer to main task
+	move.l 	$4,a6				; Get Exec pointer
+	JSRLIB	Signal				; send signal to main() in order to wake-up
+intNoSendSignal:
+	moveq	#0,d0
+	rts
+
+*******************************************************************************
+	
+	end

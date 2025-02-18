@@ -1,0 +1,31 @@
+; AmiGUS Assembler Routines
+; (C) 2024 by Oliver Achten
+
+	INCLUDE "exec/types.i"
+	INCLUDE "exec/execbase.i"
+	INCLUDE "exec/memory.i"
+	INCLUDE "exec/macros.i"
+	
+	xdef _initSample
+
+	section text,code
+
+*******************************************************************************
+
+_initSample:
+	movem.l d1-d7/a0-a6,-(sp)	; Save registers
+	
+	moveq	#0,d4				; Set address to 0
+	move.l  d4,$14(a6)
+	
+	lea 	$10(a6),a1			; Load data port offset in A1
+
+initSampleLoop:
+	move.l	(a0)+,(a1)
+	sub.l	#1,d3
+	bne		initSampleLoop
+		
+	movem.l (sp)+,d1-d7/a0-a6	; Restore registers
+	rts
+	
+	end

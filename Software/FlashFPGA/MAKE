@@ -1,0 +1,1 @@
+sc FlashGUI.c incdir=include: cpu=68000 link

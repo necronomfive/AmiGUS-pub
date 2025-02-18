@@ -1,0 +1,1 @@
+sc Mixer.c asmroutines.a incdir=include: cpu=68000 MATH=standard link

@@ -1,0 +1,99 @@
+; AmiGUS Assembler Routines
+; (C) 2024 by Oliver Achten
+
+	INCLUDE "exec/types.i"
+	INCLUDE "exec/execbase.i"
+	INCLUDE "exec/memory.i"
+	INCLUDE "exec/macros.i"
+	
+	xdef _initFIFO
+	xdef _intServer
+
+	section text,code
+
+*******************************************************************************
+
+_initFIFO:
+	movem.l d1-d7/a0-a6,-(sp)	; Save registers
+	
+	lea 	$a(a6),a1
+	moveq	#0,d0
+	
+initFIFOLoop:
+	move.l	d0,(a1)
+	dbra	d3,initFIFOLoop
+	
+	movem.l (sp)+,d1-d7/a0-a6	; Restore registers
+	rts
+	
+*******************************************************************************
+
+       STRUCTURE INTDATA,0
+		APTR 	board_base
+		APTR	buffer
+		ULONG	buf_size
+		ULONG 	buf_count	
+		ULONG	buf_segments	
+		ULONG	buf_half_segments			
+        APTR   	rd_task
+        ULONG  	rd_signal
+		ULONG	tmp_buffer	
+        LABEL RBFDATA_SIZEOF
+
+* Entered with:       A0 == scratch (execpt for highest pri vertb server)
+*  D0 == scratch      A1 == is_Data
+*  D1 == scratch      A5 == vector to interrupt code (scratch)
+*                     A6 == scratch
+*
+
+_intServer:
+	move.l 	board_base(a1),a6	; get AmiGUS hardware register base
+	move.w	$00(a6),d0			; read interrupt status
+	and.w   #$4,d0				; did FIFO watermark irq occur?
+	beq		noFIFOInt			; if not, then there is nothing to do here
+;---
+	move.l 	buf_count(a1),d0	; load used buffer number
+	cmp.l	#0,d0				; first buffer used?
+	bne		intNoFirstBuf		; no, use temporary memory buffer
+	move.l  buffer(a1),a0		; yes, use first memory buffer
+	bra		intFirstBuf
+intNoFirstBuf:
+	move.l	tmp_buffer(a1),a0	; load temporary memory buffer
+intFirstBuf:
+	move.l  buf_size(a1),d1		; get buffer size
+	lea 	$a(a6),a5			; AmiGUS hardware register for FIFO
+intFIFOLoop:
+	move.l  (a0)+,(a5)			; copy memory buffer into FIFO
+	dbra	d1,intFIFOLoop	
+
+	move.w  #$4,d1				; clear FIFO watermark irq
+	move.w  d1,$00(a6)
+	
+	move.l	a0,tmp_buffer(a1)	; store buffer pointer
+
+	addq	#1,d0				; increment buffer count
+	cmp.l	buf_segments(a1),d0	; did we reach last buffer?
+	bne		noBufOverflow		; no
+	moveq	#0,d0				; yes: reset buffer number to 0
+	move.l	d0,buf_count(a1)	; store it
+	bra		intSendSignal		; buffer#0 reached: send signal
+noBufOverflow:
+	move.l	d0,buf_count(a1)	; store incremented buffer count
+	cmp.l	buf_half_segments(a1),d0 ; did we reach half of buffer?
+	bne		intNoSendSignal		; no: send no signal. yes: send signal
+	
+intSendSignal:
+	move.l	rd_signal(a1),d0	; get signal
+	move.l	rd_task(a1),a1		; get pointer to main task
+	move.l 	$4,a6				; Get Exec pointer
+	JSRLIB	Signal				; send signal to main() in order to wake-up
+intNoSendSignal
+
+;---	
+noFIFOInt:
+	moveq	#0,d0
+	rts
+
+*******************************************************************************
+	
+	end

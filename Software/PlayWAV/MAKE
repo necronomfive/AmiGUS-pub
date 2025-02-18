@@ -1,0 +1,2 @@
+sc PlayWav.c asmroutines.a incdir=include: cpu=68000 link
+

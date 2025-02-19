@@ -81,6 +81,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define HAGEN_VOICE_VOLUMEL	0x32
 #define HAGEN_VOICE_VOLUMER 0x34
 
+#define HAGEN_GLOBAL_VOLUMEL	0x40
+#define HAGEN_GLOBAL_VOLUMER	0x42
+
 /* Static arrays */
 
 static ULONG midiFreq[128] = {	
@@ -337,7 +340,7 @@ int main(int argc,char **argv)
 	
 	BOOL	board_found = FALSE;
 	
-    printf("\n=========================\n AmiGUS MIDI Player V0.3 \n(C) 2024 by Oliver Achten\n=========================\n\n");
+    printf("\n=========================\n AmiGUS MIDI Player V0.31 \n(C) 2025 by Oliver Achten\n=========================\n\n");
 
 	if (argc < 2)
 	{
@@ -468,7 +471,10 @@ int main(int argc,char **argv)
 				WriteReg32(board_base,HAGEN_VOICE_RATEH,0x0);
 				WriteReg16(board_base,HAGEN_VOICE_VOLUMEL,0x8000);
 				WriteReg16(board_base,HAGEN_VOICE_VOLUMER,0x8000);
-			}	
+			}
+			// Set master volume
+			WriteReg16(board_base,HAGEN_GLOBAL_VOLUMEL,0xffff);
+			WriteReg16(board_base,HAGEN_GLOBAL_VOLUMEL,0xffff);
 		}
 		else
 		{

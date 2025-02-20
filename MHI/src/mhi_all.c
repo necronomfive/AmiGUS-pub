@@ -1,9 +1,29 @@
 #include <libraries/mhi.h>
+#include <proto/exec.h>
 
 #include "amigus_mhi.h"
 #include "debug.h"
 #include "library.h"
+#include "support.h"
 #include "SDI_mhi_protos.h"
+
+
+VOID FlushAllBuffers( struct AmiGUSClientHandle * clientHandle ) {
+
+  struct List * buffers = ( struct List * )&clientHandle->agch_Buffers;
+  struct Node * buffer;
+
+  while ( buffer = RemHead( buffers )) {
+
+    LOG_V(( "V: Removing / free'ing MHI buffer 0x%08lx, "
+      "size %ld LONGs, index %ld\n",
+      buffer,
+      (( struct AmiGUSMhiBuffer * ) buffer)->agmb_BufferMax,
+      (( struct AmiGUSMhiBuffer * ) buffer)->agmb_BufferIndex ));
+    FreeMem( buffer, sizeof( struct AmiGUSMhiBuffer ) );
+  }
+  LOG_D(( "D: All buffers flushed.\n" ));
+}
 
 ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a0, struct Task * task ),
@@ -20,6 +40,8 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     struct AmiGUSClientHandle * handle = &AmiGUSBase->agb_ClientHandle;
     handle->agch_Task = task;
     handle->agch_Signal = signal;
+    handle->agch_Status = MHIF_STOPPED;
+    NonConflictingNewMinList( &handle->agch_Buffers );
     result = ( APTR ) handle;
     ++AmiGUSBase->agb_UsageCounter;
 
@@ -40,8 +62,8 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   REG( a6, struct AmiGUSBase * amiGUSBase )
 ) {
 
-  struct AmiGUSClientHandle *clientHandle =
-    ( struct AmiGUSClientHandle * )handle;
+  struct AmiGUSClientHandle * clientHandle =
+    ( struct AmiGUSClientHandle * ) handle;
   struct Task * task = clientHandle->agch_Task;
   ULONG signal = clientHandle->agch_Signal;
 
@@ -53,6 +75,7 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 
     clientHandle->agch_Task = NULL;
     clientHandle->agch_Signal = 0;
+    FlushAllBuffers( clientHandle );
     --AmiGUSBase->agb_UsageCounter;
 
     LOG_D(( "D: AmiGUS MHI free'd up task 0x%08lx and signal 0x%08lx.\n",
@@ -74,16 +97,77 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
   REG( d0, ULONG size),
   REG( a6, struct AmiGUSBase * amiGUSBase )
 ) {
+  struct AmiGUSClientHandle * clientHandle =
+    ( struct AmiGUSClientHandle * ) handle;
+  struct List * buffers = ( struct List * )&clientHandle->agch_Buffers;
+  struct AmiGUSMhiBuffer * mhiBuffer;
+
   LOG_D(( "D: MHIQueueBuffer start\n" ));
+  if ( &AmiGUSBase->agb_ClientHandle != handle ) {
+
+    LOG_D(( "D: MHIQueueBuffer failed, unknown handle.\n" ));
+    return FALSE;
+  }
+  if ( ( ULONG ) buffer & 0x00000003 ) {
+
+    LOG_D(( "D: MHIQueueBuffer failed, buffer not LONG aligned.\n" ));
+    return FALSE;
+  }
+  if ( size & 0x00000003 ) {
+
+    LOG_D(( "D: MHIQueueBuffer failed, buffer size no multiple of LONG.\n" ));
+    return FALSE;
+  }
+  mhiBuffer = AllocMem( sizeof( struct AmiGUSMhiBuffer ),
+                        MEMF_ANY | MEMF_CLEAR );
+  mhiBuffer->agmb_Buffer = buffer;
+  mhiBuffer->agmb_BufferMax = size >> 2;
+  LOG_V(( "V: Enqueueing MHI buffer 0x%08lx, data 0x%08lx, "
+          "size %ld BYTEs = %ld LONGs\n",
+          mhiBuffer,
+          buffer,
+          size,
+          mhiBuffer->agmb_BufferMax ));
+  AddTail( buffers, ( struct Node * ) mhiBuffer );
+
   LOG_D(( "D: MHIQueueBuffer done\n" ));
-  return FALSE;
+  return TRUE;
 }
 
 ASM( APTR ) SAVEDS MHIGetEmpty(
   REG( a3, APTR handle ),
   REG( a6, struct AmiGUSBase * amiGUSBase )
 ) {
+
+  struct AmiGUSClientHandle * clientHandle =
+    ( struct AmiGUSClientHandle * ) handle;
+  struct List * buffers = ( struct List * ) &clientHandle->agch_Buffers;
+  struct AmiGUSMhiBuffer * mhiBuffer;
+
   LOG_D(( "D: MHIGetEmpty start\n" ));
+  for ( mhiBuffer = ( struct AmiGUSMhiBuffer * ) buffers->lh_Head ;
+        mhiBuffer->agmb_Node.mln_Succ ;
+        mhiBuffer = ( struct AmiGUSMhiBuffer * )
+          mhiBuffer->agmb_Node.mln_Succ ) {
+
+    if (( mhiBuffer ) &&
+        (( struct AmiGUSMhiBuffer * ) buffers != mhiBuffer ) &&
+        ( mhiBuffer->agmb_BufferIndex >= mhiBuffer->agmb_BufferMax )) {
+
+      APTR result = mhiBuffer->agmb_Buffer;
+
+      LOG_V(( "V: Removing / free'ing MHI buffer 0x%08lx, "
+              "size %ld LONGs, index %ld\n",
+              mhiBuffer,
+              mhiBuffer->agmb_BufferMax,
+              mhiBuffer->agmb_BufferIndex ));
+      Remove(( struct Node * ) mhiBuffer );
+      FreeMem( mhiBuffer, sizeof( struct AmiGUSMhiBuffer ));
+
+      return result;
+    }
+  }
+
   LOG_D(( "D: MHIGetEmpty done\n" ));
   return NULL;
 }
@@ -92,16 +176,22 @@ ASM( UBYTE ) SAVEDS MHIGetStatus(
   REG( a3, APTR handle ),
   REG( a6, struct AmiGUSBase * amiGUSBase )
 ) {
-  LOG_D(( "D: MHIGetStatus start\n" ));
-  LOG_D(( "D: MHIGetStatus done\n" ));
-  return 0;
+  struct AmiGUSClientHandle * clientHandle =
+    ( struct AmiGUSClientHandle * ) handle;
+
+  LOG_D(( "D: MHIGetStatus %ld start/done\n", clientHandle->agch_Status ));
+  return clientHandle->agch_Status;
 }
 
 ASM( VOID ) SAVEDS MHIPlay(
   REG( a3, APTR handle ),
   REG( a6, struct AmiGUSBase * amiGUSBase )
 ) {
+
+  struct AmiGUSClientHandle * clientHandle =
+    ( struct AmiGUSClientHandle * ) handle;
   LOG_D(( "D: MHIPlay start\n" ));
+  clientHandle->agch_Status = MHIF_PLAYING;
   LOG_D(( "D: MHIPlay done\n" ));
   return;
 }
@@ -110,7 +200,12 @@ ASM( VOID ) SAVEDS MHIStop(
   REG( a3, APTR handle ),
   REG( a6, struct AmiGUSBase * amiGUSBase )
 ) {
+
+  struct AmiGUSClientHandle * clientHandle =
+    ( struct AmiGUSClientHandle * ) handle;
   LOG_D(( "D: MHIStop start\n" ));
+  FlushAllBuffers( clientHandle );
+  clientHandle->agch_Status = MHIF_STOPPED;
   LOG_D(( "D: MHIStop done\n" ));
   return;
 }
@@ -119,7 +214,19 @@ ASM( VOID ) SAVEDS MHIPause(
   REG( a3, APTR handle ),
   REG( a6, struct AmiGUSBase * amiGUSBase )
 ) {
+
+  struct AmiGUSClientHandle * clientHandle =
+    ( struct AmiGUSClientHandle * ) handle;
   LOG_D(( "D: MHIPause start\n" ));
+
+  if ( clientHandle->agch_Status == MHIF_PAUSED ) {
+
+    clientHandle->agch_Status = MHIF_PLAYING;
+
+  } else if( clientHandle->agch_Status == MHIF_PLAYING ) {
+
+    clientHandle->agch_Status = MHIF_PAUSED;
+  }
   LOG_D(( "D: MHIPause done\n" ));
   return;
 }
@@ -188,6 +295,7 @@ ASM( ULONG ) SAVEDS MHIQuery(
       break;
     }
   }
+  LOG_V(( "V: Query %ld, result %ld = 0x%08lx \n", query, result, result ));
   LOG_D(( "D: MHIQuery done\n" ));
   return result;
 }
@@ -198,6 +306,9 @@ ASM( VOID ) SAVEDS MHISetParam(
   REG( d1, ULONG value ),
   REG( a6, struct AmiGUSBase * amiGUSBase )
 ) {
+
+  struct AmiGUSClientHandle * clientHandle =
+    ( struct AmiGUSClientHandle * ) handle;
   LOG_D(( "D: MHISetParam start\n" ));
   LOG_D(( "D: MHISetParam done\n" ));
   return;

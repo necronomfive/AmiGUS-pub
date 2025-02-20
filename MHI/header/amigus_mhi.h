@@ -14,8 +14,8 @@
  * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AMIGUS_MHI_SUB_H
-#define AMIGUS_MHI_SUB_H
+#ifndef AMIGUS_MHI_H
+#define AMIGUS_MHI_H
 
 /* 
 * MHI driver library header.
@@ -63,9 +63,23 @@
  * Library base structure components
  *****************************************************************************/
 
+struct AmiGUSMhiBuffer {
+
+  struct MinNode                agmb_Node;
+  ULONG                       * agmb_Buffer;
+  ULONG                         agmb_BufferIndex;
+  ULONG	                        agmb_BufferMax;
+};
+
 struct AmiGUSClientHandle {
   struct Task                 * agch_Task;
   ULONG                         agch_Signal;
+
+  struct MinList                agch_Buffers;
+
+  UBYTE                         agch_Status;
+  UBYTE                         agch_Reserved0;
+  UWORD                         agch_Reserved1;
 };
 
 /******************************************************************************
@@ -93,7 +107,9 @@ struct AmiGUSBase {
   struct AmiGUSClientHandle     agb_ClientHandle;
 
   /* Only 1 AmiGUS supported per machine currently, sorry */
-  BYTE                          agb_UsageCounter;    
+  BYTE                          agb_UsageCounter;
+  UBYTE                         agb_Reserved0;
+  UWORD                         agb_Reserved1;
 
   BPTR                          agb_LogFile;       /* Debug log file handle  */
   APTR                          agb_LogMem;        /* Debug log memory blob  */
@@ -121,4 +137,4 @@ struct AmiGUSBase {
  * Library flag definitions
  *****************************************************************************/
 
-#endif /* AMIGUS_MHI_SUB_H */
+#endif /* AMIGUS_MHI_H */

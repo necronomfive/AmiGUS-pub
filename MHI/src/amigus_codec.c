@@ -41,7 +41,7 @@ LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
     return EAmiGUSNotFound;
   }
   if (   ( AMIGUS_MANUFACTURER_ID != configDevice->cd_Rom.er_Manufacturer )
-      || ( AMIGUS_MAIN_PRODUCT_ID != configDevice->cd_Rom.er_Product ) 
+      || ( AMIGUS_CODEC_PRODUCT_ID != configDevice->cd_Rom.er_Product ) 
      ) {
 
     LOG_E(("E: AmiGUS detection failed\n"));

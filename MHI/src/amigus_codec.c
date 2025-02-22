@@ -57,11 +57,11 @@ LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
   }
 
   LOG_V(("V: AmiGUS firmware %08lx\n", serial));
-  minute = (UBYTE)((serial & 0x0000003Ful)      );
-  hour   = (UBYTE)((serial & 0x000007C0ul) >>  6);
-  day    = (UBYTE)((serial & 0x0000F800ul) >> 11);
-  month  = (UBYTE)((serial & 0x000F0000ul) >> 16);
-  year   = (UWORD)((serial & 0xFFF00000ul) >> 20);
+  minute = ( UBYTE )(( serial & 0x0000003Ful )       );
+  hour   = ( UBYTE )(( serial & 0x000007C0ul ) >>  6 );
+  day    = ( UBYTE )(( serial & 0x0000F800ul ) >> 11 );
+  month  = ( UBYTE )(( serial & 0x000F0000ul ) >> 16 );
+  year   = ( UWORD )(( serial & 0xFFF00000ul ) >> 20 );
   LOG_I(("I: AmiGUS firmware date %04ld-%02ld-%02ld, %02ld:%02ld\n",
          year, month, day, hour, minute));
 
@@ -69,8 +69,67 @@ LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
   LOG_I(( "I: AmiGUS found at 0x%08lx\n",
           amiGUSBase->agb_CardBase ));
   LOG_V(( "V: AmiGUS address stored at 0x%08lx\n",
-          &(amiGUSBase->agb_CardBase )));
+          &( amiGUSBase->agb_CardBase )));
   amiGUSBase->agb_UsageCounter = 0;
 
   return ENoError;
+}
+
+VOID StartAmiGusCodecPlayback( VOID ) {
+
+  APTR amiGUS = AmiGUSBase->agb_CardBase;
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_FIFO_RESET,
+              AMIGUS_CODEC_FIFO_RESET_STROBE );
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_FIFO_WATERMARK,
+              AMIGUS_CODEC_PLAY_FIFO_WORDS >> 1 );
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_INT_ENABLE,
+              AMIGUS_INT_F_CLEAR
+              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
+              | AMIGUS_INT_F_CODEC_FIFO_FULL
+              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK
+              | AMIGUS_INT_F_CODEC_SPI_FINISH
+              | AMIGUS_INT_F_CODEC_VS1063_DRQ );
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_INT_CONTROL,
+              AMIGUS_INT_F_CLEAR
+              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
+              | AMIGUS_INT_F_CODEC_FIFO_FULL
+              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK
+              | AMIGUS_INT_F_CODEC_SPI_FINISH
+              | AMIGUS_INT_F_CODEC_VS1063_DRQ );
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_INT_ENABLE,
+              AMIGUS_INT_F_SET
+              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
+              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK );
+}
+
+VOID StopAmiGusCodecPlayback( VOID ) {
+
+  APTR amiGUS = AmiGUSBase->agb_CardBase;
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_FIFO_CONTROL,
+              AMIGUS_CODEC_FIFO_DMA_DISABLE );
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_INT_ENABLE,
+              AMIGUS_INT_F_CLEAR
+              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
+              | AMIGUS_INT_F_CODEC_FIFO_FULL
+              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK
+              | AMIGUS_INT_F_CODEC_SPI_FINISH
+              | AMIGUS_INT_F_CODEC_VS1063_DRQ );
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_INT_CONTROL,
+              AMIGUS_INT_F_CLEAR
+              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
+              | AMIGUS_INT_F_CODEC_FIFO_FULL
+              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK
+              | AMIGUS_INT_F_CODEC_SPI_FINISH
+              | AMIGUS_INT_F_CODEC_VS1063_DRQ );  
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_FIFO_RESET,
+              AMIGUS_CODEC_FIFO_RESET_STROBE );
 }

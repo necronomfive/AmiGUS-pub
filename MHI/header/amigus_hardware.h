@@ -32,9 +32,13 @@
 #define AMIGUS_HAGEN_PRODUCT_ID          17
 #define AMIGUS_CODEC_PRODUCT_ID          18
 
+/******************************************************************************
+ * AmiGUS PCM hardware definitions below
+ *****************************************************************************/
+
 /* AmiGUS PCM Registers */
-#define AMIGUS_PCM_MAIN_INT_CONTROL      0x00
-#define AMIGUS_PCM_MAIN_INT_ENABLE       0x02
+#define AMIGUS_PCM_INT_CONTROL           0x00
+#define AMIGUS_PCM_INT_ENABLE            0x02
 
 #define AMIGUS_PCM_PLAY_SAMPLE_FORMAT    0x04
 #define AMIGUS_PCM_PLAY_SAMPLE_RATE      0x06
@@ -114,7 +118,7 @@
 #define AMIGUS_PCM_S_REC_F_AHI_SRC       0x0040
 
 /* FIFO Reset */
-#define AMIGUS_PCM_FIFO_RESET            0x0000
+#define AMIGUS_PCM_FIFO_RESET_STROBE     0x0000
 
 /* FIFO size */
 #define AMIGUS_PCM_PLAY_FIFO_BYTES       8192
@@ -127,6 +131,77 @@
 
 #define AMIGUS_OUTPUTS_COUNT             1
 #define AMIGUS_INPUTS_COUNT              4
+
+/******************************************************************************
+ * AmiGUS Codec hardware definitions below
+ *****************************************************************************/
+
+#define	AMIGUS_CODEC_INT_CONTROL         0x00
+#define	AMIGUS_CODEC_INT_ENABLE          0x02
+
+#define	AMIGUS_CODEC_FIFO_CONTROL        0x04
+#define	AMIGUS_CODEC_FIFO_RESET          0x06
+#define	AMIGUS_CODEC_FIFO_WATERMARK      0x08
+#define	AMIGUS_CODEC_FIFO_WRITE          0x0a
+#define	AMIGUS_CODEC_FIFO_USAGE          0x0e
+
+#define AMIGUS_CODEC_SPI_ADDRESS         0x20
+#define AMIGUS_CODEC_SPI_WRITE_DATA      0x22
+#define AMIGUS_CODEC_SPI_WRITE_TRIGGER   0x24
+#define AMIGUS_CODEC_SPI_READ_TRIGGER    0x26
+#define AMIGUS_CODEC_SPI_READ_DATA       0x28
+#define AMIGUS_CODEC_SPI_STATUS	         0x2a
+
+#define AMIGUS_CODEC_SPI_STROBE          0x0000
+
+/* AmiGUS Codec Interrupt Flags */
+#define AMIGUS_INT_F_CODEC_FIFO_EMPTY    0x0001
+#define AMIGUS_INT_F_CODEC_FIFO_FULL     0x0002
+#define AMIGUS_INT_F_CODEC_FIFO_WATERMRK 0x0004
+#define AMIGUS_INT_F_CODEC_SPI_FINISH    0x0008
+#define AMIGUS_INT_F_CODEC_VS1063_DRQ    0x0010
+// As above:
+//      AMIGUS_INT_F_SPI_TRANSFER_FINISH 0x0008
+//      AMIGUS_INT_F_SET                 0x8000
+//      AMIGUS_INT_F_CLEAR               0x0000
+
+/* FIFO DMA */
+#define AMIGUS_CODEC_FIFO_DMA_ENABLE     0x8000
+#define AMIGUS_CODEC_FIFO_DMA_DISABLE    0x0000
+
+/* FIFO Reset */
+#define AMIGUS_CODEC_FIFO_RESET_STROBE   0x0000
+
+/* FIFO size */
+#define AMIGUS_CODEC_PLAY_FIFO_BYTES     4096
+#define AMIGUS_CODEC_PLAY_FIFO_WORDS     2048
+#define AMIGUS_CODEC_PLAY_FIFO_LONGS     1024
+
+/**
+ * VS1063 codec specifics
+ * - all according to VS1063a Datasheet
+ * - vs1063ds.pdf, Version: 1.32, 2024-01-31
+ * - page references point into that
+ */
+
+// VS1063 codec's SDI - Serial Data Interface is SPI port for data
+
+// VS1063 codec's SCIs - Serial Control Interface SPI ports, overview page 43
+#define VS1063_CODEC_SCI_CLOCKF         0x0003 // page 48
+#define VS1063_CODEC_SCI_WRAM           0x0006 // page 49
+#define VS1063_CODEC_SCI_WRAMADDR       0x0007 // page 49
+
+// VS1063 codec's addresses of memory mapped registers
+#define VS1063_CODEC_ADDRESS_GPIO_DDR   0xC017 // page 86
+#define VS1063_CODEC_ADDRESS_I2S_CONFIG 0xC040 // page 86
+
+// VS1063 codec's magic flag values according to datasheet
+#define VS1063_CODEC_F_SC_MULT_5_0X     0xE000 // page 48
+
+#define VS1063_CODEC_F_GPIO_DDR_192k    0xD0   // page 86
+
+#define VS1063_CODEC_F_I2S_CONFIG_RESET 0x00   // page 86
+#define VS1063_CODEC_F_I2S_CONFIG_192k  0x06   // page 86
 
 /******************************************************************************
  * Low-Level hardware access functions

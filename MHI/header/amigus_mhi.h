@@ -102,6 +102,7 @@ struct AmiGUSBase {
   struct IORequest            * agb_TimerRequest;
   /* AmiGUS specific member variables */
   APTR                          agb_CardBase;
+  struct Interrupt            * agb_Interrupt;
 
   /* Client info */
   struct AmiGUSClientHandle     agb_ClientHandle;

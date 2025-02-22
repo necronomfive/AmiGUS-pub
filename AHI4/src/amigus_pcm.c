@@ -58,11 +58,11 @@ LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase ) {
   }
 
   LOG_V(("V: AmiGUS firmware %08lx\n", serial));
-  minute = (UBYTE)((serial & 0x0000003Ful)      );
-  hour   = (UBYTE)((serial & 0x000007C0ul) >>  6);
-  day    = (UBYTE)((serial & 0x0000F800ul) >> 11);
-  month  = (UBYTE)((serial & 0x000F0000ul) >> 16);
-  year   = (UWORD)((serial & 0xFFF00000ul) >> 20);
+  minute = ( UBYTE )(( serial & 0x0000003Ful )       );
+  hour   = ( UBYTE )(( serial & 0x000007C0ul ) >>  6 );
+  day    = ( UBYTE )(( serial & 0x0000F800ul ) >> 11 );
+  month  = ( UBYTE )(( serial & 0x000F0000ul ) >> 16 );
+  year   = ( UWORD )(( serial & 0xFFF00000ul ) >> 20 );
   LOG_I(("I: AmiGUS firmware date %04ld-%02ld-%02ld, %02ld:%02ld\n",
          year, month, day, hour, minute));
 
@@ -70,7 +70,7 @@ LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase ) {
   LOG_I(( "I: AmiGUS found at 0x%08lx\n",
           amiGUSBase->agb_CardBase ));
   LOG_V(( "V: AmiGUS address stored at 0x%08lx\n",
-          &(amiGUSBase->agb_CardBase )));
+          &( amiGUSBase->agb_CardBase )));
   amiGUSBase->agb_UsageCounter = 0;
 
   return ENoError;

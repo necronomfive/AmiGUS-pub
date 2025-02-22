@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define INTUI_V36_NAMES_ONLY
 
-#define DEBUG
+//#define DEBUG
 
 #include <exec/types.h>
 #include <exec/memory.h>
@@ -788,7 +788,7 @@ void initGadgets(struct Window *win, struct Gadget *my_gads[], struct MixData *m
 	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0x00000070 | (ULONG)((ULONG)regval << 16);	// MAIN_TOSLINK_CTRL
 	
 	GT_SetGadgetAttrs(my_gads[MYGAD_CYCLE_TOSLINK], win, NULL,
-				GTCY_Active, 2,
+				GTCY_Active, mixdat->toslink_srate,
 				TAG_END);	
 }
 
@@ -1091,11 +1091,11 @@ switch (gad->GadgetID)
        GT_SetGadgetAttrs(my_gads[MYGAD_CHKBOX_ADC], win, NULL,
                             GTCB_Checked, 1,
                             TAG_END);
-							
+		
 		GT_SetGadgetAttrs(my_gads[MYGAD_CYCLE_TOSLINK], win, NULL,
 				GTCY_Active, 0,
-				TAG_END);					
-							
+				TAG_END);
+				
 		initCfgMem (cfg_mem);					
 		mixdat->ahi_vol_ll = 0x8000;
 		mixdat->ahi_vol_rr = 0x8000;
@@ -1577,7 +1577,7 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	ng.ng_GadgetText = "_Save";
 	ng.ng_GadgetID   = MYGAD_BUTTON_SAVE;
 	ng.ng_Flags      = 0;
-	gad = CreateGadget(BUTTON_KIND, gad, &ng,
+	my_gads[MYGAD_BUTTON_SAVE] = gad = CreateGadget(BUTTON_KIND, gad, &ng,
 						GT_Underscore, '_',
 						TAG_END);
 						
@@ -1588,7 +1588,7 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	ng.ng_GadgetText = "_Use";
 	ng.ng_GadgetID   = MYGAD_BUTTON_USE;
 	ng.ng_Flags      = 0;
-	gad = CreateGadget(BUTTON_KIND, gad, &ng,
+	my_gads[MYGAD_BUTTON_USE] = gad = CreateGadget(BUTTON_KIND, gad, &ng,
 						GT_Underscore, '_',
 						TAG_END);
 						
@@ -1599,7 +1599,7 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	ng.ng_GadgetText = "_Reset";
 	ng.ng_GadgetID   = MYGAD_BUTTON_RESET;
 	ng.ng_Flags      = 0;
-	gad = CreateGadget(BUTTON_KIND, gad, &ng,
+	my_gads[MYGAD_BUTTON_RESET] = gad = CreateGadget(BUTTON_KIND, gad, &ng,
 						GT_Underscore, '_',
 						TAG_END);	
 	/* ========== Cycle Gadgets =========== */
@@ -1611,9 +1611,9 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	ng.ng_GadgetText = "";
 	ng.ng_GadgetID   = MYGAD_CYCLE_LEVELS;
 	ng.ng_Flags      = 0;
-	gad = CreateGadget(CYCLE_KIND, gad, &ng,
+	my_gads[MYGAD_CYCLE_LEVELS] = gad = CreateGadget(CYCLE_KIND, gad, &ng,
 						GTCY_Labels, (ULONG)levels_options,
-						GTCY_Active, 0,
+						GTCY_Active, 1,
 						GA_Disabled, FALSE,
 						TAG_END);		
 
@@ -1624,7 +1624,7 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	ng.ng_GadgetText = "";
 	ng.ng_GadgetID   = MYGAD_CYCLE_TOSLINK;
 	ng.ng_Flags      = 0;
-	gad = CreateGadget(CYCLE_KIND, gad, &ng,
+	my_gads[MYGAD_CYCLE_TOSLINK] = gad = CreateGadget(CYCLE_KIND, gad, &ng,
 						GTCY_Labels, (ULONG)toslink_options,
 						GTCY_Active, 0,
 						GA_Disabled, FALSE,
@@ -1868,7 +1868,7 @@ VOID gadtoolsWindow(VOID)
 
 	if (intdata = AllocMem(sizeof(struct IntData), MEMF_PUBLIC|MEMF_CLEAR))
     {
-		intdata->int_rate = 0;
+		intdata->int_rate = 5;
 		intdata->counter = 0;
 		intdata->rd_Signal = 1L << signr;
 		intdata->rd_Task = FindTask(NULL);		
@@ -1927,7 +1927,7 @@ VOID gadtoolsWindow(VOID)
 				else
 					{
 					if (NULL == (mywin = OpenWindowTags(NULL,
-							WA_Title,     "AmiGUS Mixer V0.62 - (c)2025 by O. Achten",
+							WA_Title,     "AmiGUS Mixer V0.63 - (c)2025 by O. Achten",
 							WA_Gadgets,   glist,      WA_AutoAdjust,    TRUE,
 							WA_Width,       528,      WA_MinWidth,        50,
 							WA_InnerHeight, 154,      WA_MinHeight,       50,

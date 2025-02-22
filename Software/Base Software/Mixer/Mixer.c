@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define INTUI_V36_NAMES_ONLY
 
-//#define DEBUG
+#define DEBUG
 
 #include <exec/types.h>
 #include <exec/memory.h>
@@ -787,10 +787,8 @@ void initGadgets(struct Window *win, struct Gadget *my_gads[], struct MixData *m
 	mixdat->toslink_srate = regval;
 	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0x00000070 | (ULONG)((ULONG)regval << 16);	// MAIN_TOSLINK_CTRL
 	
-	regval = regval < 3 ? regval : 0;
-	
 	GT_SetGadgetAttrs(my_gads[MYGAD_CYCLE_TOSLINK], win, NULL,
-				GTCY_Active, regval,
+				GTCY_Active, 2,
 				TAG_END);	
 }
 
@@ -1094,6 +1092,10 @@ switch (gad->GadgetID)
                             GTCB_Checked, 1,
                             TAG_END);
 							
+		GT_SetGadgetAttrs(my_gads[MYGAD_CYCLE_TOSLINK], win, NULL,
+				GTCY_Active, 0,
+				TAG_END);					
+							
 		initCfgMem (cfg_mem);					
 		mixdat->ahi_vol_ll = 0x8000;
 		mixdat->ahi_vol_rr = 0x8000;
@@ -1110,6 +1112,8 @@ switch (gad->GadgetID)
 		mixdat->adc_mix_lr = 0x0000;		
 		
 		mixdat->adc_enable = 0x0002;
+		
+		mixdat->toslink_srate = 0x0;
 
 		mixdat->ahi_locked = TRUE;
 		mixdat->mhi_locked = TRUE;
@@ -1720,7 +1724,8 @@ VOID process_window_events(struct Window *mywin,
 					case IDCMP_GADGETUP:					
 					case IDCMP_MOUSEMOVE:					
 						handleGadgetEvent(mywin, gad, imsgCode, slider_level, my_gads, &terminated,mixdat,board_base,cfg_mem,intdata);
-						updateSliders(mywin, my_gads,mixdat);						
+						updateSliders(mywin, my_gads,mixdat);
+						
 						break;
 					case IDCMP_VANILLAKEY:
 						handleVanillaKey(mywin, imsgCode, slider_level, my_gads);
@@ -1922,7 +1927,7 @@ VOID gadtoolsWindow(VOID)
 				else
 					{
 					if (NULL == (mywin = OpenWindowTags(NULL,
-							WA_Title,     "AmiGUS Mixer V0.61 - (c)2025 by O. Achten",
+							WA_Title,     "AmiGUS Mixer V0.62 - (c)2025 by O. Achten",
 							WA_Gadgets,   glist,      WA_AutoAdjust,    TRUE,
 							WA_Width,       528,      WA_MinWidth,        50,
 							WA_InnerHeight, 154,      WA_MinHeight,       50,

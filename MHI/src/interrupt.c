@@ -25,9 +25,57 @@
 #include "debug.h"
 #include "interrupt.h"
 
-INLINE VOID HandlePlayback( VOID ) {
+VOID HandlePlayback( VOID ) {
 
-  LOG_INT(( "INT: Playback \n" ));
+  APTR amiGUS = AmiGUSBase->agb_CardBase;
+  struct AmiGUSMhiBuffer * next = 
+    AmiGUSBase->agb_ClientHandle.agch_NextBuffer;
+  /* Read-back remaining FIFO samples in BYTES */
+  LONG reminder = ReadReg16( amiGUS, AMIGUS_CODEC_FIFO_USAGE ) << 1;
+  LONG target = AMIGUS_CODEC_PLAY_FIFO_BYTES - reminder - 3;
+  LONG copied = 0;
+
+  if ( !next ) {
+
+    LOG_INT(( "INT: No next buffer!\n" ));
+    return;
+  }
+  while ( copied < target ) {
+
+    if ( next->agmb_BufferIndex < next->agmb_BufferMax ) {
+
+      ULONG data = next->agmb_Buffer[ next->agmb_BufferIndex ];
+      WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, data );
+      ++next->agmb_BufferIndex;
+      copied += 4;
+
+    } else if ( next->agmb_Node.mln_Succ ) {
+
+      LOG_INT(( "INT: ob 0x%08lx i %ld m %ld\n",
+                next,
+                next->agmb_BufferIndex,
+                next->agmb_BufferMax ));
+      next = ( struct AmiGUSMhiBuffer * ) next->agmb_Node.mln_Succ;
+      AmiGUSBase->agb_ClientHandle.agch_NextBuffer = next;
+      LOG_INT(( "INT: nb 0x%08lx i %ld m %ld\n",
+                next,
+                next->agmb_BufferIndex,
+                next->agmb_BufferMax ));
+
+    } else {
+
+      LOG_INT(( "INT: lb 0x%08lx i %ld m %ld\n",
+                next,
+                next->agmb_BufferIndex,
+                next->agmb_BufferMax ));
+      // Playback buffers empty, but FIFO could take more. - Not so good, Al...
+      break;
+    }
+  }
+  LOG_INT(( "INT: Playback t %4ld c %4ld nb 0x%08lx\n",
+            target,
+            copied,
+            next->agmb_Node.mln_Succ ));
 }
 
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (

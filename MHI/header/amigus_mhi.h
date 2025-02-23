@@ -76,6 +76,7 @@ struct AmiGUSClientHandle {
   ULONG                         agch_Signal;
 
   struct MinList                agch_Buffers;
+  struct AmiGUSMhiBuffer *      agch_NextBuffer;
 
   UBYTE                         agch_Status;
   UBYTE                         agch_Reserved0;

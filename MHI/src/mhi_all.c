@@ -22,6 +22,7 @@ VOID FlushAllBuffers( struct AmiGUSClientHandle * clientHandle ) {
       (( struct AmiGUSMhiBuffer * ) buffer)->agmb_BufferIndex ));
     FreeMem( buffer, sizeof( struct AmiGUSMhiBuffer ) );
   }
+  clientHandle->agch_NextBuffer = NULL;
   LOG_D(( "D: All buffers flushed.\n" ));
 }
 
@@ -41,13 +42,14 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     handle->agch_Task = task;
     handle->agch_Signal = signal;
     handle->agch_Status = MHIF_STOPPED;
+    handle->agch_NextBuffer = NULL;
     NonConflictingNewMinList( &handle->agch_Buffers );
     result = ( APTR ) handle;
     ++AmiGUSBase->agb_UsageCounter;
 
     LOG_D(( "D: AmiGUS MHI accepted task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
-
+// TODO: Init interrupt here
   } else {
 
     LOG_D(( "D: AmiGUS MHI in use, denying.\n" ));
@@ -80,7 +82,7 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 
     LOG_D(( "D: AmiGUS MHI free'd up task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
-
+// TODO: Free interrupt here
   } else {
 
     LOG_W(( "W: AmiGUS MHI does not know task 0x%08lx and signal 0x%08lx"
@@ -129,6 +131,10 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
           size,
           mhiBuffer->agmb_BufferMax ));
   AddTail( buffers, ( struct Node * ) mhiBuffer );
+  if ( NULL == clientHandle->agch_NextBuffer ) {
+
+    clientHandle->agch_NextBuffer = mhiBuffer;
+  }
 
   LOG_D(( "D: MHIQueueBuffer done\n" ));
   return TRUE;
@@ -163,6 +169,10 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
               mhiBuffer->agmb_BufferIndex ));
       Remove(( struct Node * ) mhiBuffer );
       FreeMem( mhiBuffer, sizeof( struct AmiGUSMhiBuffer ));
+      if ( mhiBuffer == clientHandle->agch_NextBuffer ) {
+
+        clientHandle->agch_NextBuffer = NULL;
+      }
 
       return result;
     }
@@ -191,6 +201,7 @@ ASM( VOID ) SAVEDS MHIPlay(
   struct AmiGUSClientHandle * clientHandle =
     ( struct AmiGUSClientHandle * ) handle;
   LOG_D(( "D: MHIPlay start\n" ));
+// TODO: Start playing here
   clientHandle->agch_Status = MHIF_PLAYING;
   LOG_D(( "D: MHIPlay done\n" ));
   return;
@@ -204,6 +215,7 @@ ASM( VOID ) SAVEDS MHIStop(
   struct AmiGUSClientHandle * clientHandle =
     ( struct AmiGUSClientHandle * ) handle;
   LOG_D(( "D: MHIStop start\n" ));
+// TODO: Stop playing here
   FlushAllBuffers( clientHandle );
   clientHandle->agch_Status = MHIF_STOPPED;
   LOG_D(( "D: MHIStop done\n" ));

@@ -35,8 +35,8 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 ) {
   const UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
                                   AMIGUS_CODEC_INT_CONTROL );
-  if ( !( status & ( AMIGUS_INT_F_CODEC_FIFO_EMPTY
-                   | AMIGUS_INT_F_CODEC_FIFO_WATERMRK )) ) {
+  if ( !( status & ( AMIGUS_CODEC_INT_F_FIFO_EMPTY
+                   | AMIGUS_CODEC_INT_F_FIFO_WATERMRK )) ) {
 
     return 0;
   }
@@ -61,8 +61,8 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   WriteReg16( AmiGUSBase->agb_CardBase,
               AMIGUS_CODEC_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
-              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
-              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK );
+              | AMIGUS_CODEC_INT_F_FIFO_EMPTY
+              | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
 
   return 1;
 }

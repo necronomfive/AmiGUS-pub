@@ -80,31 +80,31 @@ VOID StartAmiGusCodecPlayback( VOID ) {
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_RESET,
-              AMIGUS_CODEC_FIFO_RESET_STROBE );
+              AMIGUS_CODEC_FIFO_F_RESET_STROBE );
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_WATERMARK,
               AMIGUS_CODEC_PLAY_FIFO_WORDS >> 1 );
   WriteReg16( amiGUS,
               AMIGUS_CODEC_INT_ENABLE,
               AMIGUS_INT_F_CLEAR
-              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
-              | AMIGUS_INT_F_CODEC_FIFO_FULL
-              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK
-              | AMIGUS_INT_F_CODEC_SPI_FINISH
-              | AMIGUS_INT_F_CODEC_VS1063_DRQ );
+              | AMIGUS_CODEC_INT_F_FIFO_EMPTY
+              | AMIGUS_CODEC_INT_F_FIFO_FULL
+              | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
+              | AMIGUS_CODEC_INT_F_SPI_FINISH
+              | AMIGUS_CODEC_INT_F_VS1063_DRQ );
   WriteReg16( amiGUS,
               AMIGUS_CODEC_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
-              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
-              | AMIGUS_INT_F_CODEC_FIFO_FULL
-              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK
-              | AMIGUS_INT_F_CODEC_SPI_FINISH
-              | AMIGUS_INT_F_CODEC_VS1063_DRQ );
+              | AMIGUS_CODEC_INT_F_FIFO_EMPTY
+              | AMIGUS_CODEC_INT_F_FIFO_FULL
+              | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
+              | AMIGUS_CODEC_INT_F_SPI_FINISH
+              | AMIGUS_CODEC_INT_F_VS1063_DRQ );
   WriteReg16( amiGUS,
               AMIGUS_CODEC_INT_ENABLE,
               AMIGUS_INT_F_SET
-              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
-              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK );
+              | AMIGUS_CODEC_INT_F_FIFO_EMPTY
+              | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
 }
 
 VOID StopAmiGusCodecPlayback( VOID ) {
@@ -112,24 +112,24 @@ VOID StopAmiGusCodecPlayback( VOID ) {
   APTR amiGUS = AmiGUSBase->agb_CardBase;
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_CONTROL,
-              AMIGUS_CODEC_FIFO_DMA_DISABLE );
+              AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
   WriteReg16( amiGUS,
               AMIGUS_CODEC_INT_ENABLE,
               AMIGUS_INT_F_CLEAR
-              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
-              | AMIGUS_INT_F_CODEC_FIFO_FULL
-              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK
-              | AMIGUS_INT_F_CODEC_SPI_FINISH
-              | AMIGUS_INT_F_CODEC_VS1063_DRQ );
+              | AMIGUS_CODEC_INT_F_FIFO_EMPTY
+              | AMIGUS_CODEC_INT_F_FIFO_FULL
+              | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
+              | AMIGUS_CODEC_INT_F_SPI_FINISH
+              | AMIGUS_CODEC_INT_F_VS1063_DRQ );
   WriteReg16( amiGUS,
               AMIGUS_CODEC_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
-              | AMIGUS_INT_F_CODEC_FIFO_EMPTY
-              | AMIGUS_INT_F_CODEC_FIFO_FULL
-              | AMIGUS_INT_F_CODEC_FIFO_WATERMRK
-              | AMIGUS_INT_F_CODEC_SPI_FINISH
-              | AMIGUS_INT_F_CODEC_VS1063_DRQ );  
+              | AMIGUS_CODEC_INT_F_FIFO_EMPTY
+              | AMIGUS_CODEC_INT_F_FIFO_FULL
+              | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
+              | AMIGUS_CODEC_INT_F_SPI_FINISH
+              | AMIGUS_CODEC_INT_F_VS1063_DRQ );  
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_RESET,
-              AMIGUS_CODEC_FIFO_RESET_STROBE );
+              AMIGUS_CODEC_FIFO_F_RESET_STROBE );
 }

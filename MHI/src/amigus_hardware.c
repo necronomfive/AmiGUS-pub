@@ -64,7 +64,7 @@ VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue ) {
     amiGUS,
     SPIregister,
     SPIvalue,
-    0xc000, // TODO: Fix Magic number
+    AMIGUS_CODEC_SPI_F_BUSY,
     AMIGUS_CODEC_SPI_STATUS,
     AMIGUS_CODEC_SPI_ADDRESS, 
     AMIGUS_CODEC_SPI_WRITE_DATA,

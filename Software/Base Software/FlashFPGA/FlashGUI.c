@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//#define DEBUG
 #define INTUI_V36_NAMES_ONLY
 
 #include <exec/types.h>
@@ -773,7 +774,7 @@ VOID process_window_events(struct Window *mywin,
 	ULONG	board_serial_id;
 	APTR	board_base;
 	
-	char	filename[256];
+	char	filename[1024];
 	char	txtbuf[256];
 
 	BPTR 	filehandle;
@@ -800,7 +801,7 @@ VOID process_window_events(struct Window *mywin,
 
 	myCD = NULL;
 	
-	wPrintF(0,"AmiGUS Flash Tool V0.31", TRUE,topborder,font,mywin);
+	wPrintF(0,"AmiGUS Flash Tool V0.32", TRUE,topborder,font,mywin);
 	wPrintF(1,"(C)2025 by Oliver Achten", FALSE,topborder,font,mywin);
 	
 	/* Find AmiGus Card */
@@ -930,7 +931,10 @@ VOID process_window_events(struct Window *mywin,
 				{		
 			
 					if (AslRequest(fr, 0L))
-						sprintf(filename,"%s%s", fr->rf_Dir, fr->rf_File);
+					{
+						sprintf(filename,"%s", fr->rf_Dir);
+						AddPart(filename,fr->rf_File,sizeof(filename));
+					}
 					else
 					{
 						printf("No file selected!\n");
@@ -1027,7 +1031,10 @@ VOID process_window_events(struct Window *mywin,
 				{		
 			
 					if (AslRequest(fr, 0L))
-						sprintf(filename,"%s%s", fr->rf_Dir, fr->rf_File);
+					{
+						sprintf(filename,"%s", fr->rf_Dir);
+						AddPart(filename,fr->rf_File,sizeof(filename));
+					}
 					else
 					{
 						break;
@@ -1098,7 +1105,10 @@ VOID process_window_events(struct Window *mywin,
 				{		
 			
 					if (AslRequest(fr, 0L))
-						sprintf(filename,"%s%s", fr->rf_Dir, fr->rf_File);
+					{
+						sprintf(filename,"%s", fr->rf_Dir);
+						AddPart(filename,fr->rf_File,sizeof(filename));
+					}
 					else
 					{
 						wPrintF(0,"Config save aborted", TRUE,topborder,font,mywin);

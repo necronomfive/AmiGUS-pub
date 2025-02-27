@@ -14,7 +14,7 @@ And since we are at it right now, you can own an **AmiGUS** too, either by buyin
 ## AmiGUS Feature List
 * **Zorro II** card for **Amiga 2000 / 3000 /4000** computers, or compatible bus boards.
 * **Standard RCA** stereo output, **192kHz @24-bit**.
-* **TOSLINK** optical output, supporting **96kHz @20-bit**.
+* **TOSLINK** optical output, supporting **48kHz, 96kHz & 192kHz @24-bit**.
 * **3x analogue audio inputs** (PAULA, CD-ROM, EXTERNAL), sampled at **192kHz @24-bit**.
 * **High-quality digital mixer** which operates at full **192kHz @24-bit** resolution.
 * **AHI stream interface**, supporting **8-/16- & 24-bit** modes for playback and recording.

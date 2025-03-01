@@ -167,7 +167,7 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
   for ( mhiBuffer = ( struct AmiGUSMhiBuffer * ) buffers->lh_Head ;
         (( clientHandle->agch_CurrentBuffer )
           && (( APTR ) clientHandle->agch_CurrentBuffer
-            != ( APTR ) mhiBuffer->agmb_Node.mln_Succ ));
+            != ( APTR ) mhiBuffer ));
         mhiBuffer = ( struct AmiGUSMhiBuffer * )
           mhiBuffer->agmb_Node.mln_Succ ) {
 

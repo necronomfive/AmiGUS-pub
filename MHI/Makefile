@@ -135,7 +135,18 @@ install: all
 	$(INSTALL0)
 	$(INSTALL1)
 
-test: 
+test: test_playback
+
+test_playback: FOLDERS $(LIB_OBJS)
+	@echo " "
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
+            $(BDIR)interrupt.o \
+            $(BDIR)debug.o $(BDIR)support.o \
+            $(LFLAGST2)
+	@echo " "
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
 
 INCLUDES:
 	make -f Makefile-Includes all 

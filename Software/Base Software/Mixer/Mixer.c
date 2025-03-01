@@ -306,8 +306,8 @@ void setMixer(APTR base,struct MixData *mixdat)
 
 	WriteReg16(base,MAIN_TOSLINK_CTRL,mixdat->toslink_srate);
 	
-	WriteSPI(base, 0x06, mixdat->adc_enable);	// Enable PAULA Left
-	WriteSPI(base, 0x07, mixdat->adc_enable);	// Enable PAULA Right
+	WriteSPI(base, 0x06, (UWORD)mixdat->adc_enable);	// Enable PAULA Left
+	WriteSPI(base, 0x07, (UWORD)mixdat->adc_enable);	// Enable PAULA Right
 }
 
 
@@ -690,7 +690,7 @@ void initGadgets(struct Window *win, struct Gadget *my_gads[], struct MixData *m
 	/* Initialise checkboxes from ADC settings */
 							
 	regval = (ReadSPI(base,0x06)&0xe);
-	mixdat->adc_enable = regval;
+	mixdat->adc_enable = (UBYTE)regval;
 	*((ULONG *)((ULONG)cfg_mem+0x0044)) = 0x00000022 | (ULONG)((ULONG)regval << 16);
 	*((ULONG *)((ULONG)cfg_mem+0x0050)) = 0x00000022 | (ULONG)((ULONG)regval << 16);
 	
@@ -943,7 +943,7 @@ switch (gad->GadgetID)
 		*((ULONG *)((ULONG)cfg_mem+0x0078)) = 0x00000040 | (ULONG)((ULONG)mixdat->adc_mix_lr << 16);	// MAIN_WAV_MIX_LR	
         break;		
     case MYGAD_CHKBOX_PAULA:
-		if (code == 1)
+		if ((my_gads[MYGAD_CHKBOX_PAULA]->Flags & GFLG_SELECTED) != 0)
 		{
 			mixdat->adc_enable |= 0x02;
 			*((ULONG *)((ULONG)cfg_mem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixdat->adc_enable << 16);
@@ -957,7 +957,7 @@ switch (gad->GadgetID)
 		}
 		break;
     case MYGAD_CHKBOX_CDROM:
-		if (code == 1)
+		if ((my_gads[MYGAD_CHKBOX_CDROM]->Flags & GFLG_SELECTED) != 0)
 		{
 			mixdat->adc_enable |= 0x04;
 			*((ULONG *)((ULONG)cfg_mem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixdat->adc_enable << 16);
@@ -971,7 +971,7 @@ switch (gad->GadgetID)
 		}		
 		break;
     case MYGAD_CHKBOX_LINE:
-		if (code == 1)
+		if ((my_gads[MYGAD_CHKBOX_LINE]->Flags & GFLG_SELECTED) != 0)
 		{
 			mixdat->adc_enable |= 0x08;
 			*((ULONG *)((ULONG)cfg_mem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixdat->adc_enable << 16);
@@ -985,7 +985,7 @@ switch (gad->GadgetID)
 		}
 		break;
     case MYGAD_CHKBOX_AHI:
-		if (code == 1)
+		if ((my_gads[MYGAD_CHKBOX_AHI]->Flags & GFLG_SELECTED) != 0)
 		{
 			mixdat->ahi_locked = TRUE;
 		}
@@ -995,7 +995,7 @@ switch (gad->GadgetID)
 		}
 		break;
     case MYGAD_CHKBOX_MHI:
-		if (code == 1)
+		if ((my_gads[MYGAD_CHKBOX_MHI]->Flags & GFLG_SELECTED) != 0)
 		{
 			mixdat->mhi_locked = TRUE;
 		}
@@ -1005,7 +1005,7 @@ switch (gad->GadgetID)
 		}		
 		break;
     case MYGAD_CHKBOX_HGN:
-		if (code == 1)
+		if ((my_gads[MYGAD_CHKBOX_HGN]->Flags & GFLG_SELECTED) != 0)
 		{
 			mixdat->wav_locked = TRUE;
 		}
@@ -1015,7 +1015,7 @@ switch (gad->GadgetID)
 		}		
 		break;		
     case MYGAD_CHKBOX_ADC:
-		if (code == 1)
+		if ((my_gads[MYGAD_CHKBOX_ADC]->Flags & GFLG_SELECTED) != 0)
 		{
 			mixdat->adc_locked = TRUE;
 		}
@@ -1927,7 +1927,7 @@ VOID gadtoolsWindow(VOID)
 				else
 					{
 					if (NULL == (mywin = OpenWindowTags(NULL,
-							WA_Title,     "AmiGUS Mixer V0.63 - (c)2025 by O. Achten",
+							WA_Title,     "AmiGUS Mixer V0.64 - (c)2025 by O. Achten",
 							WA_Gadgets,   glist,      WA_AutoAdjust,    TRUE,
 							WA_Width,       528,      WA_MinWidth,        50,
 							WA_InnerHeight, 154,      WA_MinHeight,       50,
@@ -1981,19 +1981,19 @@ VOID gadtoolsWindow(VOID)
 void main(void)
 {
 	SetTaskPri(FindTask(NULL),30);	
-	if (NULL == (IntuitionBase = OpenLibrary("intuition.library", 37)))
+	if (NULL == (IntuitionBase = OpenLibrary("intuition.library", 34)))
 		errorMessage( "Requires V37 intuition.library");
 	else
 		{
-		if (NULL == (ExpansionBase = OpenLibrary("expansion.library", 37)))
+		if (NULL == (ExpansionBase = OpenLibrary("expansion.library", 34)))
 			errorMessage( "Requires V37 expansion.library");
 		else	
 			{
-			if (NULL == (GfxBase = OpenLibrary("graphics.library", 37)))
+			if (NULL == (GfxBase = OpenLibrary("graphics.library", 34)))
 				errorMessage( "Requires V37 graphics.library");
 			else
 				{
-				if (NULL == (GadToolsBase = OpenLibrary("gadtools.library", 37)))
+				if (NULL == (GadToolsBase = OpenLibrary("gadtools.library", 34)))
 					errorMessage( "Requires V37 gadtools.library");
 				else			
 					{

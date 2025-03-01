@@ -15,6 +15,7 @@
  */
 
 #include "amigus_hardware.h"
+#include "debug.h"
 #include "SDI_compiler.h"
 
 UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
@@ -41,18 +42,19 @@ INLINE VOID WriteSPI(
   APTR amiGUS,
   UWORD SPIregister,
   UWORD SPIvalue,
-  UWORD SPImask, // TODO: Better name?
+  UWORD blockedSPImask,
   UWORD offsetSPIstatus,
   UWORD offsetSPIaddress,
   UWORD offsetSPIwrite,
   UWORD offsetSPItrigger ) {
 
-  UWORD status = 1;
+  UWORD status;
 
-  while ( status & SPImask ) {
+  do {
 
     status = ReadReg16( amiGUS, offsetSPIstatus );
-  }
+
+  } while ( status & blockedSPImask );
   WriteReg16( amiGUS, offsetSPIaddress, SPIregister );
   WriteReg16( amiGUS, offsetSPIwrite, SPIvalue );
   WriteReg16( amiGUS, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
@@ -64,7 +66,7 @@ VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue ) {
     amiGUS,
     SPIregister,
     SPIvalue,
-    AMIGUS_CODEC_SPI_F_BUSY,
+    AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,
     AMIGUS_CODEC_SPI_STATUS,
     AMIGUS_CODEC_SPI_ADDRESS, 
     AMIGUS_CODEC_SPI_WRITE_DATA,
@@ -77,7 +79,7 @@ VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
 	WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
 }
 
-VOID initVS1063Codec( APTR amiGUS ) {
+VOID InitVS1063Codec( APTR amiGUS ) {
 
   // Set SC_MULT to XTALI x 5.0 in SC_CLOCKF,
   // see VS1063a Datasheet, Version: 1.32, 2024-01-31, page 48

@@ -20,6 +20,7 @@
 #include "exec/types.h"
 #include "SDI_compiler.h"
 
+VOID HandlePlayback( VOID );
 BOOL CreateInterruptHandler( VOID );
 VOID DestroyInterruptHandler( VOID );
 

@@ -174,6 +174,7 @@
 #define AMIGUS_CODEC_FIFO_F_RESET_STROBE 0x0000
 
 /* AmiGUS Codec SPI Steering Flags */
+#define AMIGUS_CODEC_SPI_F_DREQ          0x4000
 #define AMIGUS_CODEC_SPI_F_BUSY          0x8000
 
 /* FIFO size */
@@ -215,6 +216,10 @@ UWORD ReadReg16( APTR amiGUS, ULONG offset );
 VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
 ULONG ReadReg32( APTR amiGUS, ULONG offset );
 VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
+
+VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue );
+VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value );
+VOID InitVS1063Codec( APTR amiGUS );
 
 /******************************************************************************
  * Low-Level hardware feature lookup tables

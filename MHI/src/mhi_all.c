@@ -1,9 +1,12 @@
 #include <libraries/mhi.h>
 #include <proto/exec.h>
 
+#include "amigus_codec.h"
+#include "amigus_hardware.h"
 #include "amigus_mhi.h"
 #include "debug.h"
 #include "library.h"
+#include "interrupt.h"
 #include "support.h"
 #include "SDI_mhi_protos.h"
 
@@ -22,7 +25,7 @@ VOID FlushAllBuffers( struct AmiGUSClientHandle * clientHandle ) {
       (( struct AmiGUSMhiBuffer * ) buffer)->agmb_BufferIndex ));
     FreeMem( buffer, sizeof( struct AmiGUSMhiBuffer ) );
   }
-  clientHandle->agch_NextBuffer = NULL;
+  clientHandle->agch_CurrentBuffer = NULL;
   LOG_D(( "D: All buffers flushed.\n" ));
 }
 
@@ -42,14 +45,18 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     handle->agch_Task = task;
     handle->agch_Signal = signal;
     handle->agch_Status = MHIF_STOPPED;
-    handle->agch_NextBuffer = NULL;
+    handle->agch_CurrentBuffer = NULL;
     NonConflictingNewMinList( &handle->agch_Buffers );
     result = ( APTR ) handle;
     ++AmiGUSBase->agb_UsageCounter;
 
     LOG_D(( "D: AmiGUS MHI accepted task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
-// TODO: Init interrupt here
+
+    LOG_D(( "D: Initializing VS1063 codec\n" ));
+    InitVS1063Codec( AmiGUSBase->agb_CardBase );
+    CreateInterruptHandler();
+
   } else {
 
     LOG_D(( "D: AmiGUS MHI in use, denying.\n" ));
@@ -82,7 +89,8 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 
     LOG_D(( "D: AmiGUS MHI free'd up task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
-// TODO: Free interrupt here
+    DestroyInterruptHandler();
+
   } else {
 
     LOG_W(( "W: AmiGUS MHI does not know task 0x%08lx and signal 0x%08lx"
@@ -115,25 +123,30 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
     LOG_D(( "D: MHIQueueBuffer failed, buffer not LONG aligned.\n" ));
     return FALSE;
   }
-  if ( size & 0x00000003 ) {
 
-    LOG_D(( "D: MHIQueueBuffer failed, buffer size no multiple of LONG.\n" ));
-    return FALSE;
-  }
   mhiBuffer = AllocMem( sizeof( struct AmiGUSMhiBuffer ),
                         MEMF_ANY | MEMF_CLEAR );
   mhiBuffer->agmb_Buffer = buffer;
   mhiBuffer->agmb_BufferMax = size >> 2;
-  LOG_V(( "V: Enqueueing MHI buffer 0x%08lx, data 0x%08lx, "
+  mhiBuffer->agmb_BufferExtraBytes = size & 0x00000003;
+  if ( mhiBuffer->agmb_BufferExtraBytes ) {
+
+    LOG_W(( "W: Buffer size %ld no multiple of LONG - performance impacted!\n",
+            size ));
+  }
+  LOG_V(( "V: Enqueueing MHI buffer 0x%08lx, current 0x%08lx, data 0x%08lx, "
           "size %ld BYTEs = %ld LONGs\n",
           mhiBuffer,
+          clientHandle->agch_CurrentBuffer,
           buffer,
           size,
           mhiBuffer->agmb_BufferMax ));
+  Disable();
   AddTail( buffers, ( struct Node * ) mhiBuffer );
-  if ( NULL == clientHandle->agch_NextBuffer ) {
+  Enable();
+  if ( !(clientHandle->agch_CurrentBuffer )) {
 
-    clientHandle->agch_NextBuffer = mhiBuffer;
+    clientHandle->agch_CurrentBuffer = mhiBuffer;
   }
 
   LOG_D(( "D: MHIQueueBuffer done\n" ));
@@ -152,10 +165,13 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
 
   LOG_D(( "D: MHIGetEmpty start\n" ));
   for ( mhiBuffer = ( struct AmiGUSMhiBuffer * ) buffers->lh_Head ;
-        mhiBuffer->agmb_Node.mln_Succ ;
+        (( clientHandle->agch_CurrentBuffer )
+          && (( APTR ) clientHandle->agch_CurrentBuffer
+            != ( APTR ) mhiBuffer->agmb_Node.mln_Succ ));
         mhiBuffer = ( struct AmiGUSMhiBuffer * )
           mhiBuffer->agmb_Node.mln_Succ ) {
 
+    LOG_V(( "V: Checking for empty @ 0x%08lx\n", mhiBuffer ));
     if (( mhiBuffer ) &&
         (( struct AmiGUSMhiBuffer * ) buffers != mhiBuffer ) &&
         ( mhiBuffer->agmb_BufferIndex >= mhiBuffer->agmb_BufferMax )) {
@@ -167,11 +183,13 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
               mhiBuffer,
               mhiBuffer->agmb_BufferMax,
               mhiBuffer->agmb_BufferIndex ));
+      Disable();
       Remove(( struct Node * ) mhiBuffer );
+      Enable();
       FreeMem( mhiBuffer, sizeof( struct AmiGUSMhiBuffer ));
-      if ( mhiBuffer == clientHandle->agch_NextBuffer ) {
+      if ( mhiBuffer == clientHandle->agch_CurrentBuffer ) {
 
-        clientHandle->agch_NextBuffer = NULL;
+        clientHandle->agch_CurrentBuffer = NULL;
       }
 
       return result;
@@ -201,7 +219,7 @@ ASM( VOID ) SAVEDS MHIPlay(
   struct AmiGUSClientHandle * clientHandle =
     ( struct AmiGUSClientHandle * ) handle;
   LOG_D(( "D: MHIPlay start\n" ));
-// TODO: Start playing here
+  StartAmiGusCodecPlayback();
   clientHandle->agch_Status = MHIF_PLAYING;
   LOG_D(( "D: MHIPlay done\n" ));
   return;
@@ -215,7 +233,7 @@ ASM( VOID ) SAVEDS MHIStop(
   struct AmiGUSClientHandle * clientHandle =
     ( struct AmiGUSClientHandle * ) handle;
   LOG_D(( "D: MHIStop start\n" ));
-// TODO: Stop playing here
+  StopAmiGusCodecPlayback();
   FlushAllBuffers( clientHandle );
   clientHandle->agch_Status = MHIF_STOPPED;
   LOG_D(( "D: MHIStop done\n" ));

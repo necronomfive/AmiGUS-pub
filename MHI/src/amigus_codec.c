@@ -21,6 +21,7 @@
 #include "amigus_mhi.h"
 #include "debug.h"
 #include "errors.h"
+#include "interrupt.h"
 
 LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
 
@@ -105,6 +106,10 @@ VOID StartAmiGusCodecPlayback( VOID ) {
               AMIGUS_INT_F_SET
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
+  HandlePlayback();
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_FIFO_CONTROL,
+              AMIGUS_CODEC_FIFO_F_DMA_ENABLE );
 }
 
 VOID StopAmiGusCodecPlayback( VOID ) {

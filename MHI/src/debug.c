@@ -129,8 +129,8 @@ VOID debug_mprintf( STRPTR format, ... ) {
   if ( !AmiGUSBase->agb_LogMem ) {
 
     // Yep, defaults to 
-    LONG size = 32<<20;             // 32MB in the
-    APTR where = (APTR) 0x0bffFFff; // middle 3/4000 CPU board space
+    LONG size = 32<<20;             // 32MB somewhere
+    APTR where = (APTR) 0x0a000000; // in 3/4000 CPU board space
     UBYTE buffer[64];
     LONG i;
 
@@ -147,7 +147,7 @@ VOID debug_mprintf( STRPTR format, ... ) {
     }
     /*
      * UAE:  setenv AmiGUS-MHI-LOG-ADDRESS 1207959552 -> 0x48000000
-     * 3/4k: setenv AmiGUS-MHI-LOG-ADDRESS 201326591  -> 0x0bffFFff
+     * 3/4k: setenv AmiGUS-MHI-LOG-ADDRESS 167772160  -> 0x0a000000
      */
     i = GetVar( "AmiGUS-MHI-LOG-SIZE", buffer, sizeof(buffer), 0 );
     if ( i > 0 ) {

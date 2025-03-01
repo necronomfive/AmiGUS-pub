@@ -68,7 +68,8 @@ struct AmiGUSMhiBuffer {
   struct MinNode                agmb_Node;
   ULONG                       * agmb_Buffer;
   ULONG                         agmb_BufferIndex;
-  ULONG	                        agmb_BufferMax;
+  ULONG                         agmb_BufferMax;
+  ULONG                         agmb_BufferExtraBytes; // Only 0-3 - :)
 };
 
 struct AmiGUSClientHandle {
@@ -76,7 +77,7 @@ struct AmiGUSClientHandle {
   ULONG                         agch_Signal;
 
   struct MinList                agch_Buffers;
-  struct AmiGUSMhiBuffer *      agch_NextBuffer;
+  struct AmiGUSMhiBuffer *      agch_CurrentBuffer;
 
   UBYTE                         agch_Status;
   UBYTE                         agch_Reserved0;

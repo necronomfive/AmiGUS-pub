@@ -28,54 +28,83 @@
 VOID HandlePlayback( VOID ) {
 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
-  struct AmiGUSMhiBuffer * next = 
-    AmiGUSBase->agb_ClientHandle.agch_NextBuffer;
+  struct AmiGUSClientHandle * handle = &( AmiGUSBase->agb_ClientHandle );
+  struct AmiGUSMhiBuffer * current = handle->agch_CurrentBuffer;
+  const APTR tail = &( handle->agch_Buffers.mlh_Tail );
   /* Read-back remaining FIFO samples in BYTES */
   LONG reminder = ReadReg16( amiGUS, AMIGUS_CODEC_FIFO_USAGE ) << 1;
   LONG target = AMIGUS_CODEC_PLAY_FIFO_BYTES - reminder - 3;
   LONG copied = 0;
 
-  if ( !next ) {
+  if ( !current ) {
 
-    LOG_INT(( "INT: No next buffer!\n" ));
+    LOG_INT(( "INT: No current buffer!\n" ));
     return;
   }
   while ( copied < target ) {
 
-    if ( next->agmb_BufferIndex < next->agmb_BufferMax ) {
+    if ( current->agmb_BufferIndex < current->agmb_BufferMax ) {
 
-      ULONG data = next->agmb_Buffer[ next->agmb_BufferIndex ];
+      ULONG data = current->agmb_Buffer[ current->agmb_BufferIndex ];
       WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, data );
-      ++next->agmb_BufferIndex;
+      // LOG_INT(( "INT: 0x%08lx\n", data ));
+      ++current->agmb_BufferIndex;
       copied += 4;
 
-    } else if ( next->agmb_Node.mln_Succ ) {
+    } else if ( current->agmb_BufferExtraBytes ) {
+
+      ULONG data = 0;
+      UBYTE shift = 24;
+      ULONG address = ( ULONG ) current->agmb_Buffer;
+      address += current->agmb_BufferIndex << 2;
+      copied += current->agmb_BufferExtraBytes;
+      
+      while ( current->agmb_BufferExtraBytes ) {
+
+        UBYTE * extraData = ( UBYTE * ) address;
+        UBYTE byteData = *extraData;
+
+        data |= byteData << shift;
+
+        ++address;
+        --current->agmb_BufferExtraBytes;
+        shift -= 8;
+      }
+      LOG_INT(( "INT: ed 0x%08lx\n", data ));
+      WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, data );     
+
+    } else if ( tail != current->agmb_Node.mln_Succ ) {
 
       LOG_INT(( "INT: ob 0x%08lx i %ld m %ld\n",
-                next,
-                next->agmb_BufferIndex,
-                next->agmb_BufferMax ));
-      next = ( struct AmiGUSMhiBuffer * ) next->agmb_Node.mln_Succ;
-      AmiGUSBase->agb_ClientHandle.agch_NextBuffer = next;
+                current,
+                current->agmb_BufferIndex,
+                current->agmb_BufferMax ));
+      Signal( handle->agch_Task, handle->agch_Signal );
+      current = ( struct AmiGUSMhiBuffer * ) current->agmb_Node.mln_Succ;
+      handle->agch_CurrentBuffer = current;
       LOG_INT(( "INT: nb 0x%08lx i %ld m %ld\n",
-                next,
-                next->agmb_BufferIndex,
-                next->agmb_BufferMax ));
+                current,
+                current->agmb_BufferIndex,
+                current->agmb_BufferMax ));
 
     } else {
 
+      // Playback buffers empty, but FIFO could take more. - End of Stream?
+      handle->agch_Status = MHIF_OUT_OF_DATA;
+      Signal( handle->agch_Task, handle->agch_Signal );
       LOG_INT(( "INT: lb 0x%08lx i %ld m %ld\n",
-                next,
-                next->agmb_BufferIndex,
-                next->agmb_BufferMax ));
-      // Playback buffers empty, but FIFO could take more. - Not so good, Al...
+                current,
+                current->agmb_BufferIndex,
+                current->agmb_BufferMax ));
       break;
     }
   }
-  LOG_INT(( "INT: Playback t %4ld c %4ld nb 0x%08lx\n",
+  LOG_INT(( "INT: Playback r %4ld t %4ld c %4ld cb 0x%08lx nb 0x%08lx\n",
+            reminder,
             target,
             copied,
-            next->agmb_Node.mln_Succ ));
+            current,
+            current->agmb_Node.mln_Succ ));
 }
 
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (

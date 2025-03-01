@@ -21,5 +21,7 @@
 struct AmiGUSBase;
 
 LONG FindAmiGusCodec( struct AmiGUSBase *amiGUSBase );
+VOID StartAmiGusCodecPlayback( VOID );
+VOID StopAmiGusCodecPlayback( VOID );
 
 #endif /* AMIGUS_CODEC_H */

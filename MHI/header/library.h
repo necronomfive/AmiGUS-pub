@@ -46,7 +46,7 @@
  *****************************************************************************/
 #define LIBRARY_NAME      "mhiAmiGUS.library"
 #define LIBRARY_VERSION   1
-#define LIBRARY_REVISION  1
+#define LIBRARY_REVISION  2
 #define LIBRARY_DATETXT	  __AMIGADATE__
 #define LIBRARY_VERSTXT	 GSTR( LIBRARY_VERSION ) ".00" GSTR( LIBRARY_REVISION )
 

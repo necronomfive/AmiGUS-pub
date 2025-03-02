@@ -208,7 +208,7 @@ ASM( UBYTE ) SAVEDS MHIGetStatus(
     ( struct AmiGUSClientHandle * ) handle;
 
   LOG_D(( "D: MHIGetStatus %ld start/done\n", clientHandle->agch_Status ));
-  return clientHandle->agch_Status;
+  return ( UBYTE ) clientHandle->agch_Status;
 }
 
 ASM( VOID ) SAVEDS MHIPlay(

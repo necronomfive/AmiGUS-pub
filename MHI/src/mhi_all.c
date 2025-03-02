@@ -340,6 +340,29 @@ ASM( VOID ) SAVEDS MHISetParam(
   struct AmiGUSClientHandle * clientHandle =
     ( struct AmiGUSClientHandle * ) handle;
   LOG_D(( "D: MHISetParam start\n" ));
+  LOG_D(( "V: Param %ld, Value %ld\n", param, value ));
+
+  switch ( param ) {
+    // 0=muted .. 100=0dB
+    case MHIP_VOLUME:
+    // 0=left .. 50=center .. 100=right
+    case MHIP_PANNING:
+    // 0=stereo .. 100=mono
+    case MHIP_CROSSMIXING:
+    // For all Equilizer:
+    // 0=max.cut .. 50=unity gain .. 100=max.boost
+    case MHIP_BASS:
+    case MHIP_MID:
+    case MHIP_TREBLE:
+    case MHIP_PREFACTOR:
+    case MHIP_MIDBASS:
+    case MHIP_MIDHIGH:
+    default:
+      LOG_W(( "W: MHISetParam cannot set param %ld to Value %ld yet\n",
+              param, value ));
+      break;
+  }
+
   LOG_D(( "D: MHISetParam done\n" ));
   return;
 }

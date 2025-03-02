@@ -1,4 +1,6 @@
 Next:
+- Implement MHI equalizer
+- Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
 - Decide on debug + cpu variants
 - Switch to AmiGUS ints instead AHI timing
 - Unify recording and playback buffer sizing 
@@ -9,7 +11,6 @@ Next:
 - Calibration of all audio sources' volumes with each other
 - Calibrate volume AHI Mono vs Stereo
 - Mixer UI elements and their responsiveness
-- Get MHI implemented as per https://bitbucket.org/supernobby/mhimdev/src/main/ and https://aminet.net/package/driver/audio/mhimasplayer
 - Get mpeg.device working as per https://aminet.net/package/mus/play/dmdev
 - Make CAMD on https://aminet.net/package/mus/midi/camd / https://aminet.net/package/mus/play/projectomega / https://aminet.net/package/driver/other/uaemidi / https://aminet.net/package/mus/midi/camd40 / https://aminet.net/package/driver/other/mmp
 - Fully split Recording + Playback parts in AHI to allow 1 client each
@@ -22,3 +23,4 @@ Done:
 - Recording overflow handling similar to playback underrun handling
 - Move to mode file: RecordingSampleTypeById, RecordingSampleAlignmentById, AmiGUSPlaybackSampleSizes -> moved all tables to lookup based on mode id
 - Test Recording and release alpha15 / beta 15
+- Get MHI implemented as per https://bitbucket.org/supernobby/mhimdev/src/main/ and https://aminet.net/package/driver/audio/mhimasplayer

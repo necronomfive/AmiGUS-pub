@@ -33,7 +33,12 @@ VOID HandlePlayback( VOID ) {
   const APTR tail = &( handle->agch_Buffers.mlh_Tail );
   /* Read-back remaining FIFO samples in BYTES */
   LONG reminder = ReadReg16( amiGUS, AMIGUS_CODEC_FIFO_USAGE ) << 1;
-  LONG target = AMIGUS_CODEC_PLAY_FIFO_BYTES - reminder - 3;
+  /**********************************************************
+   * Keep some 1 LONG = 4 BYTE distance to FIFO's limit---+ *
+   * Bytes currently remaining in CODEC FIFO------+       | *
+   * Size of the CODEC FIFO---+                   |       | *
+   *                          V                   V       V */
+  LONG target = AMIGUS_CODEC_PLAY_FIFO_BYTES - reminder - 4;
   LONG copied = 0;
 
   if ( !current ) {

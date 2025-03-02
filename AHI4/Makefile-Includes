@@ -1,0 +1,82 @@
+#
+# This file is part of the AmiGUS.audio driver.
+#
+# AmiGUS.audio driver is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, version 3 of the License only.
+#
+# AmiGUS.audio driver is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU LesserGeneral Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+BASE    = ahi_sub
+PATH    = include
+
+AHI_INCLUDES    = AHI4Develop:include
+AHI_ORIG_CLIB   = $(AHI_INCLUDES)/C/clib/$(BASE)_protos.h
+AHI_ORIG_FD     = $(AHI_INCLUDES)/FD/$(BASE)_lib.fd
+
+PRAGMAPATH = $(PATH)/C/pragma/
+PRAGMANAME = $(PRAGMAPATH)$(BASE)_lib.h
+$(PRAGMANAME): $(AHI_ORIG_FD)
+	-@makedir $(PRAGMAPATH) ALL >NIL:
+	fd2pragma SPECIAL   6 CLIB $(AHI_ORIG_CLIB) INFILE $(AHI_ORIG_FD) TO $(PRAGMAPATH)
+
+AMIGAEPATH = $(PATH)/AmigaE/
+AMIGAENAME = $(AMIGAEPATH)$(BASE).m
+$(AMIGAENAME): $(AHI_ORIG_FD)
+	-@makedir $(AMIGAEPATH) ALL >NIL:
+	fd2pragma SPECIAL  18 CLIB $(AHI_ORIG_CLIB) INFILE $(AHI_ORIG_FD) TO $(AMIGAEPATH)
+
+GCCINLINEPATH = $(PATH)/C/inline/
+GCCINLINENAME = $(GCCINLINEPATH)$(BASE).h
+$(GCCINLINENAME): $(AHI_ORIG_FD)
+	-@makedir $(GCCINLINEPATH) ALL >NIL:
+	fd2pragma SPECIAL  40 CLIB $(AHI_ORIG_CLIB) INFILE $(AHI_ORIG_FD) TO $(GCCINLINEPATH)
+
+PROTOPATH = $(PATH)/C/proto/
+PROTONAME = $(PROTOPATH)$(BASE).h
+$(PROTONAME): $(AHI_ORIG_FD)
+	-@makedir $(PROTOPATH) ALL >NIL:
+	fd2pragma SPECIAL  38 CLIB $(AHI_ORIG_CLIB) INFILE $(AHI_ORIG_FD) TO $(PROTOPATH)
+
+VBCCINLINEPATH = $(PATH)/C/inline/
+VBCCINLINENAME = $(VBCCINLINEPATH)$(BASE)_protos.h
+$(VBCCINLINENAME): $(AHI_ORIG_FD)
+	-@makedir $(VBCCINLINEPATH) ALL >NIL:
+	fd2pragma SPECIAL  70 CLIB $(AHI_ORIG_CLIB) INFILE $(AHI_ORIG_FD) TO $(VBCCINLINEPATH)
+
+LVOPATH = $(PATH)/ASM/lvo/
+LVONAME = $(LVOPATH)$(BASE)_lib.i
+$(LVONAME): $(AHI_ORIG_FD)
+	-@makedir $(LVOPATH) ALL >NIL:
+	fd2pragma SPECIAL  23 CLIB $(AHI_ORIG_CLIB) INFILE $(AHI_ORIG_FD) TO $(LVOPATH)
+
+FDPATH = $(PATH)/FD/
+FDNAME = $(FDPATH)$(BASE)_lib.fd
+$(FDNAME): $(AHI_ORIG_FD)
+	-@makedir $(FDPATH) ALL >NIL:
+	fd2pragma SPECIAL 110 CLIB $(AHI_ORIG_CLIB) INFILE $(AHI_ORIG_FD) TO $(FDPATH) COMMENT
+
+CLIBPATH = $(PATH)/C/clib/
+CLIBNAME = $(CLIBPATH)$(BASE)_protos.h
+$(CLIBNAME): $(AHI_ORIG_FD)
+	-@makedir $(CLIBPATH) ALL >NIL:
+	fd2pragma SPECIAL 111 CLIB $(AHI_ORIG_CLIB) INFILE $(AHI_ORIG_FD) TO $(CLIBPATH) COMMENT
+# breaks it sometimes... COPYRIGHT $(AUTHOR)
+
+all: $(PRAGMANAME) $(AMIGAENAME) $(GCCINLINENAME) $(PROTONAME) \
+     $(VBCCINLINENAME) $(LVONAME) $(FDNAME) $(CLIBNAME) \
+     $(LIBRARYNAME)
+	copy $(AHI_INCLUDES)/Asm/devices $(PATH)/ASM/devices       ALL CLONE
+	copy $(AHI_INCLUDES)/Asm/libraries $(PATH)/ASM/libraries   ALL CLONE
+	copy $(AHI_INCLUDES)/C/devices $(PATH)/C/devices           ALL CLONE
+	copy $(AHI_INCLUDES)/C/libraries $(PATH)/C/libraries       ALL CLONE	
+
+clean:
+	-@delete $(PATH) ALL

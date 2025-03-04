@@ -1,5 +1,6 @@
 #include <libraries/mhi.h>
 #include <proto/exec.h>
+#include <proto/utility.h>
 
 #include "amigus_codec.h"
 #include "amigus_hardware.h"
@@ -9,7 +10,6 @@
 #include "interrupt.h"
 #include "support.h"
 #include "SDI_mhi_protos.h"
-
 
 VOID FlushAllBuffers( struct AmiGUSClientHandle * clientHandle ) {
 
@@ -29,6 +29,24 @@ VOID FlushAllBuffers( struct AmiGUSClientHandle * clientHandle ) {
   LOG_D(( "D: All buffers flushed.\n" ));
 }
 
+VOID UpdateEqualizer( UWORD bandLevel, UWORD percent ) {
+
+  LONG intermediate;
+  WORD gain;
+  APTR amiGUScard = AmiGUSBase->agb_CardBase;
+
+  /* gain value = (value * 325) / 502 - 32 */
+  intermediate = SMult32( percent, 325 );
+  intermediate = SDivMod32( intermediate, 502 );
+  intermediate -= 32;
+
+  gain = ( WORD ) intermediate;
+  LOG_D(( "D: Calculated gain %ld = %ld for %ld%\n",
+          intermediate, gain, percent ));
+
+  UpdateVS1063Equalizer( amiGUScard, bandLevel, gain );
+}
+
 ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a0, struct Task * task ),
   REG( d0, ULONG signal ),
@@ -41,6 +59,7 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
   if ( !AmiGUSBase->agb_UsageCounter ) {
 
+    APTR amiGUScard = AmiGUSBase->agb_CardBase;
     struct AmiGUSClientHandle * handle = &AmiGUSBase->agb_ClientHandle;
     handle->agch_Task = task;
     handle->agch_Signal = signal;
@@ -54,7 +73,8 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
             task, signal ));
 
     LOG_D(( "D: Initializing VS1063 codec\n" ));
-    InitVS1063Codec( AmiGUSBase->agb_CardBase );
+    InitVS1063Codec( amiGUScard );
+    InitVS1063Equalizer( amiGUScard, TRUE, AmiGUSDefaultEqualizer );
     CreateInterruptHandler();
 
   } else {
@@ -339,6 +359,7 @@ ASM( VOID ) SAVEDS MHISetParam(
 
   struct AmiGUSClientHandle * clientHandle =
     ( struct AmiGUSClientHandle * ) handle;
+
   LOG_D(( "D: MHISetParam start\n" ));
   LOG_D(( "V: Param %ld, Value %ld\n", param, value ));
 
@@ -351,12 +372,32 @@ ASM( VOID ) SAVEDS MHISetParam(
     case MHIP_CROSSMIXING:
     // For all Equilizer:
     // 0=max.cut .. 50=unity gain .. 100=max.boost
-    case MHIP_BASS:
-    case MHIP_MID:
-    case MHIP_TREBLE:
+    case MHIP_BASS: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL1, value );
+      break;
+    }
+    case MHIP_MIDBASS: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL2, value );
+      break;
+    }
+    case MHIP_MID: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL3, value );
+      break;
+    }
+    case MHIP_MIDHIGH: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL4, value );
+      break;
+    }
+    case MHIP_TREBLE: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL5, value );
+      break;
+    }
     case MHIP_PREFACTOR:
-    case MHIP_MIDBASS:
-    case MHIP_MIDHIGH:
     default:
       LOG_W(( "W: MHISetParam cannot set param %ld to Value %ld yet\n",
               param, value ));

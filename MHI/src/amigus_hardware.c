@@ -23,14 +23,57 @@ UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
   return *(( UWORD * )(( ULONG ) amiGUS + offset ));
 }
 
-VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value ) {
-
-  *(( UWORD * )(( ULONG ) amiGUS + offset )) = value;
-}
-
 ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
 
   return *(( ULONG * )(( ULONG ) amiGUS + offset ));
+}
+
+INLINE UWORD ReadSPI(
+  APTR amiGUS,
+  UWORD SPIregister,
+  UWORD blockedSPImask,
+  UWORD offsetSPIstatus,
+  UWORD offsetSPIaddress,
+  UWORD offsetSPIread,
+  UWORD offsetSPItrigger ) {
+
+  UWORD status;
+
+  do {
+
+    status = ReadReg16( amiGUS, offsetSPIstatus );
+
+  } while ( status & blockedSPImask );
+  WriteReg16( amiGUS, offsetSPIaddress, SPIregister );
+  WriteReg16( amiGUS, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
+  do {
+
+    status = ReadReg16( amiGUS, offsetSPIstatus );
+
+  } while ( status & blockedSPImask );
+  return ReadReg16( amiGUS, offsetSPIread );
+}
+
+UWORD ReadCodecSPI( APTR amiGUS, UWORD SPIregister ) {
+
+  return ReadSPI( amiGUS,
+                  SPIregister,
+                  AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,
+                  AMIGUS_CODEC_SPI_STATUS,
+                  AMIGUS_CODEC_SPI_ADDRESS, 
+                  AMIGUS_CODEC_SPI_READ_DATA,
+                  AMIGUS_CODEC_SPI_READ_TRIGGER );
+}
+
+UWORD ReadVS1063Mem( APTR amiGUS, UWORD address ) {
+
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
+  return ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM );
+}
+
+VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value ) {
+
+  *(( UWORD * )(( ULONG ) amiGUS + offset )) = value;
 }
 
 VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
@@ -62,21 +105,20 @@ INLINE VOID WriteSPI(
 
 VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue ) {
 
-  WriteSPI(
-    amiGUS,
-    SPIregister,
-    SPIvalue,
-    AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,
-    AMIGUS_CODEC_SPI_STATUS,
-    AMIGUS_CODEC_SPI_ADDRESS, 
-    AMIGUS_CODEC_SPI_WRITE_DATA,
-    AMIGUS_CODEC_SPI_WRITE_TRIGGER );
+  WriteSPI( amiGUS,
+            SPIregister,
+            SPIvalue,
+            AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,
+            AMIGUS_CODEC_SPI_STATUS,
+            AMIGUS_CODEC_SPI_ADDRESS, 
+            AMIGUS_CODEC_SPI_WRITE_DATA,
+            AMIGUS_CODEC_SPI_WRITE_TRIGGER );
 }
 
 VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
 
   WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
-	WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
 }
 
 VOID InitVS1063Codec( APTR amiGUS ) {
@@ -97,6 +139,58 @@ VOID InitVS1063Codec( APTR amiGUS ) {
   WriteVS1063Mem( amiGUS,
                   VS1063_CODEC_ADDRESS_I2S_CONFIG,
                   VS1063_CODEC_F_I2S_CONFIG_192k );
+}
+
+VOID InitVS1063Equalizer( APTR amiGUS, BOOL enable, const WORD * settings ) {
+
+  UWORD oldPlayMode = ReadVS1063Mem( amiGUS,
+                                     VS1063_CODEC_ADDRESS_PLAY_MODE );
+  UWORD newPlayMode = ( enable )
+                      ? ( oldPlayMode | VS1063_CODEC_F_PL_MO_EQ5_ENABLE )
+                      : ( oldPlayMode & ~VS1063_CODEC_F_PL_MO_EQ5_ENABLE );
+  UWORD wasEnabled = oldPlayMode & VS1063_CODEC_F_PL_MO_EQ5_ENABLE;
+
+  LOG_V(( "V: Old PlayMode 0x%04lx = 0x%04lx\n",
+          VS1063_CODEC_ADDRESS_PLAY_MODE, oldPlayMode ));
+  if ( enable ) {
+
+    UWORD i;
+    for ( i = 0 ; i < 9 ; ++i ) {
+
+      LOG_V(( "V: Setting 0x%04lx = %ld\n",
+              VS1063_CODEC_ADDRESS_EQ5_LEVEL1 + i, settings[ i ] ));
+      WriteVS1063Mem( amiGUS, 
+                      VS1063_CODEC_ADDRESS_EQ5_LEVEL1 + i,
+                      settings[ i ] );
+    }
+  }
+
+  if (( wasEnabled ) && ( enable )) {
+
+    LOG_V(( "V: Updating EQ5 only \n" ));
+    WriteVS1063Mem( amiGUS,
+                    VS1063_CODEC_ADDRESS_EQ5_UPDATE,
+                    VS1063_CODEC_F_EQ5_UPD_STROBE );
+
+  } else {
+
+    LOG_V(( "V: New PlayMode 0x%04lx = 0x%04lx\n",
+            VS1063_CODEC_ADDRESS_PLAY_MODE, newPlayMode ));
+    WriteVS1063Mem( amiGUS,
+                    VS1063_CODEC_ADDRESS_PLAY_MODE,
+                    newPlayMode );
+  }
+}
+
+VOID UpdateVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value ) {
+
+  LOG_V(( "V: Updating EQ5 level 0x%04lx = %ld\n", equalizerLevel, value ));
+  WriteVS1063Mem( amiGUS, 
+                  equalizerLevel,
+                  value );
+  WriteVS1063Mem( amiGUS,
+                  VS1063_CODEC_ADDRESS_EQ5_UPDATE,
+                  VS1063_CODEC_F_EQ5_UPD_STROBE );
 }
 
 /*
@@ -145,4 +239,41 @@ const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ] = {
   AMIGUS_PCM_S_REC_F_WAVETABLE_SRC,
   // AMIGUS_PCM_S_REC_F_AHI_SRC,
   AMIGUS_PCM_S_REC_F_MIXER_SRC       // What-You-Hear
+};
+
+/*
+ * Some equalizer support info...
+ * AmigaAMP sliders |  MHI EQ5   |         AmiGUS        | Industry
+ *        # |   Hz  | ID |   Hz  | calculated | possible | Standard
+ * ---------+-------+----+-------+------------+----------+----------
+ *        1 |    60 |  3 |    64 |            |          |
+ *        2 |   170 |  3 |    64 |        230 |      150 |      125
+ *        3 |   310 |  7 |   250 |            |          |
+ *        4 |   600 |  7 |   250 |        775 |      775 |      500
+ *        5 |  1000 |  4 |  1000 |            |          |
+ *        6 |  3000 |  4 |  1000 |       4243 |     4243 |     2000
+ *        7 |  6000 |  8 |  4000 |            |          |
+ *        8 | 12000 |  8 |  4000 |      12961 |    12961 |     8000
+ *        9 | 14000 |  5 | 16000 |            |          |
+ *       10 | 16000 |  5 | 16000 |            |          |
+ *
+ * The borders between the frequency bands would be calculated using
+ * log-average: 10^( ( log(a)/log(10) + log(b)/log(10) ) / 2 )
+ *
+ * So much for defining other frequency patterns like:
+ */
+const WORD AmiGUSDefaultEqualizer[ 9 ] = {
+  0, /* +/- 0dB */   125, /* Hz */
+  0, /* +/- 0dB */   500, /* Hz */
+  0, /* +/- 0dB */  2000, /* Hz */
+  0, /* +/- 0dB */  8000, /* Hz */
+  0  /* +/- 0dB */
+};
+
+const WORD AmiGUSAmigaAmpEqualizer[ 9 ] = {
+  0, /* +/- 0dB */   150, /* Hz */
+  0, /* +/- 0dB */   775, /* Hz */
+  0, /* +/- 0dB */  4243, /* Hz */
+  0, /* +/- 0dB */ 12961, /* Hz */
+  0  /* +/- 0dB */
 };

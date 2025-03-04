@@ -20,6 +20,7 @@ path=sys:C,sc:c,vbcc:bin,developer:Make-4.4.1
 [assigns]
 developer=sys:
 NDK_3.2=developer:NDK_3.2
+NDK_1.3=developer:NDK_1.3
 AHI4Develop=developer:AHI4/Developer
 
 sc=developer:sc

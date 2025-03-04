@@ -125,25 +125,25 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
   amiGUSBase->agb_LogMem = NULL;
 
   amiGUSBase->agb_DOSBase =
-    (struct DosLibrary *) OpenLibrary("dos.library", 37);
+    (struct DosLibrary *) OpenLibrary("dos.library", 34);
   if( !(amiGUSBase->agb_DOSBase) ) {
 
     return EOpenDosBase;
   }
   amiGUSBase->agb_IntuitionBase =
-    (struct IntuitionBase *) OpenLibrary("intuition.library", 37);
+    (struct IntuitionBase *) OpenLibrary("intuition.library", 34);
   if( !(amiGUSBase->agb_IntuitionBase) ) {
 
     return EOpenIntuitionBase;
   }
   amiGUSBase->agb_UtilityBase = 
-    (struct Library *) OpenLibrary("utility.library", 37);
+    (struct Library *) OpenLibrary("utility.library", 34);
   if( !(amiGUSBase->agb_UtilityBase) ) {
 
     return EOpenUtilityBase;
   }
   amiGUSBase->agb_ExpansionBase =
-    (struct Library *) OpenLibrary("expansion.library", 37);
+    (struct Library *) OpenLibrary("expansion.library", 34);
   if( !(amiGUSBase->agb_ExpansionBase) ) {
 
     return EOpenExpansionBase;

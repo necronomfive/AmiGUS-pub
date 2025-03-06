@@ -19,7 +19,6 @@
 #include <proto/exec.h>
 #include <proto/intuition.h>
 #include <proto/timer.h>
-#include <proto/utility.h>
 
 #include "amigus_mhi.h"
 #include "debug.h"
@@ -141,13 +140,17 @@ VOID LogTicks( UBYTE bitmask ) {
   }
 }
 
-VOID Sleep( ULONG millis ) {
+VOID Sleep( UWORD pseudomillis ) {
 
   struct EClockVal ecv;
   ULONG ef = ReadEClock( &ecv );
-  ULONG milli_ticks = UDivMod32( ef, 1000 );           // ef -> ticks / milli
-  ULONG needed_ticks = UMult32( milli_ticks, millis ); //    -> target inc
+  UWORD milli_ticks = ef >> 10;                          // ef -> ticks / milli
+  ULONG needed_ticks = milli_ticks * pseudomillis;       //    -> target inc
   /*
+   * Real seconds would be:
+   * ULONG milli_ticks = UDivMod32( ef, 1000 );          // ef -> ticks / milli
+   * ULONG needed_ticks = UMult32( milli_ticks, millis );//    -> target inc
+   *
    * Higher precision, but 32bit not wide enough:
    * ULONG second_ticks = UMult32( ef, millis );
    * ULONG needed_ticks = UDivMod32( second_ticks, 1000 );

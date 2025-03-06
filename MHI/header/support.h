@@ -38,9 +38,10 @@ VOID DisplayError( ULONG aError );
 VOID LogTicks( UBYTE bitmask );
 
 /**
- * Waits for some milli seconds.
+ * Waits for some milli seconds... almost,
+ * assuming 1 second has 1024 milliseconds.
  */
-VOID Sleep( ULONG millis );
+VOID Sleep( UWORD pseudomillis );
 
 /**
  * Correctly initializes an empty, new MinList.

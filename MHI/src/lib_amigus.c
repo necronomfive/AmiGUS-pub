@@ -77,10 +77,6 @@ VOID CustomLibClose( struct BaseLibrary * base ) {
 
     CloseLibrary( (struct Library *) amiGUSBase->agb_IntuitionBase );
   }
-  if( amiGUSBase->agb_UtilityBase ) {
-
-    CloseLibrary( (struct Library *) amiGUSBase->agb_UtilityBase );
-  }
   if( amiGUSBase->agb_ExpansionBase ) {
 
     CloseLibrary( (struct Library *) amiGUSBase->agb_ExpansionBase );
@@ -136,12 +132,6 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
 
     return EOpenIntuitionBase;
   }
-  amiGUSBase->agb_UtilityBase = 
-    (struct Library *) OpenLibrary("utility.library", 34);
-  if( !(amiGUSBase->agb_UtilityBase) ) {
-
-    return EOpenUtilityBase;
-  }
   amiGUSBase->agb_ExpansionBase =
     (struct Library *) OpenLibrary("expansion.library", 34);
   if( !(amiGUSBase->agb_ExpansionBase) ) {
@@ -164,7 +154,6 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
 #ifdef BASE_GLOBAL
   DOSBase       = amiGUSBase->agb_DOSBase;
   IntuitionBase = amiGUSBase->agb_IntuitionBase;
-  UtilityBase   = amiGUSBase->agb_UtilityBase;
   ExpansionBase = amiGUSBase->agb_ExpansionBase;
   TimerBase     = amiGUSBase->agb_TimerBase;
   AmiGUSBase    = amiGUSBase;

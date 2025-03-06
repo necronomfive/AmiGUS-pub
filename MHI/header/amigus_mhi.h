@@ -96,7 +96,6 @@ struct AmiGUSBase {
   struct ExecBase             * agb_SysBase;
   struct DosLibrary           * agb_DOSBase;
   struct IntuitionBase        * agb_IntuitionBase;
-  struct Library              * agb_UtilityBase;
   struct Library              * agb_ExpansionBase;
 
   struct Device               * agb_TimerBase;
@@ -124,7 +123,6 @@ struct AmiGUSBase {
   extern struct IntuitionBase     * IntuitionBase;
   extern struct ExecBase          * SysBase;
   extern struct Device            * TimerBase;
-  extern struct Library           * UtilityBase;
 #elif defined(BASE_REDEFINE)
   #define AmiGUSBase                (amiGUSBase)
   #define DOSBase                   amiGUSBase->agb_DOSBase
@@ -132,7 +130,6 @@ struct AmiGUSBase {
   #define IntuitionBase             amiGUSBase->agb_IntuitionBase
   #define SysBase                   amiGUSBase->agb_SysBase
   #define TimerBase                 amiGUSBase->TimerBase
-  #define UtilityBase               amiGUSBase->agb_UtilityBase
 #endif
 
 /******************************************************************************

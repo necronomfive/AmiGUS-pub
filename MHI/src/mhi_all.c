@@ -1,6 +1,5 @@
 #include <libraries/mhi.h>
 #include <proto/exec.h>
-#include <proto/utility.h>
 
 #include "amigus_codec.h"
 #include "amigus_hardware.h"
@@ -31,16 +30,11 @@ VOID FlushAllBuffers( struct AmiGUSClientHandle * clientHandle ) {
 
 VOID UpdateEqualizer( UWORD bandLevel, UWORD percent ) {
 
-  LONG intermediate;
-  WORD gain;
   APTR amiGUScard = AmiGUSBase->agb_CardBase;
-
-  /* gain value = (value * 325) / 502 - 32 */
-  intermediate = SMult32( percent, 325 );
-  intermediate = SDivMod32( intermediate, 502 );
-  intermediate -= 32;
-
-  gain = ( WORD ) intermediate;
+  // -32 .. +32 = ((( 0 .. 100 ) * 2655 ) / 4096 ) - 32
+  // gain = percent * 2655 / 4096 - 32
+  LONG intermediate = (( percent * 2655 ) >> 12 ) - 32;
+  WORD gain = ( WORD ) intermediate;
   LOG_D(( "D: Calculated gain %ld = %ld for %ld%\n",
           intermediate, gain, percent ));
 

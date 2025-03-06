@@ -66,9 +66,9 @@ BOOL testAlignedPlayback( VOID ) {
   BOOL failed = FALSE;
   ULONG u;
   UWORD inBuffer16[] = {
-    AMIGUS_PCM_REC_FIFO_WORDS - ( 2 << 1 ),
-    AMIGUS_PCM_REC_FIFO_WORDS - ( 4 << 1 ),
-    AMIGUS_PCM_REC_FIFO_WORDS - ( 2 << 1 ),
+    AMIGUS_PCM_REC_FIFO_WORDS - 1 - ( 2 << 1 ),
+    AMIGUS_PCM_REC_FIFO_WORDS - 1 - ( 4 << 1 ),
+    AMIGUS_PCM_REC_FIFO_WORDS - 1 - ( 2 << 1 ),
   };
   ULONG outBuffer32[ 10 ];
 
@@ -109,9 +109,10 @@ BOOL testAlignedPlayback( VOID ) {
   for ( u = 0 ; u <= 8 ; ++u ) {
 
     failed |= ( outBuffer32[ u ] != u );
+    // printf("u = %ld is %ld\n", u, failed);
   }
   failed |= ( outBuffer32[ 9 ] != 0 );
-  printf( "\NAligned Playback test %s\n", failed ? "failed" : "OK" );
+  printf( "\nAligned Playback test %s\n", failed ? "failed" : "OK" );
 
   return failed;
 }

@@ -24,6 +24,11 @@
 #include "interrupt.h"
 #include "support.h"
 
+/* Private function declarations: */
+VOID CancelVS1063Playback( APTR amiGUS );
+VOID ResetCodec( APTR amiGUS );
+
+/* Public function definitions: */
 LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
 
   struct ConfigDev *configDevice = 0;
@@ -116,13 +121,8 @@ VOID StartAmiGusCodecPlayback( VOID ) {
 VOID StopAmiGusCodecPlayback( VOID ) {
 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
-  ULONG endFill;
-  UWORD sciMode;
-  ULONG i;
-  ULONG j;
-  UWORD format;
-  ULONG repeats;
 
+  // Original AmiGUS "stop playback" functionality
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
@@ -145,30 +145,44 @@ VOID StopAmiGusCodecPlayback( VOID ) {
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_RESET,
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );
+  CancelVS1063Playback( amiGUS );
+}
+
+/* Private function definitions: */
+
+VOID CancelVS1063Playback( APTR amiGUS ) {
+
+  UWORD sciMode;
+  ULONG i;
+  ULONG j;
+
+  // Need to know what is playing - page 50.
+  // For FLAC, according to page 50 SCI_HDAT1 = 0x664C,
+  // send 12288 end fill bytes according to page 57,
+  // for all others, send >= 2052 end fill bytes.
+  // Will use 3072 BYTEs = 768 LONGs, 
+  // 'cause 3072 * 4 = 12288
+  const UWORD format = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 );
+  const ULONG blockCount = ( 0x664C == format) ? 4: 1;
+  const ULONG blockSize = 768;
+
+  // Now we need to tell the VS1063 to cleanly (!) stop
+  // so...
+  // Trigger end of 11.5.1 Playing a Whole File - page 57
+
+  // step 2
+  ULONG endFill = ReadVS1063Mem( amiGUS, VS1063_CODEC_ADDRESS_END_FILL );
+  endFill &= 0x000000FF;
+  endFill |= ( endFill << 24 ) | ( endFill << 16 ) | ( endFill << 8 );
+
+  // Re-Enable DMA so we can feed end fill bytes
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_ENABLE );
-
-  // Trigger 11.5.1 Playing a Whole File - page 57
-  format = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 );
-  if ( 0x664C == format) { // FLAC according to page 50
-    // For FLAC, send 12288 end fill bytes - page 57:
-    repeats = 4;
-
-  } else {
-    // All others: send >= 2052 end fill bytes - page 57:
-    // Will use 3072 BYTEs = 768 LONGs, 
-    // 'cause 3072 * 4 = 12288
-    repeats = 1;
-  }
-  // step 2
-  endFill = ReadVS1063Mem( amiGUS, VS1063_CODEC_ADDRESS_END_FILL );
-  endFill &= 0x000000FF;
-  endFill |= ( endFill << 24 ) | ( endFill << 16 ) | ( endFill << 8 );
   // step 3
-  for ( j = 0; j < repeats; j++ ) {
+  for ( j = 0; j < blockCount; j++ ) {
     LOG_V(( "V: End of file step 3.%ld\n", j ));
-    for ( i = 0; i < 768; ++i) {
+    for ( i = 0; i < blockSize; ++i) {
 
       WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, endFill );
     }
@@ -198,12 +212,7 @@ VOID StopAmiGusCodecPlayback( VOID ) {
   if ( sciMode & VS1063_CODEC_F_SM_CANCEL ) {
 
     LOG_V(( "V: End of file failed - reset\n" ));
-    WriteCodecSPI( amiGUS,
-                   VS1063_CODEC_SCI_MODE,
-                   VS1063_CODEC_F_SM_RESET );
-    // page 56 - 11.3 Software Reset
-    Sleep( 4 );
-    // TODO: Apply patches here!!!
+    ResetCodec( amiGUS );
   }
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_CONTROL,
@@ -211,4 +220,20 @@ VOID StopAmiGusCodecPlayback( VOID ) {
   LOG_V(( "V: Playback ended, HDAT0 = 0x%04lx, HDAT1 = 0x%04lx\n",
           ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT0 ),
           ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 )));
+}
+
+VOID ResetCodec( APTR amiGUS ) {
+
+  LOG_D(( "D: Resetting VS1063 codec...\n"));
+  WriteCodecSPI( amiGUS,
+                 VS1063_CODEC_SCI_MODE,
+                 VS1063_CODEC_F_SM_RESET );
+  // page 56 - 11.3 Software Reset
+  Sleep( 4 );
+  /*
+  // TODO: do we want / need that?
+  LOG_D(( "D: ... patching ...\n"));
+  ApplyCompressedVS1063Patch( amiGUS, VS1063Patch20191204 );
+  */
+  LOG_D(( "D: ... done.\n"));
 }

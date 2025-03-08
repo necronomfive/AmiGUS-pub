@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "errors.h"
 #include "interrupt.h"
+#include "support.h"
 
 LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
 
@@ -115,6 +116,13 @@ VOID StartAmiGusCodecPlayback( VOID ) {
 VOID StopAmiGusCodecPlayback( VOID ) {
 
   APTR amiGUS = AmiGUSBase->agb_CardBase;
+  ULONG endFill;
+  UWORD sciMode;
+  ULONG i;
+  ULONG j;
+  UWORD format;
+  ULONG repeats;
+
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
@@ -137,4 +145,64 @@ VOID StopAmiGusCodecPlayback( VOID ) {
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_RESET,
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );
+
+  // Trigger 11.5.1 Playing a Whole File - page 57
+  format = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 );
+  if ( 0x664C == format) { // FLAC according to page 50
+    // For FLAC, send 12288 end fill bytes - page 57:
+    repeats = 4;
+
+  } else {
+    // All others: send >= 2052 end fill bytes - page 57:
+    // Will use 3072 BYTEs = 768 LONGs, 
+    // 'cause 3072 * 4 = 12288
+    repeats = 1;
+  }
+  // step 2
+  endFill = ReadVS1063Mem( amiGUS, VS1063_CODEC_ADDRESS_END_FILL );
+  endFill &= 0x000000FF;
+  endFill |= ( endFill << 24 ) | ( endFill << 16 ) | ( endFill << 8 );
+  // step 3
+  for ( j = 0; j < repeats; j++ ) {
+    LOG_V(( "V: End of file step 3.%ld\n", j ));
+    for ( i = 0; i < 768; ++i) {
+
+      WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, endFill );
+    }
+    while( ReadReg32( amiGUS, AMIGUS_CODEC_FIFO_USAGE ) );
+  }
+  // step 4
+  LOG_V(( "V: End of file step 4\n" ));
+  sciMode = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_MODE );
+  sciMode |= VS1063_CODEC_F_SM_CANCEL;
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_MODE, sciMode );
+
+  for ( j = 0; j < 64; ++j ) {
+    // step 5
+    LOG_V(( "V: End of file step 5.%ld\n", j ));
+    for ( i = 0; i < 8; ++i) {
+
+      WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, endFill );
+    }
+    // step 6
+    sciMode = ReadVS1063Mem( amiGUS, VS1063_CODEC_SCI_MODE );
+    if ( sciMode & VS1063_CODEC_F_SM_CANCEL ) {
+
+      LOG_V(( "V: End of file step 6\n" ));
+      break;
+    }
+  }
+  if ( sciMode & VS1063_CODEC_F_SM_CANCEL ) {
+
+    LOG_V(( "V: End of file failed - reset\n" ));
+    WriteCodecSPI( amiGUS,
+                   VS1063_CODEC_SCI_MODE,
+                   VS1063_CODEC_F_SM_RESET );
+    // page 56 - 11.3 Software Reset
+    Sleep( 4 );
+    // TODO: Apply patches here!!!
+  }
+  LOG_V(( "V: Playback ended, HDAT0 = 0x%04lx, HDAT1 = 0x%04lx\n"
+          ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT0 ),
+          ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 )));
 }

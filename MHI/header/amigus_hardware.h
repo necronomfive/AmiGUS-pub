@@ -192,12 +192,16 @@
 // VS1063 codec's SDI - Serial Data Interface is SPI port for data
 
 // VS1063 codec's SCIs - Serial Control Interface SPI ports, overview page 43
+#define VS1063_CODEC_SCI_MODE           0x0000 // page 44
 #define VS1063_CODEC_SCI_CLOCKF         0x0003 // page 48
 #define VS1063_CODEC_SCI_WRAM           0x0006 // page 49
 #define VS1063_CODEC_SCI_WRAMADDR       0x0007 // page 49
+#define VS1063_CODEC_SCI_HDAT0          0x0008 // page 50
+#define VS1063_CODEC_SCI_HDAT1          0x0009 // page 50
 
 // VS1063 codec's addresses of memory mapped registers
 // all parameter memory 0x1E00-0x1E3F is mapped to 0xC0C0-0xC0FF - page 49
+#define VS1063_CODEC_ADDRESS_END_FILL   0xC0C6 // 0x1E06 p.70 + 57
 #define VS1063_CODEC_ADDRESS_PLAY_MODE  0xC0C9 // 0x1E09 p.77
 #define VS1063_CODEC_ADDRESS_EQ5_LEVEL1 0xC0D3 // 0x1E13 p.77 (-32 - +32)*0.5dB
 #define VS1063_CODEC_ADDRESS_EQ5_FREQ1  0xC0D4 // 0x1E14 p.77      20 -   150Hz
@@ -214,6 +218,12 @@
 #define VS1063_CODEC_ADDRESS_I2S_CONFIG 0xC040 // page 86
 
 // VS1063 codec's magic flag values according to datasheet
+#define VS1063_CODEC_F_SM_LAYER12       0x0002 // page 44
+#define VS1063_CODEC_F_SM_RESET         0x0004 // page 44
+#define VS1063_CODEC_F_SM_CANCEL        0x0008 // page 44
+#define VS1063_CODEC_F_SM_SDINEW        0x0800 // page 44
+#define VS1063_CODEC_F_SM_ENCODE        0x1000 // page 44
+
 #define VS1063_CODEC_F_SC_MULT_5_0X     0xE000 // page 48
 
 #define VS1063_CODEC_F_PL_MO_EQ5_ENABLE 0x20   // page 77
@@ -229,12 +239,15 @@
  *****************************************************************************/
 
 UWORD ReadReg16( APTR amiGUS, ULONG offset );
-VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
 ULONG ReadReg32( APTR amiGUS, ULONG offset );
-VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
+UWORD ReadCodecSPI( APTR amiGUS, UWORD SPIregister );  
+UWORD ReadVS1063Mem( APTR amiGUS, UWORD address );
 
+VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
+VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
 VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue );
 VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value );
+
 VOID InitVS1063Codec( APTR amiGUS );
 
 /**

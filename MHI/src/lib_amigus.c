@@ -127,7 +127,7 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
     return EOpenDosBase;
   }
   amiGUSBase->agb_IntuitionBase =
-    (struct IntuitionBase *) OpenLibrary("intuition.library", 34);
+    (struct IntuitionBase *) OpenLibrary("intuition.library", 36);
   if( !(amiGUSBase->agb_IntuitionBase) ) {
 
     return EOpenIntuitionBase;

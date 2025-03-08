@@ -1,5 +1,6 @@
 Next:
-- Fix stupid sounds blooping from one song to the next
+- Replace EasyRequest with AutoRequest for 1.3 compatibility
+- Implement 1.3 compatible Sleep() method
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
 - Decide on debug + cpu variants
 - Switch to AmiGUS ints instead AHI timing
@@ -25,3 +26,4 @@ Done:
 - Test Recording and release alpha15 / beta 15
 - Get MHI implemented as per https://bitbucket.org/supernobby/mhimdev/src/main/ and https://aminet.net/package/driver/audio/mhimasplayer
 - Implement MHI equalizer
+- Fix stupid sounds blooping from one song to the next

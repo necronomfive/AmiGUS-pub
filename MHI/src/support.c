@@ -28,52 +28,50 @@
 /**
  * Type for error message declarations.
  */
-struct TErrorMessage
-  {
+struct TErrorMessage {
   ULONG iError;
   UBYTE* iMessage;
   UBYTE* iButton;
-  };
+};
 
 /**
  * Mapping between error code, error message and button label.
  */
-struct TErrorMessage errors[] =
-  {
-    { ENoError, "", "" },
+struct TErrorMessage errors[] = {
+  { ENoError, "", "" },
 
-    /* Insert errors below. */
-    { EOpenDosBase, "Can not open dos.library.", "What the ...?" },
-    { EOpenUtilityBase, "Your utility.library is shit!", "I'm sorry." },
-    { EGetAttrNotImplemented, "AHI requested unknown info, may work still...", "Fingers crossed" },
+  /* Insert errors below. */
+  { EOpenDosBase, "Can not open dos.library.", "What the ...?" },
+  { EOpenUtilityBase, "Your utility.library is shit!", "I'm sorry." },
+  { EGetAttrNotImplemented, "AHI requested unknown info, may work still...", "Fingers crossed" },
 
-    { EAmiGUSNotFound, "AmiGUS card not found.", "Read?" },
-    { EAmiGUSDetectError, "AmiGUS card detection mess.", "Damn!" },
-    { EAmiGUSFirmwareOutdated, "AmiGUS card firmware outdated.", "Will update, promised!" },
+  { EAmiGUSNotFound, "AmiGUS card not found.", "Read?" },
+  { EAmiGUSDetectError, "AmiGUS card detection mess.", "Damn!" },
+  { EAmiGUSFirmwareOutdated, "AmiGUS card firmware outdated.", "Will update, promised!" },
 
-    { EAudioModeNotImplemented, "Right now implemented, 16bit, stereo, no Hifi", "Coming soon..." },
+  { EAudioModeNotImplemented, "Right now implemented, 16bit, stereo, no Hifi", "Coming soon..." },
 
-    { EOpenLogFile, "Can not create log file RAM:AmiGUS-MHI.log.", "Oops!" },
-    { EAllocateLogMem, "Can not allocate memory blob for extra-dirty logging.", "Meh." },
-    { EDriverInUse, "Currently only one client is supported.", "Shame!" },
-    /*
-    { EOutOfMemory, "You are out of memory!", "Shit!" },
-    { EMixerBufferNotAligned, "Misaligned mixer buffer not yet handled.", "Ok" },
+  { EOpenLogFile, "Can not create log file RAM:AmiGUS-MHI.log.", "Oops!" },
+  { EAllocateLogMem, "Can not allocate memory blob for extra-dirty logging.", "Meh." },
+  { EDriverInUse, "Currently only one client is supported.", "Shame!" },
+  /*
+  { EOutOfMemory, "You are out of memory!", "Shit!" },
+  { EMixerBufferNotAligned, "Misaligned mixer buffer not yet handled.", "Ok" },
 */
-    { ESampleFormatMissingFromMode, "AMIGUS mode file issue: Lacking AmiGUS_SampleFormat." "Will report issue!" },
-    { ECopyFunctionMissingFromMode, "AMIGUS mode file issue: Lacking AmiGUS_CopyFunction." "Will report issue!" },
-    { EWorkerProcessCreationFailed, "Could not create playback worker.", "Damn." },
-    { EWorkerProcessDied, "Playback worker died.", "RIP" },
-    { EWorkerProcessSignalsFailed, "Worker does not like to communicate.", "Swine!" },
-    { EMainProcessSignalsFailed, "Main process is deaf-mute, this won't work.", "Oh." },
+  { ESampleFormatMissingFromMode, "AMIGUS mode file issue: Lacking AmiGUS_SampleFormat." "Will report issue!" },
+  { ECopyFunctionMissingFromMode, "AMIGUS mode file issue: Lacking AmiGUS_CopyFunction." "Will report issue!" },
+  { EWorkerProcessCreationFailed, "Could not create playback worker.", "Damn." },
+  { EWorkerProcessDied, "Playback worker died.", "RIP" },
+  { EWorkerProcessSignalsFailed, "Worker does not like to communicate.", "Swine!" },
+  { EMainProcessSignalsFailed, "Main process is deaf-mute, this won't work.", "Oh." },
 
-    { ERecordingNotImplemented, "This driver does not support recording.", "Fine!" },
-    { ERecordingModeNotSupported, "The selected audio mode does not support recording.", "Understood" },
+  { ERecordingNotImplemented, "This driver does not support recording.", "Fine!" },
+  { ERecordingModeNotSupported, "The selected audio mode does not support recording.", "Understood" },
 
-    /* Insert errors above. */
+  /* Insert errors above. */
 
-    { EUnknownError, "Unknown error.", "Shit!" }
-  };
+  { EUnknownError, "Unknown error.", "Shit!" }
+};
 
 /*
  * Displays an error message, showing the error code and

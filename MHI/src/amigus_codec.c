@@ -145,6 +145,9 @@ VOID StopAmiGusCodecPlayback( VOID ) {
   WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_RESET,
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_FIFO_CONTROL,
+              AMIGUS_CODEC_FIFO_F_DMA_ENABLE );
 
   // Trigger 11.5.1 Playing a Whole File - page 57
   format = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 );
@@ -186,7 +189,7 @@ VOID StopAmiGusCodecPlayback( VOID ) {
     }
     // step 6
     sciMode = ReadVS1063Mem( amiGUS, VS1063_CODEC_SCI_MODE );
-    if ( sciMode & VS1063_CODEC_F_SM_CANCEL ) {
+    if ( !( sciMode & VS1063_CODEC_F_SM_CANCEL )) {
 
       LOG_V(( "V: End of file step 6\n" ));
       break;
@@ -202,7 +205,10 @@ VOID StopAmiGusCodecPlayback( VOID ) {
     Sleep( 4 );
     // TODO: Apply patches here!!!
   }
-  LOG_V(( "V: Playback ended, HDAT0 = 0x%04lx, HDAT1 = 0x%04lx\n"
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_FIFO_CONTROL,
+              AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
+  LOG_V(( "V: Playback ended, HDAT0 = 0x%04lx, HDAT1 = 0x%04lx\n",
           ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT0 ),
           ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 )));
 }

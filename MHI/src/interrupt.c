@@ -22,6 +22,7 @@
 
 #include "amigus_mhi.h"
 #include "amigus_hardware.h"
+#include "amigus_vs1063.h"
 #include "debug.h"
 #include "interrupt.h"
 
@@ -59,7 +60,7 @@ VOID HandlePlayback( VOID ) {
     } else if ( current->agmb_BufferExtraBytes ) {
 
       ULONG data = 0;
-      UBYTE shift = 24;
+      BYTE shift = 24;
       ULONG address = ( ULONG ) current->agmb_Buffer;
       address += current->agmb_BufferIndex << 2;
       copied += current->agmb_BufferExtraBytes;
@@ -75,8 +76,10 @@ VOID HandlePlayback( VOID ) {
         --current->agmb_BufferExtraBytes;
         shift -= 8;
       }
+      data |= ( GetVS1063EndFill( amiGUS ) & (0xFFffFFff >> ( 24 - shift ));
       LOG_INT(( "INT: ed 0x%08lx\n", data ));
-      WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, data );     
+      WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, data );
+      copied += 4;
 
     } else if ( tail != current->agmb_Node.mln_Succ ) {
 

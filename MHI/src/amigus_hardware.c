@@ -65,12 +65,6 @@ UWORD ReadCodecSPI( APTR amiGUS, UWORD SPIregister ) {
                   AMIGUS_CODEC_SPI_READ_TRIGGER );
 }
 
-UWORD ReadVS1063Mem( APTR amiGUS, UWORD address ) {
-
-  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
-  return ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM );
-}
-
 VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value ) {
 
   *(( UWORD * )(( ULONG ) amiGUS + offset )) = value;
@@ -113,84 +107,6 @@ VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue ) {
             AMIGUS_CODEC_SPI_ADDRESS, 
             AMIGUS_CODEC_SPI_WRITE_DATA,
             AMIGUS_CODEC_SPI_WRITE_TRIGGER );
-}
-
-VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
-
-  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
-  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
-}
-
-VOID InitVS1063Codec( APTR amiGUS ) {
-
-  // Set SC_MULT to XTALI x 5.0 in SC_CLOCKF,
-  // see VS1063a Datasheet, Version: 1.32, 2024-01-31, page 48
-  WriteCodecSPI( amiGUS,
-                 VS1063_CODEC_SCI_CLOCKF,
-                 VS1063_CODEC_F_SC_MULT_5_0X );
-  // Enable I2S Interface at 192kHz sample rate,
-  // see VS1063a Datasheet, Version: 1.32, 2024-01-31, page 86
-  WriteVS1063Mem( amiGUS,
-                  VS1063_CODEC_ADDRESS_GPIO_DDR,
-                  VS1063_CODEC_F_GPIO_DDR_192k );
-  WriteVS1063Mem( amiGUS,
-                  VS1063_CODEC_ADDRESS_I2S_CONFIG,
-                  VS1063_CODEC_F_I2S_CONFIG_RESET );
-  WriteVS1063Mem( amiGUS,
-                  VS1063_CODEC_ADDRESS_I2S_CONFIG,
-                  VS1063_CODEC_F_I2S_CONFIG_192k );
-}
-
-VOID InitVS1063Equalizer( APTR amiGUS, BOOL enable, const WORD * settings ) {
-
-  UWORD oldPlayMode = ReadVS1063Mem( amiGUS,
-                                     VS1063_CODEC_ADDRESS_PLAY_MODE );
-  UWORD newPlayMode = ( enable )
-                      ? ( oldPlayMode | VS1063_CODEC_F_PL_MO_EQ5_ENABLE )
-                      : ( oldPlayMode & ~VS1063_CODEC_F_PL_MO_EQ5_ENABLE );
-  UWORD wasEnabled = oldPlayMode & VS1063_CODEC_F_PL_MO_EQ5_ENABLE;
-
-  LOG_V(( "V: Old PlayMode 0x%04lx = 0x%04lx\n",
-          VS1063_CODEC_ADDRESS_PLAY_MODE, oldPlayMode ));
-  if ( enable ) {
-
-    UWORD i;
-    for ( i = 0 ; i < 9 ; ++i ) {
-
-      LOG_V(( "V: Setting 0x%04lx = %ld\n",
-              VS1063_CODEC_ADDRESS_EQ5_LEVEL1 + i, settings[ i ] ));
-      WriteVS1063Mem( amiGUS, 
-                      VS1063_CODEC_ADDRESS_EQ5_LEVEL1 + i,
-                      settings[ i ] );
-    }
-  }
-
-  if (( wasEnabled ) && ( enable )) {
-
-    LOG_V(( "V: Updating EQ5 only \n" ));
-    WriteVS1063Mem( amiGUS,
-                    VS1063_CODEC_ADDRESS_EQ5_UPDATE,
-                    VS1063_CODEC_F_EQ5_UPD_STROBE );
-
-  } else {
-
-    LOG_V(( "V: New PlayMode 0x%04lx = 0x%04lx\n",
-            VS1063_CODEC_ADDRESS_PLAY_MODE, newPlayMode ));
-    WriteVS1063Mem( amiGUS,
-                    VS1063_CODEC_ADDRESS_PLAY_MODE,
-                    newPlayMode );
-  }
-}
-
-VOID UpdateVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value ) {
-
-  LOG_V(( "V: Updating EQ5 level 0x%04lx = %ld\n", equalizerLevel, value ));
-  WriteVS1063Mem( amiGUS, 
-                  equalizerLevel,
-                  value );
-  WriteVS1063Mem( amiGUS,
-                  VS1063_CODEC_ADDRESS_EQ5_UPDATE,
-                  VS1063_CODEC_F_EQ5_UPD_STROBE );
 }
 
 /*

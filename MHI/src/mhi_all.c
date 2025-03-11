@@ -15,12 +15,14 @@
  */
 
 #include <libraries/mhi.h>
+#include <libraries/configvars.h>
 #include <proto/exec.h>
 
 #include "amigus_codec.h"
 #include "amigus_hardware.h"
 #include "amigus_mhi.h"
 #include "debug.h"
+#include "errors.h"
 #include "library.h"
 #include "interrupt.h"
 #include "support.h"
@@ -69,9 +71,9 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   LOG_D(( "D: MHIAllocDecoder start\n" ));
 
   Forbid();
-  if ( AmiGUSBase->agb_ConfigDevice.cd_Driver ) {
+  if ( AmiGUSBase->agb_ConfigDevice->cd_Driver ) {
 
-    error = EAmiGUSInUseError
+    error = EAmiGUSInUseError;
 
   } else if ( AmiGUSBase->agb_UsageCounter ) {
 
@@ -81,7 +83,7 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
     // Now we own the card!
     ++AmiGUSBase->agb_UsageCounter;
-    AmiGUSBase->agb_ConfigDevice.cd_Driver = AmiGUSBase;
+    AmiGUSBase->agb_ConfigDevice->cd_Driver = AmiGUSBase;
   }
   Permit();
 
@@ -140,12 +142,12 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 
   Forbid();
   if (( AmiGUSBase->agb_UsageCounter ) &&
-      ( AmiGUSBase->agb_ConfigDevice.cd_Driver == AmiGUSBase )) {
+      ( AmiGUSBase->agb_ConfigDevice->cd_Driver == AmiGUSBase )) {
 
     clientHandle->agch_Task = NULL;
     clientHandle->agch_Signal = 0;
     --AmiGUSBase->agb_UsageCounter;
-    AmiGUSBase->agb_ConfigDevice.cd_Driver = NULL;
+    AmiGUSBase->agb_ConfigDevice->cd_Driver = NULL;
 
   } else {
 

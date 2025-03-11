@@ -76,7 +76,7 @@ VOID HandlePlayback( VOID ) {
         --current->agmb_BufferExtraBytes;
         shift -= 8;
       }
-      data |= ( GetVS1063EndFill( amiGUS ) & (0xFFffFFff >> ( 24 - shift ));
+      data |= ( GetVS1063EndFill( amiGUS ) & (0xFFffFFff >> ( 24 - shift )));
       LOG_INT(( "INT: ed 0x%08lx\n", data ));
       WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, data );
       copied += 4;

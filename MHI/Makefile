@@ -148,6 +148,10 @@ test_playback: FOLDERS $(LIB_OBJS)
 	$(RUNNER) test/$@
 	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
 
+test_dialog: FOLDERS
+	@echo " "
+	vc +kick13 test/$@.c -o test/$@
+
 INCLUDES:
 	make -f Makefile-Includes all 
 

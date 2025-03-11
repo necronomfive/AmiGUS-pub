@@ -152,6 +152,10 @@ test_dialog: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
 
+test_sleep: FOLDERS
+	@echo " "
+	vc +kick13 test/$@.c -o test/$@
+
 INCLUDES:
 	make -f Makefile-Includes all 
 

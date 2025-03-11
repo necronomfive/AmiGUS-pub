@@ -68,6 +68,7 @@ enum TErrorCodes
   /* Hardware errors 200-300 */
   EAmiGUSNotFound = 200,
   EAmiGUSDetectError,
+  EAmiGUSInUseError,
   EAmiGUSFirmwareOutdated,
   EAmiGUSWriteFailed,
   EAmiGUSReadFailed,

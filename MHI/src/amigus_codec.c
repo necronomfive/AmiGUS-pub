@@ -43,12 +43,16 @@ LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
     LOG_E(("E: AmiGUS not found\n"));
     return EAmiGUSNotFound;
   }
-  if (   ( AMIGUS_MANUFACTURER_ID != configDevice->cd_Rom.er_Manufacturer )
-      || ( AMIGUS_CODEC_PRODUCT_ID != configDevice->cd_Rom.er_Product ) 
-     ) {
+  if (( AMIGUS_MANUFACTURER_ID != configDevice->cd_Rom.er_Manufacturer )
+     || ( AMIGUS_CODEC_PRODUCT_ID != configDevice->cd_Rom.er_Product )) {
 
     LOG_E(("E: AmiGUS detection failed\n"));
     return EAmiGUSDetectError;
+  }
+  if ( configDevice->cd_Driver ) {
+
+    LOG_E(("E: AmiGUS in use\n"));
+    return EAmiGUSInUseError;
   }
 
   serial = configDevice->cd_Rom.er_SerialNumber;
@@ -68,6 +72,7 @@ LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
   LOG_I(("I: AmiGUS firmware date %04ld-%02ld-%02ld, %02ld:%02ld\n",
          year, month, day, hour, minute));
 
+  amiGUSBase->agb_ConfigDevice = configDevice;
   amiGUSBase->agb_CardBase = (struct AmiGUS *)configDevice->cd_BoardAddr;
   LOG_I(( "I: AmiGUS found at 0x%08lx\n",
           amiGUSBase->agb_CardBase ));

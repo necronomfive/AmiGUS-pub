@@ -101,6 +101,7 @@ struct AmiGUSBase {
   struct Device               * agb_TimerBase;
   struct IORequest            * agb_TimerRequest;
   /* AmiGUS specific member variables */
+  struct ConfigDev            * agb_ConfigDevice;
   APTR                          agb_CardBase;
   struct Interrupt            * agb_Interrupt;
 

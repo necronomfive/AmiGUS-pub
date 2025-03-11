@@ -64,11 +64,29 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 ) {
 
   APTR result = NULL;
+  ULONG error = ENoError;
 
   LOG_D(( "D: MHIAllocDecoder start\n" ));
 
-  if ( !AmiGUSBase->agb_UsageCounter ) {
+  Forbid();
+  if ( AmiGUSBase->agb_ConfigDevice.cd_Driver ) {
 
+    error = EAmiGUSInUseError
+
+  } else if ( AmiGUSBase->agb_UsageCounter ) {
+
+    error = EDriverInUse;
+
+  } else {
+
+    // Now we own the card!
+    ++AmiGUSBase->agb_UsageCounter;
+    AmiGUSBase->agb_ConfigDevice.cd_Driver = AmiGUSBase;
+  }
+  Permit();
+
+  if ( !error ) {
+ 
     APTR amiGUScard = AmiGUSBase->agb_CardBase;
     struct AmiGUSClientHandle * handle = &AmiGUSBase->agb_ClientHandle;
     handle->agch_Task = task;
@@ -76,8 +94,8 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     handle->agch_Status = MHIF_STOPPED;
     handle->agch_CurrentBuffer = NULL;
     NonConflictingNewMinList( &handle->agch_Buffers );
+
     result = ( APTR ) handle;
-    ++AmiGUSBase->agb_UsageCounter;
 
     LOG_D(( "D: AmiGUS MHI accepted task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
@@ -89,7 +107,8 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
   } else {
 
-    LOG_D(( "D: AmiGUS MHI in use, denying.\n" ));
+    // Takes care of the log entry, too. :)
+    DisplayError( error );
   }
   
   LOG_D(( "D: MHIAllocDecoder done\n" ));
@@ -105,27 +124,45 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
     ( struct AmiGUSClientHandle * ) handle;
   struct Task * task = clientHandle->agch_Task;
   ULONG signal = clientHandle->agch_Signal;
+  ULONG error = ENoError;
 
   LOG_D(( "D: MHIFreeDecoder start\n" ));
 
-  if (( &AmiGUSBase->agb_ClientHandle == clientHandle ) &&
-      ( task ) &&
-      ( AmiGUSBase->agb_UsageCounter )) {
+  if (( &AmiGUSBase->agb_ClientHandle != clientHandle ) ||
+      ( !task )) {
+
+      LOG_W(( "W: AmiGUS MHI does not know task 0x%08lx and signal 0x%08lx"
+        " - hence not free'd.\n",
+        task, signal ));
+      LOG_D(( "D: MHIFreeDecoder done\n" ));
+      return;
+  }
+
+  Forbid();
+  if (( AmiGUSBase->agb_UsageCounter ) &&
+      ( AmiGUSBase->agb_ConfigDevice.cd_Driver == AmiGUSBase )) {
 
     clientHandle->agch_Task = NULL;
     clientHandle->agch_Signal = 0;
-    FlushAllBuffers( clientHandle );
     --AmiGUSBase->agb_UsageCounter;
+    AmiGUSBase->agb_ConfigDevice.cd_Driver = NULL;
+
+  } else {
+
+    error = EDriverNotInUse;
+  }
+  Permit();
+  if ( error ) {
+
+    DisplayError( error );
+
+  } else {
+
+    FlushAllBuffers( clientHandle );
 
     LOG_D(( "D: AmiGUS MHI free'd up task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
     DestroyInterruptHandler();
-
-  } else {
-
-    LOG_W(( "W: AmiGUS MHI does not know task 0x%08lx and signal 0x%08lx"
-            " - hence not free'd.\n",
-            task, signal ));
   }
   LOG_D(( "D: MHIFreeDecoder done\n" ));
   return;

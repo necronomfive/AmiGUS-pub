@@ -47,6 +47,7 @@ struct TErrorMessage errors[] = {
 
   { EAmiGUSNotFound, "AmiGUS card not found.", "Read?" },
   { EAmiGUSDetectError, "AmiGUS card detection mess.", "Damn!" },
+  { EAmiGUSInUseError, "AmiGUS codec part is in use by another driver.", "Oops." },
   { EAmiGUSFirmwareOutdated, "AmiGUS card firmware outdated.", "Will update, promised!" },
 
   { EAudioModeNotImplemented, "Right now implemented, 16bit, stereo, no Hifi", "Coming soon..." },

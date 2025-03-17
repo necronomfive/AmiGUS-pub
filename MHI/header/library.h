@@ -106,7 +106,7 @@ struct BaseLibrary {
 /******************************************************************************
  * Define your library's base type here, will be used in library.c.
  *****************************************************************************/
-#define LIBRARY_TYPE      struct AmiGUSBase
+#define LIBRARY_TYPE      struct AmiGUS_MHI_Base
 
 /******************************************************************************
  * Your library's own base structure shall have its own include,
@@ -118,7 +118,7 @@ struct BaseLibrary {
 /******************************************************************************
  * Now go ahead and implement these functions in your library adapter code!
  *****************************************************************************/
-LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase );
-VOID CustomLibClose( struct BaseLibrary * base );
+LONG CustomLibInit( struct BaseLibrary * libBase, struct ExecBase * sysBase );
+VOID CustomLibClose( struct BaseLibrary * libBase );
 
 #endif /* LIBRARY_H */

@@ -35,57 +35,57 @@ struct IntuitionBase     * IntuitionBase     = 0;
 struct Library           * UtilityBase       = 0;
 struct Library           * ExpansionBase     = 0;
 struct Device            * TimerBase         = 0;
-struct AmiGUSBase        * AmiGUSBase        = 0;
+struct AmiGUS_MHI_Base   * AmiGUS_MHI_Base   = 0;
 
 #endif
 
 /* Closes all the libraries opened by LibInit() */
-VOID CustomLibClose( struct BaseLibrary * base ) {
+VOID CustomLibClose( struct BaseLibrary * libBase ) {
 
-  struct AmiGUSBase * amiGUSBase = (struct AmiGUSBase *)base;
+  struct AmiGUS_MHI_Base * base = ( struct AmiGUS_MHI_Base * ) libBase;
 
 #ifndef BASE_GLOBAL
-  struct ExecBase *SysBase = AmiGUSBase->agb_SysBase;
+  struct ExecBase *SysBase = base->agb_SysBase;
 #endif
 
-  if( amiGUSBase->agb_TimerBase ) {
+  if( base->agb_TimerBase ) {
 
-    CloseDevice( amiGUSBase->agb_TimerRequest );
+    CloseDevice( base->agb_TimerRequest );
   }
-  if( amiGUSBase->agb_TimerRequest ) {
+  if( base->agb_TimerRequest ) {
 
-    FreeMem( amiGUSBase->agb_TimerRequest, sizeof(struct IORequest) );
+    FreeMem( base->agb_TimerRequest, sizeof(struct IORequest) );
   }  
-  if ( amiGUSBase->agb_LogFile ) {
+  if ( base->agb_LogFile ) {
 
-    Close( amiGUSBase->agb_LogFile );
+    Close( base->agb_LogFile );
   }
   /*
   Remember: memory cannot be overwritten if we do not return it. :)
   So... we leak it here... 
-  if ( amiGUSBase->agb_LogMem ) {
+  if ( base->agb_LogMem ) {
 
-    FreeMem( amiGUSBase->agb_LogMem, ... );
+    FreeMem( base->agb_LogMem, ... );
   }    
   */
 
-  if( amiGUSBase->agb_DOSBase ) {
+  if( base->agb_DOSBase ) {
 
-    CloseLibrary( (struct Library *) amiGUSBase->agb_DOSBase );
+    CloseLibrary( (struct Library *) base->agb_DOSBase );
   }
-  if( amiGUSBase->agb_IntuitionBase ) {
+  if( base->agb_IntuitionBase ) {
 
-    CloseLibrary( (struct Library *) amiGUSBase->agb_IntuitionBase );
+    CloseLibrary( (struct Library *) base->agb_IntuitionBase );
   }
-  if( amiGUSBase->agb_ExpansionBase ) {
+  if( base->agb_ExpansionBase ) {
 
-    CloseLibrary( (struct Library *) amiGUSBase->agb_ExpansionBase );
+    CloseLibrary( (struct Library *) base->agb_ExpansionBase );
   }
 }
 
-LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
+LONG CustomLibInit( struct BaseLibrary * libBase, struct ExecBase * sysBase ) {
 
-  struct AmiGUSBase * amiGUSBase = (struct AmiGUSBase *)base;
+  struct AmiGUS_MHI_Base * base = ( struct AmiGUS_MHI_Base * ) libBase;
   LONG error;
 
   /* Prevent use of customized library versions on CPUs not targetted. */
@@ -111,56 +111,56 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
   }
 #endif
 
-  amiGUSBase->agb_SysBase = sysBase;
+  base->agb_SysBase = sysBase;
 
 #ifdef BASE_GLOBAL
   SysBase = sysBase;
 #endif
 
-  amiGUSBase->agb_LogFile = NULL;
-  amiGUSBase->agb_LogMem = NULL;
+  base->agb_LogFile = NULL;
+  base->agb_LogMem = NULL;
 
-  amiGUSBase->agb_DOSBase =
+  base->agb_DOSBase =
     (struct DosLibrary *) OpenLibrary("dos.library", 34);
-  if( !(amiGUSBase->agb_DOSBase) ) {
+  if( !(base->agb_DOSBase) ) {
 
     return EOpenDosBase;
   }
-  amiGUSBase->agb_IntuitionBase =
+  base->agb_IntuitionBase =
     (struct IntuitionBase *) OpenLibrary("intuition.library", 36);
-  if( !(amiGUSBase->agb_IntuitionBase) ) {
+  if( !(base->agb_IntuitionBase) ) {
 
     return EOpenIntuitionBase;
   }
-  amiGUSBase->agb_ExpansionBase =
+  base->agb_ExpansionBase =
     (struct Library *) OpenLibrary("expansion.library", 34);
-  if( !(amiGUSBase->agb_ExpansionBase) ) {
+  if( !(base->agb_ExpansionBase) ) {
 
     return EOpenExpansionBase;
   }
-  amiGUSBase->agb_TimerRequest = AllocMem( sizeof(struct IORequest),
-                                           MEMF_ANY | MEMF_CLEAR );
-  if( !(amiGUSBase->agb_TimerRequest) ) {
+  base->agb_TimerRequest = AllocMem( sizeof(struct IORequest),
+                                     MEMF_ANY | MEMF_CLEAR );
+  if( !(base->agb_TimerRequest) ) {
 
     return EAllocateTimerRequest;
   }
-  error = OpenDevice("timer.device", 0, amiGUSBase->agb_TimerRequest, 0);
+  error = OpenDevice("timer.device", 0, base->agb_TimerRequest, 0);
   if ( error ) {
 
     return EOpenTimerDevice;
   }
-  amiGUSBase->agb_TimerBase = amiGUSBase->agb_TimerRequest->io_Device;
+  base->agb_TimerBase = base->agb_TimerRequest->io_Device;
 
 #ifdef BASE_GLOBAL
-  DOSBase       = amiGUSBase->agb_DOSBase;
-  IntuitionBase = amiGUSBase->agb_IntuitionBase;
-  ExpansionBase = amiGUSBase->agb_ExpansionBase;
-  TimerBase     = amiGUSBase->agb_TimerBase;
-  AmiGUSBase    = amiGUSBase;
+  DOSBase         = base->agb_DOSBase;
+  IntuitionBase   = base->agb_IntuitionBase;
+  ExpansionBase   = base->agb_ExpansionBase;
+  TimerBase       = base->agb_TimerBase;
+  AmiGUS_MHI_Base = base;
 #endif
 
-  LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", amiGUSBase));
-  error = FindAmiGusCodec( amiGUSBase );
+  LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", base));
+  error = FindAmiGusCodec( base );
   if ( error ) {
 
     DisplayError( error );

@@ -25,7 +25,7 @@
 #include "interrupt.h"
 #include "support.h"
 
-LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
+LONG FindAmiGusCodec( struct AmiGUS_MHI_Base * base ) {
 
   struct ConfigDev *configDevice = 0;
   ULONG serial;
@@ -72,27 +72,27 @@ LONG FindAmiGusCodec( struct AmiGUSBase * amiGUSBase ) {
   LOG_I(("I: AmiGUS firmware date %04ld-%02ld-%02ld, %02ld:%02ld\n",
          year, month, day, hour, minute));
 
-  amiGUSBase->agb_ConfigDevice = configDevice;
-  amiGUSBase->agb_CardBase = (struct AmiGUS *)configDevice->cd_BoardAddr;
+  base->agb_ConfigDevice = configDevice;
+  base->agb_CardBase = (struct AmiGUS *)configDevice->cd_BoardAddr;
   LOG_I(( "I: AmiGUS found at 0x%08lx\n",
-          amiGUSBase->agb_CardBase ));
+          base->agb_CardBase ));
   LOG_V(( "V: AmiGUS address stored at 0x%08lx\n",
-          &( amiGUSBase->agb_CardBase )));
-  amiGUSBase->agb_UsageCounter = 0;
+          &( base->agb_CardBase )));
+  base->agb_UsageCounter = 0;
 
   return ENoError;
 }
 
 VOID StartAmiGusCodecPlayback( VOID ) {
 
-  APTR amiGUS = AmiGUSBase->agb_CardBase;
-  WriteReg16( amiGUS,
+  APTR card = AmiGUS_MHI_Base->agb_CardBase;
+  WriteReg16( card,
               AMIGUS_CODEC_FIFO_RESET,
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );
-  WriteReg16( amiGUS,
+  WriteReg16( card,
               AMIGUS_CODEC_FIFO_WATERMARK,
               AMIGUS_CODEC_PLAY_FIFO_WORDS >> 1 );
-  WriteReg16( amiGUS,
+  WriteReg16( card,
               AMIGUS_CODEC_INT_ENABLE,
               AMIGUS_INT_F_CLEAR
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
@@ -100,7 +100,7 @@ VOID StartAmiGusCodecPlayback( VOID ) {
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_SPI_FINISH
               | AMIGUS_CODEC_INT_F_VS1063_DRQ );
-  WriteReg16( amiGUS,
+  WriteReg16( card,
               AMIGUS_CODEC_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
@@ -108,26 +108,26 @@ VOID StartAmiGusCodecPlayback( VOID ) {
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_SPI_FINISH
               | AMIGUS_CODEC_INT_F_VS1063_DRQ );
-  WriteReg16( amiGUS,
+  WriteReg16( card,
               AMIGUS_CODEC_INT_ENABLE,
               AMIGUS_INT_F_SET
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
   HandlePlayback();
-  WriteReg16( amiGUS,
+  WriteReg16( card,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_ENABLE );
 }
 
 VOID StopAmiGusCodecPlayback( VOID ) {
 
-  APTR amiGUS = AmiGUSBase->agb_CardBase;
+  APTR card = AmiGUS_MHI_Base->agb_CardBase;
 
   // Original AmiGUS "stop playback" functionality
-  WriteReg16( amiGUS,
+  WriteReg16( card,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
-  WriteReg16( amiGUS,
+  WriteReg16( card,
               AMIGUS_CODEC_INT_ENABLE,
               AMIGUS_INT_F_CLEAR
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
@@ -135,7 +135,7 @@ VOID StopAmiGusCodecPlayback( VOID ) {
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_SPI_FINISH
               | AMIGUS_CODEC_INT_F_VS1063_DRQ );
-  WriteReg16( amiGUS,
+  WriteReg16( card,
               AMIGUS_CODEC_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
@@ -143,8 +143,8 @@ VOID StopAmiGusCodecPlayback( VOID ) {
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_SPI_FINISH
               | AMIGUS_CODEC_INT_F_VS1063_DRQ );  
-  WriteReg16( amiGUS,
+  WriteReg16( card,
               AMIGUS_CODEC_FIFO_RESET,
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );
-  CancelVS1063Playback( amiGUS );
+  CancelVS1063Playback( card );
 }

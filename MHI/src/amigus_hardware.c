@@ -18,18 +18,18 @@
 #include "debug.h"
 #include "SDI_compiler.h"
 
-UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
+UWORD ReadReg16( APTR card, ULONG offset ) {
 
-  return *(( UWORD * )(( ULONG ) amiGUS + offset ));
+  return *(( UWORD * )(( ULONG ) card + offset ));
 }
 
-ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
+ULONG ReadReg32( APTR card, ULONG offset ) {
 
-  return *(( ULONG * )(( ULONG ) amiGUS + offset ));
+  return *(( ULONG * )(( ULONG ) card + offset ));
 }
 
 INLINE UWORD ReadSPI(
-  APTR amiGUS,
+  APTR card,
   UWORD SPIregister,
   UWORD blockedSPImask,
   UWORD offsetSPIstatus,
@@ -41,22 +41,22 @@ INLINE UWORD ReadSPI(
 
   do {
 
-    status = ReadReg16( amiGUS, offsetSPIstatus );
+    status = ReadReg16( card, offsetSPIstatus );
 
   } while ( status & blockedSPImask );
-  WriteReg16( amiGUS, offsetSPIaddress, SPIregister );
-  WriteReg16( amiGUS, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
+  WriteReg16( card, offsetSPIaddress, SPIregister );
+  WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
   do {
 
-    status = ReadReg16( amiGUS, offsetSPIstatus );
+    status = ReadReg16( card, offsetSPIstatus );
 
   } while ( status & blockedSPImask );
-  return ReadReg16( amiGUS, offsetSPIread );
+  return ReadReg16( card, offsetSPIread );
 }
 
-UWORD ReadCodecSPI( APTR amiGUS, UWORD SPIregister ) {
+UWORD ReadCodecSPI( APTR card, UWORD SPIregister ) {
 
-  return ReadSPI( amiGUS,
+  return ReadSPI( card,
                   SPIregister,
                   AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,
                   AMIGUS_CODEC_SPI_STATUS,
@@ -65,18 +65,18 @@ UWORD ReadCodecSPI( APTR amiGUS, UWORD SPIregister ) {
                   AMIGUS_CODEC_SPI_READ_TRIGGER );
 }
 
-VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value ) {
+VOID WriteReg16( APTR card, ULONG offset, UWORD value ) {
 
-  *(( UWORD * )(( ULONG ) amiGUS + offset )) = value;
+  *(( UWORD * )(( ULONG ) card + offset )) = value;
 }
 
-VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
+VOID WriteReg32( APTR card, ULONG offset, ULONG value ) {
 
-  *(( ULONG * )(( ULONG ) amiGUS + offset )) = value;
+  *(( ULONG * )(( ULONG ) card + offset )) = value;
 }
 
 INLINE VOID WriteSPI(
-  APTR amiGUS,
+  APTR card,
   UWORD SPIregister,
   UWORD SPIvalue,
   UWORD blockedSPImask,
@@ -89,17 +89,17 @@ INLINE VOID WriteSPI(
 
   do {
 
-    status = ReadReg16( amiGUS, offsetSPIstatus );
+    status = ReadReg16( card, offsetSPIstatus );
 
   } while ( status & blockedSPImask );
-  WriteReg16( amiGUS, offsetSPIaddress, SPIregister );
-  WriteReg16( amiGUS, offsetSPIwrite, SPIvalue );
-  WriteReg16( amiGUS, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
+  WriteReg16( card, offsetSPIaddress, SPIregister );
+  WriteReg16( card, offsetSPIwrite, SPIvalue );
+  WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
 }
 
-VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue ) {
+VOID WriteCodecSPI( APTR card, UWORD SPIregister, UWORD SPIvalue ) {
 
-  WriteSPI( amiGUS,
+  WriteSPI( card,
             SPIregister,
             SPIvalue,
             AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,

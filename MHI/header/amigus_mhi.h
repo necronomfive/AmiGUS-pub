@@ -63,7 +63,7 @@
  * Library base structure components
  *****************************************************************************/
 
-struct AmiGUSMhiBuffer {
+struct AmiGUS_MHI_Buffer {
 
   struct MinNode                agmb_Node;
 
@@ -73,12 +73,12 @@ struct AmiGUSMhiBuffer {
   ULONG                         agmb_BufferExtraBytes; // Only 0-3 - :)
 };
 
-struct AmiGUSClientHandle {
+struct AmiGUS_MHI_Handle {
   struct Task                 * agch_Task;
   ULONG                         agch_Signal;
 
   struct MinList                agch_Buffers;
-  struct AmiGUSMhiBuffer *      agch_CurrentBuffer;
+  struct AmiGUS_MHI_Buffer    * agch_CurrentBuffer;
 
   ULONG                         agch_Status;
 };
@@ -89,7 +89,7 @@ struct AmiGUSClientHandle {
 
 /* This is the private structure. The official one does not contain all
 the private fields! */
-struct AmiGUSBase {
+struct AmiGUS_MHI_Base {
   /* Library base stuff */
   struct BaseLibrary            agb_BaseLibrary;
 
@@ -106,7 +106,7 @@ struct AmiGUSBase {
   struct Interrupt            * agb_Interrupt;
 
   /* Client info */
-  struct AmiGUSClientHandle     agb_ClientHandle;
+  struct AmiGUS_MHI_Handle      agb_ClientHandle;
 
   /* Only 1 AmiGUS supported per machine currently, sorry */
   BYTE                          agb_UsageCounter;
@@ -118,19 +118,19 @@ struct AmiGUSBase {
 };
 
 #if defined(BASE_GLOBAL)
-  extern struct AmiGUSBase        * AmiGUSBase;
+  extern struct AmiGUS_MHI_Base   * AmiGUS_MHI_Base;
   extern struct DosLibrary        * DOSBase;
   extern struct Library           * ExpansionBase;
   extern struct IntuitionBase     * IntuitionBase;
   extern struct ExecBase          * SysBase;
   extern struct Device            * TimerBase;
 #elif defined(BASE_REDEFINE)
-  #define AmiGUSBase                (amiGUSBase)
-  #define DOSBase                   amiGUSBase->agb_DOSBase
-  #define ExpansionBase             amiGUSBase->agb_ExpansionBase
-  #define IntuitionBase             amiGUSBase->agb_IntuitionBase
-  #define SysBase                   amiGUSBase->agb_SysBase
-  #define TimerBase                 amiGUSBase->TimerBase
+  #define AmiGUS_MHI_Base           (base)
+  #define DOSBase                   base->agb_DOSBase
+  #define ExpansionBase             base->agb_ExpansionBase
+  #define IntuitionBase             base->agb_IntuitionBase
+  #define SysBase                   base->agb_SysBase
+  #define TimerBase                 base->TimerBase
 #endif
 
 /******************************************************************************

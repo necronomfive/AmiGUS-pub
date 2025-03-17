@@ -70,7 +70,7 @@ BDIR_SRCS       = $(foreach SRC,$(SRCS),$(subst $(SDIR),$(BDIR),$(SRC)))
 BDIR_OBJS       = $(BDIR_SRCS:%c=%o)
 LIB_OBJS        = $(BDIR)library.o \
                   $(filter-out %/library.o,$(BDIR_OBJS))
-LIB_DST         = $(DDIR)mhiAmiGUS.library
+LIB_DST         = $(DDIR)mhiamigus.library
 
 # activate VBCC builds by adding `USEVBCC=1` to the make call!
 ifdef USEVBCC

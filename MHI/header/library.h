@@ -44,7 +44,7 @@
  * Define your library's properties here,
  * will be used in library.c.
  *****************************************************************************/
-#define LIBRARY_NAME      "mhiAmiGUS.library"
+#define LIBRARY_NAME      "mhiamigus.library"
 #define LIBRARY_VERSION   1
 #define LIBRARY_REVISION  2
 #define LIBRARY_DATETXT	  __AMIGADATE__

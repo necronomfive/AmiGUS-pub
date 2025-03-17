@@ -17,14 +17,14 @@
 #ifndef AMIGUS_MHI_H
 #define AMIGUS_MHI_H
 
-/* 
-* MHI driver library header.
-*
-* To be used only internally - but there in all .c files!
-* If you are using some of the library base addresses from
-* BASE_REDEFINE directly, e.g. in libinit.c,
-* do a #define NO_BASE_REDEFINE before including this file.
-*/
+/*
+ * MHI driver library header.
+ *
+ * To be used only internally - but there in all .c files!
+ * If you are using some of the library base addresses from
+ * BASE_REDEFINE directly, e.g. in libinit.c,
+ * do a #define NO_BASE_REDEFINE before including this file.
+ */
 
 /* Activate / De-activate this define to toggle lib base mode! */
 #define BASE_GLOBAL /**/
@@ -42,12 +42,19 @@
 #include "library.h"
 #include "SDI_mhi_protos.h"
 
+#define STR_VALUE(x)      #x
+#define STR(x) STR_VALUE(x)
+
 #define AMIGUS_MHI_AUTHOR           "Christoph `Chritoph` Fassbach"
 #define AMIGUS_MHI_COPYRIGHT        "(c) 2025 Christoph Fassbach / LGPL3"
 #define AMIGUS_MHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
                                     "Frank Wille (vbcc), "                \
                                     "Thomas Wenzel et al. (MHI)"
-#define AMIGUS_MHI_VERSION          LIBRARY_IDSTRING
+#define AMIGUS_MHI_DECODER          "AmiGUS VS1063a codec"
+#define AMIGUS_MHI_VERSION          STR( LIB_FILE )" "                         \
+                                    STR( LIB_VERSION )".00"STR( LIB_REVISION ) \
+                                    " "LIB_DATE" "STR( LIB_CPU )" "            \
+                                    STR( LIB_COMPILER )" "STR( LIB_HOST )
 
 #define AMIGUS_MHI_FIRMWARE_MINIMUM ( ( 2024 << 20 ) /* year   */ \
                                     + (   12 << 16 ) /* month  */ \

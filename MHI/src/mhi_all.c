@@ -70,6 +70,10 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
   LOG_D(( "D: MHIAllocDecoder start\n" ));
 
+  if ( base != AmiGUS_MHI_Base ) {
+
+    DisplayError( ELibraryBaseInconsistency );
+  }
   Forbid();
   if ( AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver ) {
 
@@ -341,7 +345,7 @@ ASM( ULONG ) SAVEDS MHIQuery(
   switch ( query ) {
     case MHIQ_DECODER_NAME: {
 
-      result = ( ULONG ) "AmiGUS VS1063a codec";
+      result = ( ULONG ) AMIGUS_MHI_DECODER;
       break;
     }
     case MHIQ_DECODER_VERSION: {

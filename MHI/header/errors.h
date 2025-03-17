@@ -26,6 +26,7 @@ enum TErrorCodes
   /* Insert errors below. */
   /* Global errors 1-99 */
   EWrongDriverCPUVersion,
+  ELibraryBaseInconsistency,
   EOpenDosBase,
   EOpenIntuitionBase,
   EOpenUtilityBase,

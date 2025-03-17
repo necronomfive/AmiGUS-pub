@@ -41,6 +41,7 @@ struct TErrorMessage errors[] = {
   { ENoError, "", "" },
 
   /* Insert errors below. */
+  { ELibraryBaseInconsistency, "Library memory somehow damaged, expecting a crash soon.", "Have a nice day!" },
   { EOpenDosBase, "Can not open dos.library.", "What the ...?" },
   { EOpenUtilityBase, "Your utility.library is shit!", "I'm sorry." },
   { EGetAttrNotImplemented, "AHI requested unknown info, may work still...", "Fingers crossed" },

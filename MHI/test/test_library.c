@@ -134,19 +134,27 @@ BOOL testQuery( VOID ) {
 int main(int argc, char const *argv[]) {
 
   BOOL failed = FALSE;
+  STRPTR libraryName = "mhiamigus.library";
+  STRPTR attempt2 = "libs:mhi/mhiamigus.library";
 
-  MHIBase = OpenLibrary( "mhiAmiGUS.library", 0 );
+  MHIBase = OpenLibrary( libraryName, 0 );
   if ( !MHIBase ) {
 
-    printf( "Opening library failed!\n" );
-    return 20;
+    printf( "Opening %s failed!\n", libraryName );
+    libraryName = attempt2;
+    MHIBase = OpenLibrary( libraryName, 0 );
+    if ( !MHIBase ) {
+
+      printf( "Opening %s failed!\n", libraryName );
+      return 20;
+    }
   }
-  printf( "mhiAmiGUS.library opened\n" );
+  printf( "%s opened\n", libraryName );
 
   failed |= testQuery();
 
   CloseLibrary( MHIBase );
-  printf( "mhiAmiGUS.library closed\n" );
+  printf( "%s closed\n", libraryName );
 
   return ( failed ) ? 15 : 0;
 }

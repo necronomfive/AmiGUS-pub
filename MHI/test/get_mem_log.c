@@ -18,6 +18,7 @@
  * Finally, main triggering all tests:
  *****************************************************************************/
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifdef NULL
@@ -80,32 +81,60 @@ VOID WriteMemoryLog( LONG startAddress, STRPTR filename ) {
 
 int main( int argc, char const *argv[] ) {
 
-  UBYTE * filename = "ram:MemLog.txt";
+  STRPTR filename = "ram:MemLog.txt";
   LONG startAddress;
-  
   BOOL found = FALSE;
-
+  ULONG i;
+  
+  /*
+  Seems to be in sc.lib already
   DOSBase = ( struct DosLibrary * ) OpenLibrary( "dos.library", 34 );
   if ( !DOSBase ) {
     printf( "Opening dos.library failed.\n" );
     return 20;
   }
+  */
+  for ( i = 1; i < argc; ++i ) {
+    if ( !strncmp( "address=0x", argv[ i ], sizeof( "address=0x" ) - 1 )) {
 
-  printf( "Checking for settings first...\n" );
-#ifdef INCLUDE_VERSION
-  if ( 36 <= (( struct Library * ) DOSBase )->lib_Version) {
-    UBYTE buffer[ 64 ];
-    LONG i = GetVar( "AmiGUS-MHI-LOG-ADDRESS", buffer, sizeof( buffer ), 0 );
-
-    if ( i > 0 ) {
-
-      StrToLong( buffer, ( LONG * ) &startAddress );
-      printf( " ... found address: 0x%08lx\n", startAddress );
+      STRPTR start = ( STRPTR )(( LONG ) argv[ i ] + sizeof( "address=0x" ) - 1 );
+      STRPTR end = ( STRPTR )(( LONG ) start + 8);
+      startAddress = strtol( start, &end, 16 );
+      printf( "Trying 0x%08lx...\n", startAddress );
       found = CheckStartAddress( startAddress );
-    } else {
-      printf( " ... NO address found\n" );
+      continue;
     }
+    if ( !strncmp( "out=", argv[ i ], sizeof( "out=" ) - 1 )) {
+
+      filename = ( STRPTR )((( ULONG ) argv[ i ] ) + sizeof( "out=" ) - 1 );
+      printf( "Using \"%s\" for output...\n", filename );
+      continue;
+    }
+    printf( "Unknown parameter %s\n", argv[ i ] );
+    printf( "USAGE:\nGetMemLog [address=0x23443500] [out=t:amigus-memlog.txt]\n" );
+    return 0;
   }
+
+#ifdef INCLUDE_VERSION
+  if ( !found ) {
+    if ( 36 <= (( struct Library * ) DOSBase )->lib_Version) {
+
+      UBYTE buffer[ 64 ];
+
+      printf( "Checking for settings first...\n" );
+      i = GetVar( "AmiGUS-MHI-LOG-ADDRESS", buffer, sizeof( buffer ), 0 );  
+      if ( i > 0 ) {
+  
+        StrToLong( buffer, ( LONG * ) &startAddress );
+        printf( " ... found address: 0x%08lx\n", startAddress );
+        found = CheckStartAddress( startAddress );
+
+      } else {
+
+        printf( " ... NO address found\n" );
+      }
+    }
+  }  
 #endif
   
   if ( !( found )) {
@@ -129,8 +158,41 @@ int main( int argc, char const *argv[] ) {
   }
   if ( !( found )) {
 
+    LONG memStart[ 32 ];
+    LONG memEnd[ 32 ];
+    struct MemHeader * mem = NULL;
+    ULONG slab = 0;
+
     printf( "Trying full scan finally...\n" );
-    // TODO: list memory regions, scan them LONG wise
+    
+    Forbid();
+    for ( mem = ( struct MemHeader * ) SysBase->MemList.lh_Head;
+          mem->mh_Node.ln_Succ;
+          mem = ( struct MemHeader * ) mem->mh_Node.ln_Succ ) {
+
+      memStart[ slab ] = ( LONG )mem;
+      memEnd[ slab ] = ( LONG )mem->mh_Upper;
+      ++slab;
+    }
+    Permit();
+    for ( i = 0; (( i < slab ) && ( !found )); i++ ) {
+
+      printf( "Scanning region 0x%08lx to 0x%08lx...\n",
+              memStart[ i ], memEnd[ i ] );
+      for ( startAddress = memStart[ i ]; 
+            (( startAddress < memEnd[ i ] ) && ( !found ));
+            startAddress += 4 ) {
+
+        if ( CheckStartAddress( startAddress )) {
+
+          printf( "Success at 0x%08lx\n", startAddress );
+          found = TRUE;
+        } else if ( 0 == ( startAddress & 0x000fFFff )) {
+
+          printf( "\r...now at 0x%08lx...\n", startAddress);
+        } 
+      }
+    }
   }
 
   if ( found ) {
@@ -141,5 +203,12 @@ int main( int argc, char const *argv[] ) {
 
     printf( "No start marker found, giving up, sorry\n" );
   }
+  /*
+  Seems to be in sc.lib already
+  if ( DOSBase ) {
+    CloseLibrary(( struct Library * ) DOSBase );
+    DOSBase = NULL;
+  }
+  */
   return 0;
 }

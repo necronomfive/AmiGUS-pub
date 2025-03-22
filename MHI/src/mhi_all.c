@@ -62,7 +62,7 @@ VOID UpdateEqualizer( UWORD bandLevel, UWORD percent ) {
 ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a0, struct Task * task ),
   REG( d0, ULONG signal ),
-  REG( a6, struct AmiGUS_MHI_Base * base ) 
+  REG( a6, struct AmiGUS_MHI * base ) 
 ) {
 
   APTR result = NULL;
@@ -123,7 +123,7 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
 ASM( VOID ) SAVEDS MHIFreeDecoder(
   REG( a3, APTR handle ), 
-  REG( a6, struct AmiGUS_MHI_Base * base )
+  REG( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct AmiGUS_MHI_Handle * clientHandle =
@@ -178,7 +178,7 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
   REG( a3, APTR handle ),
   REG( a0, APTR buffer ),
   REG( d0, ULONG size),
-  REG( a6, struct AmiGUS_MHI_Base * base )
+  REG( a6, struct AmiGUS_MHI * base )
 ) {
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
@@ -228,7 +228,7 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
 
 ASM( APTR ) SAVEDS MHIGetEmpty(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base )
+  REG( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct AmiGUS_MHI_Handle * clientHandle =
@@ -275,7 +275,7 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
 
 ASM( UBYTE ) SAVEDS MHIGetStatus(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base )
+  REG( a6, struct AmiGUS_MHI * base )
 ) {
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
@@ -286,7 +286,7 @@ ASM( UBYTE ) SAVEDS MHIGetStatus(
 
 ASM( VOID ) SAVEDS MHIPlay(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base )
+  REG( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct AmiGUS_MHI_Handle * clientHandle =
@@ -300,7 +300,7 @@ ASM( VOID ) SAVEDS MHIPlay(
 
 ASM( VOID ) SAVEDS MHIStop(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base )
+  REG( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct AmiGUS_MHI_Handle * clientHandle =
@@ -315,7 +315,7 @@ ASM( VOID ) SAVEDS MHIStop(
 
 ASM( VOID ) SAVEDS MHIPause(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base )
+  REG( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct AmiGUS_MHI_Handle * clientHandle =
@@ -336,7 +336,7 @@ ASM( VOID ) SAVEDS MHIPause(
 
 ASM( ULONG ) SAVEDS MHIQuery(
   REG( d1, ULONG query ),
-  REG( a6, struct AmiGUS_MHI_Base * base )
+  REG( a6, struct AmiGUS_MHI * base )
 ) {
 
   ULONG result = MHIF_UNSUPPORTED;
@@ -407,7 +407,7 @@ ASM( VOID ) SAVEDS MHISetParam(
   REG( a3, APTR handle ),
   REG( d0, UWORD param ),
   REG( d1, ULONG value ),
-  REG( a6, struct AmiGUS_MHI_Base * base )
+  REG( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct AmiGUS_MHI_Handle * clientHandle =

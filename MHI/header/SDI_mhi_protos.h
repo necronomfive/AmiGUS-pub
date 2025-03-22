@@ -30,51 +30,51 @@
 #endif
 
 /* Forward declaration here. */
-struct AmiGUS_MHI_Base;
+struct AmiGUS_MHI;
 
 ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a0, struct Task * task ),
   REG( d0, ULONG signal ),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 ASM( VOID ) SAVEDS MHIFreeDecoder(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 ASM( BOOL ) SAVEDS MHIQueueBuffer(
   REG( a3, APTR handle ),
   REG( a0, APTR buffer ),
   REG( d0, ULONG size),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 ASM( APTR ) SAVEDS MHIGetEmpty(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 ASM( UBYTE ) SAVEDS MHIGetStatus(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 ASM( VOID ) SAVEDS MHIPlay(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 ASM( VOID ) SAVEDS MHIStop(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 ASM( VOID ) SAVEDS MHIPause(
   REG( a3, APTR handle ),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 ASM( ULONG ) SAVEDS MHIQuery(
   REG( d1, ULONG query ),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 ASM( VOID ) SAVEDS MHISetParam(
   REG( a3, APTR handle ),
   REG( d0, UWORD param ),
   REG( d1, ULONG value ),
-  REG( a6, struct AmiGUS_MHI_Base * base ));
+  REG( a6, struct AmiGUS_MHI * base ));
 
 #endif /* SDI_MHI_PROTOS_H */

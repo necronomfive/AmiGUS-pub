@@ -96,7 +96,7 @@ struct AmiGUS_MHI_Handle {
 
 /* This is the private structure. The official one does not contain all
 the private fields! */
-struct AmiGUS_MHI_Base {
+struct AmiGUS_MHI {
   /* Library base stuff */
   struct BaseLibrary            agb_BaseLibrary;
 
@@ -125,7 +125,7 @@ struct AmiGUS_MHI_Base {
 };
 
 #if defined(BASE_GLOBAL)
-  extern struct AmiGUS_MHI_Base   * AmiGUS_MHI_Base;
+  extern struct AmiGUS_MHI        * AmiGUS_MHI_Base;
   extern struct DosLibrary        * DOSBase;
   extern struct Library           * ExpansionBase;
   extern struct IntuitionBase     * IntuitionBase;

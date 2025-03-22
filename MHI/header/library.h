@@ -106,7 +106,7 @@ struct BaseLibrary {
 /******************************************************************************
  * Define your library's base type here, will be used in library.c.
  *****************************************************************************/
-#define LIBRARY_TYPE      struct AmiGUS_MHI_Base
+#define LIBRARY_TYPE      struct AmiGUS_MHI
 
 /******************************************************************************
  * Your library's own base structure shall have its own include,

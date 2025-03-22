@@ -25,7 +25,7 @@
 #include "interrupt.h"
 #include "support.h"
 
-LONG FindAmiGusCodec( struct AmiGUS_MHI_Base * base ) {
+LONG FindAmiGusCodec( struct AmiGUS_MHI * base ) {
 
   struct ConfigDev *configDevice = 0;
   ULONG serial;

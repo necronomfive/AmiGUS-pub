@@ -137,7 +137,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
        DMA from FIFO to DAC will stay disabled until worker task prepared some
        buffers and triggered a full playback init cycle to make it run again.
       * /
-      AmiGUS_MHI_Base->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
+      AmiGUS_MHI_Base_Base->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
     }
 */
   }
@@ -172,7 +172,7 @@ BOOL CreateInterruptHandler( VOID ) {
   if ( AmiGUS_MHI_Base->agb_Interrupt ) {
 
     AmiGUS_MHI_Base->agb_Interrupt->is_Node.ln_Pri = 100;
-    AmiGUS_MHI_Base->agb_Interrupt->is_Node.ln_Name = "AMIGUS_MHI_INT";
+    AmiGUS_MHI_Base->agb_Interrupt->is_Node.ln_Name = "AmiGUS_MHI_Base_INT";
     AmiGUS_MHI_Base->agb_Interrupt->is_Data = AmiGUS_MHI_Base;
     AmiGUS_MHI_Base->agb_Interrupt->is_Code = (void (* )())handleInterrupt;
 

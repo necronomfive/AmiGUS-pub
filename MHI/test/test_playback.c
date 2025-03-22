@@ -31,7 +31,7 @@
  * Mocked functions and stubbed external symbols below:
  *****************************************************************************/
 
-struct AmiGUSBase        * AmiGUSBase        = NULL;
+struct AmiGUS_MHI        * AmiGUS_MHI_Base   = NULL;
 struct Device            * TimerBase         = NULL;
 
 UWORD                    * ReadReg16queue    = NULL;
@@ -97,11 +97,11 @@ BOOL testAlignedPlayback( VOID ) {
   };
   ULONG outBuffer32[ 10 ];
 
-  struct AmiGUSMhiBuffer mhiBufferA;
-  struct AmiGUSMhiBuffer mhiBufferB;
+  struct AmiGUS_MHI_Buffer mhiBufferA;
+  struct AmiGUS_MHI_Buffer mhiBufferB;
   ULONG bufferA[] = { 1, 2, 3, 4 };
   ULONG bufferB[] = { 5, 6, 7, 8 };
-  struct AmiGUSClientHandle * handle = &AmiGUSBase->agb_ClientHandle;
+  struct AmiGUS_MHI_Handle * handle = &AmiGUS_MHI_Base->agb_ClientHandle;
 
   mhiBufferA.agmb_Buffer = ( ULONG * ) &bufferA;
   mhiBufferA.agmb_BufferIndex = 0;
@@ -164,12 +164,12 @@ BOOL testUnalignedPlayback( VOID ) {
     0x00000000
   };
 
-  struct AmiGUSMhiBuffer mhiBufferA;
-  struct AmiGUSMhiBuffer mhiBufferB;
+  struct AmiGUS_MHI_Buffer mhiBufferA;
+  struct AmiGUS_MHI_Buffer mhiBufferB;
   UBYTE bufferA[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
                       0x12, 0x34, 0x56, 0x78 };
   ULONG bufferB[] = { 5, 6, 7, 8 };
-  struct AmiGUSClientHandle * handle = &AmiGUSBase->agb_ClientHandle;
+  struct AmiGUS_MHI_Handle * handle = &AmiGUS_MHI_Base->agb_ClientHandle;
 
   mhiBufferA.agmb_Buffer = ( ULONG * ) &bufferA;
   mhiBufferA.agmb_BufferIndex = 0;
@@ -222,10 +222,10 @@ int main(int argc, char const *argv[]) {
 
   BOOL failed = FALSE;
 
-  AmiGUSBase = malloc( sizeof( struct AmiGUSBase ) );
-  memset( AmiGUSBase, 0, sizeof( struct AmiGUSBase ) );
+  AmiGUS_MHI_Base = malloc( sizeof( struct AmiGUS_MHI ) );
+  memset( AmiGUS_MHI_Base, 0, sizeof( struct AmiGUS_MHI ) );
 
-  if ( !AmiGUSBase ) {
+  if ( !AmiGUS_MHI_Base ) {
 
     printf( "Memory allocation failed!" );
     return 20;
@@ -234,7 +234,7 @@ int main(int argc, char const *argv[]) {
   failed |= testAlignedPlayback();
   failed |= testUnalignedPlayback();
 
-  free( AmiGUSBase );
+  free( AmiGUS_MHI_Base );
 
   return ( failed ) ? 15 : 0;
 }

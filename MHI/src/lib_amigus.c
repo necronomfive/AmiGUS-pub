@@ -35,14 +35,14 @@ struct IntuitionBase     * IntuitionBase     = 0;
 struct Library           * UtilityBase       = 0;
 struct Library           * ExpansionBase     = 0;
 struct Device            * TimerBase         = 0;
-struct AmiGUS_MHI_Base   * AmiGUS_MHI_Base   = 0;
+struct AmiGUS_MHI        * AmiGUS_MHI_Base   = 0;
 
 #endif
 
 /* Closes all the libraries opened by LibInit() */
 VOID CustomLibClose( struct BaseLibrary * libBase ) {
 
-  struct AmiGUS_MHI_Base * base = ( struct AmiGUS_MHI_Base * ) libBase;
+  struct AmiGUS_MHI * base = ( struct AmiGUS_MHI * ) libBase;
 
 #ifndef BASE_GLOBAL
   struct ExecBase *SysBase = base->agb_SysBase;
@@ -85,7 +85,7 @@ VOID CustomLibClose( struct BaseLibrary * libBase ) {
 
 LONG CustomLibInit( struct BaseLibrary * libBase, struct ExecBase * sysBase ) {
 
-  struct AmiGUS_MHI_Base * base = ( struct AmiGUS_MHI_Base * ) libBase;
+  struct AmiGUS_MHI * base = ( struct AmiGUS_MHI * ) libBase;
   LONG error;
 
   /* Prevent use of customized library versions on CPUs not targetted. */

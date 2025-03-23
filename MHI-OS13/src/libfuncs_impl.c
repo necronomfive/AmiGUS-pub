@@ -78,7 +78,7 @@ ASM SAVEDS struct Library *LibInit( ASMR(d0) BASETYPE *example_libbase  ASMREG(d
 	InitSemaphore( &example_libbase->LockSemaphore );
 
 	example_libbase->seglist    = seglist;
-	example_libbase->libnode.lib_IdString = _LibVersionString;
+	example_libbase->libnode.lib_IdString = ( APTR ) _LibVersionString;
 
 	/* config.c uses memory pools, require kick 3.0 */
 	/*example_libbase->utilitylib = OpenLibrary( (STRPTR)"utility.library", 39 );*/

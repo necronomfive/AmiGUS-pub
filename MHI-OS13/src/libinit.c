@@ -18,13 +18,6 @@
 #include "libfuncs_impl.h"
 #include "SDI_mhi_protos.h"
 
-#define xstr(a) str(a)
-#define str(a) #a
-
-#ifndef LIBEXTRA
-#define LIBEXTRA
-#endif
-
 #ifdef __SASC
 #define _STATIC_ static
 #else
@@ -95,17 +88,9 @@ struct LibInitData
 	(ULONG) 0
 };
 
-
 const APTR LibInitTab[] = {
 	(APTR) sizeof( BASETYPE ),
 	(APTR) &LibFunctions,
 	(APTR) &LibInitializers,
 	(APTR) LibInit
 };
-
-#if 0
-float blah2(float a )
-{
-	return a;
-}
-#endif

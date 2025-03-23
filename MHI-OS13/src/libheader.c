@@ -45,8 +45,8 @@ extern const APTR LibInitTab[];
 static const struct Resident _00RomTag;
 static const struct Resident _00RomTag = {
 	RTC_MATCHWORD,
-	( struct Resident* ) &_00RomTag,
-	( struct Resident* ) &_00RomTag + 1,
+	( struct Resident * ) &_00RomTag,
+	( APTR ) &_00RomTag + 1,
 	RTF_AUTOINIT,
 	LIBVERSION,
 	NT_LIBRARY,

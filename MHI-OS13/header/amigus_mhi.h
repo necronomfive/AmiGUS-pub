@@ -39,8 +39,8 @@
 #endif
 #endif
 
-// #include "library.h"
-#include "libfuncs_impl.h"
+#include "library.h"
+//#include "libfuncs_impl.h"
 
 #include "SDI_mhi_protos.h"
 
@@ -100,7 +100,7 @@ struct AmiGUS_MHI_Handle {
 the private fields! */
 struct AmiGUS_MHI {
   /* Library base stuff */
-  struct example_libbase            agb_BaseLibrary;
+  struct BaseLibrary            agb_BaseLibrary;
 
   struct ExecBase             * agb_SysBase;
   struct DosLibrary           * agb_DOSBase;

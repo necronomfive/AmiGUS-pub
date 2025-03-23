@@ -27,7 +27,7 @@
  */
 
 /* Activate / De-activate this define to toggle lib base mode! */
-#define BASE_GLOBAL /**/
+/* #define BASE_GLOBAL */
 
 #ifndef BASE_GLOBAL 
 #ifndef NO_BASE_REDEFINE

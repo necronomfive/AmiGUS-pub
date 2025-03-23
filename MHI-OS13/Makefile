@@ -89,8 +89,8 @@ A_SRCS          = $(wildcard $(SDIR)$(WILDCARD).asm)
 BDIR_A_SRCS     = $(foreach A_SRC,$(A_SRCS),$(subst $(SDIR),$(BDIR),$(A_SRC)))
 BDIR_A_OBJS     = $(BDIR_A_SRCS:%asm=%o)
 
-LIB_OBJS        = $(BDIR)libheader.o $(BDIR)libinit.o \
-                  $(filter-out %libinit.o,$(filter-out %/libheader.o,$(BDIR_C_OBJS))) \
+LIB_OBJS        = $(BDIR)library.o \
+                  $(filter-out %/library.o,$(BDIR_C_OBJS)) \
                   $(filter-out %/library.o,$(BDIR_A_OBJS))
 
 ###########################
@@ -105,7 +105,7 @@ ifdef USEVBCC
   endif
 
   AFLAGS        = -I$(NDK_ASM_INCLUDE) -quiet -phxass -Fhunk -o
-  CFLAGS        = -c -Os -+ +kick13 -c99 -cpu=68000                \
+  CFLAGS        = +kick13 -c -Os -+ -c99 -cpu=68000                \
                   -I$(MHI_INCLUDE) -I$(HDIR)                       \
                   -D__NOLIBBASE__                                  \
                   -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__  \

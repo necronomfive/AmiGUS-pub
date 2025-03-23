@@ -64,7 +64,7 @@ extern const APTR LibInitTab[];
 static const struct Resident _00RomTag = {
   RTC_MATCHWORD,
   ( struct Resident * ) &_00RomTag,
-  ( APTR ) ((( ULONG ) &_00RomTag ) + 1 ),
+  ( APTR ) ( &_00RomTag + 1 ),
   RTF_AUTOINIT,
   LIB_VERSION,
   NT_LIBRARY,
@@ -73,16 +73,6 @@ static const struct Resident _00RomTag = {
   ( STRPTR ) _LibVersionString,
   ( APTR ) LibInitTab
 };
-
-#define INITBYTE(offset,value)  0xe000,(UWORD) (offset),(UWORD) ((value)<<8)
-#define INITWORD(offset,value)  0xd000,(UWORD) (offset),(UWORD) (value)
-#define INITLONG(offset,value)  0xc000,(UWORD) (offset), \
-                                (UWORD) ((value)>>16), \
-                                (UWORD) ((value) & 0xffff)
-#define INITSTRUCT(size,offset,value,count) \
-                                (UWORD) (0xc000|(size<<12)|(count<<8)| \
-                                ((UWORD) ((offset)>>16)), \
-                                ((UWORD) (offset)) & 0xffff)
 
 const char _LibVersionString[] = "$VER: " AMIGUS_MHI_VERSION "\r\n";
 const char LibName[] = STR( LIB_FILE );
@@ -99,8 +89,18 @@ const APTR LibFunctions[] = {
   ( APTR ) -1
 };
 
-#define WORDINIT(_a_) UWORD _a_ ##W1; UWORD _a_ ##W2; UWORD _a_ ##ARG;
-#define LONGINIT(_a_) UBYTE _a_ ##A1; UBYTE _a_ ##A2; ULONG _a_ ##ARG;
+#define WORDINIT( _a_ ) UWORD _a_ ##W1; UWORD _a_ ##W2; UWORD _a_ ##ARG;
+#define LONGINIT( _a_ ) UBYTE _a_ ##A1; UBYTE _a_ ##A2; ULONG _a_ ##ARG;
+#define INITBYTE( offset, value )  \
+        0xe000, ( UWORD ) ( offset ), \
+        ( UWORD ) (( value ) << 8 )
+#define INITWORD( offset, value )  \
+        0xd000, ( UWORD ) ( offset ), \
+        ( UWORD ) ( value )
+#define INITLONG( offset, value )  \
+        0xc000, ( UWORD ) ( offset ), \
+        ( UWORD ) (( value ) >> 16 ), ( UWORD ) (( value ) & 0xffff )
+
 struct LibInitData {
 
   WORDINIT( w1 )
@@ -115,13 +115,13 @@ struct LibInitData {
 
   INITBYTE( OFFSET( Node,  ln_Type), NT_LIBRARY ),
   0x80,
-  ( UBYTE )(( LONG ) OFFSET( Node,  ln_Name)),
-  ( ULONG ) &LibName[0],
-  INITBYTE( OFFSET(Library,lib_Flags), LIBF_SUMUSED|LIBF_CHANGED ),
-  INITWORD( OFFSET(Library,lib_Version), LIB_VERSION  ),
-  INITWORD( OFFSET(Library,lib_Revision), LIB_REVISION ),
+  ( UBYTE ) (( LONG ) OFFSET( Node,  ln_Name)),
+  ( ULONG ) &LibName[ 0 ],
+  INITBYTE( OFFSET( Library, lib_Flags ), LIBF_SUMUSED | LIBF_CHANGED ),
+  INITWORD( OFFSET( Library, lib_Version ), LIB_VERSION  ),
+  INITWORD( OFFSET( Library, lib_Revision ), LIB_REVISION ),
   0x80,
-  ( UBYTE )(( LONG ) OFFSET( Library, lib_IdString )),
+  ( UBYTE ) (( LONG ) OFFSET( Library, lib_IdString )),
   ( ULONG ) &_LibVersionString,
   ( ULONG ) 0
 };
@@ -134,38 +134,33 @@ const APTR LibInitTab[] = {
   ( APTR ) LibInit
 };
 
-void MemClear( void *ptr, LONG bytes ) {
-  UBYTE *p = (UBYTE*)ptr;
-
-  while( bytes-- ) {
-
-    *p++ = 0;
-  }
-}
-
 static ASM( LIB_PTR ) SAVEDS LibInit(
   REG( d0, struct BaseLibrary * base ),
   REG( a0, SEGLISTPTR seglist ),
   REG( a6, struct Library * _SysBase )) {
 
-  UBYTE * p = ( UBYTE * ) base;
+  ULONG p = ( ULONG ) base;
+  ULONG t = p + sizeof( LIBRARY_TYPE );
 
-  if( !p ) {
+  if ( !p ) {
 
     return NULL;
   }
 
-  MemClear( p + sizeof(struct Library),
-            sizeof( LIBRARY_TYPE ) - sizeof( struct Library ));
+  p += sizeof( struct Library );
+  while ( p < t ) {
+    
+    *(( UBYTE * ) p++ ) = 0;
+  }
 
-  SysBase = *((struct Library **)4UL);
+  SysBase = *(( struct Library ** ) 4UL );
 
   InitSemaphore( &base->LockSemaphore );
 
-  base->SegList    = seglist;
+  base->SegList = seglist;
   base->LibNode.lib_IdString = ( APTR ) _LibVersionString;
 
-  return (struct Library *)base;
+  return ( struct Library * ) base;
 }
 
 static ASM( LIB_PTR ) SAVEDS LibOpen(

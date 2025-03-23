@@ -66,7 +66,7 @@ static const struct Resident _00RomTag = {
   ( struct Resident * ) &_00RomTag,
   ( APTR ) ( &_00RomTag + 1 ),
   RTF_AUTOINIT,
-  LIB_VERSION,
+  LIBRARY_VERSI0N,
   NT_LIBRARY,
   0,
   ( STRPTR ) LibName,
@@ -74,8 +74,8 @@ static const struct Resident _00RomTag = {
   ( APTR ) LibInitTab
 };
 
-const char _LibVersionString[] = "$VER: " AMIGUS_MHI_VERSION "\r\n";
-const char LibName[] = STR( LIB_FILE );
+const char _LibVersionString[] = "$VER: " LIBRARY_IDSTRING "\r\n";
+const char LibName[] = STR( LIBRARY_NAME );
 
 const APTR LibFunctions[] = {
   /* Basic library open, close, flush functions */
@@ -118,8 +118,8 @@ struct LibInitData {
   ( UBYTE ) (( LONG ) OFFSET( Node,  ln_Name)),
   ( ULONG ) &LibName[ 0 ],
   INITBYTE( OFFSET( Library, lib_Flags ), LIBF_SUMUSED | LIBF_CHANGED ),
-  INITWORD( OFFSET( Library, lib_Version ), LIB_VERSION  ),
-  INITWORD( OFFSET( Library, lib_Revision ), LIB_REVISION ),
+  INITWORD( OFFSET( Library, lib_Version ), LIBRARY_VERSI0N  ),
+  INITWORD( OFFSET( Library, lib_Revision ), LIBRARY_REVISION ),
   0x80,
   ( UBYTE ) (( LONG ) OFFSET( Library, lib_IdString )),
   ( ULONG ) &_LibVersionString,
@@ -160,7 +160,15 @@ static ASM( LIB_PTR ) SAVEDS LibInit(
   base->SegList = seglist;
   base->LibNode.lib_IdString = ( APTR ) _LibVersionString;
 
-  return ( struct Library * ) base;
+  if ( !CustomLibInit(( LIBRARY_TYPE * ) base,
+                      (struct ExecBase * ) SysBase )) {
+    
+    return ( struct Library * ) base;
+  }
+
+  CustomLibClose(( LIBRARY_TYPE * ) base );
+  // TODO: more error handling here - FreeMem? Expunge?
+  return NULL;
 }
 
 static ASM( LIB_PTR ) SAVEDS LibOpen(
@@ -206,6 +214,8 @@ static ASM( SEGLISTPTR ) SAVEDS LibExpunge(
     base->LibNode.lib_Flags |= LIBF_DELEXP;
     return NULL;
   }
+
+  CustomLibClose(( LIBRARY_TYPE * ) base );
 
   Forbid();
   Remove(( struct Node * ) base ); /* Lib no longer in system */

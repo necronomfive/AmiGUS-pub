@@ -20,7 +20,7 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
-// #include "amigus_codec.h"
+//#include "amigus_codec.h"
 #include "amigus_mhi.h"
 #include "debug.h"
 #include "errors.h"
@@ -40,9 +40,7 @@ struct AmiGUS_MHI        * AmiGUS_MHI_Base   = 0;
 #endif
 
 /* Closes all the libraries opened by LibInit() */
-VOID CustomLibClose( struct BaseLibrary * libBase ) {
-
-  struct AmiGUS_MHI * base = ( struct AmiGUS_MHI * ) libBase;
+VOID CustomLibClose( LIBRARY_TYPE * base ) {
 
 #ifndef BASE_GLOBAL
   struct ExecBase *SysBase = base->agb_SysBase;
@@ -83,9 +81,8 @@ VOID CustomLibClose( struct BaseLibrary * libBase ) {
   }
 }
 
-LONG CustomLibInit( struct BaseLibrary * libBase, struct ExecBase * sysBase ) {
+LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 
-  struct AmiGUS_MHI * base = ( struct AmiGUS_MHI * ) libBase;
   LONG error;
 
   /* Prevent use of customized library versions on CPUs not targetted. */
@@ -127,7 +124,7 @@ LONG CustomLibInit( struct BaseLibrary * libBase, struct ExecBase * sysBase ) {
     return EOpenDosBase;
   }
   base->agb_IntuitionBase =
-    (struct IntuitionBase *) OpenLibrary("intuition.library", 36);
+    (struct IntuitionBase *) OpenLibrary("intuition.library", 34);
   if( !(base->agb_IntuitionBase) ) {
 
     return EOpenIntuitionBase;
@@ -160,7 +157,7 @@ LONG CustomLibInit( struct BaseLibrary * libBase, struct ExecBase * sysBase ) {
 #endif
 
   LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", base));
-  // error = FindAmiGusCodec( base );
+  error = FindAmiGusCodec( base );
   if ( error ) {
 
     DisplayError( error );

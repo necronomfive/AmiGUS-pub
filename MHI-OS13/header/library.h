@@ -40,43 +40,17 @@
  * Define your library's properties here,
  * will be used in library.c.
  *****************************************************************************/
-/*
-#define LIBRARY_NAME      GSTR( LIB_FILE )
-#define LIBRARY_VERSION   1
-#define LIBRARY_REVISION  2
-#define LIBRARY_DATETXT	  __AMIGADATE__
-#define LIBRARY_VERSTXT	 GSTR( LIBRARY_VERSION ) ".00" GSTR( LIBRARY_REVISION )
 
-#if defined( _M68060 )
-  #define LIBRARY_CPUTXT  " 060"
-#elif defined( _M68040 )
-  #define LIBRARY_CPUTXT  " 040"
-#elif defined( _M68030 )
-  #define LIBRARY_CPUTXT  " 030"
-#elif defined( _M68020 )
-  #define LIBRARY_CPUTXT  " 020"
-#elif defined( __MORPHOS__ )
-  #define LIBRARY_CPUTXT  " MorphOS"
-#else
-  #define LIBRARY_CPUTXT  " 000"
-#endif
+#define STR_VALUE(x)      #x
+#define STR(x)            STR_VALUE(x)
 
-#if defined( __VBCC__ )
-  #define LIBRARY_COMPILERTXT " vbcc"
-#elif defined( __SASC )
-  #define LIBRARY_COMPILERTXT " SAS/C"
-#endif
-
-#ifdef CROSS_TOOLCHAIN
-  #define LIBRARY_HOSTTXT " cross"
-#else
-  #define LIBRARY_HOSTTXT " native"
-#endif
-
-#define LIBRARY_IDSTRING \
-  LIBRARY_NAME " " LIBRARY_VERSTXT " " LIBRARY_DATETXT \
-  LIBRARY_CPUTXT LIBRARY_COMPILERTXT LIBRARY_HOSTTXT
-*/
+#define LIBRARY_NAME      LIB_FILE
+#define LIBRARY_VERSI0N   LIB_VERSION
+#define LIBRARY_REVISION  LIB_REVISION
+#define LIBRARY_IDSTRING  STR( LIB_FILE )" "                         \
+                          STR( LIB_VERSION )".00"STR( LIB_REVISION ) \
+                          " "LIB_DATE" "STR( LIB_CPU )" "            \
+                          STR( LIB_COMPILER )" "STR( LIB_HOST )
 
 /******************************************************************************
  * SegList pointer definition
@@ -118,7 +92,7 @@ struct BaseLibrary {
 /******************************************************************************
  * Now go ahead and implement these functions in your library adapter code!
  *****************************************************************************/
-LONG CustomLibInit( LIBRARY_TYPE * libBase, struct ExecBase * sysBase );
-VOID CustomLibClose( LIBRARY_TYPE * libBase );
+LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase );
+VOID CustomLibClose( LIBRARY_TYPE * base );
 
 #endif /* LIBRARY_H */

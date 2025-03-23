@@ -27,25 +27,21 @@
  */
 
 /* Activate / De-activate this define to toggle lib base mode! */
-/* #define BASE_GLOBAL */
+#define BASE_GLOBAL /**/
 
 #ifndef BASE_GLOBAL 
 #ifndef NO_BASE_REDEFINE
 /* 
-    either this is active for everything except libinit.c
-    or BASE_GLOBAL is active everywhere
-*/
+ * either this is active for everything except libinit.c
+ * or BASE_GLOBAL is active everywhere
+ */
 #define BASE_REDEFINE
 #endif
 #endif
 
 #include "library.h"
-//#include "libfuncs_impl.h"
 
 #include "SDI_mhi_protos.h"
-
-#define STR_VALUE(x)      #x
-#define STR(x) STR_VALUE(x)
 
 #define AMIGUS_MHI_AUTHOR           "Christoph `Chritoph` Fassbach"
 #define AMIGUS_MHI_COPYRIGHT        "(c) 2025 Christoph Fassbach / LGPL3"
@@ -53,10 +49,7 @@
                                     "Frank Wille (vbcc), "                \
                                     "Thomas Wenzel et al. (MHI)"
 #define AMIGUS_MHI_DECODER          "AmiGUS VS1063a codec"
-#define AMIGUS_MHI_VERSION          STR( LIB_FILE )" "                         \
-                                    STR( LIB_VERSION )".00"STR( LIB_REVISION ) \
-                                    " "LIB_DATE" "STR( LIB_CPU )" "            \
-                                    STR( LIB_COMPILER )" "STR( LIB_HOST )
+#define AMIGUS_MHI_VERSION          LIBRARY_IDSTRING
 
 #define AMIGUS_MHI_FIRMWARE_MINIMUM ( ( 2024 << 20 ) /* year   */ \
                                     + (   12 << 16 ) /* month  */ \

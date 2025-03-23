@@ -14,6 +14,7 @@
 
 #include "config.h"
 
+#include "amigus_mhi.h"
 #include "libfuncs_impl.h"
 #include "SDI_mhi_protos.h"
 
@@ -48,9 +49,8 @@
 #endif
 
 /* strings from version.h */
-_STATIC_ const unsigned short hdr[] = { 0x2456,0x4552,0x3a20 }; /* "$VER: " */
-const char *_LibVersionString = xstr(LIBNAME) " " xstr(LIBVERSION) "." xstr(LIBREVISION) " (" xstr(LIBDATE) ") " xstr(LIBEXTRA) "\r\n";
-const char LibName[] = xstr(LIBNAME);
+const char *_LibVersionString = "$VER: " AMIGUS_MHI_VERSION "\r\n";
+const char LibName[] = STR( LIB_FILE );
 
 const APTR LibFunctions[] = {
 	/* from libfuncs_impl.h */
@@ -89,8 +89,8 @@ struct LibInitData
 	INITBYTE(     STRUCTOFFSET( Node,  ln_Type),         NT_LIBRARY),
 	0x80, (UBYTE) ((LONG)STRUCTOFFSET( Node,  ln_Name)), (ULONG) &LibName[0],
 	INITBYTE(     STRUCTOFFSET(Library,lib_Flags),       LIBF_SUMUSED|LIBF_CHANGED ),
-	INITWORD(     STRUCTOFFSET(Library,lib_Version),     LIBVERSION  ),
-	INITWORD(     STRUCTOFFSET(Library,lib_Revision),    LIBREVISION ),
+	INITWORD(     STRUCTOFFSET(Library,lib_Version),     LIB_VERSION  ),
+	INITWORD(     STRUCTOFFSET(Library,lib_Revision),    LIB_REVISION ),
 	0x80, (UBYTE) ((LONG)STRUCTOFFSET(Library,lib_IdString)), (ULONG) &_LibVersionString,
 	(ULONG) 0
 };

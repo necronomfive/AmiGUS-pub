@@ -27,7 +27,7 @@
  */
 
 /* Activate / De-activate this define to toggle lib base mode! */
-#define BASE_GLOBAL /**/
+/* #define BASE_GLOBAL */
 
 #ifndef BASE_GLOBAL 
 #ifndef NO_BASE_REDEFINE
@@ -41,13 +41,6 @@
 
 // #include "library.h"
 #include "libfuncs_impl.h"
-#define LIB_FILE mhiamigus.library
-#define LIB_VERSION 1
-#define LIB_REVISION 0
-#define LIB_DATE __AMIGADATE__
-#define LIB_CPU 000
-#define LIB_COMPILER VBCC
-#define LIB_HOST cross
 
 #include "SDI_mhi_protos.h"
 

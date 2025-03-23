@@ -1,0 +1,44 @@
+#
+# SAS/C Makefile for I2Clock
+#
+
+LIBTARGET = example_lib.library
+TARGET = libtest
+
+RM	= delete force quiet
+CC	= sc
+LD      = slink
+CFLAGS	= INCLUDEDIR=include NOVER NOICONS nostackcheck math=standard strmerge strsect=code parameters=regs data=near opt optsize ignore 315 
+
+#CFLAGS  = INCLUDEDIR=include NOVER NOICONS nostackcheck math=ieee ignore 315 strmerge strsect=code parameters=regs data=near opt optsize
+#math=ffp
+
+CFLAGS  = $(CFLAGS) DEFINE LIBNAME=example_lib.library 
+#see version.h
+#DEFINE LIBVERSION=1 DEFINE LIBREVISION=2 DEFINE "LIBDATE=23.05.2019"
+LDFLAGS	= NOICONS SC SD ND QUIET 
+#LDFLAGS = LIB sc:lib/scmieee.lib LIB sc:lib/sc.lib $(LDFLAGS)
+LDFLAGS = LIB sc:lib/scm.lib LIB sc:lib/sc.lib $(LDFLAGS)
+# NOVER
+
+# debug stuff
+#CFLAGS  = DEFINE DEBUG=1 $(CFLAGS)
+#LDFLAGS = LIB sc:lib/debug.lib LIB sc:lib/amiga.lib $(LDFLAGS)
+
+LIBOBJS = libheader.o libinit.o libfuncs_impl.o
+
+all:	$(LIBTARGET) $(TARGET)
+
+$(LIBTARGET) : $(LIBOBJS)
+	$(LD) $(LIBOBJS) $(LDFLAGS) TO $(LIBTARGET)
+
+$(TARGET): libtest.o
+	$(LD) sc:lib/c.o libtest.o $(LDFLAGS) TO $(TARGET)
+
+clean:
+	-$(RM) $(LIBTARGET) $(LIBOBJS) #?.lnk 
+
+# dependencies
+libheader.o: libheader.c compiler.h libfuncs_impl.h config.h version.h
+libinit.o : libinit.c compiler.h libfuncs_impl.h config.h version.h
+

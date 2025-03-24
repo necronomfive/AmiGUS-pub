@@ -24,6 +24,9 @@
 
 #include <proto/exec.h>
 
+#include "SDI_compiler.h"
+#include "SDI_mhi_protos.h"
+
 // This file lives before the library is set up completely...
 // so it does not use the default library definitions, hence:
 #define NO_BASE_REDEFINE
@@ -153,7 +156,7 @@ static ASM( LIB_PTR ) SAVEDS LibInit(
     *(( UBYTE * ) p++ ) = 0;
   }
 
-  SysBase = *(( struct Library ** ) 4UL );
+  SysBase = *(( struct ExecBase ** ) 4UL );
 
   InitSemaphore( &base->LockSemaphore );
 
@@ -161,9 +164,9 @@ static ASM( LIB_PTR ) SAVEDS LibInit(
   base->LibNode.lib_IdString = ( APTR ) _LibVersionString;
 
   if ( !CustomLibInit(( LIBRARY_TYPE * ) base,
-                      (struct ExecBase * ) SysBase )) {
+                      ( struct ExecBase * ) SysBase )) {
     
-    return ( struct Library * ) base;
+    return ( LIB_PTR ) base;
   }
 
   CustomLibClose(( LIBRARY_TYPE * ) base );

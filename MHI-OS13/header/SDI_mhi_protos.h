@@ -19,6 +19,7 @@
 
 // TO NEVER BE USED OUTSIDE THE LIBRARY CODE !!!
 
+#include <exec/types.h>
 #include <exec/tasks.h>
 
 #include "SDI_compiler.h"

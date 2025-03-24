@@ -19,22 +19,45 @@
 #include <libraries/configvars.h>
 #include <proto/exec.h>
 
-
-#include "amigus_mhi.h"
-/*
+#include "SDI_mhi_protos.h"
 #include "amigus_codec.h"
 #include "amigus_hardware.h"
-
+#include "amigus_mhi.h"
 #include "debug.h"
 #include "errors.h"
-#include "library.h"
 #include "interrupt.h"
 #include "support.h"
-*/
-#include "SDI_mhi_protos.h"
 
-#define LOG_V(x)
-#define LOG_D(x)
+VOID FlushAllBuffers( struct AmiGUS_MHI_Handle * clientHandle ) {
+
+  struct List * buffers = ( struct List * )&clientHandle->agch_Buffers;
+  struct Node * buffer;
+
+  while ( buffer = RemHead( buffers )) {
+
+    LOG_V(( "V: Removing / free'ing MHI buffer 0x%08lx, "
+      "size %ld LONGs, index %ld\n",
+      buffer,
+      (( struct AmiGUS_MHI_Buffer * ) buffer)->agmb_BufferMax,
+      (( struct AmiGUS_MHI_Buffer * ) buffer)->agmb_BufferIndex ));
+    FreeMem( buffer, sizeof( struct AmiGUS_MHI_Buffer ) );
+  }
+  clientHandle->agch_CurrentBuffer = NULL;
+  LOG_D(( "D: All buffers flushed.\n" ));
+}
+
+VOID UpdateEqualizer( UWORD bandLevel, UWORD percent ) {
+
+  APTR card = AmiGUS_MHI_Base->agb_CardBase;
+  // -32 .. +32 = ((( 0 .. 100 ) * 2655 ) / 4096 ) - 32
+  // gain = percent * 2655 / 4096 - 32
+  LONG intermediate = (( percent * 2655 ) >> 12 ) - 32;
+  WORD gain = ( WORD ) intermediate;
+  LOG_D(( "D: Calculated gain %ld = %ld for %ld%\n",
+          intermediate, gain, percent ));
+
+  UpdateVS1063Equalizer( card, bandLevel, gain );
+}
 
 ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a0, struct Task * task ),
@@ -42,7 +65,60 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a6, struct AmiGUS_MHI * base ) 
 ) {
 
-  return NULL;
+  APTR result = NULL;
+  ULONG error = ENoError;
+
+  LOG_D(( "D: MHIAllocDecoder start\n" ));
+
+  if ( base != AmiGUS_MHI_Base ) {
+
+    DisplayError( ELibraryBaseInconsistency );
+  }
+  Forbid();
+  if ( AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver ) {
+
+    error = EAmiGUSInUseError;
+
+  } else if ( AmiGUS_MHI_Base->agb_UsageCounter ) {
+
+    error = EDriverInUse;
+
+  } else {
+
+    // Now we own the card!
+    ++AmiGUS_MHI_Base->agb_UsageCounter;
+    AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver = AmiGUS_MHI_Base;
+  }
+  Permit();
+
+  if ( !error ) {
+ 
+    APTR card = AmiGUS_MHI_Base->agb_CardBase;
+    struct AmiGUS_MHI_Handle * handle = &AmiGUS_MHI_Base->agb_ClientHandle;
+    handle->agch_Task = task;
+    handle->agch_Signal = signal;
+    handle->agch_Status = MHIF_STOPPED;
+    handle->agch_CurrentBuffer = NULL;
+    NonConflictingNewMinList( &handle->agch_Buffers );
+
+    result = ( APTR ) handle;
+
+    LOG_D(( "D: AmiGUS MHI accepted task 0x%08lx and signal 0x%08lx.\n",
+            task, signal ));
+
+    LOG_D(( "D: Initializing VS1063 codec\n" ));
+    InitVS1063Codec( card );
+    InitVS1063Equalizer( card, TRUE, AmiGUSDefaultEqualizer );
+    CreateInterruptHandler();
+
+  } else {
+
+    // Takes care of the log entry, too. :)
+    DisplayError( error );
+  }
+  
+  LOG_D(( "D: MHIAllocDecoder done\n" ));
+  return result;
 }
 
 ASM( VOID ) SAVEDS MHIFreeDecoder(
@@ -50,6 +126,51 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
+  struct AmiGUS_MHI_Handle * clientHandle =
+    ( struct AmiGUS_MHI_Handle * ) handle;
+  struct Task * task = clientHandle->agch_Task;
+  ULONG signal = clientHandle->agch_Signal;
+  ULONG error = ENoError;
+
+  LOG_D(( "D: MHIFreeDecoder start for task 0x%08lx\n", task ));
+
+  if (( &AmiGUS_MHI_Base->agb_ClientHandle != clientHandle ) ||
+      ( !task )) {
+
+      LOG_W(( "W: AmiGUS MHI does not know task 0x%08lx and signal 0x%08lx"
+        " - hence not free'd.\n",
+        task, signal ));
+      LOG_D(( "D: MHIFreeDecoder done\n" ));
+      return;
+  }
+
+  Forbid();
+  if (( AmiGUS_MHI_Base->agb_UsageCounter ) &&
+      ( AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver == AmiGUS_MHI_Base )) {
+
+    clientHandle->agch_Task = NULL;
+    clientHandle->agch_Signal = 0;
+    --AmiGUS_MHI_Base->agb_UsageCounter;
+    AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver = NULL;
+
+  } else {
+
+    error = EDriverNotInUse;
+  }
+  Permit();
+  if ( error ) {
+
+    DisplayError( error );
+
+  } else {
+
+    FlushAllBuffers( clientHandle );
+
+    LOG_D(( "D: AmiGUS MHI free'd up task 0x%08lx and signal 0x%08lx.\n",
+            task, signal ));
+    DestroyInterruptHandler();
+  }
+  LOG_D(( "D: MHIFreeDecoder done\n" ));
   return;
 }
 
@@ -59,7 +180,49 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
   REG( d0, ULONG size),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
+  struct AmiGUS_MHI_Handle * clientHandle =
+    ( struct AmiGUS_MHI_Handle * ) handle;
+  struct List * buffers = ( struct List * )&clientHandle->agch_Buffers;
+  struct AmiGUS_MHI_Buffer * mhiBuffer;
 
+  LOG_D(( "D: MHIQueueBuffer start\n" ));
+  if ( &AmiGUS_MHI_Base->agb_ClientHandle != handle ) {
+
+    LOG_D(( "D: MHIQueueBuffer failed, unknown handle.\n" ));
+    return FALSE;
+  }
+  if ( ( ULONG ) buffer & 0x00000003 ) {
+
+    LOG_D(( "D: MHIQueueBuffer failed, buffer not LONG aligned.\n" ));
+    return FALSE;
+  }
+
+  mhiBuffer = AllocMem( sizeof( struct AmiGUS_MHI_Buffer ),
+                        MEMF_ANY | MEMF_CLEAR );
+  mhiBuffer->agmb_Buffer = buffer;
+  mhiBuffer->agmb_BufferMax = size >> 2;
+  mhiBuffer->agmb_BufferExtraBytes = size & 0x00000003;
+  if ( mhiBuffer->agmb_BufferExtraBytes ) {
+
+    LOG_W(( "W: Buffer size %ld no multiple of LONG - performance impacted!\n",
+            size ));
+  }
+  LOG_V(( "V: Enqueueing MHI buffer 0x%08lx, current 0x%08lx, data 0x%08lx, "
+          "size %ld BYTEs = %ld LONGs\n",
+          mhiBuffer,
+          clientHandle->agch_CurrentBuffer,
+          buffer,
+          size,
+          mhiBuffer->agmb_BufferMax ));
+  Disable();
+  AddTail( buffers, ( struct Node * ) mhiBuffer );
+  Enable();
+  if ( !(clientHandle->agch_CurrentBuffer )) {
+
+    clientHandle->agch_CurrentBuffer = mhiBuffer;
+  }
+
+  LOG_D(( "D: MHIQueueBuffer done\n" ));
   return TRUE;
 }
 
@@ -68,6 +231,45 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
+  struct AmiGUS_MHI_Handle * clientHandle =
+    ( struct AmiGUS_MHI_Handle * ) handle;
+  struct List * buffers = ( struct List * ) &clientHandle->agch_Buffers;
+  struct AmiGUS_MHI_Buffer * mhiBuffer;
+
+  LOG_D(( "D: MHIGetEmpty start\n" ));
+  for ( mhiBuffer = ( struct AmiGUS_MHI_Buffer * ) buffers->lh_Head ;
+        (( clientHandle->agch_CurrentBuffer )
+          && (( APTR ) clientHandle->agch_CurrentBuffer
+            != ( APTR ) mhiBuffer ));
+        mhiBuffer = ( struct AmiGUS_MHI_Buffer * )
+          mhiBuffer->agmb_Node.mln_Succ ) {
+
+    LOG_V(( "V: Checking for empty @ 0x%08lx\n", mhiBuffer ));
+    if (( mhiBuffer ) &&
+        (( struct AmiGUS_MHI_Buffer * ) buffers != mhiBuffer ) &&
+        ( mhiBuffer->agmb_BufferIndex >= mhiBuffer->agmb_BufferMax )) {
+
+      APTR result = mhiBuffer->agmb_Buffer;
+
+      LOG_V(( "V: Removing / free'ing MHI buffer 0x%08lx, "
+              "size %ld LONGs, index %ld\n",
+              mhiBuffer,
+              mhiBuffer->agmb_BufferMax,
+              mhiBuffer->agmb_BufferIndex ));
+      Disable();
+      Remove(( struct Node * ) mhiBuffer );
+      Enable();
+      FreeMem( mhiBuffer, sizeof( struct AmiGUS_MHI_Buffer ));
+      if ( mhiBuffer == clientHandle->agch_CurrentBuffer ) {
+
+        clientHandle->agch_CurrentBuffer = NULL;
+      }
+
+      return result;
+    }
+  }
+
+  LOG_D(( "D: MHIGetEmpty done\n" ));
   return NULL;
 }
 
@@ -75,8 +277,11 @@ ASM( UBYTE ) SAVEDS MHIGetStatus(
   REG( a3, APTR handle ),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
+  struct AmiGUS_MHI_Handle * clientHandle =
+    ( struct AmiGUS_MHI_Handle * ) handle;
 
-  return ( UBYTE ) 17;
+  LOG_D(( "D: MHIGetStatus %ld start/done\n", clientHandle->agch_Status ));
+  return ( UBYTE ) clientHandle->agch_Status;
 }
 
 ASM( VOID ) SAVEDS MHIPlay(
@@ -84,6 +289,12 @@ ASM( VOID ) SAVEDS MHIPlay(
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
+  struct AmiGUS_MHI_Handle * clientHandle =
+    ( struct AmiGUS_MHI_Handle * ) handle;
+  LOG_D(( "D: MHIPlay start\n" ));
+  StartAmiGusCodecPlayback();
+  clientHandle->agch_Status = MHIF_PLAYING;
+  LOG_D(( "D: MHIPlay done\n" ));
   return;
 }
 
@@ -92,6 +303,13 @@ ASM( VOID ) SAVEDS MHIStop(
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
+  struct AmiGUS_MHI_Handle * clientHandle =
+    ( struct AmiGUS_MHI_Handle * ) handle;
+  LOG_D(( "D: MHIStop start\n" ));
+  StopAmiGusCodecPlayback();
+  FlushAllBuffers( clientHandle );
+  clientHandle->agch_Status = MHIF_STOPPED;
+  LOG_D(( "D: MHIStop done\n" ));
   return;
 }
 
@@ -100,6 +318,19 @@ ASM( VOID ) SAVEDS MHIPause(
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
+  struct AmiGUS_MHI_Handle * clientHandle =
+    ( struct AmiGUS_MHI_Handle * ) handle;
+  LOG_D(( "D: MHIPause start\n" ));
+
+  if ( clientHandle->agch_Status == MHIF_PAUSED ) {
+
+    clientHandle->agch_Status = MHIF_PLAYING;
+
+  } else if( clientHandle->agch_Status == MHIF_PLAYING ) {
+
+    clientHandle->agch_Status = MHIF_PAUSED;
+  }
+  LOG_D(( "D: MHIPause done\n" ));
   return;
 }
 
@@ -179,5 +410,53 @@ ASM( VOID ) SAVEDS MHISetParam(
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
+  struct AmiGUS_MHI_Handle * clientHandle =
+    ( struct AmiGUS_MHI_Handle * ) handle;
+
+  LOG_D(( "D: MHISetParam start\n" ));
+  LOG_D(( "V: Param %ld, Value %ld\n", param, value ));
+
+  switch ( param ) {
+    // 0=muted .. 100=0dB
+    case MHIP_VOLUME:
+    // 0=left .. 50=center .. 100=right
+    case MHIP_PANNING:
+    // 0=stereo .. 100=mono
+    case MHIP_CROSSMIXING:
+    // For all Equilizer:
+    // 0=max.cut .. 50=unity gain .. 100=max.boost
+    case MHIP_BASS: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL1, value );
+      break;
+    }
+    case MHIP_MIDBASS: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL2, value );
+      break;
+    }
+    case MHIP_MID: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL3, value );
+      break;
+    }
+    case MHIP_MIDHIGH: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL4, value );
+      break;
+    }
+    case MHIP_TREBLE: {
+      
+      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL5, value );
+      break;
+    }
+    case MHIP_PREFACTOR:
+    default:
+      LOG_W(( "W: MHISetParam cannot set param %ld to Value %ld yet\n",
+              param, value ));
+      break;
+  }
+
+  LOG_D(( "D: MHISetParam done\n" ));
   return;
 }

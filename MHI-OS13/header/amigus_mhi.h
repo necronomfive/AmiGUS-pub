@@ -41,8 +41,6 @@
 
 #include "library.h"
 
-#include "SDI_mhi_protos.h"
-
 #define AMIGUS_MHI_AUTHOR           "Christoph `Chritoph` Fassbach"
 #define AMIGUS_MHI_COPYRIGHT        "(c) 2025 Christoph Fassbach / LGPL3"
 #define AMIGUS_MHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \

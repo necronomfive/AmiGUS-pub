@@ -17,7 +17,10 @@
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
+#include <exec/types.h>
+#include <exec/execbase.h>
 #include <exec/libraries.h>
+#include <exec/semaphores.h>
 #include <libraries/dos.h>
 
 /******************************************************************************
@@ -74,13 +77,15 @@ struct BaseLibrary {
   UWORD                         Unused0;                 /* better alignment */
   SEGLISTPTR                    SegList;
   struct SignalSemaphore        LockSemaphore;
-  struct Library              * SysBase;
+  struct ExecBase             * SysBase;
 };
 
 /******************************************************************************
  * Define your library's base type here, will be used in library.c.
  *****************************************************************************/
 #define LIBRARY_TYPE      struct AmiGUS_MHI
+
+LIBRARY_TYPE;
 
 /******************************************************************************
  * Your library's own base structure shall have its own include,

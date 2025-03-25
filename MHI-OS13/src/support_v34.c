@@ -86,13 +86,13 @@ VOID ShowError( STRPTR title, STRPTR message, STRPTR button ) {
   negative.NextText = NULL;
 
   window = BuildSysRequest(
-    ( struct Window * ) NULL,
-    ( struct IntuiText * ) &body, // body IntuiText
-    ( struct IntuiText * ) NULL, // positive IntuiText
+    ( struct Window * ) NULL,         // parent Window
+    ( struct IntuiText * ) &body,     // body IntuiText
+    ( struct IntuiText * ) NULL,      // positive IntuiText
     ( struct IntuiText * ) &negative, // negative IntuiText
-    ( ULONG ) IDCMP_GADGETUP, // flags
-    ( UWORD ) 640, // width
-    ( UWORD ) 50 // height
+    ( ULONG ) IDCMP_GADGETUP,         // flags
+    ( UWORD ) 640,                    // width
+    ( UWORD ) 50                      // height
   );
   SetWindowTitles( window, title, NULL /*"screen title"*/ );
   Wait( 1L << window->UserPort->mp_SigBit );

@@ -38,8 +38,15 @@ struct AmiGUS_MHI        * AmiGUS_MHI_Base   = 0;
 
 #endif
 
+// # d e fine USE_FAKE_DEVICE
+
 /* Closes all the libraries opened by LibInit() */
 VOID CustomLibClose( LIBRARY_TYPE * base ) {
+
+#ifdef USE_FAKE_DEVICE
+  FreeMem( base->agb_CardBase, 256);
+  FreeMem( base->agb_ConfigDevice, sizeof( struct ConfigDev ));
+#endif
 
 #ifndef BASE_GLOBAL
   struct ExecBase *SysBase = base->agb_SysBase;
@@ -156,7 +163,13 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 #endif
 
   LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", base));
+#ifndef USE_FAKE_DEVICE
   error = FindAmiGusCodec( base );
+#else
+  base->agb_CardBase = AllocMem( 256, MEMF_PUBLIC | MEMF_CLEAR );
+  base->agb_ConfigDevice = AllocMem( sizeof( struct ConfigDev ),
+                                     MEMF_PUBLIC | MEMF_CLEAR );
+#endif
   if ( error ) {
 
     DisplayError( error );

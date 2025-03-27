@@ -87,7 +87,7 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
     // Now we own the card!
     ++AmiGUS_MHI_Base->agb_UsageCounter;
-    AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver = AmiGUS_MHI_Base;
+    AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver = ( APTR ) AmiGUS_MHI_Base;
   }
   Permit();
 
@@ -146,7 +146,8 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 
   Forbid();
   if (( AmiGUS_MHI_Base->agb_UsageCounter ) &&
-      ( AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver == AmiGUS_MHI_Base )) {
+      ( AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver
+        == ( APTR ) AmiGUS_MHI_Base )) {
 
     clientHandle->agch_Task = NULL;
     clientHandle->agch_Signal = 0;
@@ -186,7 +187,7 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
   struct AmiGUS_MHI_Buffer * mhiBuffer;
 
   LOG_D(( "D: MHIQueueBuffer start\n" ));
-  if ( &AmiGUS_MHI_Base->agb_ClientHandle != handle ) {
+  if ( &AmiGUS_MHI_Base->agb_ClientHandle != clientHandle ) {
 
     LOG_D(( "D: MHIQueueBuffer failed, unknown handle.\n" ));
     return FALSE;
@@ -198,8 +199,8 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
   }
 
   mhiBuffer = AllocMem( sizeof( struct AmiGUS_MHI_Buffer ),
-                        MEMF_ANY | MEMF_CLEAR );
-  mhiBuffer->agmb_Buffer = buffer;
+                        MEMF_PUBLIC | MEMF_CLEAR );
+  mhiBuffer->agmb_Buffer = ( ULONG * ) buffer;
   mhiBuffer->agmb_BufferMax = size >> 2;
   mhiBuffer->agmb_BufferExtraBytes = size & 0x00000003;
   if ( mhiBuffer->agmb_BufferExtraBytes ) {
@@ -249,7 +250,7 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
         (( struct AmiGUS_MHI_Buffer * ) buffers != mhiBuffer ) &&
         ( mhiBuffer->agmb_BufferIndex >= mhiBuffer->agmb_BufferMax )) {
 
-      APTR result = mhiBuffer->agmb_Buffer;
+      APTR result = ( APTR ) mhiBuffer->agmb_Buffer;
 
       LOG_V(( "V: Removing / free'ing MHI buffer 0x%08lx, "
               "size %ld LONGs, index %ld\n",

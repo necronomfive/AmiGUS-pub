@@ -38,10 +38,10 @@ VOID DisplayError( ULONG aError );
 VOID LogTicks( UBYTE bitmask );
 
 /**
- * Waits for some milli seconds... almost,
- * assuming 1 second has 1024 milliseconds.
+ * Waits for some time using timer device.
+ *
  */
-VOID Sleep( UWORD pseudomillis );
+VOID Sleep( ULONG seconds, ULONG micros );
 
 /**
  * Correctly initializes an empty, new MinList.
@@ -50,5 +50,15 @@ VOID Sleep( UWORD pseudomillis );
  *             all former content would be orphaned.
  */
 VOID NonConflictingNewMinList( struct MinList * list );
+
+VOID ShowError( STRPTR title, STRPTR message, STRPTR button );
+
+VOID ShowAlert( ULONG alertNum );
+
+struct MsgPort * CreatePort( BYTE * name, LONG priority );
+VOID DeletePort( struct MsgPort * port );
+
+struct IORequest * CreateExtIO( struct MsgPort * port, ULONG ioSize );
+VOID DeleteExtIO( struct IORequest * ioReq );
 
 #endif /* SUPPORT_H */

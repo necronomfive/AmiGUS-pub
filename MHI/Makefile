@@ -89,7 +89,9 @@ A_SRCS          = $(wildcard $(SDIR)$(WILDCARD).asm)
 BDIR_A_SRCS     = $(foreach A_SRC,$(A_SRCS),$(subst $(SDIR),$(BDIR),$(A_SRC)))
 BDIR_A_OBJS     = $(BDIR_A_SRCS:%asm=%o)
 
-LIB_OBJS        = $(BDIR_C_OBJS) $(BDIR_A_OBJS)
+LIB_OBJS        = $(BDIR)library.o \
+                  $(filter-out %/library.o,$(BDIR_C_OBJS)) \
+                  $(filter-out %/library.o,$(BDIR_A_OBJS))
 
 ###########################
 
@@ -103,7 +105,7 @@ ifdef USEVBCC
   endif
 
   AFLAGS        = -I$(NDK_ASM_INCLUDE) -quiet -phxass -Fhunk -o
-  CFLAGS        = -O2 -c                                           \
+  CFLAGS        = +kick13 -c -Os -+ -c99 -cpu=68000                \
                   -I$(MHI_INCLUDE) -I$(HDIR)                       \
                   -D__NOLIBBASE__                                  \
                   -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__  \
@@ -111,14 +113,25 @@ ifdef USEVBCC
                   -DLIB_REVISION=$(LIB_REVISION) -DLIB_CPU=000     \
                   -DLIB_COMPILER=VBCC -DLIB_HOST=$(LIB_HOST)       \
                   -o
-  LFLAGS        = -nostdlib -o
+
+  AUS_CFLAGS        = -O2 -c                                           \
+                  -I$(MHI_INCLUDE) -I$(HDIR)                       \
+                  -D__NOLIBBASE__                                  \
+                  -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__  \
+                  -DLIB_VERSION=$(LIB_VERSION)                     \
+                  -DLIB_REVISION=$(LIB_REVISION) -DLIB_CPU=000     \
+                  -DLIB_COMPILER=VBCC -DLIB_HOST=$(LIB_HOST)       \
+                  -o
+  LFLAGS        = -bamigahunk -x -s -mrel -Cvbcc -Bstatic -nostdlib -o
   LFLAGS1       =
   LFLAGST1      = $(LDIR)startup.o
   LFLAGST2      = $(LDIR)auto.lib $(LDIR)vc.lib
   # add -v below to see what vbcc does under the hood :)
-  CC            = vc +aos68k
+  CC            = vc 
+  XXX = +aos68k
   AS            = vasmm68k_mot
-  LD            = vc +aos68k
+  LD            = vlink 
+  yyy = vc +aos68k
 else
   AFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(HOST_TOOLCHAIN)   \
                   IDIR=$(MHI_INCLUDE) IDIR=NDK_3.2:Include_I IDIR=$(HDIR)      \

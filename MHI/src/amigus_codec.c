@@ -73,7 +73,7 @@ LONG FindAmiGusCodec( struct AmiGUS_MHI * base ) {
          year, month, day, hour, minute));
 
   base->agb_ConfigDevice = configDevice;
-  base->agb_CardBase = (struct AmiGUS *)configDevice->cd_BoardAddr;
+  base->agb_CardBase = ( APTR ) configDevice->cd_BoardAddr;
   LOG_I(( "I: AmiGUS found at 0x%08lx\n",
           base->agb_CardBase ));
   LOG_V(( "V: AmiGUS address stored at 0x%08lx\n",

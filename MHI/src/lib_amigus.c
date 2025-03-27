@@ -18,9 +18,8 @@
 #include <libraries/expansionbase.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
-#include <proto/utility.h>
 
-// #include "amigus_codec.h"
+#include "amigus_codec.h"
 #include "amigus_mhi.h"
 #include "debug.h"
 #include "errors.h"
@@ -39,22 +38,27 @@ struct AmiGUS_MHI        * AmiGUS_MHI_Base   = 0;
 
 #endif
 
-/* Closes all the libraries opened by LibInit() */
-VOID CustomLibClose( struct BaseLibrary * libBase ) {
+// # d e fine USE_FAKE_DEVICE
 
-  struct AmiGUS_MHI * base = ( struct AmiGUS_MHI * ) libBase;
+/* Closes all the libraries opened by LibInit() */
+VOID CustomLibClose( LIBRARY_TYPE * base ) {
+
+#ifdef USE_FAKE_DEVICE
+  FreeMem( base->agb_CardBase, 256);
+  FreeMem( base->agb_ConfigDevice, sizeof( struct ConfigDev ));
+#endif
 
 #ifndef BASE_GLOBAL
   struct ExecBase *SysBase = base->agb_SysBase;
 #endif
 
-  if( base->agb_TimerBase ) {
+  if ( base->agb_TimerBase ) {
 
     CloseDevice( base->agb_TimerRequest );
   }
-  if( base->agb_TimerRequest ) {
+  if ( base->agb_TimerRequest ) {
 
-    FreeMem( base->agb_TimerRequest, sizeof(struct IORequest) );
+    FreeMem( base->agb_TimerRequest, sizeof( struct IORequest ));
   }  
   if ( base->agb_LogFile ) {
 
@@ -69,23 +73,22 @@ VOID CustomLibClose( struct BaseLibrary * libBase ) {
   }    
   */
 
-  if( base->agb_DOSBase ) {
+  if ( base->agb_DOSBase ) {
 
-    CloseLibrary( (struct Library *) base->agb_DOSBase );
+    CloseLibrary(( struct Library *) base->agb_DOSBase );
   }
-  if( base->agb_IntuitionBase ) {
+  if ( base->agb_IntuitionBase ) {
 
-    CloseLibrary( (struct Library *) base->agb_IntuitionBase );
+    CloseLibrary(( struct Library * ) base->agb_IntuitionBase );
   }
-  if( base->agb_ExpansionBase ) {
+  if ( base->agb_ExpansionBase ) {
 
-    CloseLibrary( (struct Library *) base->agb_ExpansionBase );
+    CloseLibrary(( struct Library * ) base->agb_ExpansionBase );
   }
 }
 
-LONG CustomLibInit( struct BaseLibrary * libBase, struct ExecBase * sysBase ) {
+LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 
-  struct AmiGUS_MHI * base = ( struct AmiGUS_MHI * ) libBase;
   LONG error;
 
   /* Prevent use of customized library versions on CPUs not targetted. */
@@ -121,30 +124,30 @@ LONG CustomLibInit( struct BaseLibrary * libBase, struct ExecBase * sysBase ) {
   base->agb_LogMem = NULL;
 
   base->agb_DOSBase =
-    (struct DosLibrary *) OpenLibrary("dos.library", 34);
-  if( !(base->agb_DOSBase) ) {
+    ( struct DosLibrary * ) OpenLibrary( "dos.library", 34 );
+  if ( !( base->agb_DOSBase )) {
 
     return EOpenDosBase;
   }
   base->agb_IntuitionBase =
-    (struct IntuitionBase *) OpenLibrary("intuition.library", 36);
-  if( !(base->agb_IntuitionBase) ) {
+    ( struct IntuitionBase * ) OpenLibrary( "intuition.library", 34 );
+  if ( !( base->agb_IntuitionBase )) {
 
     return EOpenIntuitionBase;
   }
   base->agb_ExpansionBase =
-    (struct Library *) OpenLibrary("expansion.library", 34);
-  if( !(base->agb_ExpansionBase) ) {
+    ( struct Library * ) OpenLibrary( "expansion.library", 34 );
+  if ( !( base->agb_ExpansionBase )) {
 
     return EOpenExpansionBase;
   }
-  base->agb_TimerRequest = AllocMem( sizeof(struct IORequest),
-                                     MEMF_ANY | MEMF_CLEAR );
-  if( !(base->agb_TimerRequest) ) {
+  base->agb_TimerRequest = AllocMem( sizeof( struct IORequest ),
+                                     MEMF_PUBLIC | MEMF_CLEAR );
+  if( !( base->agb_TimerRequest )) {
 
     return EAllocateTimerRequest;
   }
-  error = OpenDevice("timer.device", 0, base->agb_TimerRequest, 0);
+  error = OpenDevice( "timer.device", 0, base->agb_TimerRequest, 0 );
   if ( error ) {
 
     return EOpenTimerDevice;
@@ -160,7 +163,13 @@ LONG CustomLibInit( struct BaseLibrary * libBase, struct ExecBase * sysBase ) {
 #endif
 
   LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", base));
-  // error = FindAmiGusCodec( base );
+#ifndef USE_FAKE_DEVICE
+  error = FindAmiGusCodec( base );
+#else
+  base->agb_CardBase = AllocMem( 256, MEMF_PUBLIC | MEMF_CLEAR );
+  base->agb_ConfigDevice = AllocMem( sizeof( struct ConfigDev ),
+                                     MEMF_PUBLIC | MEMF_CLEAR );
+#endif
   if ( error ) {
 
     DisplayError( error );

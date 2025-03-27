@@ -14,6 +14,7 @@
  * along with mhiAmiGUS.library driver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <exec/types.h>
 #include <exec/interrupts.h>
 #include <hardware/intbits.h>
 #include <libraries/mhi.h>
@@ -31,7 +32,7 @@ VOID HandlePlayback( VOID ) {
   APTR card = AmiGUS_MHI_Base->agb_CardBase;
   struct AmiGUS_MHI_Handle * handle = &( AmiGUS_MHI_Base->agb_ClientHandle );
   struct AmiGUS_MHI_Buffer * current = handle->agch_CurrentBuffer;
-  const APTR tail = &( handle->agch_Buffers.mlh_Tail );
+  const APTR tail = ( const APTR ) &( handle->agch_Buffers.mlh_Tail );
   /* Read-back remaining FIFO samples in BYTES */
   LONG reminder = ReadReg16( card, AMIGUS_CODEC_FIFO_USAGE ) << 1;
   /**********************************************************
@@ -81,7 +82,7 @@ VOID HandlePlayback( VOID ) {
       WriteReg32( card, AMIGUS_CODEC_FIFO_WRITE, data );
       copied += 4;
 
-    } else if ( tail != current->agmb_Node.mln_Succ ) {
+    } else if ( tail != ( const APTR ) current->agmb_Node.mln_Succ ) {
 
       LOG_INT(( "INT: ob 0x%08lx i %ld m %ld\n",
                 current,
@@ -173,7 +174,7 @@ BOOL CreateInterruptHandler( VOID ) {
 
     AmiGUS_MHI_Base->agb_Interrupt->is_Node.ln_Pri = 100;
     AmiGUS_MHI_Base->agb_Interrupt->is_Node.ln_Name = "AmiGUS_MHI_Base_INT";
-    AmiGUS_MHI_Base->agb_Interrupt->is_Data = AmiGUS_MHI_Base;
+    AmiGUS_MHI_Base->agb_Interrupt->is_Data = ( APTR ) AmiGUS_MHI_Base;
     AmiGUS_MHI_Base->agb_Interrupt->is_Code = (void (* )())handleInterrupt;
 
     AddIntServer( INTB_PORTS, AmiGUS_MHI_Base->agb_Interrupt );

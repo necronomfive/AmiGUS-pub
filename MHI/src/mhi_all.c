@@ -14,19 +14,19 @@
  * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <exec/types.h>
 #include <libraries/mhi.h>
 #include <libraries/configvars.h>
 #include <proto/exec.h>
 
+#include "SDI_mhi_protos.h"
 #include "amigus_codec.h"
 #include "amigus_hardware.h"
 #include "amigus_mhi.h"
 #include "debug.h"
 #include "errors.h"
-#include "library.h"
 #include "interrupt.h"
 #include "support.h"
-#include "SDI_mhi_protos.h"
 
 VOID FlushAllBuffers( struct AmiGUS_MHI_Handle * clientHandle ) {
 

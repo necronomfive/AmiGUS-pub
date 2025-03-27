@@ -190,7 +190,7 @@ ULONG GetVS1063EndFill( APTR card ) {
                    VS1063_CODEC_SCI_MODE,
                    VS1063_CODEC_F_SM_RESET );
     // page 56 - 11.3 Software Reset
-    Sleep( 4 );
+    Sleep( 0, 4 );
     /*
     // TODO: do we want / need that?
     LOG_D(( "D: ... patching ...\n"));

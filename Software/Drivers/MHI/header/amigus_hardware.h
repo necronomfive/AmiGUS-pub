@@ -32,6 +32,16 @@
 #define AMIGUS_HAGEN_PRODUCT_ID          17
 #define AMIGUS_CODEC_PRODUCT_ID          18
 
+#define AMIGUS_TIMER_START               0x8000
+#define AMIGUS_TIMER_STOP                0x0000
+#define AMIGUS_TIMER_ONCE                0x0001
+#define AMIGUS_TIMER_CONTINOUES          0x0000
+
+#define AMIGUS_TIMER_CLOCK               24576000  /* Hz = 1/s = quarz clock */
+
+#define MILLIS_PER_SECOND                1000
+#define MICROS_PER_SECOND                1000000
+
 /******************************************************************************
  * AmiGUS PCM hardware definitions below
  *****************************************************************************/
@@ -154,12 +164,17 @@
 
 #define AMIGUS_CODEC_SPI_STROBE          0x0000
 
+#define AMIGUS_CODEC_TIMER_CONTROL       0xf0
+#define AMIGUS_CODEC_TIMER_RELOAD        0xf2
+#define AMIGUS_CODEC_TIMER_READ          0xf6
+
 /* AmiGUS Codec Interrupt Flags */
 #define AMIGUS_CODEC_INT_F_FIFO_EMPTY    0x0001
 #define AMIGUS_CODEC_INT_F_FIFO_FULL     0x0002
 #define AMIGUS_CODEC_INT_F_FIFO_WATERMRK 0x0004
 #define AMIGUS_CODEC_INT_F_SPI_FINISH    0x0008
 #define AMIGUS_CODEC_INT_F_VS1063_DRQ    0x0010
+#define AMIGUS_CODEC_INT_F_TIMER         0x4000
 // As above:
 //      AMIGUS_INT_F_SPI_TRANSFER_FINISH 0x0008
 //      AMIGUS_INT_F_SET                 0x8000
@@ -192,34 +207,99 @@
 // VS1063 codec's SDI - Serial Data Interface is SPI port for data
 
 // VS1063 codec's SCIs - Serial Control Interface SPI ports, overview page 43
+#define VS1063_CODEC_SCI_MODE           0x0000 // page 44
 #define VS1063_CODEC_SCI_CLOCKF         0x0003 // page 48
 #define VS1063_CODEC_SCI_WRAM           0x0006 // page 49
 #define VS1063_CODEC_SCI_WRAMADDR       0x0007 // page 49
+#define VS1063_CODEC_SCI_HDAT0          0x0008 // page 50
+#define VS1063_CODEC_SCI_HDAT1          0x0009 // page 50
 
 // VS1063 codec's addresses of memory mapped registers
+// all parameter memory 0x1E00-0x1E3F is mapped to 0xC0C0-0xC0FF - page 49
+#define VS1063_CODEC_ADDRESS_END_FILL   0xC0C6 // 0x1E06 p.70 + 57
+#define VS1063_CODEC_ADDRESS_PLAY_MODE  0xC0C9 // 0x1E09 p.77
+#define VS1063_CODEC_ADDRESS_EQ5_LEVEL1 0xC0D3 // 0x1E13 p.77 (-32 - +32)*0.5dB
+#define VS1063_CODEC_ADDRESS_EQ5_FREQ1  0xC0D4 // 0x1E14 p.77      20 -   150Hz
+#define VS1063_CODEC_ADDRESS_EQ5_LEVEL2 0xC0D5 // 0x1E15 p.77 (-32 - +32)*0.5dB
+#define VS1063_CODEC_ADDRESS_EQ5_FREQ2  0xC0D6 // 0x1E16 p.77 -    50 -  1000Hz
+#define VS1063_CODEC_ADDRESS_EQ5_LEVEL3 0xC0D7 // 0x1E17 p.77 (-32 - +32)*0.5dB
+#define VS1063_CODEC_ADDRESS_EQ5_FREQ3  0xC0D8 // 0x1E18 p.77 -  1000 - 15000Hz
+#define VS1063_CODEC_ADDRESS_EQ5_LEVEL4 0xC0D9 // 0x1E19 p.77 (-32 - +32)*0.5dB
+#define VS1063_CODEC_ADDRESS_EQ5_FREQ4  0xC0DA // 0x1E1A p.77 -  2000 - 15000Hz
+#define VS1063_CODEC_ADDRESS_EQ5_LEVEL5 0xC0DB // 0x1E1B p.77 (-32 - +32)*0.5dB
+#define VS1063_CODEC_ADDRESS_EQ5_UPDATE 0xC0DC // 0x1E1C p.77 strobe for update
+
 #define VS1063_CODEC_ADDRESS_GPIO_DDR   0xC017 // page 86
 #define VS1063_CODEC_ADDRESS_I2S_CONFIG 0xC040 // page 86
 
 // VS1063 codec's magic flag values according to datasheet
+#define VS1063_CODEC_F_SM_LAYER12       0x0002 // page 44
+#define VS1063_CODEC_F_SM_RESET         0x0004 // page 44
+#define VS1063_CODEC_F_SM_CANCEL        0x0008 // page 44
+#define VS1063_CODEC_F_SM_SDINEW        0x0800 // page 44
+#define VS1063_CODEC_F_SM_ENCODE        0x1000 // page 44
+
 #define VS1063_CODEC_F_SC_MULT_5_0X     0xE000 // page 48
+
+#define VS1063_CODEC_F_PL_MO_EQ5_ENABLE 0x20   // page 77
+#define VS1063_CODEC_F_EQ5_UPD_STROBE   0x01   // page 77
 
 #define VS1063_CODEC_F_GPIO_DDR_192k    0xD0   // page 86
 
 #define VS1063_CODEC_F_I2S_CONFIG_RESET 0x00   // page 86
 #define VS1063_CODEC_F_I2S_CONFIG_192k  0x06   // page 86
 
+#define VS1063_CODEC_RESET_DELAY_MICROS 2      // page 56
+#define VS1063_CODEC_RESET_DELAY_TICKS  (( AMIGUS_TIMER_CLOCK \
+                                          * VS1063_CODEC_RESET_DELAY_MICROS ) \
+                                            / MICROS_PER_SECOND )
+
 /******************************************************************************
  * Low-Level hardware access functions
  *****************************************************************************/
 
 UWORD ReadReg16( APTR amiGUS, ULONG offset );
-VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
 ULONG ReadReg32( APTR amiGUS, ULONG offset );
-VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
+UWORD ReadCodecSPI( APTR amiGUS, UWORD SPIregister );  
+UWORD ReadVS1063Mem( APTR amiGUS, UWORD address );
 
+VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
+VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
 VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue );
 VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value );
+
 VOID InitVS1063Codec( APTR amiGUS );
+
+/**
+ * Initializes and sets the equalizer to settings.
+ *
+ * @param amiGUS         Pointer to AmiGUS Codec part card base.
+ * @param enable         TRUE to enable the equalizer,
+ *                       FALSE to disable it.
+ * @param settings       Nine element WORD array, with alternatingly:
+ *                       0 - band 1 setting - between -32 and +32,
+ *                       1 - border frequency 1 -   20 -   150Hz,
+ *                       2 - band 2 setting - between -32 and +32,
+ *                       3 - border frequency 2 -   50 -  1000Hz,
+ *                       4 - band 3 setting - between -32 and +32,
+ *                       5 - border frequency 3 - 1000 - 15000Hz,
+ *                       6 - band 4 setting - between -32 and +32,
+ *                       7 - border frequency 4 - 2000 - 15000Hz,
+ *                       8 - band 5 setting - between -32 and +32.
+ */
+VOID InitVS1063Equalizer( APTR amiGUS, BOOL enable, const WORD * settings );
+
+/**
+ * Updates a single equalizer band to a desired setting.
+ *
+ * @param amiGUS         Pointer to AmiGUS Codec part card base.
+ * @param equalizerLevel One equalizer level between
+ *                       VS1063_CODEC_ADDRESS_EQ5_LEVEL1 and
+ *                       VS1063_CODEC_ADDRESS_EQ5_LEVEL5.
+ * @param value          A new equalizer setting for this frequency band or
+ *                       level, between -32 and +32.
+ */
+VOID UpdateVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value );
 
 /******************************************************************************
  * Low-Level hardware feature lookup tables
@@ -229,5 +309,7 @@ extern const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ];
 extern const STRPTR AmiGUSOutputs[ AMIGUS_OUTPUTS_COUNT ];
 extern const STRPTR AmiGUSInputs[ AMIGUS_INPUTS_COUNT ];
 extern const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ];
+extern const WORD AmiGUSDefaultEqualizer[];
+extern const WORD AmiGUSAmigaAmpEqualizer[];
 
 #endif /* AMIGUS_HARDWARE_H */

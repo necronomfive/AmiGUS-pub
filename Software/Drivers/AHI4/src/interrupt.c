@@ -121,11 +121,11 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
 ) {
   const UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
-                                  AMIGUS_PCM_MAIN_INT_CONTROL );
-  if ( !( status & ( AMIGUS_INT_F_PLAY_FIFO_EMPTY
-                   | AMIGUS_INT_F_PLAY_FIFO_WATERMARK
-                   | AMIGUS_INT_F_REC_FIFO_FULL
-                   | AMIGUS_INT_F_REC_FIFO_WATERMARK ) ) ) {
+                                  AMIGUS_PCM_INT_CONTROL );
+  if ( !( status & ( AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
+                   | AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK
+                   | AMIGUS_PCM_INT_F_REC_FIFO_FULL
+                   | AMIGUS_PCM_INT_F_REC_FIFO_WTRMRK ) ) ) {
 
     return 0;
   }
@@ -134,7 +134,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
     HandlePlayback();
 
-    if ( status & AMIGUS_INT_F_PLAY_FIFO_EMPTY ) {
+    if ( status & AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY ) {
 
       /*
        Recovery from buffer underruns is a bit tricky.
@@ -148,7 +148,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
     HandleRecording();
 
-     if ( status & AMIGUS_INT_F_REC_FIFO_FULL ) {
+     if ( status & AMIGUS_PCM_INT_F_REC_FIFO_FULL ) {
       LOG_INT(( "INT: Signaling recording buffer overflow.\n" ));
       /*
        Recovery from buffer overflow is not so bad...
@@ -161,12 +161,12 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 
   /* Clear AmiGUS control flags here!!! */
   WriteReg16( AmiGUSBase->agb_CardBase,
-              AMIGUS_PCM_MAIN_INT_CONTROL,
+              AMIGUS_PCM_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
-            | AMIGUS_INT_F_PLAY_FIFO_EMPTY
-            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK
-            | AMIGUS_INT_F_REC_FIFO_FULL
-            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK
+            | AMIGUS_PCM_INT_F_REC_FIFO_FULL
+            | AMIGUS_PCM_INT_F_REC_FIFO_WTRMRK );
   /* Signal sub task */
   if ( AmiGUSBase->agb_WorkerReady ) {
 

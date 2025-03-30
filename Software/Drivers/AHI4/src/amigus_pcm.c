@@ -58,11 +58,11 @@ LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase ) {
   }
 
   LOG_V(("V: AmiGUS firmware %08lx\n", serial));
-  minute = (UBYTE)((serial & 0x0000003Ful)      );
-  hour   = (UBYTE)((serial & 0x000007C0ul) >>  6);
-  day    = (UBYTE)((serial & 0x0000F800ul) >> 11);
-  month  = (UBYTE)((serial & 0x000F0000ul) >> 16);
-  year   = (UWORD)((serial & 0xFFF00000ul) >> 20);
+  minute = ( UBYTE )(( serial & 0x0000003Ful )       );
+  hour   = ( UBYTE )(( serial & 0x000007C0ul ) >>  6 );
+  day    = ( UBYTE )(( serial & 0x0000F800ul ) >> 11 );
+  month  = ( UBYTE )(( serial & 0x000F0000ul ) >> 16 );
+  year   = ( UWORD )(( serial & 0xFFF00000ul ) >> 20 );
   LOG_I(("I: AmiGUS firmware date %04ld-%02ld-%02ld, %02ld:%02ld\n",
          year, month, day, hour, minute));
 
@@ -70,7 +70,7 @@ LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase ) {
   LOG_I(( "I: AmiGUS found at 0x%08lx\n",
           amiGUSBase->agb_CardBase ));
   LOG_V(( "V: AmiGUS address stored at 0x%08lx\n",
-          &(amiGUSBase->agb_CardBase )));
+          &( amiGUSBase->agb_CardBase )));
   amiGUSBase->agb_UsageCounter = 0;
 
   return ENoError;
@@ -93,7 +93,7 @@ VOID StartAmiGusPcmPlayback( VOID ) {
               AMIGUS_PCM_SAMPLE_F_DISABLE );
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_FIFO_RESET,
-              AMIGUS_PCM_FIFO_RESET );
+              AMIGUS_PCM_FIFO_RESET_STROBE );
   // Idea: Watermark is here 6 words aka 3 longs,
   //       2 24bit samples, ... 
   // Cool, always a fit for all sample widths.
@@ -102,25 +102,25 @@ VOID StartAmiGusPcmPlayback( VOID ) {
               // Watermark is WORDs, so using LONG value means half
               prefillSize );
   WriteReg16( amiGUS, 
-              AMIGUS_PCM_MAIN_INT_CONTROL, 
+              AMIGUS_PCM_INT_CONTROL, 
               /* Clear interrupt flag bits */
               AMIGUS_INT_F_CLEAR
-            | AMIGUS_INT_F_PLAY_FIFO_EMPTY
-            | AMIGUS_INT_F_PLAY_FIFO_FULL
-            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_FULL
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK );
   WriteReg16( amiGUS,
-              AMIGUS_PCM_MAIN_INT_ENABLE,
+              AMIGUS_PCM_INT_ENABLE,
               /* Clear interrupt mask bits */
               AMIGUS_INT_F_CLEAR
-            | AMIGUS_INT_F_PLAY_FIFO_EMPTY
-            | AMIGUS_INT_F_PLAY_FIFO_FULL
-            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_FULL
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK );
   WriteReg16( amiGUS,
-              AMIGUS_PCM_MAIN_INT_ENABLE,
+              AMIGUS_PCM_INT_ENABLE,
               /* Now set some! */
               AMIGUS_INT_F_SET
-            | AMIGUS_INT_F_PLAY_FIFO_EMPTY
-            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK );
 
   // Now write twice the amount of data into FIFO to kick off playback
   for ( i = prefillSize; 0 < i; --i ) {
@@ -153,20 +153,20 @@ VOID StopAmiGusPcmPlayback( VOID ) {
               AMIGUS_PCM_PLAY_SAMPLE_RATE, 
               AMIGUS_PCM_SAMPLE_F_DISABLE );
   WriteReg16( amiGUS, 
-              AMIGUS_PCM_MAIN_INT_CONTROL, 
+              AMIGUS_PCM_INT_CONTROL, 
               /* Clear interrupt flag bits */
-              AMIGUS_INT_F_PLAY_FIFO_EMPTY
-            | AMIGUS_INT_F_PLAY_FIFO_FULL
-            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
+              AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_FULL
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK );
   WriteReg16( amiGUS,
-              AMIGUS_PCM_MAIN_INT_ENABLE,
+              AMIGUS_PCM_INT_ENABLE,
               /* Clear interrupt mask bits */
-              AMIGUS_INT_F_PLAY_FIFO_EMPTY
-            | AMIGUS_INT_F_PLAY_FIFO_FULL
-            | AMIGUS_INT_F_PLAY_FIFO_WATERMARK );
+              AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_FULL
+            | AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK );
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_FIFO_RESET,
-              AMIGUS_PCM_FIFO_RESET );
+              AMIGUS_PCM_FIFO_RESET_STROBE );
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
 }
 
@@ -184,32 +184,32 @@ VOID StartAmiGusPcmRecording( VOID ) {
               AMIGUS_PCM_SAMPLE_F_DISABLE );
   WriteReg16( amiGUS,
               AMIGUS_PCM_REC_FIFO_RESET,
-              AMIGUS_PCM_FIFO_RESET );
+              AMIGUS_PCM_FIFO_RESET_STROBE );
   // Idea: Watermark is half the FIFO size, much smaller here anyway
   WriteReg16( amiGUS,
               AMIGUS_PCM_REC_FIFO_WATERMARK,
               // Watermark is WORDs, so using LONG value means half
               AMIGUS_PCM_REC_FIFO_LONGS );
   WriteReg16( amiGUS, 
-              AMIGUS_PCM_MAIN_INT_CONTROL, 
+              AMIGUS_PCM_INT_CONTROL, 
               /* Clear interrupt flag bits */
               AMIGUS_INT_F_CLEAR
-            | AMIGUS_INT_F_REC_FIFO_EMPTY
-            | AMIGUS_INT_F_REC_FIFO_FULL
-            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+            | AMIGUS_PCM_INT_F_REC_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_REC_FIFO_FULL
+            | AMIGUS_PCM_INT_F_REC_FIFO_WTRMRK );
   WriteReg16( amiGUS,
-              AMIGUS_PCM_MAIN_INT_ENABLE,
+              AMIGUS_PCM_INT_ENABLE,
               /* Clear interrupt mask bits */
               AMIGUS_INT_F_CLEAR
-            | AMIGUS_INT_F_REC_FIFO_EMPTY
-            | AMIGUS_INT_F_REC_FIFO_FULL
-            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+            | AMIGUS_PCM_INT_F_REC_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_REC_FIFO_FULL
+            | AMIGUS_PCM_INT_F_REC_FIFO_WTRMRK );
   WriteReg16( amiGUS,
-              AMIGUS_PCM_MAIN_INT_ENABLE,
+              AMIGUS_PCM_INT_ENABLE,
               /* Now set some! */
               AMIGUS_INT_F_SET
-            | AMIGUS_INT_F_REC_FIFO_FULL
-            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+            | AMIGUS_PCM_INT_F_REC_FIFO_FULL
+            | AMIGUS_PCM_INT_F_REC_FIFO_WTRMRK );
 
   flags32 = 0xffFFffFF; // TODO: Input Gain here!
   WriteReg32( amiGUS, AMIGUS_PCM_REC_VOLUME, flags32 ); 
@@ -240,21 +240,21 @@ VOID StopAmiGusPcmRecording( VOID ) {
               AMIGUS_PCM_REC_SAMPLE_RATE, 
               AMIGUS_PCM_SAMPLE_F_DISABLE );
   WriteReg16( amiGUS, 
-              AMIGUS_PCM_MAIN_INT_CONTROL, 
+              AMIGUS_PCM_INT_CONTROL, 
               /* Clear interrupt flag bits */
               AMIGUS_INT_F_CLEAR
-            | AMIGUS_INT_F_REC_FIFO_EMPTY
-            | AMIGUS_INT_F_REC_FIFO_FULL
-            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+            | AMIGUS_PCM_INT_F_REC_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_REC_FIFO_FULL
+            | AMIGUS_PCM_INT_F_REC_FIFO_WTRMRK );
   WriteReg16( amiGUS,
-              AMIGUS_PCM_MAIN_INT_ENABLE,
+              AMIGUS_PCM_INT_ENABLE,
               /* Clear interrupt mask bits */
               AMIGUS_INT_F_CLEAR
-            | AMIGUS_INT_F_REC_FIFO_EMPTY
-            | AMIGUS_INT_F_REC_FIFO_FULL
-            | AMIGUS_INT_F_REC_FIFO_WATERMARK );
+            | AMIGUS_PCM_INT_F_REC_FIFO_EMPTY
+            | AMIGUS_PCM_INT_F_REC_FIFO_FULL
+            | AMIGUS_PCM_INT_F_REC_FIFO_WTRMRK );
   WriteReg16( amiGUS,
               AMIGUS_PCM_REC_FIFO_RESET,
-              AMIGUS_PCM_FIFO_RESET );
+              AMIGUS_PCM_FIFO_RESET_STROBE );
   AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;
 }

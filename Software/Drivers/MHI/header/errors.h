@@ -26,6 +26,7 @@ enum TErrorCodes
   /* Insert errors below. */
   /* Global errors 1-99 */
   EWrongDriverCPUVersion,
+  ELibraryBaseInconsistency,
   EOpenDosBase,
   EOpenIntuitionBase,
   EOpenUtilityBase,
@@ -68,6 +69,7 @@ enum TErrorCodes
   /* Hardware errors 200-300 */
   EAmiGUSNotFound = 200,
   EAmiGUSDetectError,
+  EAmiGUSInUseError,
   EAmiGUSFirmwareOutdated,
   EAmiGUSWriteFailed,
   EAmiGUSReadFailed,

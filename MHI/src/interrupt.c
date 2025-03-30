@@ -27,6 +27,18 @@
 #include "debug.h"
 #include "interrupt.h"
 
+VOID SleepTicks( ULONG ticks ) {
+
+  APTR card = AmiGUS_MHI_Base->agb_CardBase;
+  LOG_V(( "V: Sleeping for 2 micros\n" ));
+  WriteReg32( card, AMIGUS_CODEC_TIMER_RELOAD, ticks );
+  WriteReg16( card, 
+              AMIGUS_CODEC_TIMER_CONTROL,
+              AMIGUS_TIMER_ONCE | AMIGUS_TIMER_START );
+  Wait( AmiGUS_MHI_Base->agb_ClientHandle.agch_ResetSignal );
+  LOG_V(( "V: Woke up\n" ));
+}
+
 VOID HandlePlayback( VOID ) {
 
   APTR card = AmiGUS_MHI_Base->agb_CardBase;
@@ -121,15 +133,23 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 ) {
   const UWORD status = ReadReg16( AmiGUS_MHI_Base->agb_CardBase,
                                   AMIGUS_CODEC_INT_CONTROL );
-  if ( !( status & ( AMIGUS_CODEC_INT_F_FIFO_EMPTY
-                   | AMIGUS_CODEC_INT_F_FIFO_WATERMRK )) ) {
+  struct AmiGUS_MHI_Handle * handle = &( AmiGUS_MHI_Base->agb_ClientHandle );
+  LONG handled = 0;
 
-    return 0;
+  if ( status & AMIGUS_CODEC_INT_F_TIMER ) {
+
+    LOG_INT(( "INT: Timer t 0x%08lx s 0x%08lx\n",
+              handle->agch_Task, handle->agch_ResetSignal ));
+    Signal( handle->agch_Task, handle->agch_ResetSignal );
+    handled = 1;
   }
+  if ( status & ( AMIGUS_CODEC_INT_F_FIFO_EMPTY
+                | AMIGUS_CODEC_INT_F_FIFO_WATERMRK )) {
 
-  if ( MHIF_PLAYING == AmiGUS_MHI_Base->agb_ClientHandle.agch_Status ) {
+    handled = 1;
+    if ( MHIF_PLAYING == AmiGUS_MHI_Base->agb_ClientHandle.agch_Status ) {
 
-    HandlePlayback();
+      HandlePlayback();
 /*
     if ( status & AMIGUS_INT_F_PLAY_FIFO_EMPTY ) {
 
@@ -141,16 +161,21 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
       AmiGUS_MHI_Base_Base->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
     }
 */
+    }
   }
 
-  /* Clear AmiGUS control flags here!!! */
-  WriteReg16( AmiGUS_MHI_Base->agb_CardBase,
-              AMIGUS_CODEC_INT_CONTROL,
-              AMIGUS_INT_F_CLEAR
-              | AMIGUS_CODEC_INT_F_FIFO_EMPTY
-              | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
+  if ( handled ) {
 
-  return 1;
+    /* Clear AmiGUS control flags here!!! */
+    WriteReg16( AmiGUS_MHI_Base->agb_CardBase,
+                AMIGUS_CODEC_INT_CONTROL,
+                AMIGUS_INT_F_CLEAR
+                | AMIGUS_CODEC_INT_F_FIFO_EMPTY
+                | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
+                | AMIGUS_CODEC_INT_F_TIMER );
+  }
+
+  return handled;
 }
 
 // TRUE = failure
@@ -175,7 +200,7 @@ BOOL CreateInterruptHandler( VOID ) {
     AmiGUS_MHI_Base->agb_Interrupt->is_Node.ln_Pri = 100;
     AmiGUS_MHI_Base->agb_Interrupt->is_Node.ln_Name = "AmiGUS_MHI_Base_INT";
     AmiGUS_MHI_Base->agb_Interrupt->is_Data = ( APTR ) AmiGUS_MHI_Base;
-    AmiGUS_MHI_Base->agb_Interrupt->is_Code = (void (* )())handleInterrupt;
+    AmiGUS_MHI_Base->agb_Interrupt->is_Code = ( VOID ( * )( )) handleInterrupt;
 
     AddIntServer( INTB_PORTS, AmiGUS_MHI_Base->agb_Interrupt );
 

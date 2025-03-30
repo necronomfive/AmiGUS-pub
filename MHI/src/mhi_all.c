@@ -106,6 +106,10 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     LOG_D(( "D: AmiGUS MHI accepted task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
 
+    handle->agch_ResetSignal = 1L << AllocSignal( -1 );
+    LOG_D(( "D: AmiGUS MHI allocated reset signal 0x%08lx.\n",
+            handle->agch_ResetSignal ));
+
     LOG_D(( "D: Initializing VS1063 codec\n" ));
     InitVS1063Codec( card );
     InitVS1063Equalizer( card, TRUE, AmiGUSDefaultEqualizer );
@@ -118,6 +122,9 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   }
   
   LOG_D(( "D: MHIAllocDecoder done\n" ));
+  LOG_D(( "D: Testing Sleep( 2s )\n" ));
+  SleepTicks( AMIGUS_TIMER_CLOCK << 1 );
+  LOG_D(( "D: .. done\n" ));
   return result;
 }
 
@@ -129,7 +136,7 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
   struct Task * task = clientHandle->agch_Task;
-  ULONG signal = clientHandle->agch_Signal;
+  LONG signal = clientHandle->agch_Signal;
   ULONG error = ENoError;
 
   LOG_D(( "D: MHIFreeDecoder start for task 0x%08lx\n", task ));
@@ -137,12 +144,16 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   if (( &AmiGUS_MHI_Base->agb_ClientHandle != clientHandle ) ||
       ( !task )) {
 
-      LOG_W(( "W: AmiGUS MHI does not know task 0x%08lx and signal 0x%08lx"
-        " - hence not free'd.\n",
-        task, signal ));
-      LOG_D(( "D: MHIFreeDecoder done\n" ));
-      return;
+    LOG_W(( "W: AmiGUS MHI does not know task 0x%08lx and signal 0x%08lx"
+            " - hence not free'd.\n",
+            task, signal ));
+    LOG_D(( "D: MHIFreeDecoder done\n" ));
+    return;
   }
+
+  FreeSignal( clientHandle->agch_ResetSignal );
+  LOG_D(( "D: AmiGUS MHI free'd reset signal 0x%08lx.\n",
+          clientHandle->agch_ResetSignal ));
 
   Forbid();
   if (( AmiGUS_MHI_Base->agb_UsageCounter ) &&
@@ -410,10 +421,10 @@ ASM( VOID ) SAVEDS MHISetParam(
   REG( d1, ULONG value ),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
-
+  /* TODO: needed?
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
-
+  */
   LOG_D(( "D: MHISetParam start\n" ));
   LOG_D(( "V: Param %ld, Value %ld\n", param, value ));
 

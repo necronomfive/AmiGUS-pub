@@ -92,6 +92,12 @@ VOID StartAmiGusCodecPlayback( VOID ) {
   WriteReg16( card,
               AMIGUS_CODEC_FIFO_WATERMARK,
               AMIGUS_CODEC_PLAY_FIFO_WORDS >> 1 );
+  WriteReg32( card,
+              AMIGUS_CODEC_TIMER_RELOAD,
+              0xffFFffFF );
+  WriteReg16( card,
+              AMIGUS_CODEC_TIMER_CONTROL,
+              AMIGUS_TIMER_STOP | AMIGUS_TIMER_ONCE );
   WriteReg16( card,
               AMIGUS_CODEC_INT_ENABLE,
               AMIGUS_INT_F_CLEAR
@@ -99,7 +105,8 @@ VOID StartAmiGusCodecPlayback( VOID ) {
               | AMIGUS_CODEC_INT_F_FIFO_FULL
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_SPI_FINISH
-              | AMIGUS_CODEC_INT_F_VS1063_DRQ );
+              | AMIGUS_CODEC_INT_F_VS1063_DRQ
+              | AMIGUS_CODEC_INT_F_TIMER );
   WriteReg16( card,
               AMIGUS_CODEC_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
@@ -107,12 +114,14 @@ VOID StartAmiGusCodecPlayback( VOID ) {
               | AMIGUS_CODEC_INT_F_FIFO_FULL
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_SPI_FINISH
-              | AMIGUS_CODEC_INT_F_VS1063_DRQ );
+              | AMIGUS_CODEC_INT_F_VS1063_DRQ
+              | AMIGUS_CODEC_INT_F_TIMER );
   WriteReg16( card,
               AMIGUS_CODEC_INT_ENABLE,
               AMIGUS_INT_F_SET
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
-              | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
+              | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
+              | AMIGUS_CODEC_INT_F_TIMER );
   HandlePlayback();
   WriteReg16( card,
               AMIGUS_CODEC_FIFO_CONTROL,
@@ -134,7 +143,8 @@ VOID StopAmiGusCodecPlayback( VOID ) {
               | AMIGUS_CODEC_INT_F_FIFO_FULL
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_SPI_FINISH
-              | AMIGUS_CODEC_INT_F_VS1063_DRQ );
+              | AMIGUS_CODEC_INT_F_VS1063_DRQ
+              | AMIGUS_CODEC_INT_F_TIMER );
   WriteReg16( card,
               AMIGUS_CODEC_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
@@ -142,7 +152,8 @@ VOID StopAmiGusCodecPlayback( VOID ) {
               | AMIGUS_CODEC_INT_F_FIFO_FULL
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_SPI_FINISH
-              | AMIGUS_CODEC_INT_F_VS1063_DRQ );  
+              | AMIGUS_CODEC_INT_F_VS1063_DRQ
+              | AMIGUS_CODEC_INT_F_TIMER );
   WriteReg16( card,
               AMIGUS_CODEC_FIFO_RESET,
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );

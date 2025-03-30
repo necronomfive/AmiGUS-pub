@@ -38,12 +38,6 @@ VOID DisplayError( ULONG aError );
 VOID LogTicks( UBYTE bitmask );
 
 /**
- * Waits for some time using timer device.
- *
- */
-VOID Sleep( ULONG seconds, ULONG micros );
-
-/**
  * Correctly initializes an empty, new MinList.
  *
  * @param list Pointer to MinList to initialize, will be empty afterwards,

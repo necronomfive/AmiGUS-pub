@@ -33,7 +33,6 @@ struct DosLibrary        * DOSBase           = 0;
 struct IntuitionBase     * IntuitionBase     = 0;
 struct Library           * UtilityBase       = 0;
 struct Library           * ExpansionBase     = 0;
-struct Device            * TimerBase         = 0;
 struct AmiGUS_MHI        * AmiGUS_MHI_Base   = 0;
 
 #endif
@@ -52,14 +51,6 @@ VOID CustomLibClose( LIBRARY_TYPE * base ) {
   struct ExecBase *SysBase = base->agb_SysBase;
 #endif
 
-  if ( base->agb_TimerBase ) {
-
-    CloseDevice( base->agb_TimerRequest );
-  }
-  if ( base->agb_TimerRequest ) {
-
-    FreeMem( base->agb_TimerRequest, sizeof( struct IORequest ));
-  }  
   if ( base->agb_LogFile ) {
 
     Close( base->agb_LogFile );
@@ -72,7 +63,6 @@ VOID CustomLibClose( LIBRARY_TYPE * base ) {
     FreeMem( base->agb_LogMem, ... );
   }    
   */
-
   if ( base->agb_DOSBase ) {
 
     CloseLibrary(( struct Library *) base->agb_DOSBase );
@@ -141,24 +131,11 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 
     return EOpenExpansionBase;
   }
-  base->agb_TimerRequest = AllocMem( sizeof( struct IORequest ),
-                                     MEMF_PUBLIC | MEMF_CLEAR );
-  if( !( base->agb_TimerRequest )) {
-
-    return EAllocateTimerRequest;
-  }
-  error = OpenDevice( "timer.device", 0, base->agb_TimerRequest, 0 );
-  if ( error ) {
-
-    return EOpenTimerDevice;
-  }
-  base->agb_TimerBase = base->agb_TimerRequest->io_Device;
 
 #ifdef BASE_GLOBAL
   DOSBase         = base->agb_DOSBase;
   IntuitionBase   = base->agb_IntuitionBase;
   ExpansionBase   = base->agb_ExpansionBase;
-  TimerBase       = base->agb_TimerBase;
   AmiGUS_MHI_Base = base;
 #endif
 

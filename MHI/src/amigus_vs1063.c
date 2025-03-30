@@ -17,6 +17,7 @@
 #include "amigus_hardware.h"
 #include "amigus_vs1063.h"
 #include "debug.h"
+#include "interrupt.h"
 #include "support.h"
 
 UWORD ReadVS1063Mem( APTR card, UWORD address ) {
@@ -105,97 +106,97 @@ VOID UpdateVS1063Equalizer( APTR card, UWORD equalizerLevel, WORD value ) {
 
 ULONG GetVS1063EndFill( APTR card ) {
 
-    ULONG endFill = ReadVS1063Mem( card, VS1063_CODEC_ADDRESS_END_FILL );
-    endFill &= 0x000000FF;
-    endFill |= ( endFill << 24 ) | ( endFill << 16 ) | ( endFill << 8 );
-    return endFill;
-  }
-  
-  /* Private function definitions: */
-  
-  VOID CancelVS1063Playback( APTR card ) {
-  
-    UWORD sciMode;
-    ULONG i;
-    ULONG j;
-  
-    // Need to know what is playing - page 50.
-    // For FLAC, according to page 50 SCI_HDAT1 = 0x664C,
-    // send 12288 end fill bytes according to page 57,
-    // for all others, send >= 2052 end fill bytes.
-    // Will use 3072 BYTEs = 768 LONGs, 
-    // 'cause 3072 * 4 = 12288
-    const UWORD format = ReadCodecSPI( card, VS1063_CODEC_SCI_HDAT1 );
-    const ULONG blockCount = ( 0x664C == format) ? 4: 1;
-    const ULONG blockSize = 768;
-  
-    // Now we need to tell the VS1063 to cleanly (!) stop
-    // so...
-    // Trigger end of 11.5.1 Playing a Whole File - page 57
-  
-    // step 2
-    ULONG endFill = GetVS1063EndFill( card );
-  
-    // Re-Enable DMA so we can feed end fill bytes
-    WriteReg16( card,
-                AMIGUS_CODEC_FIFO_CONTROL,
-                AMIGUS_CODEC_FIFO_F_DMA_ENABLE );
-    // step 3
-    for ( j = 0; j < blockCount; j++ ) {
-      LOG_V(( "V: End of file step 3.%ld\n", j ));
-      for ( i = 0; i < blockSize; ++i) {
-  
-        WriteReg32( card, AMIGUS_CODEC_FIFO_WRITE, endFill );
-      }
-      while( ReadReg32( card, AMIGUS_CODEC_FIFO_USAGE ) );
+  ULONG endFill = ReadVS1063Mem( card, VS1063_CODEC_ADDRESS_END_FILL );
+  endFill &= 0x000000FF;
+  endFill |= ( endFill << 24 ) | ( endFill << 16 ) | ( endFill << 8 );
+  return endFill;
+}
+
+/* Private function definitions: */
+
+VOID CancelVS1063Playback( APTR card ) {
+
+  UWORD sciMode;
+  ULONG i;
+  ULONG j;
+
+  // Need to know what is playing - page 50.
+  // For FLAC, according to page 50 SCI_HDAT1 = 0x664C,
+  // send 12288 end fill bytes according to page 57,
+  // for all others, send >= 2052 end fill bytes.
+  // Will use 3072 BYTEs = 768 LONGs, 
+  // 'cause 3072 * 4 = 12288
+  const UWORD format = ReadCodecSPI( card, VS1063_CODEC_SCI_HDAT1 );
+  const ULONG blockCount = ( 0x664C == format) ? 4: 1;
+  const ULONG blockSize = 768;
+
+  // Now we need to tell the VS1063 to cleanly (!) stop
+  // so...
+  // Trigger end of 11.5.1 Playing a Whole File - page 57
+
+  // step 2
+  ULONG endFill = GetVS1063EndFill( card );
+
+  // Re-Enable DMA so we can feed end fill bytes
+  WriteReg16( card,
+              AMIGUS_CODEC_FIFO_CONTROL,
+              AMIGUS_CODEC_FIFO_F_DMA_ENABLE );
+  // step 3
+  for ( j = 0; j < blockCount; j++ ) {
+    LOG_V(( "V: End of file step 3.%ld\n", j ));
+    for ( i = 0; i < blockSize; ++i) {
+
+      WriteReg32( card, AMIGUS_CODEC_FIFO_WRITE, endFill );
     }
-    // step 4
-    LOG_V(( "V: End of file step 4\n" ));
-    sciMode = ReadCodecSPI( card, VS1063_CODEC_SCI_MODE );
-    sciMode |= VS1063_CODEC_F_SM_CANCEL;
-    WriteCodecSPI( card, VS1063_CODEC_SCI_MODE, sciMode );
-  
-    for ( j = 0; j < 64; ++j ) {
-      // step 5
-      LOG_V(( "V: End of file step 5.%ld\n", j ));
-      for ( i = 0; i < 8; ++i) {
-  
-        WriteReg32( card, AMIGUS_CODEC_FIFO_WRITE, endFill );
-      }
-      // step 6
-      sciMode = ReadVS1063Mem( card, VS1063_CODEC_SCI_MODE );
-      if ( !( sciMode & VS1063_CODEC_F_SM_CANCEL )) {
-  
-        LOG_V(( "V: End of file step 6\n" ));
-        break;
-      }
-    }
-    if ( sciMode & VS1063_CODEC_F_SM_CANCEL ) {
-  
-      LOG_V(( "V: End of file failed - reset\n" ));
-      ResetVS1063( card );
-    }
-    WriteReg16( card,
-                AMIGUS_CODEC_FIFO_CONTROL,
-                AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
-    LOG_V(( "V: Playback ended, HDAT0 = 0x%04lx, HDAT1 = 0x%04lx\n",
-            ReadCodecSPI( card, VS1063_CODEC_SCI_HDAT0 ),
-            ReadCodecSPI( card, VS1063_CODEC_SCI_HDAT1 )));
+    while( ReadReg32( card, AMIGUS_CODEC_FIFO_USAGE ) );
   }
-  
-  VOID ResetVS1063( APTR card ) {
-  
-    LOG_D(( "D: Resetting VS1063 codec...\n"));
-    WriteCodecSPI( card,
-                   VS1063_CODEC_SCI_MODE,
-                   VS1063_CODEC_F_SM_RESET );
-    // page 56 - 11.3 Software Reset
-    Sleep( 0, 4 );
-    /*
-    // TODO: do we want / need that?
-    LOG_D(( "D: ... patching ...\n"));
-    ApplyCompressedVS1063Patch( card, VS1063Patch20191204 );
-    */
-    LOG_D(( "D: ... done.\n"));
+  // step 4
+  LOG_V(( "V: End of file step 4\n" ));
+  sciMode = ReadCodecSPI( card, VS1063_CODEC_SCI_MODE );
+  sciMode |= VS1063_CODEC_F_SM_CANCEL;
+  WriteCodecSPI( card, VS1063_CODEC_SCI_MODE, sciMode );
+
+  for ( j = 0; j < 64; ++j ) {
+    // step 5
+    LOG_V(( "V: End of file step 5.%ld\n", j ));
+    for ( i = 0; i < 8; ++i) {
+
+      WriteReg32( card, AMIGUS_CODEC_FIFO_WRITE, endFill );
+    }
+    // step 6
+    sciMode = ReadVS1063Mem( card, VS1063_CODEC_SCI_MODE );
+    if ( !( sciMode & VS1063_CODEC_F_SM_CANCEL )) {
+
+      LOG_V(( "V: End of file step 6\n" ));
+      break;
+    }
   }
-  
+  if ( sciMode & VS1063_CODEC_F_SM_CANCEL ) {
+
+    LOG_V(( "V: End of file failed - reset\n" ));
+    ResetVS1063( card );
+  }
+  WriteReg16( card,
+              AMIGUS_CODEC_FIFO_CONTROL,
+              AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
+  LOG_V(( "V: Playback ended, HDAT0 = 0x%04lx, HDAT1 = 0x%04lx\n",
+          ReadCodecSPI( card, VS1063_CODEC_SCI_HDAT0 ),
+          ReadCodecSPI( card, VS1063_CODEC_SCI_HDAT1 )));
+}
+
+VOID ResetVS1063( APTR card ) {
+
+  LOG_D(( "D: Resetting VS1063 codec...\n"));
+  WriteCodecSPI( card,
+                 VS1063_CODEC_SCI_MODE,
+                 VS1063_CODEC_F_SM_RESET );
+  // page 56 - 11.3 Software Reset
+//TODO: TEST  SleepTicks( VS1063_CODEC_RESET_DELAY_TICKS );
+
+  /*
+  // TODO: do we want / need that?
+  LOG_D(( "D: ... patching ...\n"));
+  ApplyCompressedVS1063Patch( card, VS1063Patch20191204 );
+  */
+  LOG_D(( "D: ... done.\n"));
+}

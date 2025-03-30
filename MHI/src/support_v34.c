@@ -103,23 +103,3 @@ VOID ShowAlert( ULONG alertNum ) {
 
   Alert13Compat( alertNum );
 }
-
-VOID Sleep( ULONG seconds, ULONG micros ) {
-
-  struct timerequest sleepRequest;
-
-  LOG_V(( "V: Sleeping for %ld %ld\n", seconds, micros ));
-/*
-  CopyMemQuick( AmiGUS_MHI_Base->agb_TimerRequest,
-                &sleepRequest,
-                sizeof( struct timerequest ));
-  sleepRequest.tr_node.io_Command = TR_ADDREQUEST;
-  sleepRequest.tr_time.tv_secs = seconds;
-  sleepRequest.tr_time.tv_micro = micros;
-
-  SendIO(( struct IORequest * ) &sleepRequest );
-  Wait( 1 << sleepRequest.tr_node.io_Message.mn_ReplyPort->mp_SigBit );
-  WaitIO(( struct IORequest * ) &sleepRequest );
-*/
-  LOG_V(( "V: Woke up\n" ));
-}

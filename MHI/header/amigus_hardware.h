@@ -32,6 +32,16 @@
 #define AMIGUS_HAGEN_PRODUCT_ID          17
 #define AMIGUS_CODEC_PRODUCT_ID          18
 
+#define AMIGUS_TIMER_START               0x8000
+#define AMIGUS_TIMER_STOP                0x0000
+#define AMIGUS_TIMER_ONCE                0x0001
+#define AMIGUS_TIMER_CONTINOUES          0x0000
+
+#define AMIGUS_TIMER_CLOCK               24576000  /* Hz = 1/s = quarz clock */
+
+#define MILLIS_PER_SECOND                1000
+#define MICROS_PER_SECOND                1000000
+
 /******************************************************************************
  * AmiGUS PCM hardware definitions below
  *****************************************************************************/
@@ -154,12 +164,17 @@
 
 #define AMIGUS_CODEC_SPI_STROBE          0x0000
 
+#define AMIGUS_CODEC_TIMER_CONTROL       0xf0
+#define AMIGUS_CODEC_TIMER_RELOAD        0xf2
+#define AMIGUS_CODEC_TIMER_READ          0xf6
+
 /* AmiGUS Codec Interrupt Flags */
 #define AMIGUS_CODEC_INT_F_FIFO_EMPTY    0x0001
 #define AMIGUS_CODEC_INT_F_FIFO_FULL     0x0002
 #define AMIGUS_CODEC_INT_F_FIFO_WATERMRK 0x0004
 #define AMIGUS_CODEC_INT_F_SPI_FINISH    0x0008
 #define AMIGUS_CODEC_INT_F_VS1063_DRQ    0x0010
+#define AMIGUS_CODEC_INT_F_TIMER         0x4000
 // As above:
 //      AMIGUS_INT_F_SPI_TRANSFER_FINISH 0x0008
 //      AMIGUS_INT_F_SET                 0x8000
@@ -233,6 +248,11 @@
 
 #define VS1063_CODEC_F_I2S_CONFIG_RESET 0x00   // page 86
 #define VS1063_CODEC_F_I2S_CONFIG_192k  0x06   // page 86
+
+#define VS1063_CODEC_RESET_DELAY_MICROS 2      // page 56
+#define VS1063_CODEC_RESET_DELAY_TICKS  (( AMIGUS_TIMER_CLOCK \
+                                          * VS1063_CODEC_RESET_DELAY_MICROS ) \
+                                            / MICROS_PER_SECOND )
 
 /******************************************************************************
  * Low-Level hardware access functions

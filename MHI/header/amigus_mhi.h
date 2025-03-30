@@ -49,10 +49,10 @@
 #define AMIGUS_MHI_DECODER          "AmiGUS VS1063a codec"
 #define AMIGUS_MHI_VERSION          LIBRARY_IDSTRING
 
-#define AMIGUS_MHI_FIRMWARE_MINIMUM ( ( 2024 << 20 ) /* year   */ \
-                                    + (   12 << 16 ) /* month  */ \
-                                    + (    8 << 11 ) /* day    */ \
-                                    + (   22 <<  6 ) /* hour   */ \
+#define AMIGUS_MHI_FIRMWARE_MINIMUM ( ( 2025 << 20 ) /* year   */ \
+                                    + (    3 << 16 ) /* month  */ \
+                                    + (   24 << 11 ) /* day    */ \
+                                    + (   21 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
 #define AMIGUS_MEM_LOG_MARKER        "********************************"   \
@@ -75,11 +75,12 @@ struct AmiGUS_MHI_Buffer {
 
 struct AmiGUS_MHI_Handle {
   struct Task                 * agch_Task;
-  ULONG                         agch_Signal;
+  LONG                          agch_Signal;
 
   struct MinList                agch_Buffers;
   struct AmiGUS_MHI_Buffer    * agch_CurrentBuffer;
 
+  LONG                          agch_ResetSignal;
   ULONG                         agch_Status;
 };
 
@@ -98,8 +99,6 @@ struct AmiGUS_MHI {
   struct IntuitionBase        * agb_IntuitionBase;
   struct Library              * agb_ExpansionBase;
 
-  struct Device               * agb_TimerBase;
-  struct IORequest            * agb_TimerRequest;
   /* AmiGUS specific member variables */
   struct ConfigDev            * agb_ConfigDevice;
   APTR                          agb_CardBase;
@@ -123,14 +122,12 @@ struct AmiGUS_MHI {
   extern struct Library           * ExpansionBase;
   extern struct IntuitionBase     * IntuitionBase;
   extern struct ExecBase          * SysBase;
-  extern struct Device            * TimerBase;
 #elif defined(BASE_REDEFINE)
   #define AmiGUS_MHI_Base           (base)
   #define DOSBase                   base->agb_DOSBase
   #define ExpansionBase             base->agb_ExpansionBase
   #define IntuitionBase             base->agb_IntuitionBase
   #define SysBase                   base->agb_SysBase
-  #define TimerBase                 base->TimerBase
 #endif
 
 /******************************************************************************

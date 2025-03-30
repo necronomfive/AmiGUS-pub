@@ -33,34 +33,6 @@
 #define Alert13Compat( x )        Alert( x )
 #endif
 
-VOID LogTicks( UBYTE bitmask ) {
-#if OS_1_3_READY
-// TODO
-  struct EClockVal ecv;
-  ULONG ef = ReadEClock( &ecv );
-
-  switch (bitmask) {
-    case 0x00:
-      break;
-    case 0x01:
-      LOG_I(("I: Tick frequency %ld\n", ef));
-      break;
-    case 0x02:
-      LOG_I(("I: Tick low %lu\n", ecv.ev_lo));
-      break;
-    case 0x04:
-      LOG_I(("I: Tick high %lu\n", ecv.ev_hi));
-      break;
-    case 0x03:
-      LOG_I(("I: Tick freq %ld low %ld\n", ef, ecv.ev_lo));
-      break;
-    case 0x07:
-      LOG_I(("I: Tick freq %ld low %ld high %ld\n", ef, ecv.ev_lo, ecv.ev_hi));
-      break;
-  }
-#endif
-}
-
 VOID ShowError( STRPTR title, STRPTR message, STRPTR button ) {
 
   struct IntuiText body;

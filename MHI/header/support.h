@@ -33,11 +33,6 @@
 VOID DisplayError( ULONG aError );
 
 /**
- * Prints some time info.
- */
-VOID LogTicks( UBYTE bitmask );
-
-/**
  * Correctly initializes an empty, new MinList.
  *
  * @param list Pointer to MinList to initialize, will be empty afterwards,
@@ -48,11 +43,5 @@ VOID NonConflictingNewMinList( struct MinList * list );
 VOID ShowError( STRPTR title, STRPTR message, STRPTR button );
 
 VOID ShowAlert( ULONG alertNum );
-
-struct MsgPort * CreatePort( BYTE * name, LONG priority );
-VOID DeletePort( struct MsgPort * port );
-
-struct IORequest * CreateExtIO( struct MsgPort * port, ULONG ioSize );
-VOID DeleteExtIO( struct IORequest * ioReq );
 
 #endif /* SUPPORT_H */

@@ -13,212 +13,221 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-#ifndef LIBRARY_C
-#define LIBRARY_C
 
-/* This file cannot cope with BASE_REDEFINE, blocking that permanently here. */
-#define NO_BASE_REDEFINE
-
-#include <exec/execbase.h>
+#include <exec/types.h>
+#include <exec/libraries.h>
+#include <exec/nodes.h>
 #include <exec/resident.h>
+#include <exec/semaphores.h>
+
+#include <libraries/dos.h>
+
 #include <proto/exec.h>
 
 #include "SDI_compiler.h"
-#include "library.h"
+#include "SDI_mhi_protos.h"
 
-#ifdef __MORPHOS__
-#ifndef RTF_PPC
-#define RTF_PPC (1<<3) /* rt_Init points to a PPC function */
-#endif
-#ifndef FUNCARRAY_32BIT_QUICK_NATIVE
-#define FUNCARRAY_32BIT_QUICK_NATIVE 0xFFFBFFFB
-#endif
-/* To tell the loader that this is a new emulppc elf and not
- * one for the ppc.library. */
-ULONG __amigappc__=1;
-#endif
+// This file lives before the library is set up completely...
+// so it does not use the default library definitions, hence:
+#define NO_BASE_REDEFINE
+#include "amigus_mhi.h"
 
-/************************************************************************/
+/* Private forward declarations */
 
-/* First executable routine of this library; must return an error
-   to the unsuspecting caller */
-LONG ReturnError( VOID ) {
+// 'cause otherwise VBCC does not swallow the ASM macros
+typedef struct Library * LIB_PTR;
 
-  return -1;
+static ASM( LIB_PTR ) SAVEDS LibInit(
+  REG( d0, struct BaseLibrary * base ),
+  REG( a0, SEGLISTPTR seglist ),
+  REG( a6, struct Library * _SysBase ));
+
+static ASM( LIB_PTR ) SAVEDS LibOpen(
+  REG( a6, struct BaseLibrary * base ));
+
+static ASM( SEGLISTPTR ) SAVEDS LibClose(
+  REG( a6, struct BaseLibrary * base ));
+
+static ASM( SEGLISTPTR ) SAVEDS LibExpunge(
+  REG( a6, struct BaseLibrary * base ));
+
+#define SysBase base->SysBase
+
+////////////////////////////////////////////////////////////////////7
+
+ASM( LONG ) SAVEDS LibNull( VOID ) {
+
+    return 0;
 }
+ 
+extern const char LibName[];
+extern const char _LibVersionString[];
+extern const APTR LibInitTab[];
 
-/*****************************************************************************/
+static const struct Resident _00RomTag = {
+  RTC_MATCHWORD,
+  ( struct Resident * ) &_00RomTag,
+  ( APTR ) ( &_00RomTag + 1 ),
+  RTF_AUTOINIT,
+  LIBRARY_VERSI0N,
+  NT_LIBRARY,
+  0,
+  ( STRPTR ) LibName,
+  ( STRPTR ) _LibVersionString,
+  ( APTR ) LibInitTab
+};
 
-/* natural aligned! */
+const char _LibVersionString[] = "$VER: " LIBRARY_IDSTRING "\r\n";
+const char LibName[] = STR( LIBRARY_NAME );
+
+const APTR LibFunctions[] = {
+  /* Basic library open, close, flush functions */
+  ( APTR ) LibOpen,
+  ( APTR ) LibClose,
+  ( APTR ) LibExpunge,
+  ( APTR ) LibNull,
+  /* Real library specific functions */
+  LIBRARY_FUNCTIONS,
+  /* End marker */
+  ( APTR ) -1
+};
+
+#define WORDINIT( _a_ ) UWORD _a_ ##W1; UWORD _a_ ##W2; UWORD _a_ ##ARG;
+#define LONGINIT( _a_ ) UBYTE _a_ ##A1; UBYTE _a_ ##A2; ULONG _a_ ##ARG;
+#define INITBYTE( offset, value )  \
+        0xe000, ( UWORD ) ( offset ), \
+        ( UWORD ) (( value ) << 8 )
+#define INITWORD( offset, value )  \
+        0xd000, ( UWORD ) ( offset ), \
+        ( UWORD ) ( value )
+#define INITLONG( offset, value )  \
+        0xc000, ( UWORD ) ( offset ), \
+        ( UWORD ) (( value ) >> 16 ), ( UWORD ) (( value ) & 0xffff )
+
 struct LibInitData {
 
-  UBYTE i_Type;     UBYTE o_Type;                                     // 2 byte
-  UBYTE  d_Type;    UBYTE p_Type;                                     // 2 byte
-  UWORD i_Name;     UWORD o_Name;     STRPTR d_Name;                  // 8 byte
-  UBYTE i_Flags;    UBYTE o_Flags;                                    // 2 byte
-  UBYTE  d_Flags;   UBYTE p_Flags;                                    // 2 byte
-  UBYTE i_Version;  UBYTE o_Version;  UWORD  d_Version;               // 4 byte
-  UBYTE i_Revision; UBYTE o_Revision; UWORD  d_Revision;              // 4 byte
-  UWORD i_IdString; UWORD o_IdString; STRPTR d_IdString;              // 8 byte
-  ULONG endmark;                                                      // 4 byte
+  WORDINIT( w1 )
+  LONGINIT( l1 )
+  WORDINIT( w2 )
+  WORDINIT( w3 )
+  WORDINIT( w4 )
+  LONGINIT( l2 )
+  ULONG end_initlist;
+
+} LibInitializers = {
+
+  INITBYTE( OFFSET( Node,  ln_Type), NT_LIBRARY ),
+  0x80,
+  ( UBYTE ) (( LONG ) OFFSET( Node,  ln_Name)),
+  ( ULONG ) &LibName[ 0 ],
+  INITBYTE( OFFSET( Library, lib_Flags ), LIBF_SUMUSED | LIBF_CHANGED ),
+  INITWORD( OFFSET( Library, lib_Version ), LIBRARY_VERSI0N  ),
+  INITWORD( OFFSET( Library, lib_Revision ), LIBRARY_REVISION ),
+  0x80,
+  ( UBYTE ) (( LONG ) OFFSET( Library, lib_IdString )),
+  ( ULONG ) &_LibVersionString,
+  ( ULONG ) 0
 };
 
-/*****************************************************************************/
-extern const ULONG LibInitTable[4]; /* the prototype */
+const APTR LibInitTab[] = {
 
-/* The library loader looks for this marker in the memory
-   the library code and data will occupy. It is responsible
-   setting up the Library base data structure. */
-const struct Resident RomTag = {
-
-  RTC_MATCHWORD,                   /* Marker value.                          */
-  (struct Resident *)&RomTag,      /* This points back to itself.            */
-  (struct Resident *)LibInitTable, /* Points somewhere behind this marker.   */
-#ifdef __MORPHOS__
-  RTF_PPC|
-#endif
-  RTF_AUTOINIT,                    /* Set up shall be according to table.    */
-  LIBRARY_VERSION,                 /* Version of this Library.               */
-  NT_LIBRARY,                      /* Defines this module as a Library.      */
-  0,                               /* (Unused) Initialization priority.      */
-  LIBRARY_NAME,                    /* Points to the name of the Library.     */
-  LIBRARY_IDSTRING,                /* Identification string of this Library. */
-  (APTR)&LibInitTable              /* Table is for initializing the Library. */
+  ( APTR ) sizeof( LIBRARY_TYPE ),
+  ( APTR ) &LibFunctions,
+  ( APTR ) &LibInitializers,
+  ( APTR ) LibInit
 };
 
-/*****************************************************************************/
+static ASM( LIB_PTR ) SAVEDS LibInit(
+  REG( d0, struct BaseLibrary * base ),
+  REG( a0, SEGLISTPTR seglist ),
+  REG( a6, struct Library * _SysBase )) {
 
-/* The mandatory reserved library function */
-static ULONG LibReserved( VOID ) {
+  ULONG p = ( ULONG ) base;
+  ULONG t = p + sizeof( LIBRARY_TYPE );
 
-  return 0;
+  if ( !p ) {
+
+    return NULL;
+  }
+
+  p += sizeof( struct Library );
+  while ( p < t ) {
+    
+    *(( UBYTE * ) p++ ) = 0;
+  }
+
+  SysBase = *(( struct ExecBase ** ) 4UL );
+
+  InitSemaphore( &base->LockSemaphore );
+
+  base->SegList = seglist;
+  base->LibNode.lib_IdString = ( APTR ) _LibVersionString;
+
+  if ( !CustomLibInit(( LIBRARY_TYPE * ) base,
+                      ( struct ExecBase * ) SysBase )) {
+    
+    return ( LIB_PTR ) base;
+  }
+
+  CustomLibClose(( LIBRARY_TYPE * ) base );
+  // TODO: more error handling here - FreeMem? Expunge?
+  return NULL;
 }
 
-/* Open the library, as called via OpenLibrary() */
-static ASM(struct Library *) LibOpen( REG(a6, struct BaseLibrary * base) ) {
+static ASM( LIB_PTR ) SAVEDS LibOpen(
+  REG( a6, struct BaseLibrary * base )) {
 
-  /* Prevent delayed expunge and increment opencnt */
+  ObtainSemaphore( &base->LockSemaphore );
+
   base->LibNode.lib_Flags &= ~LIBF_DELEXP;
   base->LibNode.lib_OpenCnt++;
 
-  return &base->LibNode;
+  ReleaseSemaphore( &base->LockSemaphore );
+
+  return ( struct Library * ) base;
 }
 
-/* Expunge the library, remove it from memory */
-static ASM(SEGLISTPTR) LibExpunge( REG(a6, struct BaseLibrary * base) ) {
+static ASM( SEGLISTPTR ) SAVEDS LibClose(
+  REG( a6, struct BaseLibrary * base )) {
 
-  if(!base->LibNode.lib_OpenCnt) {
+  ObtainSemaphore( &base->LockSemaphore );
 
-    SEGLISTPTR seglist = base->SegList;
-    
-    CustomLibClose( base );
-    
-    /* Remove the library from the public list */
-    Remove( (struct Node *) base );
+  if ( base->LibNode.lib_OpenCnt ) {
 
-    /* Free the vector table and the library data */
-    FreeMem(
-      (STRPTR) base - base->LibNode.lib_NegSize,
-      base->LibNode.lib_NegSize + base->LibNode.lib_PosSize );
+    --base->LibNode.lib_OpenCnt;
+  }
 
-    return seglist;
+  ReleaseSemaphore( &base->LockSemaphore );
+  if (( base->LibNode.lib_Flags & LIBF_DELEXP ) &&
+      ( !base->LibNode.lib_OpenCnt )) {
 
-  } else {
+    return LibExpunge( base );
+  }
+
+  return NULL;
+}
+
+static ASM( SEGLISTPTR ) SAVEDS LibExpunge(
+  REG( a6, struct BaseLibrary * base )) {
+
+  SEGLISTPTR ret;
+
+  if ( base->LibNode.lib_OpenCnt ) {
 
     base->LibNode.lib_Flags |= LIBF_DELEXP;
-  }
-  /* Return the segment pointer, if any */
-  return 0;
-}
-
-/* Close the library, as called by CloseLibrary() */
-static ASM(SEGLISTPTR) LibClose( REG(a6, struct BaseLibrary * base) ) {
-
-  if( !(--base->LibNode.lib_OpenCnt) ) {
-
-    if( base->LibNode.lib_Flags & LIBF_DELEXP ) {
-
-      return LibExpunge( base );
-    }
-  }
-  return 0;
-}
-
-/* Initialize library */
-#ifdef __MORPHOS__
-static struct Library * LibInit(
-  struct BaseLibrary * base,
-  SEGLISTPTR seglist, 
-  struct ExecBase *SysBase) {
-#else
-static ASM(struct Library *) LibInit(
-  REG(a0, SEGLISTPTR seglist),
-  REG(d0, struct BaseLibrary * base),
-  REG(a6, struct ExecBase * sysBase) ) {
-#endif
-
-  /* Remember stuff */
-  base->SegList = seglist;
-  if ( !CustomLibInit( base, sysBase ) ) {
-    
-    return &base->LibNode;
+    return NULL;
   }
 
-  CustomLibClose( base );
+  CustomLibClose(( LIBRARY_TYPE * ) base );
 
-  /* Free the vector table and the library data */
-  FreeMem(
-      (STRPTR) base - base->LibNode.lib_NegSize,
-      base->LibNode.lib_NegSize + base->LibNode.lib_PosSize );
+  Forbid();
+  Remove(( struct Node * ) base ); /* Lib no longer in system */
+  Permit();
 
-  return 0;
+  ret = base->SegList;
+  
+  FreeMem(( APTR )(( ULONG ) base - ( ULONG )( base->LibNode.lib_NegSize )),
+          base->LibNode.lib_NegSize + base->LibNode.lib_PosSize );
+
+  return ret;
 }
-
-/************************************************************************/
-
-/*
- * This is the table of functions that make up the library. The first
- * four are mandatory, everything following it are user callable
- * routines. The table is terminated by the value -1.
- */
-static const APTR LibVectors[] = {
-
-#ifdef __MORPHOS__
-  (APTR) FUNCARRAY_32BIT_QUICK_NATIVE,
-#endif
-  (APTR) LibOpen,
-  (APTR) LibClose,
-  (APTR) LibExpunge,
-  (APTR) LibReserved,
-
-  LIBRARY_FUNCTIONS,
-
-  (APTR) -1
-};
-
-static const struct LibInitData LibInitData = {
-
-  0xA0,   (UBYTE) OFFSET(Node,    ln_Type),      NT_LIBRARY,                0,
-  0xC000, (UBYTE) OFFSET(Node,    ln_Name),      LIBRARY_NAME,
-  0xA0,   (UBYTE) OFFSET(Library, lib_Flags),    LIBF_SUMUSED|LIBF_CHANGED, 0,
-  0x90,   (UBYTE) OFFSET(Library, lib_Version),  LIBRARY_VERSION,
-  0x90,   (UBYTE) OFFSET(Library, lib_Revision), LIBRARY_REVISION,
-  0xC000, (UBYTE) OFFSET(Library, lib_IdString), LIBRARY_IDSTRING,
-  0
-};
-
-/*
- * The following data structures and data are responsible for
- * setting up the Library base data structure and the library
- * function vector.
- */
-const ULONG LibInitTable[4] = {
-
-  (ULONG)sizeof( LIBRARY_TYPE ),    /* Size of the base data structure */
-  (ULONG)LibVectors,                /* Points to the function vector */
-  (ULONG)&LibInitData,              /* Library base data structure table */
-  (ULONG)LibInit                    /* Address of the library setup routine */
-};
-
-#endif /* LIBRARY_C */

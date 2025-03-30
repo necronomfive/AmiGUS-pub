@@ -18,28 +18,65 @@
 #include "debug.h"
 #include "SDI_compiler.h"
 
-UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
+UWORD ReadReg16( APTR card, ULONG offset ) {
 
-  return *(( UWORD * )(( ULONG ) amiGUS + offset ));
+  return *(( UWORD * )(( ULONG ) card + offset ));
 }
 
-VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value ) {
+ULONG ReadReg32( APTR card, ULONG offset ) {
 
-  *(( UWORD * )(( ULONG ) amiGUS + offset )) = value;
+  return *(( ULONG * )(( ULONG ) card + offset ));
 }
 
-ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
+INLINE UWORD ReadSPI(
+  APTR card,
+  UWORD SPIregister,
+  UWORD blockedSPImask,
+  UWORD offsetSPIstatus,
+  UWORD offsetSPIaddress,
+  UWORD offsetSPIread,
+  UWORD offsetSPItrigger ) {
 
-  return *(( ULONG * )(( ULONG ) amiGUS + offset ));
+  UWORD status;
+
+  do {
+
+    status = ReadReg16( card, offsetSPIstatus );
+
+  } while ( status & blockedSPImask );
+  WriteReg16( card, offsetSPIaddress, SPIregister );
+  WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
+  do {
+
+    status = ReadReg16( card, offsetSPIstatus );
+
+  } while ( status & blockedSPImask );
+  return ReadReg16( card, offsetSPIread );
 }
 
-VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
+UWORD ReadCodecSPI( APTR card, UWORD SPIregister ) {
 
-  *(( ULONG * )(( ULONG ) amiGUS + offset )) = value;
+  return ReadSPI( card,
+                  SPIregister,
+                  AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,
+                  AMIGUS_CODEC_SPI_STATUS,
+                  AMIGUS_CODEC_SPI_ADDRESS, 
+                  AMIGUS_CODEC_SPI_READ_DATA,
+                  AMIGUS_CODEC_SPI_READ_TRIGGER );
+}
+
+VOID WriteReg16( APTR card, ULONG offset, UWORD value ) {
+
+  *(( UWORD * )(( ULONG ) card + offset )) = value;
+}
+
+VOID WriteReg32( APTR card, ULONG offset, ULONG value ) {
+
+  *(( ULONG * )(( ULONG ) card + offset )) = value;
 }
 
 INLINE VOID WriteSPI(
-  APTR amiGUS,
+  APTR card,
   UWORD SPIregister,
   UWORD SPIvalue,
   UWORD blockedSPImask,
@@ -52,51 +89,24 @@ INLINE VOID WriteSPI(
 
   do {
 
-    status = ReadReg16( amiGUS, offsetSPIstatus );
+    status = ReadReg16( card, offsetSPIstatus );
 
   } while ( status & blockedSPImask );
-  WriteReg16( amiGUS, offsetSPIaddress, SPIregister );
-  WriteReg16( amiGUS, offsetSPIwrite, SPIvalue );
-  WriteReg16( amiGUS, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
+  WriteReg16( card, offsetSPIaddress, SPIregister );
+  WriteReg16( card, offsetSPIwrite, SPIvalue );
+  WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
 }
 
-VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue ) {
+VOID WriteCodecSPI( APTR card, UWORD SPIregister, UWORD SPIvalue ) {
 
-  WriteSPI(
-    amiGUS,
-    SPIregister,
-    SPIvalue,
-    AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,
-    AMIGUS_CODEC_SPI_STATUS,
-    AMIGUS_CODEC_SPI_ADDRESS, 
-    AMIGUS_CODEC_SPI_WRITE_DATA,
-    AMIGUS_CODEC_SPI_WRITE_TRIGGER );
-}
-
-VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
-
-  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
-	WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
-}
-
-VOID InitVS1063Codec( APTR amiGUS ) {
-
-  // Set SC_MULT to XTALI x 5.0 in SC_CLOCKF,
-  // see VS1063a Datasheet, Version: 1.32, 2024-01-31, page 48
-  WriteCodecSPI( amiGUS,
-                 VS1063_CODEC_SCI_CLOCKF,
-                 VS1063_CODEC_F_SC_MULT_5_0X );
-  // Enable I2S Interface at 192kHz sample rate,
-  // see VS1063a Datasheet, Version: 1.32, 2024-01-31, page 86
-  WriteVS1063Mem( amiGUS,
-                  VS1063_CODEC_ADDRESS_GPIO_DDR,
-                  VS1063_CODEC_F_GPIO_DDR_192k );
-  WriteVS1063Mem( amiGUS,
-                  VS1063_CODEC_ADDRESS_I2S_CONFIG,
-                  VS1063_CODEC_F_I2S_CONFIG_RESET );
-  WriteVS1063Mem( amiGUS,
-                  VS1063_CODEC_ADDRESS_I2S_CONFIG,
-                  VS1063_CODEC_F_I2S_CONFIG_192k );
+  WriteSPI( card,
+            SPIregister,
+            SPIvalue,
+            AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,
+            AMIGUS_CODEC_SPI_STATUS,
+            AMIGUS_CODEC_SPI_ADDRESS, 
+            AMIGUS_CODEC_SPI_WRITE_DATA,
+            AMIGUS_CODEC_SPI_WRITE_TRIGGER );
 }
 
 /*
@@ -145,4 +155,41 @@ const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ] = {
   AMIGUS_PCM_S_REC_F_WAVETABLE_SRC,
   // AMIGUS_PCM_S_REC_F_AHI_SRC,
   AMIGUS_PCM_S_REC_F_MIXER_SRC       // What-You-Hear
+};
+
+/*
+ * Some equalizer support info...
+ * AmigaAMP sliders |  MHI EQ5   |         AmiGUS        | Industry
+ *        # |   Hz  | ID |   Hz  | calculated | possible | Standard
+ * ---------+-------+----+-------+------------+----------+----------
+ *        1 |    60 |  3 |    64 |            |          |
+ *        2 |   170 |  3 |    64 |        230 |      150 |      125
+ *        3 |   310 |  7 |   250 |            |          |
+ *        4 |   600 |  7 |   250 |        775 |      775 |      500
+ *        5 |  1000 |  4 |  1000 |            |          |
+ *        6 |  3000 |  4 |  1000 |       4243 |     4243 |     2000
+ *        7 |  6000 |  8 |  4000 |            |          |
+ *        8 | 12000 |  8 |  4000 |      12961 |    12961 |     8000
+ *        9 | 14000 |  5 | 16000 |            |          |
+ *       10 | 16000 |  5 | 16000 |            |          |
+ *
+ * The borders between the frequency bands would be calculated using
+ * log-average: 10^( ( log(a)/log(10) + log(b)/log(10) ) / 2 )
+ *
+ * So much for defining other frequency patterns like:
+ */
+const WORD AmiGUSDefaultEqualizer[ 9 ] = {
+  0, /* +/- 0dB */   125, /* Hz */
+  0, /* +/- 0dB */   500, /* Hz */
+  0, /* +/- 0dB */  2000, /* Hz */
+  0, /* +/- 0dB */  8000, /* Hz */
+  0  /* +/- 0dB */
+};
+
+const WORD AmiGUSAmigaAmpEqualizer[ 9 ] = {
+  0, /* +/- 0dB */   150, /* Hz */
+  0, /* +/- 0dB */   775, /* Hz */
+  0, /* +/- 0dB */  4243, /* Hz */
+  0, /* +/- 0dB */ 12961, /* Hz */
+  0  /* +/- 0dB */
 };

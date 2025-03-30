@@ -159,3 +159,25 @@ VOID StopAmiGusCodecPlayback( VOID ) {
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );
   CancelVS1063Playback( card );
 }
+
+VOID SleepCodecTicks( ULONG ticks ) {
+
+  APTR card = AmiGUS_MHI_Base->agb_CardBase;
+  LONG rounds = 0;
+
+  LOG_V(( "V: Sleeping for %ld ticks\n", ticks ));
+  WriteReg32( card, AMIGUS_CODEC_TIMER_RELOAD, ticks );
+  WriteReg16( card,
+              AMIGUS_CODEC_INT_CONTROL,
+              AMIGUS_INT_F_CLEAR
+              | AMIGUS_CODEC_INT_F_TIMER );
+  WriteReg16( card, 
+              AMIGUS_CODEC_TIMER_CONTROL,
+              AMIGUS_TIMER_ONCE | AMIGUS_TIMER_START );
+  while ( !( AMIGUS_CODEC_INT_F_TIMER 
+          & ReadReg16( card, AMIGUS_CODEC_INT_CONTROL ))) {
+
+    ++rounds;
+  }
+  LOG_V(( "V: Woke up after %ld rounds.\n", rounds ));
+}

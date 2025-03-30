@@ -80,7 +80,6 @@ struct AmiGUS_MHI_Handle {
   struct MinList                agch_Buffers;
   struct AmiGUS_MHI_Buffer    * agch_CurrentBuffer;
 
-  LONG                          agch_ResetSignal;
   ULONG                         agch_Status;
 };
 

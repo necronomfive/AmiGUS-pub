@@ -23,5 +23,6 @@ struct AmiGUS_MHI;
 LONG FindAmiGusCodec( struct AmiGUS_MHI *base );
 VOID StartAmiGusCodecPlayback( VOID );
 VOID StopAmiGusCodecPlayback( VOID );
+VOID SleepCodecTicks( ULONG ticks );
 
 #endif /* AMIGUS_CODEC_H */

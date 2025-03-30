@@ -27,18 +27,6 @@
 #include "debug.h"
 #include "interrupt.h"
 
-VOID SleepTicks( ULONG ticks ) {
-
-  APTR card = AmiGUS_MHI_Base->agb_CardBase;
-  LOG_V(( "V: Sleeping for 2 micros\n" ));
-  WriteReg32( card, AMIGUS_CODEC_TIMER_RELOAD, ticks );
-  WriteReg16( card, 
-              AMIGUS_CODEC_TIMER_CONTROL,
-              AMIGUS_TIMER_ONCE | AMIGUS_TIMER_START );
-  Wait( AmiGUS_MHI_Base->agb_ClientHandle.agch_ResetSignal );
-  LOG_V(( "V: Woke up\n" ));
-}
-
 VOID HandlePlayback( VOID ) {
 
   APTR card = AmiGUS_MHI_Base->agb_CardBase;
@@ -131,22 +119,13 @@ VOID HandlePlayback( VOID ) {
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUS_MHI_Base * base)
 ) {
+
   const UWORD status = ReadReg16( AmiGUS_MHI_Base->agb_CardBase,
                                   AMIGUS_CODEC_INT_CONTROL );
-  struct AmiGUS_MHI_Handle * handle = &( AmiGUS_MHI_Base->agb_ClientHandle );
-  LONG handled = 0;
 
-  if ( status & AMIGUS_CODEC_INT_F_TIMER ) {
-
-    LOG_INT(( "INT: Timer t 0x%08lx s 0x%08lx\n",
-              handle->agch_Task, handle->agch_ResetSignal ));
-    Signal( handle->agch_Task, handle->agch_ResetSignal );
-    handled = 1;
-  }
   if ( status & ( AMIGUS_CODEC_INT_F_FIFO_EMPTY
                 | AMIGUS_CODEC_INT_F_FIFO_WATERMRK )) {
 
-    handled = 1;
     if ( MHIF_PLAYING == AmiGUS_MHI_Base->agb_ClientHandle.agch_Status ) {
 
       HandlePlayback();
@@ -162,20 +141,17 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
     }
 */
     }
-  }
-
-  if ( handled ) {
 
     /* Clear AmiGUS control flags here!!! */
     WriteReg16( AmiGUS_MHI_Base->agb_CardBase,
                 AMIGUS_CODEC_INT_CONTROL,
                 AMIGUS_INT_F_CLEAR
                 | AMIGUS_CODEC_INT_F_FIFO_EMPTY
-                | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
-                | AMIGUS_CODEC_INT_F_TIMER );
+                | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
+    return 1;
   }
 
-  return handled;
+  return 0;
 }
 
 // TRUE = failure

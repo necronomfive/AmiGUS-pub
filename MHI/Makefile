@@ -96,7 +96,7 @@ LIB_OBJS        = $(BDIR)library.o \
 ###########################
 
 # activate VBCC builds by adding `USEVBCC=1` to the make call!
-ifdef USEVBCC
+ifeq (34,$(USEVBCC))
   ifdef AMIGAOS
     LDIR        = vlibos3:
   endif
@@ -105,16 +105,7 @@ ifdef USEVBCC
   endif
 
   AFLAGS        = -I$(NDK_ASM_INCLUDE) -quiet -phxass -Fhunk -o
-  CFLAGS        = +kick13 -c -Os -+ -c99 -cpu=68000                \
-                  -I$(MHI_INCLUDE) -I$(HDIR)                       \
-                  -D__NOLIBBASE__                                  \
-                  -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__  \
-                  -DLIB_VERSION=$(LIB_VERSION)                     \
-                  -DLIB_REVISION=$(LIB_REVISION) -DLIB_CPU=000     \
-                  -DLIB_COMPILER=VBCC -DLIB_HOST=$(LIB_HOST)       \
-                  -o
-
-  AUS_CFLAGS        = -O2 -c                                           \
+  CFLAGS        = -c -Os -+ -c99 -cpu=68000                \
                   -I$(MHI_INCLUDE) -I$(HDIR)                       \
                   -D__NOLIBBASE__                                  \
                   -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__  \
@@ -127,11 +118,34 @@ ifdef USEVBCC
   LFLAGST1      = $(LDIR)startup.o
   LFLAGST2      = $(LDIR)auto.lib $(LDIR)vc.lib
   # add -v below to see what vbcc does under the hood :)
-  CC            = vc 
-  XXX = +aos68k
+  CC            = vc +kick13
   AS            = vasmm68k_mot
   LD            = vlink 
-  yyy = vc +aos68k
+else ifdef USEVBCC
+  ifdef AMIGAOS
+    LDIR        = vlibos3:
+  endif
+  ifdef LINUX
+    LDIR        = $(VBCC)/targets/m68k-amigaos/lib/
+  endif
+
+  AFLAGS        = -I$(NDK_ASM_INCLUDE) -quiet -phxass -Fhunk -o
+  CFLAGS        = -O2 -c                                           \
+                  -I$(MHI_INCLUDE) -I$(HDIR)                       \
+                  -D__NOLIBBASE__                                  \
+                  -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__  \
+                  -DLIB_VERSION=$(LIB_VERSION)                     \
+                  -DLIB_REVISION=$(LIB_REVISION) -DLIB_CPU=000     \
+                  -DLIB_COMPILER=VBCC -DLIB_HOST=$(LIB_HOST)       \
+                  -o
+  LFLAGS        = -bamigahunk -x -s -mrel -Cvbcc -Bstatic -nostdlib -o
+  LFLAGS1       =
+  LFLAGST1      = $(LDIR)startup.o
+  LFLAGST2      = $(LDIR)auto.lib $(LDIR)vc.lib
+  # add -v below to see what vbcc does under the hood :)
+  CC            = vc +aos68k
+  AS            = vasmm68k_mot
+  LD            = vc +aos68k
 else
   AFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(HOST_TOOLCHAIN)   \
                   IDIR=$(MHI_INCLUDE) IDIR=NDK_3.2:Include_I IDIR=$(HDIR)      \
@@ -169,7 +183,9 @@ endif
 all: FOLDERS $(LIB_FILE_DEST)
 
 ECHO:
-	echo $(SRCS)
+	@echo "C-sources: "$(C_SRCS)
+	@echo "ASM-sources: "$(A_SRCS)
+	@echo "USEVBCC: "$(USEVBCC)
 
 install: all
 	$(INSTALL0)

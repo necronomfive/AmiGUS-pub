@@ -26,10 +26,21 @@
 #include "errors.h"
 #include "support.h"
 
+#ifndef IDCMP_GADGETUP
+#define IDCMP_GADGETUP 0x00000040
+#endif /* IDCMP_GADGETUP */
+
 #ifndef INCLUDE_VERSION
 /* Patches to make this compile in NDK1.3 */
 #define AN_Unknown                0x35000000
 #define AO_Unknown                0x00008035
+
+#define AlertCompat( x )          Alert( x, NULL )
+
+#else
+
+#define AlertCompat( x )          Alert( x )
+
 #endif
 
 /**
@@ -82,20 +93,23 @@ struct TErrorMessage errors[] = {
   { EUnknownError, "Unknown error.", "Shit!" }
 };
 
+VOID ShowError_v34( STRPTR title, STRPTR message, STRPTR button, LONG error );
+VOID ShowError_v36( STRPTR title, STRPTR message, STRPTR button, LONG error );
+
 /*
  * Displays an error message, showing the error code and
  * a error message defined in errors[]. If a code can not 
  * be resolved, the EUnknownError text is displayed.
  */
-VOID DisplayError( ULONG aError ) {
+VOID DisplayError( ULONG error ) {
 
   ULONG i = ENoError;
 
-  if ( !aError ) {
+  if ( !error ) {
     return;
   }
 
-  while (( aError != errors[ i ].iError ) &&
+  while (( error != errors[ i ].iError ) &&
          ( EUnknownError != errors[ i ].iError )
         ) {
     i++;
@@ -103,13 +117,26 @@ VOID DisplayError( ULONG aError ) {
 
   if ( IntuitionBase ) {
 
-    ShowError( STR( LIB_FILE ), errors[ i ].iMessage, errors[ i ].iButton );
+    STRPTR title = STR( LIB_FILE );
+    STRPTR message = errors[ i ].iMessage;
+    STRPTR button = errors[ i ].iButton;
+#ifdef INCLUDE_VERSION
+    if ( 36 > IntuitionBase->LibNode.lib_Version ) {
+#endif
 
+      ShowError_v34( title, message, button, error );
+
+#ifdef INCLUDE_VERSION
+    } else {
+
+      ShowError_v36( title, message, button, error );
+    }
+#endif
   } else {
 
-    ShowAlert( AN_Unknown | AG_OpenLib | AO_Unknown );
+    AlertCompat( AN_Unknown | AG_OpenLib | AO_Unknown );
   }
-  LOG_E(( "E: AmiGUS %ld - %s\n", aError, errors[ i ].iMessage ));
+  LOG_E(( "E: AmiGUS %ld - %s\n", error, errors[ i ].iMessage ));
 }
 
 VOID NonConflictingNewMinList( struct MinList * list ) {
@@ -117,4 +144,59 @@ VOID NonConflictingNewMinList( struct MinList * list ) {
   list->mlh_Head = ( struct MinNode * ) &list->mlh_Tail;
   list->mlh_Tail = NULL;
   list->mlh_TailPred = ( struct MinNode * ) list;
+}
+
+VOID ShowError_v34( STRPTR title, STRPTR message, STRPTR button, LONG error ) {
+
+  struct IntuiText body;
+  struct IntuiText negative;
+  struct Window * window;
+
+  LOG_V(( "V: Using V34 requester\n" ));
+  body.BackPen = 0;
+  body.FrontPen = 2;
+  body.DrawMode = 0;
+  body.ITextFont = NULL;
+  body.LeftEdge = 8;
+  body.TopEdge = 5;
+  body.IText = message;
+  body.NextText = NULL;
+
+  negative.BackPen = 0;
+  negative.FrontPen = 2;
+  negative.DrawMode = 0;
+  negative.ITextFont = NULL;
+  negative.LeftEdge = 6;
+  negative.TopEdge = 3;
+  negative.IText = button;
+  negative.NextText = NULL;
+
+  window = BuildSysRequest(
+    ( struct Window * ) NULL,         // parent Window
+    ( struct IntuiText * ) &body,     // body IntuiText
+    ( struct IntuiText * ) NULL,      // positive IntuiText
+    ( struct IntuiText * ) &negative, // negative IntuiText
+    ( ULONG ) IDCMP_GADGETUP,         // flags
+    ( UWORD ) 640,                    // width
+    ( UWORD ) 50                      // height
+  );
+  SetWindowTitles( window, title, NULL /*"screen title"*/ );
+  Wait( 1L << window->UserPort->mp_SigBit );
+  FreeSysRequest( window );
+}
+
+VOID ShowError_v36( STRPTR title, STRPTR message, STRPTR button, LONG error ) {
+
+#ifdef INCLUDE_VERSION
+  struct EasyStruct req;
+
+  LOG_V(( "V: Using V36 requester\n" ));
+  req.es_StructSize = sizeof( struct EasyStruct );
+  req.es_Flags = 0;
+  req.es_Title = title;
+  req.es_TextFormat = "Error %ld : %s";
+  req.es_GadgetFormat = button;
+
+  EasyRequest( NULL, &req, NULL, error, message );
+#endif
 }

@@ -17,6 +17,8 @@
 #ifndef AMIGUS_CODEC_H
 #define AMIGUS_CODEC_H
 
+#include <exec/types.h>
+
 /* Forward declaration here. */
 struct AmiGUS_MHI;
 

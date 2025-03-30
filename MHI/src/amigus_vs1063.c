@@ -14,10 +14,10 @@
  * along with mhiAmiGUS.library driver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "amigus_codec.h"
 #include "amigus_hardware.h"
 #include "amigus_vs1063.h"
 #include "debug.h"
-#include "interrupt.h"
 #include "support.h"
 
 UWORD ReadVS1063Mem( APTR card, UWORD address ) {
@@ -191,7 +191,7 @@ VOID ResetVS1063( APTR card ) {
                  VS1063_CODEC_SCI_MODE,
                  VS1063_CODEC_F_SM_RESET );
   // page 56 - 11.3 Software Reset
-//TODO: TEST  SleepTicks( VS1063_CODEC_RESET_DELAY_TICKS );
+  SleepCodecTicks( VS1063_CODEC_RESET_DELAY_TICKS );
 
   /*
   // TODO: do we want / need that?

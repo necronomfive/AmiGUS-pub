@@ -46,17 +46,80 @@ VOID FlushAllBuffers( struct AmiGUS_MHI_Handle * clientHandle ) {
   LOG_D(( "D: All buffers flushed.\n" ));
 }
 
-VOID UpdateEqualizer( UWORD bandLevel, UWORD percent ) {
+VOID UpdateEqualizer( UBYTE index, UBYTE percent ) {
 
   APTR card = AmiGUS_MHI_Base->agb_CardBase;
-  // -32 .. +32 = ((( 0 .. 100 ) * 2655 ) / 4096 ) - 32
-  // gain = percent * 2655 / 4096 - 32
-  LONG intermediate = (( percent * 2655 ) >> 12 ) - 32;
-  WORD gain = ( WORD ) intermediate;
-  LOG_D(( "D: Calculated gain %ld = %ld for %ld%\n",
-          intermediate, gain, percent ));
+  struct AmiGUS_MHI_Handle * handle = &( AmiGUS_MHI_Base->agb_ClientHandle );
+  UBYTE min = 255;
+  UBYTE max = 0;
+  WORD gain;
+  UBYTE i;
+  UWORD levels[ 5 ] = {
 
-  UpdateVS1063Equalizer( card, bandLevel, gain );
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL1,
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL2,
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL3,
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL4,
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL5
+  };
+
+  // Step 1: store value if changed
+  LOG_V(( "V: UpdateEqualizer index %ld was %ld, new %ld\n",
+          index, handle->agch_MHI_Equalizer[ index ], percent ));
+  if ( handle->agch_MHI_Equalizer[ index ] == percent ) {
+
+    LOG_D(( "D: UpdateEQ: No change, done.\n"));
+    return;
+  }
+  handle->agch_MHI_Equalizer[ index ] = percent;
+
+  // Step 2: calculate min + max values for all bands
+  for ( i = 0; i < 10; ++i ) {
+
+    const UBYTE current = handle->agch_MHI_Equalizer[ i ];
+    if ( current < min ) {
+
+      min = current;
+    }
+    if ( current > max ) {
+
+      max = current;
+    }
+  }
+
+  // Step 3: calculate gain - remember: VERY limited in numerical range!!!
+  gain = handle->agch_MHI_Equalizer[ 10 ];
+  LOG_V(( "V: gain %ld, min %ld, max %ld\n", gain, min, max ));
+  gain -= 50;
+  gain *= 32;
+  gain /= 50;
+  if ( gain >= 0 ) {
+
+    gain *= ( WORD )( 100 - max );
+
+  } else {
+
+    gain *= ( WORD ) min;
+  }
+  gain /= 50;
+  LOG_V(( "V: resulting gain %ld\n", gain ));
+
+  for ( i = 0; i < 10; i += 2 ) {
+
+    // Originally:
+    // -32 .. +32 = ((( 0 .. 100 ) * 2655 ) / 4096 ) - 32
+    // gain = percent * 2655 / 4096 - 32
+    // But here, we are combining 2 sliders,
+    // so range is 0-200 and >> 13 to take the average :)
+    WORD combined = handle->agch_MHI_Equalizer[ i ]
+                    + handle->agch_MHI_Equalizer[ i + 1 ];
+    LONG intermediate = (( combined * 2655 ) >> 13 ) - 32;
+    WORD final = ( WORD ) intermediate + gain;
+    LOG_D(( "D: UpdateEQ: Calculated gain %ld = %ld for %ld%%\n",
+            intermediate, final, combined ));
+
+    UpdateVS1063Equalizer( card, levels[ i>>1 ], final );
+  }
 }
 
 ASM( APTR ) SAVEDS MHIAllocDecoder(
@@ -67,6 +130,7 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
   APTR result = NULL;
   ULONG error = ENoError;
+  ULONG i;
 
   LOG_D(( "D: MHIAllocDecoder start\n" ));
 
@@ -99,6 +163,10 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     handle->agch_Signal = signal;
     handle->agch_Status = MHIF_STOPPED;
     handle->agch_CurrentBuffer = NULL;
+    for ( i = 0; i < sizeof( handle->agch_MHI_Equalizer ) ; ++i ) {
+
+      handle->agch_MHI_Equalizer[ i ] = 50;
+    }
     NonConflictingNewMinList( &handle->agch_Buffers );
 
     result = ( APTR ) handle;
@@ -380,18 +448,18 @@ ASM( ULONG ) SAVEDS MHIQuery(
     case MHIQ_LAYER3:
     case MHIQ_VARIABLE_BITRATE:
     case MHIQ_JOINT_STEREO:
+    case MHIQ_PREFACTOR_CONTROL:
     case MHIQ_BASS_CONTROL:
     case MHIQ_TREBLE_CONTROL:
     case MHIQ_MID_CONTROL:
-    case MHIQ_5_BAND_EQ: {
+    case MHIQ_5_BAND_EQ:
+    case MHIQ_10_BAND_EQ: {
 
       result = MHIF_SUPPORTED;
       break;
     }
     case MHIQ_IS_68K:
     case MHIQ_IS_PPC:
-    case MHIQ_PREFACTOR_CONTROL:
-    case MHIQ_10_BAND_EQ:
     case MHIQ_VOLUME_CONTROL:  // TODO
     case MHIQ_PANNING_CONTROL: // TODO
     case MHIQ_CROSSMIXING:     // TODO
@@ -426,32 +494,61 @@ ASM( VOID ) SAVEDS MHISetParam(
     case MHIP_CROSSMIXING:
     // For all Equilizer:
     // 0=max.cut .. 50=unity gain .. 100=max.boost
-    case MHIP_BASS: {
-      
-      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL1, value );
+    case MHIP_BAND1: {
+
+      UpdateEqualizer( 0, value );
       break;
     }
-    case MHIP_MIDBASS: {
-      
-      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL2, value );
+    case MHIP_BAND2: {
+
+      UpdateEqualizer( 1, value );
       break;
     }
-    case MHIP_MID: {
-      
-      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL3, value );
+    case MHIP_BAND3: {
+
+      UpdateEqualizer( 2, value );
       break;
     }
-    case MHIP_MIDHIGH: {
-      
-      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL4, value );
+    case MHIP_BAND4: {
+
+      UpdateEqualizer( 3, value );
       break;
     }
-    case MHIP_TREBLE: {
-      
-      UpdateEqualizer( VS1063_CODEC_ADDRESS_EQ5_LEVEL5, value );
+    case MHIP_BAND5: {
+
+      UpdateEqualizer( 4, value );
       break;
     }
-    case MHIP_PREFACTOR:
+    case MHIP_BAND6: {
+
+      UpdateEqualizer( 5, value );
+      break;
+    }
+    case MHIP_BAND7: {
+
+      UpdateEqualizer( 6, value );
+      break;
+    }
+    case MHIP_BAND8: {
+
+      UpdateEqualizer( 7, value );
+      break;
+    }
+    case MHIP_BAND9: {
+
+      UpdateEqualizer( 8, value );
+      break;
+    }
+    case MHIP_BAND10: {
+
+      UpdateEqualizer( 9, value );
+      break;
+    }
+    case MHIP_PREFACTOR: {
+
+      UpdateEqualizer( 10, value );
+      break;
+    }
     default:
       LOG_W(( "W: MHISetParam cannot set param %ld to Value %ld yet\n",
               param, value ));

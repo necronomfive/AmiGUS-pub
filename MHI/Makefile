@@ -66,7 +66,7 @@ HDIR   = header/
 LIB_NAME        = mhiamigus
 LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
-LIB_REVISION    = 2
+LIB_REVISION    = 3
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS      =
@@ -226,9 +226,29 @@ test_dialog: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
 
+test_equalizer: FOLDERS $(LIB_OBJS)
+	@echo " "
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
+            $(BDIR)mhi_all.o \
+            $(BDIR)debug.o $(BDIR)support.o \
+            $(LFLAGST2)
+	@echo " "
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
+
 test_file: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
+
+test_math: FOLDERS $(LIB_OBJS)
+	@echo " "
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) test/$@.o \
+            $(BDIR)math.o
+	@echo " "
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
 
 test_playback: FOLDERS $(LIB_OBJS)
 	@echo " "

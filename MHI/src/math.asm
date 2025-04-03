@@ -20,14 +20,16 @@
 
 	section text,code
 
-* in d0, d1
-* out d0 = d0 / d1
+* Math glue function for SAS/C, used e.g. in MHI EQ
+* in : d0, d1
+* out: d0 = d0 * d1
 __CXM33:
     muls d1,d0
     rts
 
-* in d0, d1
-* out d0 = d0 / d1
+* Math glue function for SAS/C + VBCC, used e.g. in MHI EQ
+* in : d0, d1
+* out: d0 = d0 / d1
 __CXD33:
 __divs:
     divs d1,d0

@@ -1,5 +1,5 @@
 Next:
-- MHI Volume handline
+- MHI Volume handline - test SCI_VOL 1063ds p.53
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
 - Decide on debug + cpu variants
 - Create Install disk script

@@ -265,8 +265,27 @@ test_sleep: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
 
-test_library: $(PRAGMA_FILE)
+test_library:
 	$(CC) DATA=far NOMINC $(CFLAGS) SAVEDS IGN=73 OBJNAME $(BDIR)$@.o test/$@.c
 	$(LD) NOICONS FROM LIB:c.o,$(BDIR)$@.o TO test/$@ LIB LIB:sc.lib,LIB:amiga.lib
 	-cp test/$@ ~/Documents/FS-UAE/Shared/MHI/
 	-curl --netrc --upload-file test/test_library       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+
+GetMemLog:
+	$(CC) IDIR=header OBJNAME test/get_mem_log.o test/get_mem_log.c 
+	$(LD) NOICONS TO test/GetMemLog FROM LIB:c.o test/get_mem_log.o LIB LIB:sc.lib
+	cp test/GetMemLog ~/Documents/FS-UAE/Shared/MHI/
+
+ADF:
+	mkdir -p adf
+	# bzip2 -c -d src/empty.adf.bz2 > target/AmiGUS.adf
+	adf_floppy_create target/AmiGUS.adf dd
+	adf_format -l AmiGUS -t 0 -f target/AmiGUS.adf
+	fuseadf target/AmiGUS.adf adf/
+	cp target/mhiamigus.library adf/
+	cp target/GetMemLog adf/
+	cp target/mhiamigus.library adf/
+	cp target/MHIplay adf/
+	cp target/test_library adf/
+	umount adf/
+	cp target/AmiGUS.adf /media/chritoph/HXC/

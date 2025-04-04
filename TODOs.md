@@ -1,8 +1,8 @@
 Next:
-- Replace EasyRequest with AutoRequest for 1.3 compatibility
-- Implement 1.3 compatible Sleep() method
+- MHI Volume handline
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
 - Decide on debug + cpu variants
+- Create Install disk script
 - Switch to AmiGUS ints instead AHI timing
 - Unify recording and playback buffer sizing 
   (as the buffer sizing can then be steered)

@@ -269,15 +269,15 @@ support: mhi_lib_check get_mem_log
 
 get_mem_log:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
-	$(LD) $(LFLAGS) support/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
-	-cp support/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file support/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
+	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
 
 mhi_lib_check:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
-	$(LD) $(LFLAGS) support/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
-	-cp support/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file support/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
+	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
 
 ADF:
 	mkdir -p adf

@@ -143,6 +143,7 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 #ifndef USE_FAKE_DEVICE
   error = FindAmiGusCodec( base );
 #else
+  error = 0;
   base->agb_CardBase = AllocMem( 256, MEMF_PUBLIC | MEMF_CLEAR );
   base->agb_ConfigDevice = AllocMem( sizeof( struct ConfigDev ),
                                      MEMF_PUBLIC | MEMF_CLEAR );

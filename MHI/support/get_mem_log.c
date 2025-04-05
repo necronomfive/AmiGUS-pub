@@ -30,13 +30,8 @@
 
 #include "amigus_mhi.h"
 
-
-// vamos sc IDIR=header OBJNAME test/get_mem_log.o test/get_mem_log.c 
-// vamos slink NOICONS TO test/GetMemLog FROM LIB:c.o test/get_mem_log.o LIB LIB:sc.lib
-// cp test/GetMemLog ~/Documents/FS-UAE/Shared/MHI/
-
 UBYTE memMarker[] = AMIGUS_MEM_LOG_BORDERS \
-                    STR( LIB_FILE ) \
+                    " " STR( LIB_FILE ) " " \
                     AMIGUS_MEM_LOG_BORDERS;
 
 BOOL CheckStartAddress( LONG address ) {

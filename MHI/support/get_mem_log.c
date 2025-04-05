@@ -50,7 +50,7 @@ BOOL CheckStartAddress( LONG address ) {
 
 VOID WriteMemoryLog( LONG startAddress, STRPTR filename ) {
 
-  BPTR file = NULL;
+  BPTR file;
   LONG endAddress = startAddress + sizeof( marker);
 
   printf( "Found start marker at 0x%08lx\n", startAddress );
@@ -75,14 +75,13 @@ VOID WriteMemoryLog( LONG startAddress, STRPTR filename ) {
           endAddress - startAddress );
   Write( file, ( APTR ) startAddress, endAddress - startAddress );
   Close( file );
-  file = NULL;
   printf( "Done, find your log at %s\n", filename );
 }
 
 int main( int argc, char const *argv[] ) {
 
   STRPTR filename = "ram:MemLog.txt";
-  LONG startAddress;
+  LONG startAddress = 0;
   BOOL found = FALSE;
   ULONG i;
   
@@ -99,7 +98,7 @@ int main( int argc, char const *argv[] ) {
 
       STRPTR start = ( STRPTR )(( LONG ) argv[ i ] + sizeof( "address=0x" ) - 1 );
       STRPTR end = ( STRPTR )(( LONG ) start + 8);
-      startAddress = strtol( start, &end, 16 );
+      startAddress = strtol( start, ( BYTE ** ) &end, 16 );
       printf( "Trying 0x%08lx...\n", startAddress );
       found = CheckStartAddress( startAddress );
       continue;
@@ -160,7 +159,7 @@ int main( int argc, char const *argv[] ) {
 
     LONG memStart[ 32 ];
     LONG memEnd[ 32 ];
-    struct MemHeader * mem = NULL;
+    struct MemHeader * mem;
     ULONG slab = 0;
 
     printf( "Trying full scan finally...\n" );
@@ -195,7 +194,7 @@ int main( int argc, char const *argv[] ) {
     }
   }
 
-  if ( found ) {
+  if (( found ) && ( startAddress )) {
 
     WriteMemoryLog( startAddress, filename );
 

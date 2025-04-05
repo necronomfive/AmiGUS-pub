@@ -265,16 +265,19 @@ test_sleep: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
 
-test_library:
-	$(CC) DATA=far NOMINC $(CFLAGS) SAVEDS IGN=73 OBJNAME $(BDIR)$@.o test/$@.c
-	$(LD) NOICONS FROM LIB:c.o,$(BDIR)$@.o TO test/$@ LIB LIB:sc.lib,LIB:amiga.lib
-	-cp test/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file test/test_library       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+support: mhi_lib_check get_mem_log
 
-GetMemLog:
-	$(CC) IDIR=header OBJNAME test/get_mem_log.o test/get_mem_log.c 
-	$(LD) NOICONS TO test/GetMemLog FROM LIB:c.o test/get_mem_log.o LIB LIB:sc.lib
-	cp test/GetMemLog ~/Documents/FS-UAE/Shared/MHI/
+get_mem_log:
+	$(CC) $(CFLAGS) support/$@.o support/$@.c
+	$(LD) $(LFLAGS) support/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
+	-cp support/$@ ~/Documents/FS-UAE/Shared/MHI/
+	-curl --netrc --upload-file support/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+
+mhi_lib_check:
+	$(CC) $(CFLAGS) support/$@.o support/$@.c
+	$(LD) $(LFLAGS) support/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
+	-cp support/$@ ~/Documents/FS-UAE/Shared/MHI/
+	-curl --netrc --upload-file support/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
 
 ADF:
 	mkdir -p adf

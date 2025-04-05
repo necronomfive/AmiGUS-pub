@@ -35,15 +35,17 @@
 // vamos slink NOICONS TO test/GetMemLog FROM LIB:c.o test/get_mem_log.o LIB LIB:sc.lib
 // cp test/GetMemLog ~/Documents/FS-UAE/Shared/MHI/
 
-UBYTE marker[] = AMIGUS_MEM_LOG_MARKER;
+UBYTE memMarker[] = AMIGUS_MEM_LOG_BORDERS \
+                    STR( LIB_FILE ) \
+                    AMIGUS_MEM_LOG_BORDERS;
 
 BOOL CheckStartAddress( LONG address ) {
 
   BOOL result = FALSE;
 
-  if (( UBYTE * ) address != marker ) {
+  if (( UBYTE * ) address != memMarker ) {
 
-    result = !strncmp(( UBYTE * ) address, marker, sizeof( marker) - 1 );
+    result = !strncmp(( UBYTE * ) address, memMarker, sizeof( memMarker) - 1 );
   }
   return result;
 }
@@ -51,16 +53,16 @@ BOOL CheckStartAddress( LONG address ) {
 VOID WriteMemoryLog( LONG startAddress, STRPTR filename ) {
 
   BPTR file;
-  LONG endAddress = startAddress + sizeof( marker);
+  LONG endAddress = startAddress + sizeof( memMarker);
 
-  printf( "Found start marker at 0x%08lx\n", startAddress );
+  printf( "Found start memMarker at 0x%08lx\n", startAddress );
   file = Open( filename, MODE_NEWFILE );
   if ( !file ) {
 
     printf( "Opening \"%s\" failed, bailing out...\n", filename );
     return;
   }
-  printf( "Incrementally finding end marker...\n" );
+  printf( "Incrementally finding end memMarker...\n" );
   while ( *(( UBYTE * ) endAddress )) {
     if ( 0x1000 <= ( endAddress - startAddress )) {
 

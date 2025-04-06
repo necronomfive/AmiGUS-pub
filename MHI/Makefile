@@ -180,7 +180,7 @@ endif
 
 .PHONY: all install test INCLUDES FOLDERS clean dist-clean dist
 
-all: FOLDERS $(LIB_FILE_DEST)
+all: FOLDERS $(LIB_FILE_DEST) support
 
 ECHO:
 	@echo "C-sources: "$(C_SRCS)
@@ -279,6 +279,12 @@ mhi_lib_check:
 	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
 	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
 
+MHIplay:
+	$(CC) $(CFLAGS) support/$@.o support/$@.c
+	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
+	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+
 ADF:
 	mkdir -p adf
 	# bzip2 -c -d src/empty.adf.bz2 > target/AmiGUS.adf
@@ -286,9 +292,8 @@ ADF:
 	adf_format -l AmiGUS -t 0 -f target/AmiGUS.adf
 	fuseadf target/AmiGUS.adf adf/
 	cp target/mhiamigus.library adf/
-	cp target/GetMemLog adf/
-	cp target/mhiamigus.library adf/
+	cp target/mhi_lib_check adf/
+	cp target/get_mem_log adf/
 	cp target/MHIplay adf/
-	cp target/test_library adf/
 	umount adf/
-	cp target/AmiGUS.adf /media/chritoph/HXC/
+	-cp target/AmiGUS.adf /media/chritoph/HXC/

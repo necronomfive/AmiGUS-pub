@@ -180,7 +180,7 @@ endif
 
 .PHONY: all install test INCLUDES FOLDERS clean dist-clean dist
 
-all: FOLDERS $(LIB_FILE_DEST) support
+all: FOLDERS $(LIB_FILE_DEST)
 
 ECHO:
 	@echo "C-sources: "$(C_SRCS)
@@ -192,7 +192,7 @@ install: all
 	$(INSTALL1)
 
 clean:
-	-$(RM) $(DDIR) $(BDIR) $(RM_SUFFIX)
+	-$(RM) $(DDIR) $(BDIR) adf $(RM_SUFFIX)
 
 dist-clean: clean
 	make -f Makefile-Includes clean
@@ -265,7 +265,7 @@ test_sleep: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
 
-support: mhi_lib_check get_mem_log
+support: mhi_lib_check get_mem_log MHIplay
 
 get_mem_log:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
@@ -285,7 +285,7 @@ MHIplay:
 	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
 	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
 
-ADF:
+ADF: all support
 	mkdir -p adf
 	# bzip2 -c -d src/empty.adf.bz2 > target/AmiGUS.adf
 	adf_floppy_create target/AmiGUS.adf dd

@@ -213,6 +213,7 @@
 #define VS1063_CODEC_SCI_WRAMADDR       0x0007 // page 49
 #define VS1063_CODEC_SCI_HDAT0          0x0008 // page 50
 #define VS1063_CODEC_SCI_HDAT1          0x0009 // page 50
+#define VS1063_CODEC_SCI_VOL            0x000B // page 53
 
 // VS1063 codec's addresses of memory mapped registers
 // all parameter memory 0x1E00-0x1E3F is mapped to 0xC0C0-0xC0FF - page 49
@@ -311,5 +312,6 @@ extern const STRPTR AmiGUSInputs[ AMIGUS_INPUTS_COUNT ];
 extern const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ];
 extern const WORD AmiGUSDefaultEqualizer[];
 extern const WORD AmiGUSAmigaAmpEqualizer[];
+extern const UBYTE AmiGUSVolumeMapping[];
 
 #endif /* AMIGUS_HARDWARE_H */

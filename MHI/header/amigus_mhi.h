@@ -78,6 +78,9 @@ struct AmiGUS_MHI_Handle {
   struct MinList                agch_Buffers;
   struct AmiGUS_MHI_Buffer    * agch_CurrentBuffer;
 
+  UBYTE                         agch_MHI_Panning;
+  UBYTE                         agch_MHI_Volume;
+  UWORD                         agch_reserved0;
   UBYTE                         agch_MHI_Equalizer[ 11 ]; /* 10 band, 1 gain */
   UBYTE                         agch_Status;
 };

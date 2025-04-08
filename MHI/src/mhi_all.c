@@ -122,6 +122,35 @@ VOID UpdateEqualizer( UBYTE index, UBYTE percent ) {
   }
 }
 
+VOID UpdateVolumePanning( struct AmiGUS_MHI_Handle * handle ) {
+
+  APTR card = AmiGUS_MHI_Base->agb_CardBase;
+  UBYTE volume = handle->agch_MHI_Volume;
+  UBYTE panning = handle->agch_MHI_Panning;
+  UBYTE multiplierLeft = ( 100 - panning ) << 1;
+  UBYTE multiplierRight = (( panning - 50 ) << 1 ) + 100;
+  UBYTE left;
+  UBYTE right;
+  UWORD value;
+
+  LOG_D(( "D: UpdateVolume: To %lu%% vol, %lu%% pan\n", volume, panning ));
+
+  multiplierLeft = ( multiplierLeft > 100 ) ? 100 : multiplierLeft;
+  multiplierRight = ( multiplierRight > 100 ) ? 100 : multiplierRight;
+
+  left = ( volume * multiplierLeft ) / 100;
+  left = AmiGUSVolumeMapping[ left ];
+  right = ( volume * multiplierRight ) / 100;
+  right = AmiGUSVolumeMapping[ right ];
+  value = ( left << 8 ) | ( right & 0x00FF );
+
+  LOG_V(( "V: left x %ld / 100 = 0x%02lx, "
+          "right x %ld / 100 = 0x%02lx -> 0x%04lx\n",
+          multiplierLeft, left, 
+          multiplierRight, right, value ));
+  WriteCodecSPI( card, VS1063_CODEC_SCI_VOL, value );
+}
+
 ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a0, struct Task * task ),
   REG( d0, ULONG signal ),
@@ -167,6 +196,8 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
       handle->agch_MHI_Equalizer[ i ] = 50;
     }
+    handle->agch_MHI_Panning = 50;
+    handle->agch_MHI_Volume = 50;
     NonConflictingNewMinList( &handle->agch_Buffers );
 
     result = ( APTR ) handle;
@@ -438,6 +469,8 @@ ASM( ULONG ) SAVEDS MHIQuery(
                "audio/flac";
       break;
     }
+    case MHIQ_VOLUME_CONTROL:
+    case MHIQ_PANNING_CONTROL:
     case MHIQ_IS_HARDWARE:
     case MHIQ_MPEG1:
     case MHIQ_MPEG2:
@@ -460,8 +493,6 @@ ASM( ULONG ) SAVEDS MHIQuery(
     }
     case MHIQ_IS_68K:
     case MHIQ_IS_PPC:
-    case MHIQ_VOLUME_CONTROL:  // TODO
-    case MHIQ_PANNING_CONTROL: // TODO
     case MHIQ_CROSSMIXING:     // TODO
     default: {
       break;
@@ -478,18 +509,27 @@ ASM( VOID ) SAVEDS MHISetParam(
   REG( d1, ULONG value ),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
-  /* TODO: needed?
+
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
-  */
   LOG_D(( "D: MHISetParam start\n" ));
   LOG_D(( "V: Param %ld, Value %ld\n", param, value ));
 
   switch ( param ) {
     // 0=muted .. 100=0dB
-    case MHIP_VOLUME:
+    case MHIP_VOLUME: {
+
+      clientHandle->agch_MHI_Volume = value;
+      UpdateVolumePanning( handle );
+      break;
+    }
     // 0=left .. 50=center .. 100=right
-    case MHIP_PANNING:
+    case MHIP_PANNING: {
+
+      clientHandle->agch_MHI_Panning = value;
+      UpdateVolumePanning( handle );
+      break;
+    }
     // 0=stereo .. 100=mono
     case MHIP_CROSSMIXING:
     // For all Equilizer:

@@ -193,6 +193,7 @@ install: all
 
 clean:
 	-$(RM) $(DDIR) $(BDIR) adf $(RM_SUFFIX)
+	-$(RM) support/$(WILDCARD).o
 
 dist-clean: clean
 	make -f Makefile-Includes clean

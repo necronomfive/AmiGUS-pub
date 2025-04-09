@@ -1,8 +1,7 @@
 Next:
-- Replace EasyRequest with AutoRequest for 1.3 compatibility
-- Implement 1.3 compatible Sleep() method
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
 - Decide on debug + cpu variants
+- Create Install disk script
 - Switch to AmiGUS ints instead AHI timing
 - Unify recording and playback buffer sizing 
   (as the buffer sizing can then be steered)
@@ -27,3 +26,4 @@ Done:
 - Get MHI implemented as per https://bitbucket.org/supernobby/mhimdev/src/main/ and https://aminet.net/package/driver/audio/mhimasplayer
 - Implement MHI equalizer
 - Fix stupid sounds blooping from one song to the next
+- MHI Volume handline - test SCI_VOL 1063ds p.53

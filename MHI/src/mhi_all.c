@@ -208,6 +208,7 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     LOG_D(( "D: Initializing VS1063 codec\n" ));
     InitVS1063Codec( card );
     InitVS1063Equalizer( card, TRUE, AmiGUSDefaultEqualizer );
+    UpdateVolumePanning( handle );
     CreateInterruptHandler();
 
   } else {

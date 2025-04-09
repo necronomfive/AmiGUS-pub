@@ -93,9 +93,9 @@ VOID InitVS1063Equalizer( APTR amiGUS, BOOL enable, const WORD * settings ) {
   }
 }
 
-VOID UpdateVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value ) {
+VOID SetVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value ) {
 
-  LOG_V(( "V: Updating EQ5 level 0x%04lx = %ld\n", equalizerLevel, value ));
+  LOG_V(( "V: Setting EQ5 level 0x%04lx = %ld\n", equalizerLevel, value ));
   WriteVS1063Mem( amiGUS, 
                   equalizerLevel,
                   value );
@@ -104,6 +104,69 @@ VOID UpdateVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value ) {
                   VS1063_CODEC_F_EQ5_UPD_STROBE );
 }
 
+VOID UpdateVS1063Equalizer( APTR amiGUS, UBYTE values[ 11 ] ) {
+
+  UBYTE min = 255;
+  UBYTE max = 0;
+  WORD gain;
+  UBYTE i;
+  UWORD levels[ 5 ] = {
+
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL1,
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL2,
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL3,
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL4,
+    VS1063_CODEC_ADDRESS_EQ5_LEVEL5
+  };
+
+  // Step 1: calculate min + max values for all bands
+  for ( i = 0; i < 10; ++i ) {
+
+    const UBYTE current = values[ i ];
+    if ( current < min ) {
+
+      min = current;
+    }
+    if ( current > max ) {
+
+      max = current;
+    }
+  }
+
+  // Step 2: calculate gain - remember: VERY limited in numerical range!!!
+  gain = values[ 10 ];
+  LOG_V(( "V: gain %ld, min %ld, max %ld\n", gain, min, max ));
+  gain -= 50;
+  gain *= 32;
+  gain /= 50;
+  if ( gain >= 0 ) {
+
+    gain *= ( WORD )( 100 - max );
+
+  } else {
+
+    gain *= ( WORD ) min;
+  }
+  gain /= 50;
+  LOG_V(( "V: resulting gain %ld\n", gain ));
+
+  // Step 3: calculate and set final values!
+  for ( i = 0; i < 10; i += 2 ) {
+
+    // Originally:
+    // -32 .. +32 = ((( 0 .. 100 ) * 2655 ) / 4096 ) - 32
+    // gain = percent * 2655 / 4096 - 32
+    // But here, we are combining 2 sliders,
+    // so range is 0-200 and >> 13 to take the average :)
+    WORD combined = values[ i ] + values[ i + 1 ];
+    LONG intermediate = (( combined * 2655 ) >> 13 ) - 32;
+    WORD final = ( WORD ) intermediate + gain;
+    LOG_D(( "D: UpdateEQ: Calculated gain %ld = %ld for %ld%%\n",
+            intermediate, final, combined ));
+
+    SetVS1063Equalizer( amiGUS, levels[ i>>1 ], final );
+  }
+}
 
 VOID UpdateVS1063VolumePanning( APTR amiGUS, UBYTE volume, UBYTE panning ) {
 

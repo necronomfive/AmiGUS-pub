@@ -42,7 +42,7 @@ VOID InitVS1063Codec( APTR amiGUS );
 VOID InitVS1063Equalizer( APTR amiGUS, BOOL enable, const WORD * settings );
 
 /**
- * Updates a single equalizer band to a desired setting.
+ * Sets a single equalizer band to a desired setting.
  *
  * @param amiGUS         Pointer to AmiGUS Codec part card base.
  * @param equalizerLevel One equalizer level between
@@ -51,7 +51,9 @@ VOID InitVS1063Equalizer( APTR amiGUS, BOOL enable, const WORD * settings );
  * @param value          A new equalizer setting for this frequency band or
  *                       level, between -32 and +32.
  */
-VOID UpdateVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value );
+VOID SetVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value );
+
+VOID UpdateVS1063Equalizer( APTR amiGUS, UBYTE values[ 11 ]);
 
 VOID UpdateVS1063VolumePanning( APTR amiGUS, UBYTE volume, UBYTE panning );
 

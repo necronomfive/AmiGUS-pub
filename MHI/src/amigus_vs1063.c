@@ -20,41 +20,41 @@
 #include "debug.h"
 #include "support.h"
 
-UWORD ReadVS1063Mem( APTR card, UWORD address ) {
+UWORD ReadVS1063Mem( APTR amiGUS, UWORD address ) {
 
-  WriteCodecSPI( card, VS1063_CODEC_SCI_WRAMADDR, address );
-  return ReadCodecSPI( card, VS1063_CODEC_SCI_WRAM );
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
+  return ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM );
 }
 
-VOID WriteVS1063Mem( APTR card, UWORD address, UWORD value ) {
+VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
 
-  WriteCodecSPI( card, VS1063_CODEC_SCI_WRAMADDR, address );
-  WriteCodecSPI( card, VS1063_CODEC_SCI_WRAM, value );
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
 }
 
-VOID InitVS1063Codec( APTR card ) {
+VOID InitVS1063Codec( APTR amiGUS ) {
 
   // Set SC_MULT to XTALI x 5.0 in SC_CLOCKF,
   // see VS1063a Datasheet, Version: 1.32, 2024-01-31, page 48
-  WriteCodecSPI( card,
+  WriteCodecSPI( amiGUS,
                  VS1063_CODEC_SCI_CLOCKF,
                  VS1063_CODEC_F_SC_MULT_5_0X );
   // Enable I2S Interface at 192kHz sample rate,
   // see VS1063a Datasheet, Version: 1.32, 2024-01-31, page 86
-  WriteVS1063Mem( card,
+  WriteVS1063Mem( amiGUS,
                   VS1063_CODEC_ADDRESS_GPIO_DDR,
                   VS1063_CODEC_F_GPIO_DDR_192k );
-  WriteVS1063Mem( card,
+  WriteVS1063Mem( amiGUS,
                   VS1063_CODEC_ADDRESS_I2S_CONFIG,
                   VS1063_CODEC_F_I2S_CONFIG_RESET );
-  WriteVS1063Mem( card,
+  WriteVS1063Mem( amiGUS,
                   VS1063_CODEC_ADDRESS_I2S_CONFIG,
                   VS1063_CODEC_F_I2S_CONFIG_192k );
 }
 
-VOID InitVS1063Equalizer( APTR card, BOOL enable, const WORD * settings ) {
+VOID InitVS1063Equalizer( APTR amiGUS, BOOL enable, const WORD * settings ) {
 
-  UWORD oldPlayMode = ReadVS1063Mem( card,
+  UWORD oldPlayMode = ReadVS1063Mem( amiGUS,
                                      VS1063_CODEC_ADDRESS_PLAY_MODE );
   UWORD newPlayMode = ( enable )
                       ? ( oldPlayMode | VS1063_CODEC_F_PL_MO_EQ5_ENABLE )
@@ -70,7 +70,7 @@ VOID InitVS1063Equalizer( APTR card, BOOL enable, const WORD * settings ) {
 
       LOG_V(( "V: Setting 0x%04lx = %ld\n",
               VS1063_CODEC_ADDRESS_EQ5_LEVEL1 + i, settings[ i ] ));
-      WriteVS1063Mem( card, 
+      WriteVS1063Mem( amiGUS, 
                       VS1063_CODEC_ADDRESS_EQ5_LEVEL1 + i,
                       settings[ i ] );
     }
@@ -79,7 +79,7 @@ VOID InitVS1063Equalizer( APTR card, BOOL enable, const WORD * settings ) {
   if (( wasEnabled ) && ( enable )) {
 
     LOG_V(( "V: Updating EQ5 only \n" ));
-    WriteVS1063Mem( card,
+    WriteVS1063Mem( amiGUS,
                     VS1063_CODEC_ADDRESS_EQ5_UPDATE,
                     VS1063_CODEC_F_EQ5_UPD_STROBE );
 
@@ -87,34 +87,59 @@ VOID InitVS1063Equalizer( APTR card, BOOL enable, const WORD * settings ) {
 
     LOG_V(( "V: New PlayMode 0x%04lx = 0x%04lx\n",
             VS1063_CODEC_ADDRESS_PLAY_MODE, newPlayMode ));
-    WriteVS1063Mem( card,
+    WriteVS1063Mem( amiGUS,
                     VS1063_CODEC_ADDRESS_PLAY_MODE,
                     newPlayMode );
   }
 }
 
-VOID UpdateVS1063Equalizer( APTR card, UWORD equalizerLevel, WORD value ) {
+VOID UpdateVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value ) {
 
   LOG_V(( "V: Updating EQ5 level 0x%04lx = %ld\n", equalizerLevel, value ));
-  WriteVS1063Mem( card, 
+  WriteVS1063Mem( amiGUS, 
                   equalizerLevel,
                   value );
-  WriteVS1063Mem( card,
+  WriteVS1063Mem( amiGUS,
                   VS1063_CODEC_ADDRESS_EQ5_UPDATE,
                   VS1063_CODEC_F_EQ5_UPD_STROBE );
 }
 
-ULONG GetVS1063EndFill( APTR card ) {
 
-  ULONG endFill = ReadVS1063Mem( card, VS1063_CODEC_ADDRESS_END_FILL );
+VOID UpdateVS1063VolumePanning( APTR amiGUS, UBYTE volume, UBYTE panning ) {
+
+  UBYTE multiplierLeft = ( 100 - panning ) << 1;
+  UBYTE multiplierRight = (( panning - 50 ) << 1 ) + 100;
+  UBYTE left;
+  UBYTE right;
+  UWORD value;
+
+  LOG_D(( "D: UpdateVolume: To %lu%% vol, %lu%% pan\n", volume, panning ));
+
+  multiplierLeft = ( multiplierLeft > 100 ) ? 100 : multiplierLeft;
+  multiplierRight = ( multiplierRight > 100 ) ? 100 : multiplierRight;
+
+  left = ( volume * multiplierLeft ) / 100;
+  left = AmiGUSVolumeMapping[ left ];
+  right = ( volume * multiplierRight ) / 100;
+  right = AmiGUSVolumeMapping[ right ];
+  value = ( left << 8 ) | ( right & 0x00FF );
+
+  LOG_V(( "V: left x %ld / 100 = 0x%02lx, "
+          "right x %ld / 100 = 0x%02lx -> 0x%04lx\n",
+          multiplierLeft, left, 
+          multiplierRight, right, value ));
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_VOL, value );
+}
+
+ULONG GetVS1063EndFill( APTR amiGUS ) {
+
+  ULONG endFill = ReadVS1063Mem( amiGUS, VS1063_CODEC_ADDRESS_END_FILL );
   endFill &= 0x000000FF;
   endFill |= ( endFill << 24 ) | ( endFill << 16 ) | ( endFill << 8 );
   return endFill;
 }
 
-/* Private function definitions: */
-
-VOID CancelVS1063Playback( APTR card ) {
+VOID CancelVS1063Playback( APTR amiGUS ) {
 
   UWORD sciMode;
   ULONG i;
@@ -126,7 +151,7 @@ VOID CancelVS1063Playback( APTR card ) {
   // for all others, send >= 2052 end fill bytes.
   // Will use 3072 BYTEs = 768 LONGs, 
   // 'cause 3072 * 4 = 12288
-  const UWORD format = ReadCodecSPI( card, VS1063_CODEC_SCI_HDAT1 );
+  const UWORD format = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 );
   const ULONG blockCount = ( 0x664C == format) ? 4: 1;
   const ULONG blockSize = 768;
 
@@ -135,10 +160,10 @@ VOID CancelVS1063Playback( APTR card ) {
   // Trigger end of 11.5.1 Playing a Whole File - page 57
 
   // step 2
-  ULONG endFill = GetVS1063EndFill( card );
+  ULONG endFill = GetVS1063EndFill( amiGUS );
 
   // Re-Enable DMA so we can feed end fill bytes
-  WriteReg16( card,
+  WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_ENABLE );
   // step 3
@@ -146,25 +171,25 @@ VOID CancelVS1063Playback( APTR card ) {
     LOG_V(( "V: End of file step 3.%ld\n", j ));
     for ( i = 0; i < blockSize; ++i) {
 
-      WriteReg32( card, AMIGUS_CODEC_FIFO_WRITE, endFill );
+      WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, endFill );
     }
-    while( ReadReg32( card, AMIGUS_CODEC_FIFO_USAGE ) );
+    while( ReadReg32( amiGUS, AMIGUS_CODEC_FIFO_USAGE ) );
   }
   // step 4
   LOG_V(( "V: End of file step 4\n" ));
-  sciMode = ReadCodecSPI( card, VS1063_CODEC_SCI_MODE );
+  sciMode = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_MODE );
   sciMode |= VS1063_CODEC_F_SM_CANCEL;
-  WriteCodecSPI( card, VS1063_CODEC_SCI_MODE, sciMode );
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_MODE, sciMode );
 
   for ( j = 0; j < 64; ++j ) {
     // step 5
     LOG_V(( "V: End of file step 5.%ld\n", j ));
     for ( i = 0; i < 8; ++i) {
 
-      WriteReg32( card, AMIGUS_CODEC_FIFO_WRITE, endFill );
+      WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, endFill );
     }
     // step 6
-    sciMode = ReadVS1063Mem( card, VS1063_CODEC_SCI_MODE );
+    sciMode = ReadVS1063Mem( amiGUS, VS1063_CODEC_SCI_MODE );
     if ( !( sciMode & VS1063_CODEC_F_SM_CANCEL )) {
 
       LOG_V(( "V: End of file step 6\n" ));
@@ -174,20 +199,20 @@ VOID CancelVS1063Playback( APTR card ) {
   if ( sciMode & VS1063_CODEC_F_SM_CANCEL ) {
 
     LOG_V(( "V: End of file failed - reset\n" ));
-    ResetVS1063( card );
+    ResetVS1063( amiGUS );
   }
-  WriteReg16( card,
+  WriteReg16( amiGUS,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
   LOG_V(( "V: Playback ended, HDAT0 = 0x%04lx, HDAT1 = 0x%04lx\n",
-          ReadCodecSPI( card, VS1063_CODEC_SCI_HDAT0 ),
-          ReadCodecSPI( card, VS1063_CODEC_SCI_HDAT1 )));
+          ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT0 ),
+          ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 )));
 }
 
-VOID ResetVS1063( APTR card ) {
+VOID ResetVS1063( APTR amiGUS ) {
 
   LOG_D(( "D: Resetting VS1063 codec...\n"));
-  WriteCodecSPI( card,
+  WriteCodecSPI( amiGUS,
                  VS1063_CODEC_SCI_MODE,
                  VS1063_CODEC_F_SM_RESET );
   // page 56 - 11.3 Software Reset
@@ -196,7 +221,7 @@ VOID ResetVS1063( APTR card ) {
   /*
   // TODO: do we want / need that?
   LOG_D(( "D: ... patching ...\n"));
-  ApplyCompressedVS1063Patch( card, VS1063Patch20191204 );
+  ApplyCompressedVS1063Patch( amiGUS, VS1063Patch20191204 );
   */
   LOG_D(( "D: ... done.\n"));
 }

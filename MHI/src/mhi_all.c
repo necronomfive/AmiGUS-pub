@@ -23,6 +23,7 @@
 #include "amigus_codec.h"
 #include "amigus_hardware.h"
 #include "amigus_mhi.h"
+#include "amigus_vs1063.h"
 #include "debug.h"
 #include "errors.h"
 #include "interrupt.h"
@@ -122,35 +123,6 @@ VOID UpdateEqualizer( UBYTE index, UBYTE percent ) {
   }
 }
 
-VOID UpdateVolumePanning( struct AmiGUS_MHI_Handle * handle ) {
-
-  APTR card = AmiGUS_MHI_Base->agb_CardBase;
-  UBYTE volume = handle->agch_MHI_Volume;
-  UBYTE panning = handle->agch_MHI_Panning;
-  UBYTE multiplierLeft = ( 100 - panning ) << 1;
-  UBYTE multiplierRight = (( panning - 50 ) << 1 ) + 100;
-  UBYTE left;
-  UBYTE right;
-  UWORD value;
-
-  LOG_D(( "D: UpdateVolume: To %lu%% vol, %lu%% pan\n", volume, panning ));
-
-  multiplierLeft = ( multiplierLeft > 100 ) ? 100 : multiplierLeft;
-  multiplierRight = ( multiplierRight > 100 ) ? 100 : multiplierRight;
-
-  left = ( volume * multiplierLeft ) / 100;
-  left = AmiGUSVolumeMapping[ left ];
-  right = ( volume * multiplierRight ) / 100;
-  right = AmiGUSVolumeMapping[ right ];
-  value = ( left << 8 ) | ( right & 0x00FF );
-
-  LOG_V(( "V: left x %ld / 100 = 0x%02lx, "
-          "right x %ld / 100 = 0x%02lx -> 0x%04lx\n",
-          multiplierLeft, left, 
-          multiplierRight, right, value ));
-  WriteCodecSPI( card, VS1063_CODEC_SCI_VOL, value );
-}
-
 ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a0, struct Task * task ),
   REG( d0, ULONG signal ),
@@ -208,7 +180,9 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     LOG_D(( "D: Initializing VS1063 codec\n" ));
     InitVS1063Codec( card );
     InitVS1063Equalizer( card, TRUE, AmiGUSDefaultEqualizer );
-    UpdateVolumePanning( handle );
+    UpdateVS1063VolumePanning( card,
+                               handle->agch_MHI_Volume,
+                               handle->agch_MHI_Panning );
     CreateInterruptHandler();
 
   } else {
@@ -513,6 +487,10 @@ ASM( VOID ) SAVEDS MHISetParam(
 
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
+  APTR card = AmiGUS_MHI_Base->agb_CardBase;
+  UBYTE * volume = &( clientHandle->agch_MHI_Volume );
+  UBYTE * panning = &( clientHandle->agch_MHI_Panning );
+
   LOG_D(( "D: MHISetParam start\n" ));
   LOG_D(( "V: Param %ld, Value %ld\n", param, value ));
 
@@ -520,15 +498,15 @@ ASM( VOID ) SAVEDS MHISetParam(
     // 0=muted .. 100=0dB
     case MHIP_VOLUME: {
 
-      clientHandle->agch_MHI_Volume = value;
-      UpdateVolumePanning( handle );
+      *volume = value;
+      UpdateVS1063VolumePanning( card, *volume, *panning );
       break;
     }
     // 0=left .. 50=center .. 100=right
     case MHIP_PANNING: {
 
-      clientHandle->agch_MHI_Panning = value;
-      UpdateVolumePanning( handle );
+      *panning = value;
+      UpdateVS1063VolumePanning( card, *volume, *panning );
       break;
     }
     // 0=stereo .. 100=mono

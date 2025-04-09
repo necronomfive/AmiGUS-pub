@@ -2,6 +2,7 @@ Next:
 - Fix MHI TODOs
 - Fix Unit tests
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
+- Write Documentations
 - Decide on debug + cpu variants
 - Create Install disk script
 - Switch to AmiGUS ints instead AHI timing

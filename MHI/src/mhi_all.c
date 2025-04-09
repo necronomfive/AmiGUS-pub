@@ -80,8 +80,14 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
     DisplayError( ELibraryBaseInconsistency );
   }
+
   Forbid();
-  if ( AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver ) {
+  if (( !AmiGUS_MHI_Base->agb_CardBase )
+        || ( !AmiGUS_MHI_Base->agb_ConfigDevice )) {
+
+    error = EAmiGUSNotFound;
+
+  } else if ( AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver ) {
 
     error = EAmiGUSInUseError;
 

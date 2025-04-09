@@ -30,37 +30,34 @@
 
 #include "amigus_mhi.h"
 
-
-// vamos sc IDIR=header OBJNAME test/get_mem_log.o test/get_mem_log.c 
-// vamos slink NOICONS TO test/GetMemLog FROM LIB:c.o test/get_mem_log.o LIB LIB:sc.lib
-// cp test/GetMemLog ~/Documents/FS-UAE/Shared/MHI/
-
-UBYTE marker[] = AMIGUS_MEM_LOG_MARKER;
+UBYTE memMarker[] = AMIGUS_MEM_LOG_BORDERS \
+                    " " STR( LIB_FILE ) " " \
+                    AMIGUS_MEM_LOG_BORDERS;
 
 BOOL CheckStartAddress( LONG address ) {
 
   BOOL result = FALSE;
 
-  if (( UBYTE * ) address != marker ) {
+  if (( UBYTE * ) address != memMarker ) {
 
-    result = !strncmp(( UBYTE * ) address, marker, sizeof( marker) - 1 );
+    result = !strncmp(( UBYTE * ) address, memMarker, sizeof( memMarker) - 1 );
   }
   return result;
 }
 
 VOID WriteMemoryLog( LONG startAddress, STRPTR filename ) {
 
-  BPTR file = NULL;
-  LONG endAddress = startAddress + sizeof( marker);
+  BPTR file;
+  LONG endAddress = startAddress + sizeof( memMarker);
 
-  printf( "Found start marker at 0x%08lx\n", startAddress );
+  printf( "Found start memMarker at 0x%08lx\n", startAddress );
   file = Open( filename, MODE_NEWFILE );
   if ( !file ) {
 
     printf( "Opening \"%s\" failed, bailing out...\n", filename );
     return;
   }
-  printf( "Incrementally finding end marker...\n" );
+  printf( "Incrementally finding end memMarker...\n" );
   while ( *(( UBYTE * ) endAddress )) {
     if ( 0x1000 <= ( endAddress - startAddress )) {
 
@@ -75,14 +72,13 @@ VOID WriteMemoryLog( LONG startAddress, STRPTR filename ) {
           endAddress - startAddress );
   Write( file, ( APTR ) startAddress, endAddress - startAddress );
   Close( file );
-  file = NULL;
   printf( "Done, find your log at %s\n", filename );
 }
 
 int main( int argc, char const *argv[] ) {
 
   STRPTR filename = "ram:MemLog.txt";
-  LONG startAddress;
+  LONG startAddress = 0;
   BOOL found = FALSE;
   ULONG i;
   
@@ -99,7 +95,7 @@ int main( int argc, char const *argv[] ) {
 
       STRPTR start = ( STRPTR )(( LONG ) argv[ i ] + sizeof( "address=0x" ) - 1 );
       STRPTR end = ( STRPTR )(( LONG ) start + 8);
-      startAddress = strtol( start, &end, 16 );
+      startAddress = strtol( start, ( BYTE ** ) &end, 16 );
       printf( "Trying 0x%08lx...\n", startAddress );
       found = CheckStartAddress( startAddress );
       continue;
@@ -160,7 +156,7 @@ int main( int argc, char const *argv[] ) {
 
     LONG memStart[ 32 ];
     LONG memEnd[ 32 ];
-    struct MemHeader * mem = NULL;
+    struct MemHeader * mem;
     ULONG slab = 0;
 
     printf( "Trying full scan finally...\n" );
@@ -195,7 +191,7 @@ int main( int argc, char const *argv[] ) {
     }
   }
 
-  if ( found ) {
+  if (( found ) && ( startAddress )) {
 
     WriteMemoryLog( startAddress, filename );
 

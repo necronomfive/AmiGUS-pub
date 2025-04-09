@@ -154,6 +154,12 @@ VOID debug_mprintf( STRPTR format, ... ) {
    * even if it fails.
    */
   static BOOL errorShown = FALSE;
+  const STRPTR memMarker[] = {
+
+    AMIGUS_MEM_LOG_BORDERS,
+    STR( LIB_FILE ),
+    AMIGUS_MEM_LOG_BORDERS
+  };
 
   if ( !AmiGUS_MHI_Base->agb_LogMem ) {
 
@@ -239,8 +245,8 @@ VOID debug_mprintf( STRPTR format, ... ) {
                    ( LONG ) AmiGUS_MHI_Base->agb_LogMem,
                    size );
 
-    RawDoFmt( AMIGUS_MEM_LOG_MARKER,
-              NULL,
+    RawDoFmt( "%s %s %s\n",
+              ( APTR ) memMarker,
               &debug_mPutChProc,
               &AmiGUS_MHI_Base->agb_LogMem );
     /* Move mem blob pointer back to overwrite trailing zero next comment */

@@ -22,6 +22,7 @@
 
 #include "amigus_mhi.h"
 #include "amigus_hardware.h"
+#include "amigus_vs1063.h"
 
 /******************************************************************************
  * Mocked functions and stubbed external symbols below:
@@ -125,9 +126,14 @@ BOOL check( WORD * expected ) {
 
       failed |= ( actEnd != expEnd );
     }
-    
-    printf( "Equalizer band%ld (%5ld - %5ld)-> expected %3ld - is %3ld\t-\t%s\n",
-            ( i >> 1 ) - 1, bandStart, actEnd, expGain, actGain, failed ? "failed" : "OK" );
+    printf( "Equalizer band%ld (%5ld - %5ld) -> expected %3ld - is %3ld\t"
+            "-\t%s\n",
+            ( LONG ) (( i >> 1 ) - 1 ),
+            ( LONG ) bandStart,
+            ( LONG ) actEnd,
+            ( LONG ) expGain,
+            ( LONG ) actGain,
+            ( failed ) ? "failed" : "OK" );
     bandStart = expEnd;
     result |= failed;
   }

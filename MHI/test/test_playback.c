@@ -208,7 +208,7 @@ BOOL testUnalignedPlayback( VOID ) {
     failed |= ( outBuffer32[ u ] != expectedBuffer32[ u ] );
     ///**/
     printf( "u = %ld is %ld - exp 0x%08lx act 0x%08lx\n",
-            u, failed, expectedBuffer32[ u ], outBuffer32[ u ] );
+            u, ( LONG ) failed, expectedBuffer32[ u ], outBuffer32[ u ] );
    /*  */
   }
   printf( "\nUnaligned Playback test %s\n\n", failed ? "failed" : "OK" );

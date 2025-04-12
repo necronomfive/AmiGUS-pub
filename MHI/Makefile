@@ -221,7 +221,12 @@ $(BDIR)%.o: $(SDIR)%.asm $(HDIR)*
 
 ###############################################################################
 
-test: test_playback
+test: test_dialog \
+      test_equalizer \
+      test_file \
+      test_math \
+      test_playback \
+      test_sleep
 
 test_dialog: FOLDERS
 	@echo " "
@@ -231,7 +236,7 @@ test_equalizer: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(CC) $(CFLAGS) test/$@.o test/$@.c
 	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
-            $(BDIR)mhi_all.o \
+            $(BDIR)amigus_vs1063.o \
             $(BDIR)debug.o $(BDIR)support.o \
             $(LFLAGST2)
 	@echo " "
@@ -266,6 +271,8 @@ test_sleep: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
 
+###############################################################################
+
 support: mhi_lib_check get_mem_log MHIplay
 
 get_mem_log:
@@ -285,6 +292,8 @@ MHIplay:
 	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
 	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
 	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+
+###############################################################################
 
 ADF: all support
 	mkdir -p adf

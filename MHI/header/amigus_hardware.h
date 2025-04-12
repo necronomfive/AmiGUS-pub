@@ -262,10 +262,12 @@
 UWORD ReadReg16( APTR amiGUS, ULONG offset );
 ULONG ReadReg32( APTR amiGUS, ULONG offset );
 UWORD ReadCodecSPI( APTR amiGUS, UWORD SPIregister );  
+UWORD ReadVS1063Mem( APTR amiGUS, UWORD address );
 
 VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
 VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
 VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue );
+VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value );
 
 /******************************************************************************
  * Low-Level hardware feature lookup tables

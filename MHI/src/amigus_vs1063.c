@@ -20,18 +20,6 @@
 #include "debug.h"
 #include "support.h"
 
-UWORD ReadVS1063Mem( APTR amiGUS, UWORD address ) {
-
-  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
-  return ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM );
-}
-
-VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
-
-  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
-  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
-}
-
 VOID InitVS1063Codec( APTR amiGUS ) {
 
   // Set SC_MULT to XTALI x 5.0 in SC_CLOCKF,

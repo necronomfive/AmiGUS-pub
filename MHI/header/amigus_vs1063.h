@@ -16,10 +16,6 @@
 
 #include <exec/types.h>
 
-UWORD ReadVS1063Mem( APTR amiGUS, UWORD address );
-
-VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value );
-
 VOID InitVS1063Codec( APTR amiGUS );
 
 /**

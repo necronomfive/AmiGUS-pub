@@ -1,5 +1,4 @@
 Next:
-- Fix MHI Unit Tests
 - AHI/MHI: move reservation of expansion device from driver loading to alloc/dealloc
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
 - Write missing comments and ReadMe.mds
@@ -31,3 +30,4 @@ Done:
 - Implement MHI equalizer
 - Fix stupid sounds blooping from one song to the next
 - MHI Volume handline - test SCI_VOL 1063ds p.53
+- Fix MHI Unit Tests

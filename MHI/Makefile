@@ -221,12 +221,24 @@ $(BDIR)%.o: $(SDIR)%.asm $(HDIR)*
 
 ###############################################################################
 
-test: test_dialog \
+test: test_cancel \
+      test_dialog \
       test_equalizer \
       test_file \
       test_math \
       test_playback \
       test_sleep
+
+test_cancel: FOLDERS $(LIB_OBJS)
+	@echo " "
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
+            $(BDIR)amigus_vs1063.o \
+            $(BDIR)debug.o $(BDIR)support.o \
+            $(LFLAGST2)
+	@echo " "
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
 
 test_dialog: FOLDERS
 	@echo " "

@@ -32,18 +32,6 @@ struct AmiGUS_MHI        * AmiGUS_MHI_Base   = NULL;
 
 WORD Equalizer[ 9 ];
 
-/*
-VOID UpdateVS1063Equalizer( APTR card, UWORD equalizerLevel, WORD value ) {
-
-  WORD level = equalizerLevel - VS1063_CODEC_ADDRESS_EQ5_LEVEL1;
-  level >>= 1;
-/ *
-  printf( "Setting 0x%04lx aka level%ld -> %ld\n",
-          equalizerLevel, level, value );
-* /
-  Equalizer[ level ] = value;
-}
-*/
 const WORD AmiGUSDefaultEqualizer[ 9 ] = {
   0, /* +/- 0dB */   125, /* Hz */
   0, /* +/- 0dB */   500, /* Hz */

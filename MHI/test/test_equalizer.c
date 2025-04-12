@@ -23,27 +23,26 @@
 #include "amigus_mhi.h"
 #include "amigus_hardware.h"
 
-VOID UpdateEqualizer( UBYTE index, UBYTE percent );
-
 /******************************************************************************
  * Mocked functions and stubbed external symbols below:
  *****************************************************************************/
 
 struct AmiGUS_MHI        * AmiGUS_MHI_Base   = NULL;
 
-WORD Equalizer[ 5 ];
+WORD Equalizer[ 9 ];
 
+/*
 VOID UpdateVS1063Equalizer( APTR card, UWORD equalizerLevel, WORD value ) {
 
   WORD level = equalizerLevel - VS1063_CODEC_ADDRESS_EQ5_LEVEL1;
   level >>= 1;
-/*
+/ *
   printf( "Setting 0x%04lx aka level%ld -> %ld\n",
           equalizerLevel, level, value );
-*/
+* /
   Equalizer[ level ] = value;
 }
-
+*/
 const WORD AmiGUSDefaultEqualizer[ 9 ] = {
   0, /* +/- 0dB */   125, /* Hz */
   0, /* +/- 0dB */   500, /* Hz */
@@ -52,36 +51,56 @@ const WORD AmiGUSDefaultEqualizer[ 9 ] = {
   0  /* +/- 0dB */
 };
 
+const UBYTE AmiGUSVolumeMapping[ 104 ] = {
+  0xFE /*  0% */, 
+  72 /*  1% */, 66 /*  2% */, 60 /*  3% */, 54 /*  4% */, 51 /*   5% */,
+  48 /*  6% */, 45 /*  7% */, 42 /*  8% */, 41 /*  9% */, 39 /*  10% */,
+  37 /* 11% */, 36 /* 12% */, 34 /* 13% */, 33 /* 14% */, 32 /*  15% */,
+  31 /* 16% */, 30 /* 17% */, 30 /* 18% */, 29 /* 19% */, 28 /*  20% */,
+  27 /* 21% */, 26 /* 22% */, 26 /* 23% */, 25 /* 24% */, 24 /*  25% */,
+  23 /* 26% */, 23 /* 27% */, 22 /* 28% */, 21 /* 29% */, 21 /*  30% */,
+  20 /* 31% */, 20 /* 32% */, 19 /* 33% */, 19 /* 34% */, 18 /*  35% */,
+  18 /* 36% */, 17 /* 37% */, 17 /* 38% */, 16 /* 39% */, 16 /*  40% */,
+  15 /* 41% */, 15 /* 42% */, 15 /* 43% */, 14 /* 44% */, 14 /*  45% */,
+  13 /* 46% */, 13 /* 47% */, 12 /* 48% */, 12 /* 49% */, 12 /*  50% */,
+  11 /* 51% */, 11 /* 52% */, 11 /* 53% */, 10 /* 54% */, 10 /*  55% */,
+  10 /* 56% */,  9 /* 57% */,  9 /* 58% */,  8 /* 59% */,  8 /*  60% */,
+   8 /* 61% */,  7 /* 62% */,  7 /* 63% */,  7 /* 64% */,  7 /*  65% */,
+   6 /* 66% */,  6 /* 67% */,  6 /* 68% */,  6 /* 69% */,  6 /*  70% */,
+   5 /* 71% */,  5 /* 72% */,  5 /* 73% */,  5 /* 74% */,  5 /*  75% */,
+   4 /* 76% */,  4 /* 77% */,  4 /* 78% */,  4 /* 79% */,  4 /*  80% */,
+   3 /* 81% */,  3 /* 82% */,  3 /* 83% */,  3 /* 84% */,  3 /*  85% */,
+   2 /* 86% */,  2 /* 87% */,  2 /* 88% */,  2 /* 89% */,  2 /*  90% */,
+   1 /* 91% */,  1 /* 92% */,  1 /* 93% */,  1 /* 94% */,  1 /*  95% */,
+   0 /* 96% */,  0 /* 97% */,  0 /* 98% */,  0 /* 99% */,  0 /* 100% */,
+  99          , 99          , 99 // padding back to LONGs
+};
 
-VOID StartAmiGusCodecPlayback( VOID ) {
+ULONG ReadReg32( APTR card, ULONG offset ) { return 0; }
+UWORD ReadCodecSPI( APTR card, UWORD SPIregister ) { return 0; }
+UWORD ReadVS1063Mem( APTR amiGUS, UWORD address ) { return 0; }
 
-  /* Just a mock - :) */
+VOID WriteReg16( APTR card, ULONG offset, UWORD value ) {}
+VOID WriteReg32( APTR card, ULONG offset, ULONG value ) {}
+VOID WriteCodecSPI( APTR card, UWORD SPIregister, UWORD SPIvalue ) {}
+
+VOID InitEqualizerMock() {
+
+  int i;
+
+  for ( i = 0; i < 9; ++i ) {
+
+    Equalizer[ i ] = i;
+  }
 }
-  
-VOID StopAmiGusCodecPlayback( VOID ) {
 
-  /* Just a mock - :) */
+VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
+
+  UWORD index = address - VS1063_CODEC_ADDRESS_EQ5_LEVEL1;
+  Equalizer[ index ] = value;
 }
 
-BOOL CreateInterruptHandler( VOID ) {
-
-  return FALSE;
-}
-
-VOID DestroyInterruptHandler( VOID ) {
-
-  /* Just a mock - :) */
-}
-
-VOID InitVS1063Equalizer( APTR card, BOOL enable, const WORD * settings ) {
-
-  /* Just a mock - :) */
-}
-
-VOID InitVS1063Codec( APTR card ) {
-
-  /* Just a mock - :) */
-}
+VOID SleepCodecTicks( ULONG ticks ) {}
 
 /******************************************************************************
  * Test functions:
@@ -91,12 +110,25 @@ BOOL check( WORD * expected ) {
 
   int i;
   BOOL result = FALSE;
+  WORD bandStart = 0;
 
-  for ( i = 0; i < 5; ++i ) {
+  for ( i = 0; i < 9; ) {
 
-    BOOL failed = ( expected[ i ] != Equalizer[ i ] );
-    printf( "Equalizer band%ld -> expected %3ld - is %3ld\t-\t%s\n",
-            i, expected[i], Equalizer[ i ], failed ? "failed" : "OK" );
+    BOOL failed = FALSE;
+    WORD expGain = expected[ i ];
+    WORD actGain = Equalizer[ i++ ];
+    WORD expEnd = expected[ i ];
+    WORD actEnd = ( 9 > i ) ? Equalizer[ i++ ] : 0x7fFF;
+
+    failed |= ( actGain != expGain );
+    if ( 9 > i ) {
+
+      failed |= ( actEnd != expEnd );
+    }
+    
+    printf( "Equalizer band%ld (%5ld - %5ld)-> expected %3ld - is %3ld\t-\t%s\n",
+            ( i >> 1 ) - 1, bandStart, actEnd, expGain, actGain, failed ? "failed" : "OK" );
+    bandStart = expEnd;
     result |= failed;
   }
 
@@ -105,212 +137,77 @@ BOOL check( WORD * expected ) {
 
 BOOL testDefaultState( VOID ) {
 
-  WORD expected[ 5 ] = { 0, 0, 0, 0, 0 };
-  int i;
+  WORD expected[ 9 ] = { 0, 125, 0, 500, 0, 2000, 0, 8000, 0 };
 
-  printf( "Testing all mid:\n" );
-  for ( i = 0; i < 11; ++i ) {
+  InitEqualizerMock();
 
-    UpdateEqualizer( i, 50 );
-  }
+  InitVS1063Equalizer( NULL, TRUE, AmiGUSDefaultEqualizer );
 
   return check( expected );
 }
 
-BOOL testGainState1( VOID ) {
+BOOL testMaxGainAllMid( VOID ) {
 
-  WORD expected[ 5 ] = { 32, 32, 32, 32, 32 };
-  int i;
+  WORD expected[ 9 ] = { 32, 125, 32, 500, 32, 2000, 32, 8000, 32 };
+  UBYTE in[ 11 ] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100 };
 
-  printf( "Testing all mid, gain max\n" );
-  for ( i = 0; i < 10; ++i ) {
-
-    UpdateEqualizer( i, 50 );
-  }
-  UpdateEqualizer( 10, 100 );
+  InitVS1063Equalizer( NULL, TRUE, AmiGUSDefaultEqualizer );
+  UpdateVS1063Equalizer( NULL, in );
 
   return check( expected );
 }
 
-BOOL testGainState2( VOID ) {
+BOOL testMinGainAllMid( VOID ) {
 
-  WORD expected[ 5 ] = { -32, -32, -32, -32, -32 };
-  int i;
+  WORD expected[ 9 ] = { -32, 125, -32, 500, -32, 2000, -32, 8000, -32 };
+  UBYTE in[ 11 ] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-  printf( "Testing all mid, gain min\n" );
-  for ( i = 0; i < 10; ++i ) {
-
-    UpdateEqualizer( i, 50 );
-  }
-  UpdateEqualizer( 10, 0 );
+  InitVS1063Equalizer( NULL, TRUE, AmiGUSDefaultEqualizer );
+  UpdateVS1063Equalizer( NULL, in );
 
   return check( expected );
 }
 
-BOOL testGainState3( VOID ) {
+BOOL testNoGainRamp( VOID ) {
 
-  WORD expected[ 5 ] = { 32, 32, 32, 32, 32 };
-  int i;
+  WORD expected[ 9 ] = { -13, 125, -7, 500, 0, 2000, 6, 8000, 13 };
+  UBYTE in[ 11 ] = { 25, 35, 35, 45, 45, 55, 55, 65, 65, 75, 50 };
 
-  printf( "Testing all min, gain max\n" );
-  for ( i = 0; i < 10; ++i ) {
-
-    UpdateEqualizer( i, 0 );
-  }
-  UpdateEqualizer( 10, 100 );
+  InitVS1063Equalizer( NULL, TRUE, AmiGUSDefaultEqualizer );
+  UpdateVS1063Equalizer( NULL, in );
 
   return check( expected );
 }
 
-BOOL testGainState4( VOID ) {
+BOOL testMaxGainRamp( VOID ) {
 
-  WORD expected[ 5 ] = { -32, -32, -32, -32, -32 };
-  int i;
+  WORD expected[ 9 ] = { 3, 125, 9, 500, 16, 2000, 22, 8000, 29 };
+  UBYTE in[ 11 ] = { 25, 35, 35, 45, 45, 55, 55, 65, 65, 75, 100 };
 
-  printf( "Testing all max, gain min\n" );
-  for ( i = 0; i < 10; ++i ) {
-
-    UpdateEqualizer( i, 100 );
-  }
-  UpdateEqualizer( 10, 0 );
+  InitVS1063Equalizer( NULL, TRUE, AmiGUSDefaultEqualizer );
+  UpdateVS1063Equalizer( NULL, in );
 
   return check( expected );
 }
 
-BOOL testGainState5( VOID ) {
+BOOL testMinGainRamp( VOID ) {
 
-  WORD expected[ 5 ] = { -32, 32, 0, 0, 0 };
-  int i;
+  WORD expected[ 9 ] = { -29, 125, -23, 500, -16, 2000, -10, 8000, -3 };
+  UBYTE in[ 11 ] = { 25, 35, 35, 45, 45, 55, 55, 65, 65, 75, 0 };
 
-  printf( "Testing 0: min, 1: max, gain: min\n" );
-  for ( i = 4; i < 10; ++i ) {
-
-    UpdateEqualizer( i, 50 );
-  }
-  UpdateEqualizer( 0, 0 );
-  UpdateEqualizer( 1, 0 );
-  UpdateEqualizer( 2, 100 );
-  UpdateEqualizer( 3, 100 );
-  UpdateEqualizer( 10, 0 );
+  InitVS1063Equalizer( NULL, TRUE, AmiGUSDefaultEqualizer );
+  UpdateVS1063Equalizer( NULL, in );
 
   return check( expected );
 }
 
-BOOL testGainState6( VOID ) {
+BOOL testSomeGainRamp( VOID ) {
 
-  WORD expected[ 5 ] = { -32, 32, 0, 0, 0 };
-  int i;
+  WORD expected[ 9 ] = { -5, 125, 1, 500, 8, 2000, 14, 8000, 21 };
+  UBYTE in[ 11 ] = { 25, 35, 35, 45, 45, 55, 55, 65, 65, 75, 75 };
 
-  printf( "Testing 0: min, 1: max, gain: max\n" );
-  for ( i = 4; i < 10; ++i ) {
-
-    UpdateEqualizer( i, 50 );
-  }
-  UpdateEqualizer( 0, 0 );
-  UpdateEqualizer( 1, 0 );
-  UpdateEqualizer( 2, 100 );
-  UpdateEqualizer( 3, 100 );
-  UpdateEqualizer( 10, 100 );
-
-  return check( expected );
-}
-
-BOOL testDistState1( VOID ) {
-
-  WORD expected[ 5 ] = { -13, -7, 0, 6, 13 };
-
-  printf( "Testing 0-5: asc ramp gain: none\n" );
-  UpdateEqualizer( 0, 30 );
-  UpdateEqualizer( 1, 30 );
-  UpdateEqualizer( 2, 40 );
-  UpdateEqualizer( 3, 40 );
-  UpdateEqualizer( 4, 50 );
-  UpdateEqualizer( 5, 50 );
-  UpdateEqualizer( 6, 60 );
-  UpdateEqualizer( 7, 60 );
-  UpdateEqualizer( 8, 70 );
-  UpdateEqualizer( 9, 70 );
-  UpdateEqualizer( 10, 50 );
-
-  return check( expected );
-}
-
-BOOL testDistState2( VOID ) {
-
-  WORD expected[ 5 ] = { -7, -1, 6, 12, 19 };
-
-  printf( "Testing 0-5: asc ramp gain: some\n" );
-  UpdateEqualizer( 0, 30 );
-  UpdateEqualizer( 1, 30 );
-  UpdateEqualizer( 2, 40 );
-  UpdateEqualizer( 3, 40 );
-  UpdateEqualizer( 4, 50 );
-  UpdateEqualizer( 5, 50 );
-  UpdateEqualizer( 6, 60 );
-  UpdateEqualizer( 7, 60 );
-  UpdateEqualizer( 8, 70 );
-  UpdateEqualizer( 9, 70 );
-  UpdateEqualizer( 10, 67 );
-
-  return check( expected );
-}
-
-BOOL testDistState3( VOID ) {
-
-  WORD expected[ 5 ] = { -20, -14, -7, -1, 6 };
-
-  printf( "Testing 0-5: asc ramp gain: neg\n" );
-  UpdateEqualizer( 0, 30 );
-  UpdateEqualizer( 1, 30 );
-  UpdateEqualizer( 2, 40 );
-  UpdateEqualizer( 3, 40 );
-  UpdateEqualizer( 4, 50 );
-  UpdateEqualizer( 5, 50 );
-  UpdateEqualizer( 6, 60 );
-  UpdateEqualizer( 7, 60 );
-  UpdateEqualizer( 8, 70 );
-  UpdateEqualizer( 9, 70 );
-  UpdateEqualizer( 10, 30 );
-
-  return check( expected );
-}
-
-BOOL testDistState4( VOID ) {
-
-  WORD expected[ 5 ] = { -32, -26, -19, -13, -6 };
-
-  printf( "Testing 0-5: asc ramp gain: min\n" );
-  UpdateEqualizer( 0, 30 );
-  UpdateEqualizer( 1, 30 );
-  UpdateEqualizer( 2, 40 );
-  UpdateEqualizer( 3, 40 );
-  UpdateEqualizer( 4, 50 );
-  UpdateEqualizer( 5, 50 );
-  UpdateEqualizer( 6, 60 );
-  UpdateEqualizer( 7, 60 );
-  UpdateEqualizer( 8, 70 );
-  UpdateEqualizer( 9, 70 );
-  UpdateEqualizer( 10, 0 );
-
-  return check( expected );
-}
-
-BOOL testDistState5( VOID ) {
-
-  WORD expected[ 5 ] = { 6, 12, 19, 25, 32 };
-
-  printf( "Testing 0-5: asc ramp gain: max\n" );
-  UpdateEqualizer( 0, 30 );
-  UpdateEqualizer( 1, 30 );
-  UpdateEqualizer( 2, 40 );
-  UpdateEqualizer( 3, 40 );
-  UpdateEqualizer( 4, 50 );
-  UpdateEqualizer( 5, 50 );
-  UpdateEqualizer( 6, 60 );
-  UpdateEqualizer( 7, 60 );
-  UpdateEqualizer( 8, 70 );
-  UpdateEqualizer( 9, 70 );
-  UpdateEqualizer( 10, 100 );
+  InitVS1063Equalizer( NULL, TRUE, AmiGUSDefaultEqualizer );
+  UpdateVS1063Equalizer( NULL, in );
 
   return check( expected );
 }
@@ -333,17 +230,12 @@ int main(int argc, char const *argv[]) {
   }
 
   failed |= testDefaultState();
-  failed |= testGainState1();
-  failed |= testGainState2();
-  failed |= testGainState3();
-  failed |= testGainState4();
-  failed |= testGainState5();
-  failed |= testGainState6();
-  failed |= testDistState1();
-  failed |= testDistState2();
-  failed |= testDistState3();
-  failed |= testDistState4();
-  failed |= testDistState5();
+  failed |= testMaxGainAllMid();
+  failed |= testMinGainAllMid();
+  failed |= testNoGainRamp();
+  failed |= testMaxGainRamp();
+  failed |= testMinGainRamp();
+  failed |= testSomeGainRamp();
 
   free( AmiGUS_MHI_Base );
 

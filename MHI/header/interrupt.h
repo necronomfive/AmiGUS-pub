@@ -21,7 +21,7 @@
 #include "SDI_compiler.h"
 
 VOID HandlePlayback( VOID );
-BOOL CreateInterruptHandler( VOID );
+LONG CreateInterruptHandler( VOID );
 VOID DestroyInterruptHandler( VOID );
 
 #endif /* INTERRUPT_H */

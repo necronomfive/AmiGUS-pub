@@ -1,6 +1,5 @@
 Next:
-- Fix MHI TODOs
-- Fix Unit tests
+- Fix MHI Unit Tests
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
 - Write missing comments and ReadMe.mds
 - Decide on debug + cpu variants
@@ -16,6 +15,7 @@ Next:
 - Mixer UI elements and their responsiveness
 - Get mpeg.device working as per https://aminet.net/package/mus/play/dmdev
 - Make CAMD on https://aminet.net/package/mus/midi/camd / https://aminet.net/package/mus/play/projectomega / https://aminet.net/package/driver/other/uaemidi / https://aminet.net/package/mus/midi/camd40 / https://aminet.net/package/driver/other/mmp
+- Start applying vendor patches to VS1063a firmware
 - Fully split Recording + Playback parts in AHI to allow 1 client each
 
 Done:

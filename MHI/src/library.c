@@ -170,7 +170,11 @@ static ASM( LIB_PTR ) SAVEDS LibInit(
   }
 
   CustomLibClose(( LIBRARY_TYPE * ) base );
-  // TODO: more error handling here - FreeMem? Expunge?
+
+  /* Free the vector table and the library data */
+  FreeMem(( APTR )(( ULONG ) base - ( ULONG )( base->LibNode.lib_NegSize )),
+          base->LibNode.lib_NegSize + base->LibNode.lib_PosSize );
+
   return NULL;
 }
 

@@ -281,10 +281,5 @@ VOID ResetVS1063( APTR amiGUS ) {
   // page 56 - 11.3 Software Reset
   SleepCodecTicks( VS1063_CODEC_RESET_DELAY_TICKS );
 
-  /*
-  // TODO: do we want / need that?
-  LOG_D(( "D: ... patching ...\n"));
-  ApplyCompressedVS1063Patch( amiGUS, VS1063Patch20191204 );
-  */
   LOG_D(( "D: ... done.\n"));
 }

@@ -25,6 +25,7 @@
 #include "amigus_hardware.h"
 #include "amigus_vs1063.h"
 #include "debug.h"
+#include "errors.h"
 #include "interrupt.h"
 
 VOID HandlePlayback( VOID ) {
@@ -154,19 +155,18 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   return 0;
 }
 
-// TRUE = failure
-BOOL CreateInterruptHandler( VOID ) {
+LONG CreateInterruptHandler( VOID ) {
 
-  if (AmiGUS_MHI_Base->agb_Interrupt) {
+  if ( AmiGUS_MHI_Base->agb_Interrupt ) {
 
-    LOG_D(("D: INT server in use!\n"));
-    return FALSE;
+    LOG_D(( "D: INT server in use!\n" ));
+    return ENoError;
   }
 
-  LOG_D(("D: Creating INT server\n"));
+  LOG_D(( "D: Creating INT server\n" ));
   Disable();
 
-  AmiGUS_MHI_Base->agb_Interrupt = (struct Interrupt *)
+  AmiGUS_MHI_Base->agb_Interrupt = ( struct Interrupt * )
       AllocMem(
           sizeof( struct Interrupt ),
           MEMF_CLEAR | MEMF_PUBLIC
@@ -182,14 +182,14 @@ BOOL CreateInterruptHandler( VOID ) {
 
     Enable();
 
-    LOG_D(("D: Created INT server\n"));
-    return FALSE;
+    LOG_D(( "D: Created INT server\n" ));
+    return ENoError;
   }
 
   Enable();
-  LOG_D(("D: Failed creating INT server\n"));
-  // TODO: Display error?
-  return TRUE;
+  LOG_D(( "D: Failed creating INT server\n" ));
+
+  return EAllocateInterrupt;
 }
 
 VOID DestroyInterruptHandler( VOID ) {

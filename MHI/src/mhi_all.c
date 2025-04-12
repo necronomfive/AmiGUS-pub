@@ -130,9 +130,10 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     UpdateVS1063VolumePanning( card,
                                handle->agch_MHI_Volume,
                                handle->agch_MHI_Panning );
-    CreateInterruptHandler();
+    error = CreateInterruptHandler();
 
-  } else {
+  }
+  if ( error ) {
 
     // Takes care of the log entry, too. :)
     DisplayError( error );
@@ -415,7 +416,7 @@ ASM( ULONG ) SAVEDS MHIQuery(
     }
     case MHIQ_IS_68K:
     case MHIQ_IS_PPC:
-    case MHIQ_CROSSMIXING:     // TODO
+    case MHIQ_CROSSMIXING:
     default: {
       break;
     }

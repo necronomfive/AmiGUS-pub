@@ -40,6 +40,7 @@ enum TErrorCodes
   EOutOfMemory,
   EAllocatePlaybackBuffers,
   EAllocateRecordingBuffers,
+  EAllocateInterrupt,
   EWorkerProcessCreationFailed,
   EWorkerProcessDied,
   EWorkerProcessSignalsFailed,

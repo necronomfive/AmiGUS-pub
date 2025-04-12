@@ -1,5 +1,6 @@
 Next:
 - Fix MHI Unit Tests
+- AHI/MHI: move reservation of expansion device from driver loading to alloc/dealloc
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
 - Write missing comments and ReadMe.mds
 - Decide on debug + cpu variants

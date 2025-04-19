@@ -66,7 +66,7 @@ HDIR   = header/
 LIB_NAME        = mhiamigus
 LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
-LIB_REVISION    = 4
+LIB_REVISION    = 5
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS      =

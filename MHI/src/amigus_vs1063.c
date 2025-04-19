@@ -267,7 +267,7 @@ VOID ResetVS1063( APTR amiGUS ) {
                  VS1063_CODEC_SCI_MODE,
                  VS1063_CODEC_F_SM_RESET );
   // page 56 - 11.3 Software Reset
-  SleepCodecTicks( VS1063_CODEC_RESET_DELAY_TICKS );
+  SleepCodecTicks( amiGUS, VS1063_CODEC_RESET_DELAY_TICKS );
 
   LOG_D(( "D: ... done.\n"));
 }

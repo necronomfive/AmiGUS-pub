@@ -70,7 +70,8 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a6, struct AmiGUS_MHI * base ) 
 ) {
 
-  APTR result = NULL;
+  struct AmiGUS_MHI_Handle * handle = NULL;
+  struct ConfigDev * device = NULL;
   ULONG error = ENoError;
   ULONG i;
 
@@ -80,7 +81,7 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
     DisplayError( ELibraryBaseInconsistency );
   }
-
+/*TODO: 
   Forbid();
   if (( !AmiGUS_MHI_Base->agb_CardBase )
         || ( !AmiGUS_MHI_Base->agb_ConfigDevice )) {
@@ -102,11 +103,22 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver = ( APTR ) AmiGUS_MHI_Base;
   }
   Permit();
-
+*/
   if ( !error ) {
  
-    APTR card = AmiGUS_MHI_Base->agb_CardBase;
-    struct AmiGUS_MHI_Handle * handle = &AmiGUS_MHI_Base->agb_ClientHandle;
+    handle = &AmiGUS_MHI_Base->agb_ClientHandle;
+    Forbid();
+    error = FindAmiGusCodec( &( handle->agch_ConfigDevice ));
+    if ( !error ) {
+
+      handle->agch_ConfigDevice->cd_Driver = handle;
+    }
+    Permit();
+  }
+  if ( !error ) {
+
+    APTR card = handle->agch_ConfigDevice->cd_BoardAddr;
+    handle->agch_CardBase = card;
     handle->agch_Task = task;
     handle->agch_Signal = signal;
     handle->agch_Status = MHIF_STOPPED;
@@ -118,8 +130,6 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     handle->agch_MHI_Panning = 50;
     handle->agch_MHI_Volume = 50;
     NonConflictingNewMinList( &handle->agch_Buffers );
-
-    result = ( APTR ) handle;
 
     LOG_D(( "D: AmiGUS MHI accepted task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
@@ -135,12 +145,16 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   }
   if ( error ) {
 
+    if ( handle ) {
+      // TODO: if alloc'ed: free here
+    }
+
     // Takes care of the log entry, too. :)
     DisplayError( error );
   }
   
   LOG_D(( "D: MHIAllocDecoder done\n" ));
-  return result;
+  return handle;
 }
 
 ASM( VOID ) SAVEDS MHIFreeDecoder(
@@ -167,14 +181,11 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   }
 
   Forbid();
-  if (( AmiGUS_MHI_Base->agb_UsageCounter ) &&
-      ( AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver
-        == ( APTR ) AmiGUS_MHI_Base )) {
+  if (( clientHandle->agch_ConfigDevice->cd_Driver == handle )) {
 
     clientHandle->agch_Task = NULL;
     clientHandle->agch_Signal = 0;
-    --AmiGUS_MHI_Base->agb_UsageCounter;
-    AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver = NULL;
+    clientHandle->agch_ConfigDevice->cd_Driver = NULL;
 
   } else {
 
@@ -315,7 +326,7 @@ ASM( VOID ) SAVEDS MHIPlay(
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
   LOG_D(( "D: MHIPlay start\n" ));
-  StartAmiGusCodecPlayback();
+  StartAmiGusCodecPlayback( clientHandle );
   clientHandle->agch_Status = MHIF_PLAYING;
   LOG_D(( "D: MHIPlay done\n" ));
   return;
@@ -329,7 +340,7 @@ ASM( VOID ) SAVEDS MHIStop(
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
   LOG_D(( "D: MHIStop start\n" ));
-  StopAmiGusCodecPlayback();
+  StopAmiGusCodecPlayback( clientHandle );
   FlushAllBuffers( clientHandle );
   clientHandle->agch_Status = MHIF_STOPPED;
   LOG_D(( "D: MHIStop done\n" ));
@@ -435,7 +446,7 @@ ASM( VOID ) SAVEDS MHISetParam(
 
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
-  APTR card = AmiGUS_MHI_Base->agb_CardBase;
+  APTR card = clientHandle->agch_CardBase;
   UBYTE * volume = &( clientHandle->agch_MHI_Volume );
   UBYTE * panning = &( clientHandle->agch_MHI_Panning );
 

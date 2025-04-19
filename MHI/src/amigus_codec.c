@@ -25,9 +25,9 @@
 #include "interrupt.h"
 #include "support.h"
 
-LONG FindAmiGusCodec( struct AmiGUS_MHI * base ) {
+LONG FindAmiGusCodec( struct ConfigDev ** device ) {
 
-  struct ConfigDev *configDevice = 0;
+  struct ConfigDev * configDevice = NULL; // TODO: needed?
   ULONG serial;
   UBYTE minute;
   UBYTE hour;
@@ -72,20 +72,17 @@ LONG FindAmiGusCodec( struct AmiGUS_MHI * base ) {
   LOG_I(("I: AmiGUS firmware date %04ld-%02ld-%02ld, %02ld:%02ld\n",
          year, month, day, hour, minute));
 
-  base->agb_ConfigDevice = configDevice;
-  base->agb_CardBase = ( APTR ) configDevice->cd_BoardAddr;
-  LOG_I(( "I: AmiGUS found at 0x%08lx\n",
-          base->agb_CardBase ));
-  LOG_V(( "V: AmiGUS address stored at 0x%08lx\n",
-          &( base->agb_CardBase )));
-  base->agb_UsageCounter = 0;
+  *device = configDevice;
+  LOG_I(( "I: AmiGUS found at 0x%08lx\n", ( *device )->cd_BoardAddr ));
+  LOG_V(( "V: AmiGUS address stored at 0x%08lx\n", device ));
 
   return ENoError;
 }
 
-VOID StartAmiGusCodecPlayback( VOID ) {
+VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle ) {
 
-  APTR card = AmiGUS_MHI_Base->agb_CardBase;
+  APTR card = handle->agch_CardBase;
+
   WriteReg16( card,
               AMIGUS_CODEC_FIFO_RESET,
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );
@@ -122,15 +119,15 @@ VOID StartAmiGusCodecPlayback( VOID ) {
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_TIMER );
-  HandlePlayback();
+  HandlePlayback( handle );
   WriteReg16( card,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_ENABLE );
 }
 
-VOID StopAmiGusCodecPlayback( VOID ) {
+VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle ) {
 
-  APTR card = AmiGUS_MHI_Base->agb_CardBase;
+  APTR card = handle->agch_CardBase;
 
   // Original AmiGUS "stop playback" functionality
   WriteReg16( card,
@@ -160,22 +157,21 @@ VOID StopAmiGusCodecPlayback( VOID ) {
   CancelVS1063Playback( card );
 }
 
-VOID SleepCodecTicks( ULONG ticks ) {
+VOID SleepCodecTicks( APTR amiGUS, ULONG ticks ) {
 
-  APTR card = AmiGUS_MHI_Base->agb_CardBase;
   LONG rounds = 0;
 
   LOG_V(( "V: Sleeping for %ld ticks\n", ticks ));
-  WriteReg32( card, AMIGUS_CODEC_TIMER_RELOAD, ticks );
-  WriteReg16( card,
+  WriteReg32( amiGUS, AMIGUS_CODEC_TIMER_RELOAD, ticks );
+  WriteReg16( amiGUS,
               AMIGUS_CODEC_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
               | AMIGUS_CODEC_INT_F_TIMER );
-  WriteReg16( card, 
+  WriteReg16( amiGUS, 
               AMIGUS_CODEC_TIMER_CONTROL,
               AMIGUS_TIMER_ONCE | AMIGUS_TIMER_START );
   while ( !( AMIGUS_CODEC_INT_F_TIMER 
-          & ReadReg16( card, AMIGUS_CODEC_INT_CONTROL ))) {
+          & ReadReg16( amiGUS, AMIGUS_CODEC_INT_CONTROL ))) {
 
     ++rounds;
   }

@@ -78,6 +78,9 @@ struct AmiGUS_MHI_Handle {
   struct MinList                agch_Buffers;
   struct AmiGUS_MHI_Buffer    * agch_CurrentBuffer;
 
+  struct ConfigDev            * agch_ConfigDevice;
+  APTR                          agch_CardBase;
+
   UBYTE                         agch_MHI_Panning;
   UBYTE                         agch_MHI_Volume;
   UWORD                         agch_reserved0;
@@ -101,17 +104,10 @@ struct AmiGUS_MHI {
   struct Library              * agb_ExpansionBase;
 
   /* AmiGUS specific member variables */
-  struct ConfigDev            * agb_ConfigDevice;
-  APTR                          agb_CardBase;
   struct Interrupt            * agb_Interrupt;
 
   /* Client info */
   struct AmiGUS_MHI_Handle      agb_ClientHandle;
-
-  /* Only 1 AmiGUS supported per machine currently, sorry */
-  BYTE                          agb_UsageCounter;
-  UBYTE                         agb_Reserved0;
-  UWORD                         agb_Reserved1;
 
   BPTR                          agb_LogFile;       /* Debug log file handle  */
   APTR                          agb_LogMem;        /* Debug log memory blob  */

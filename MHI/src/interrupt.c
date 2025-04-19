@@ -28,10 +28,9 @@
 #include "errors.h"
 #include "interrupt.h"
 
-VOID HandlePlayback( VOID ) {
+VOID HandlePlayback( struct AmiGUS_MHI_Handle * handle ) {
 
-  APTR card = AmiGUS_MHI_Base->agb_CardBase;
-  struct AmiGUS_MHI_Handle * handle = &( AmiGUS_MHI_Base->agb_ClientHandle );
+  APTR card = handle->agch_CardBase;
   struct AmiGUS_MHI_Buffer * current = handle->agch_CurrentBuffer;
   const APTR tail = ( const APTR ) &( handle->agch_Buffers.mlh_Tail );
   /* Read-back remaining FIFO samples in BYTES */
@@ -121,15 +120,16 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUS_MHI_Base * base)
 ) {
 
-  const UWORD status = ReadReg16( AmiGUS_MHI_Base->agb_CardBase,
-                                  AMIGUS_CODEC_INT_CONTROL );
+  struct AmiGUS_MHI_Handle * handle = &( AmiGUS_MHI_Base->agb_ClientHandle );
+  APTR card = handle->agch_CardBase;
+  const UWORD status = ReadReg16( card, AMIGUS_CODEC_INT_CONTROL );
 
   if ( status & ( AMIGUS_CODEC_INT_F_FIFO_EMPTY
                 | AMIGUS_CODEC_INT_F_FIFO_WATERMRK )) {
 
-    if ( MHIF_PLAYING == AmiGUS_MHI_Base->agb_ClientHandle.agch_Status ) {
+    if ( MHIF_PLAYING == handle->agch_Status ) {
 
-      HandlePlayback();
+      HandlePlayback( handle );
 /*
     if ( status & AMIGUS_INT_F_PLAY_FIFO_EMPTY ) {
 
@@ -144,7 +144,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
     }
 
     /* Clear AmiGUS control flags here!!! */
-    WriteReg16( AmiGUS_MHI_Base->agb_CardBase,
+    WriteReg16( card,
                 AMIGUS_CODEC_INT_CONTROL,
                 AMIGUS_INT_F_CLEAR
                 | AMIGUS_CODEC_INT_F_FIFO_EMPTY

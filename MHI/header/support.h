@@ -44,14 +44,6 @@
  */
 VOID DisplayError( ULONG aError );
 
-/**
- * Correctly initializes an empty, new MinList.
- *
- * @param list Pointer to MinList to initialize, will be empty afterwards,
- *             all former content would be orphaned.
- */
-VOID NonConflictingNewMinList( struct MinList * list );
-
 VOID ShowError( STRPTR title, STRPTR message, STRPTR button );
 
 VOID ShowAlert( ULONG alertNum );

@@ -101,7 +101,9 @@ BOOL testAlignedPlayback( VOID ) {
   struct AmiGUS_MHI_Buffer mhiBufferB;
   ULONG bufferA[] = { 1, 2, 3, 4 };
   ULONG bufferB[] = { 5, 6, 7, 8 };
-  struct AmiGUS_MHI_Handle * handle = &AmiGUS_MHI_Base->agb_ClientHandle;
+  struct AmiGUS_MHI_Handle * handle =
+    ( struct AmiGUS_MHI_Handle * )
+      AmiGUS_MHI_Base->agb_Clients.mlh_Head;
 
   mhiBufferA.agmb_Buffer = ( ULONG * ) &bufferA;
   mhiBufferA.agmb_BufferIndex = 0;
@@ -113,7 +115,7 @@ BOOL testAlignedPlayback( VOID ) {
   mhiBufferB.agmb_BufferMax = 4;
   mhiBufferB.agmb_BufferExtraBytes = 0;
 
-  NonConflictingNewMinList( &handle->agch_Buffers );
+  NEW_LIST( &handle->agch_Buffers );
   AddTail( ( struct List * ) &handle->agch_Buffers, 
            ( struct Node * ) &mhiBufferA );
   AddTail( ( struct List * ) &handle->agch_Buffers,
@@ -169,7 +171,9 @@ BOOL testUnalignedPlayback( VOID ) {
   UBYTE bufferA[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
                       0x12, 0x34, 0x56, 0x78 };
   ULONG bufferB[] = { 5, 6, 7, 8 };
-  struct AmiGUS_MHI_Handle * handle = &AmiGUS_MHI_Base->agb_ClientHandle;
+  struct AmiGUS_MHI_Handle * handle =
+    ( struct AmiGUS_MHI_Handle * )
+      AmiGUS_MHI_Base->agb_Clients.mlh_Head;
 
   mhiBufferA.agmb_Buffer = ( ULONG * ) &bufferA;
   mhiBufferA.agmb_BufferIndex = 0;
@@ -181,7 +185,7 @@ BOOL testUnalignedPlayback( VOID ) {
   mhiBufferB.agmb_BufferMax = 4;
   mhiBufferB.agmb_BufferExtraBytes = 0;
 
-  NonConflictingNewMinList( &handle->agch_Buffers );
+  NEW_LIST( &handle->agch_Buffers );
   AddTail( ( struct List * ) &handle->agch_Buffers, 
            ( struct Node * ) &mhiBufferA );
   AddTail( ( struct List * ) &handle->agch_Buffers,
@@ -208,7 +212,10 @@ BOOL testUnalignedPlayback( VOID ) {
     failed |= ( outBuffer32[ u ] != expectedBuffer32[ u ] );
     ///**/
     printf( "u = %ld is %ld - exp 0x%08lx act 0x%08lx\n",
-            u, ( LONG ) failed, expectedBuffer32[ u ], outBuffer32[ u ] );
+            ( LONG ) u,
+            ( LONG ) failed,
+            expectedBuffer32[ u ],
+            outBuffer32[ u ] );
    /*  */
   }
   printf( "\nUnaligned Playback test %s\n\n", failed ? "failed" : "OK" );
@@ -222,8 +229,13 @@ int main(int argc, char const *argv[]) {
 
   BOOL failed = FALSE;
 
-  AmiGUS_MHI_Base = malloc( sizeof( struct AmiGUS_MHI ) );
-  memset( AmiGUS_MHI_Base, 0, sizeof( struct AmiGUS_MHI ) );
+  struct AmiGUS_MHI_Handle * handle = 
+    malloc( sizeof( struct AmiGUS_MHI_Handle ));
+  AmiGUS_MHI_Base = malloc( sizeof( struct AmiGUS_MHI ));
+  memset( AmiGUS_MHI_Base, 0, sizeof( struct AmiGUS_MHI ));
+  NEW_LIST( &AmiGUS_MHI_Base->agb_Clients );
+  AddTail(( struct List * ) &AmiGUS_MHI_Base->agb_Clients,
+          ( struct Node * ) handle );
 
   if ( !AmiGUS_MHI_Base ) {
 
@@ -234,6 +246,7 @@ int main(int argc, char const *argv[]) {
   failed |= testAlignedPlayback();
   failed |= testUnalignedPlayback();
 
+  free( handle );
   free( AmiGUS_MHI_Base );
 
   return ( failed ) ? 15 : 0;

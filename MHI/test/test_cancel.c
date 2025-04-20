@@ -151,8 +151,8 @@ BOOL CheckWrites( ULONG * expectedWrites ) {
   while ( check < NextWriteBuffer ) {
 
     ULONG count = *expectedWrites++;
-    printf( "Checking %8ld writes of type 0x%08lx\n",
-            count, *expectedWrites & 0xf0000000 );
+    printf( "Checking %8lu writes of type 0x%08lx\n",
+            count, ( LONG ) ( *expectedWrites & 0xf0000000 ));
 
     while ( count ) {
       for ( i = 0; i < 2 ; ++i ) {

@@ -36,8 +36,6 @@ struct AmiGUS_MHI        * AmiGUS_MHI_Base   = 0;
 
 #endif
 
-// # d e fine USE_FAKE_DEVICE
-
 /* Closes all the libraries opened by LibInit() */
 VOID CustomLibClose( LIBRARY_TYPE * base ) {
 
@@ -72,8 +70,6 @@ VOID CustomLibClose( LIBRARY_TYPE * base ) {
 }
 
 LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
-
-  LONG error;
 
   /* Prevent use of customized library versions on CPUs not targetted. */
 #ifdef _M68060

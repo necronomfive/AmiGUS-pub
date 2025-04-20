@@ -72,14 +72,14 @@ struct AmiGUS_MHI_Buffer {
 };
 
 struct AmiGUS_MHI_Handle {
+  APTR                          agch_CardBase;
+  struct ConfigDev            * agch_ConfigDevice;
+
   struct Task                 * agch_Task;
   LONG                          agch_Signal;
 
   struct MinList                agch_Buffers;
   struct AmiGUS_MHI_Buffer    * agch_CurrentBuffer;
-
-  struct ConfigDev            * agch_ConfigDevice;
-  APTR                          agch_CardBase;
 
   UBYTE                         agch_MHI_Panning;
   UBYTE                         agch_MHI_Volume;

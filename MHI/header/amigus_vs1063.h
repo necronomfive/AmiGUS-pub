@@ -1,18 +1,23 @@
 /*
- * This file is part of the mhiAmiGUS.library driver.
+ * This file is part of the mhiamigus.library.
  *
- * mhiAmiGUS.library driver is free software: you can redistribute it and/or modify
+ * mhiamigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiAmiGUS.library driver is distributed in the hope that it will be useful,
+ * mhiamigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU LesserGeneral Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiAmiGUS.library driver.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mhiamigus.library.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef AMIGUS_VS1063_H
+#define AMIGUS_VS1063_H
 
 #include <exec/types.h>
 
@@ -58,3 +63,5 @@ ULONG GetVS1063EndFill( APTR amiGUS );
 VOID CancelVS1063Playback( APTR amiGUS );
 
 VOID ResetVS1063( APTR amiGUS );
+
+#endif /* AMIGUS_VS1063_H */

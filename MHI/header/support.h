@@ -19,12 +19,32 @@
 
 #include <exec/types.h>
 
+/**
+ * Initializes a List or a MinList as empty.
+ * 
+ * Careful, 
+ * this involves some cruel casts and trashes everything
+ * that is put into it without warnings by the compiler!
+ *
+ * @param list List or MinList to initialize.
+ */
 #define NEW_LIST( list ) \
   (( struct List * ) list)->lh_Head = \
     ( struct Node * ) &((( struct List * ) list)->lh_Tail); \
   (( struct List * ) list)->lh_Tail = NULL; \
   (( struct List * ) list)->lh_TailPred = ( struct Node * ) list
 
+/**
+ * Iterates with a for-loop over all elements of a List or a MinList.
+ * 
+ * Careful, 
+ * this involves some cruel casts and trashes everything
+ * that is put into it without warnings by the compiler!
+ *
+ * @param list List or MinList to iterate over.
+ * @param node Node or MinNode of matching type as in list for iterating.
+ * @param node_type Matching type of the Node or MinNode, used for casting.
+ */
 #define FOR_LIST( list, node, node_type ) \
   for ( node = ( node_type ) (( struct List * ) list)->lh_Head ;\
         ( node_type ) (( struct Node * ) node)->ln_Succ \

@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "errors.h"
 #include "interrupt.h"
+#include "support.h"
 
 VOID HandlePlayback( struct AmiGUS_MHI_Handle * handle ) {
 
@@ -121,13 +122,10 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 ) {
 
   struct MinList * clients = &( AmiGUS_MHI_Base->agb_Clients );
-  const struct MinNode * tail = 
-    ( const struct MinNode * ) clients->mlh_Tail;
-  struct AmiGUS_MHI_Handle * handle = 
-    ( struct AmiGUS_MHI_Handle * ) clients->mlh_Head;
+  struct AmiGUS_MHI_Handle * handle;
   LONG result = 0;
 
-  while ( tail != handle->agch_Node.mln_Succ ) {
+  FOR_LIST( clients, handle, struct AmiGUS_MHI_Handle * ) {
 
     APTR card = handle->agch_CardBase;
     const UWORD status = ReadReg16( card, AMIGUS_CODEC_INT_CONTROL );
@@ -153,7 +151,6 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
                   | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
       result = 1;
     }
-    handle = ( struct AmiGUS_MHI_Handle * ) handle->agch_Node.mln_Succ;
   }
 
   return result;

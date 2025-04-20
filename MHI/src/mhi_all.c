@@ -160,12 +160,8 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
-  const struct MinNode * tail =
-    ( const struct MinNode * )
-      AmiGUS_MHI_Base->agb_Clients.mlh_Tail;
-  struct AmiGUS_MHI_Handle * currentHandle =
-    ( struct AmiGUS_MHI_Handle * )
-      AmiGUS_MHI_Base->agb_Clients.mlh_Head;
+  struct MinList * clients = &( AmiGUS_MHI_Base->agb_Clients );
+  struct AmiGUS_MHI_Handle * currentHandle;
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
   struct Task * task = clientHandle->agch_Task;
@@ -174,14 +170,13 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 
 
   LOG_D(( "D: MHIFreeDecoder start for task 0x%08lx\n", task ));
-  while ( tail != currentHandle->agch_Node.mln_Succ ) {
+  FOR_LIST ( clients, currentHandle, struct AmiGUS_MHI_Handle * ) {
     
     if ( clientHandle == currentHandle ) {
 
       error = ENoError;
       break;
     }
-    currentHandle = ( struct AmiGUS_MHI_Handle * ) currentHandle->agch_Node.mln_Succ;
   }
   if (( error ) || ( !task )) {
 
@@ -291,12 +286,7 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
   struct AmiGUS_MHI_Buffer * mhiBuffer;
 
   LOG_D(( "D: MHIGetEmpty start\n" ));
-  for ( mhiBuffer = ( struct AmiGUS_MHI_Buffer * ) buffers->lh_Head ;
-        (( clientHandle->agch_CurrentBuffer )
-          && (( APTR ) clientHandle->agch_CurrentBuffer
-            != ( APTR ) mhiBuffer ));
-        mhiBuffer = ( struct AmiGUS_MHI_Buffer * )
-          mhiBuffer->agmb_Node.mln_Succ ) {
+  FOR_LIST( buffers, mhiBuffer, struct AmiGUS_MHI_Buffer * ) {
 
     LOG_V(( "V: Checking for empty @ 0x%08lx\n", mhiBuffer ));
     if (( mhiBuffer ) &&

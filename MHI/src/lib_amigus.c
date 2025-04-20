@@ -129,6 +129,8 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
   AmiGUS_MHI_Base = base;
 #endif
 
+  NEW_LIST( &( base->agb_Clients ));
+
   LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", base));
   return ENoError;
 }

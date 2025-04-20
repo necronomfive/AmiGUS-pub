@@ -72,6 +72,9 @@ struct AmiGUS_MHI_Buffer {
 };
 
 struct AmiGUS_MHI_Handle {
+
+  struct MinNode                agch_Node;
+
   APTR                          agch_CardBase;
   struct ConfigDev            * agch_ConfigDevice;
 
@@ -107,7 +110,7 @@ struct AmiGUS_MHI {
   struct Interrupt            * agb_Interrupt;
 
   /* Client info */
-  struct AmiGUS_MHI_Handle      agb_ClientHandle;
+  struct MinList                agb_Clients;
 
   BPTR                          agb_LogFile;       /* Debug log file handle  */
   APTR                          agb_LogMem;        /* Debug log memory blob  */

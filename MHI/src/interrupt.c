@@ -120,39 +120,43 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUS_MHI_Base * base)
 ) {
 
-  struct AmiGUS_MHI_Handle * handle = &( AmiGUS_MHI_Base->agb_ClientHandle );
-  APTR card = handle->agch_CardBase;
-  const UWORD status = ReadReg16( card, AMIGUS_CODEC_INT_CONTROL );
+  struct MinList * clients = &( AmiGUS_MHI_Base->agb_Clients );
+  const struct MinNode * tail = 
+    ( const struct MinNode * ) clients->mlh_Tail;
+  struct AmiGUS_MHI_Handle * handle = 
+    ( struct AmiGUS_MHI_Handle * ) clients->mlh_Head;
+  LONG result = 0;
 
-  if ( status & ( AMIGUS_CODEC_INT_F_FIFO_EMPTY
-                | AMIGUS_CODEC_INT_F_FIFO_WATERMRK )) {
+  while ( tail != handle->agch_Node.mln_Succ ) {
 
-    if ( MHIF_PLAYING == handle->agch_Status ) {
+    APTR card = handle->agch_CardBase;
+    const UWORD status = ReadReg16( card, AMIGUS_CODEC_INT_CONTROL );
 
-      HandlePlayback( handle );
-/*
-    if ( status & AMIGUS_INT_F_PLAY_FIFO_EMPTY ) {
+    /*
+    // This is super-spammy - but tells you what is wrong if int is stalling!
+    LOG_INT(( "INT: h 0x%08lx c 0x%08lx s 0x%04lx\n",
+              handle, card, status ));
+     */
+    if ( status & ( AMIGUS_CODEC_INT_F_FIFO_EMPTY
+                  | AMIGUS_CODEC_INT_F_FIFO_WATERMRK )) {
 
-      /*
-       Recovery from buffer underruns is a bit tricky.
-       DMA from FIFO to DAC will stay disabled until worker task prepared some
-       buffers and triggered a full playback init cycle to make it run again.
-      * /
-      AmiGUS_MHI_Base_Base->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
+      if ( MHIF_PLAYING == handle->agch_Status ) {
+  
+        HandlePlayback( handle );
+      }
+
+      /* Clear AmiGUS control flags here!!! */
+      WriteReg16( card,
+                  AMIGUS_CODEC_INT_CONTROL,
+                  AMIGUS_INT_F_CLEAR
+                  | AMIGUS_CODEC_INT_F_FIFO_EMPTY
+                  | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
+      result = 1;
     }
-*/
-    }
-
-    /* Clear AmiGUS control flags here!!! */
-    WriteReg16( card,
-                AMIGUS_CODEC_INT_CONTROL,
-                AMIGUS_INT_F_CLEAR
-                | AMIGUS_CODEC_INT_F_FIFO_EMPTY
-                | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
-    return 1;
+    handle = ( struct AmiGUS_MHI_Handle * ) handle->agch_Node.mln_Succ;
   }
 
-  return 0;
+  return result;
 }
 
 LONG CreateInterruptHandler( VOID ) {

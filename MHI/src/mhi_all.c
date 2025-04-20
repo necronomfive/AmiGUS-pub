@@ -53,7 +53,7 @@ VOID InitHandle( struct AmiGUS_MHI_Handle * handle ) {
 
   handle->agch_CardBase = handle->agch_ConfigDevice->cd_BoardAddr;
 
-  NonConflictingNewMinList( &( handle->agch_Buffers ));
+  NEW_LIST( &( handle->agch_Buffers ));
   handle->agch_CurrentBuffer = NULL;
 
   handle->agch_MHI_Panning = 50;
@@ -88,7 +88,7 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a6, struct AmiGUS_MHI * base ) 
 ) {
 
-  struct AmiGUS_MHI_Handle * handle = NULL;
+  struct AmiGUS_MHI_Handle * handle;
   ULONG error = ENoError;
 
   LOG_D(( "D: MHIAllocDecoder start\n" ));
@@ -97,14 +97,14 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
     error = ELibraryBaseInconsistency;
   }
+  handle = AllocMem( sizeof( struct AmiGUS_MHI_Handle ),
+                     MEMF_PUBLIC | MEMF_CLEAR );
+  if ( !handle ) {
+
+    error = EAllocateHandle;
+  }
   if ( !error ) {
- 
-    // TODO: Alloc und add to list.
-    handle = &AmiGUS_MHI_Base->agb_ClientHandle;
-    /*
-    handle = AllocMem( sizeof( struct AmiGUS_MHI_Handle ),
-                       MEMF_PUBLIC | MEMF_CLEAR );
-                       */
+
     Forbid();
     error = FindAmiGusCodec( &( handle->agch_ConfigDevice ));
     if ( !error ) {
@@ -136,18 +136,22 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 
     if ( handle ) {
 
-      // FreeMem( handle, sizeof( struct AmiGUS_MHI_Handle ));
+      FreeMem( handle, sizeof( struct AmiGUS_MHI_Handle ));
       handle = NULL;
     }
 
     // Takes care of the log entry, too. :)
     DisplayError( error );
+
   } else {
 
-    // TODO: AddTail();
+    Forbid();
+    AddTail(( struct List * ) &( AmiGUS_MHI_Base->agb_Clients ),
+            ( struct Node * ) handle );
+    Permit();
   }
-  
-  LOG_D(( "D: MHIAllocDecoder done\n" ));
+
+  LOG_D(( "D: MHIAllocDecoder done, returning handle 0x%08lx\n", handle ));
   return handle;
 }
 
@@ -156,16 +160,30 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
+  const struct MinNode * tail =
+    ( const struct MinNode * )
+      AmiGUS_MHI_Base->agb_Clients.mlh_Tail;
+  struct AmiGUS_MHI_Handle * currentHandle =
+    ( struct AmiGUS_MHI_Handle * )
+      AmiGUS_MHI_Base->agb_Clients.mlh_Head;
   struct AmiGUS_MHI_Handle * clientHandle =
     ( struct AmiGUS_MHI_Handle * ) handle;
   struct Task * task = clientHandle->agch_Task;
   LONG signal = clientHandle->agch_Signal;
-  ULONG error = ENoError;
+  ULONG error = EHandleUnknown;
+
 
   LOG_D(( "D: MHIFreeDecoder start for task 0x%08lx\n", task ));
+  while ( tail != currentHandle->agch_Node.mln_Succ ) {
+    
+    if ( clientHandle == currentHandle ) {
 
-  if (( &AmiGUS_MHI_Base->agb_ClientHandle != clientHandle ) ||
-      ( !task )) {
+      error = ENoError;
+      break;
+    }
+    currentHandle = ( struct AmiGUS_MHI_Handle * ) currentHandle->agch_Node.mln_Succ;
+  }
+  if (( error ) || ( !task )) {
 
     LOG_W(( "W: AmiGUS MHI does not know task 0x%08lx and signal 0x%08lx"
             " - hence not free'd.\n",
@@ -180,6 +198,9 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
     clientHandle->agch_Task = NULL;
     clientHandle->agch_Signal = 0;
     clientHandle->agch_ConfigDevice->cd_Driver = NULL;
+
+    Remove(( struct Node * ) clientHandle );
+    FreeMem( clientHandle, sizeof( struct AmiGUS_MHI_Handle ));
 
   } else {
 
@@ -196,7 +217,10 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 
     LOG_D(( "D: AmiGUS MHI free'd up task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
-    DestroyInterruptHandler();
+    if ( !( AmiGUS_MHI_Base->agb_Clients.mlh_Tail )) {
+
+      DestroyInterruptHandler();
+    }
   }
   LOG_D(( "D: MHIFreeDecoder done\n" ));
   return;
@@ -214,11 +238,13 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
   struct AmiGUS_MHI_Buffer * mhiBuffer;
 
   LOG_D(( "D: MHIQueueBuffer start\n" ));
+/*
   if ( &AmiGUS_MHI_Base->agb_ClientHandle != clientHandle ) {
 
     LOG_D(( "D: MHIQueueBuffer failed, unknown handle.\n" ));
     return FALSE;
   }
+    */
   if ( ( ULONG ) buffer & 0x00000003 ) {
 
     LOG_D(( "D: MHIQueueBuffer failed, buffer not LONG aligned.\n" ));

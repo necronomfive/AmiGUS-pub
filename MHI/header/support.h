@@ -19,6 +19,18 @@
 
 #include <exec/types.h>
 
+#define NEW_LIST( list ) \
+  (( struct List * ) list)->lh_Head = \
+    ( struct Node * ) &((( struct List * ) list)->lh_Tail); \
+  (( struct List * ) list)->lh_Tail = NULL; \
+  (( struct List * ) list)->lh_TailPred = ( struct Node * ) list
+
+#define FOR_LIST( list, node, node_type ) \
+  for ( node = ( node_type ) (( struct List * ) list)->lh_Head ;\
+        ( node_type ) (( struct Node * ) node)->ln_Succ \
+          != ( node_type ) (( struct List * ) list)->lh_Tail ;\
+        node = ( node_type ) (( struct Node * ) node)->ln_Succ )
+
 /**
  * Displays an error message in a requester.
  *

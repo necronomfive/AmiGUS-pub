@@ -25,12 +25,13 @@
 #include "amigus_hardware.h"
 #include "amigus_vs1063.h"
 #include "debug.h"
+#include "errors.h"
 #include "interrupt.h"
+#include "support.h"
 
-VOID HandlePlayback( VOID ) {
+VOID HandlePlayback( struct AmiGUS_MHI_Handle * handle ) {
 
-  APTR card = AmiGUS_MHI_Base->agb_CardBase;
-  struct AmiGUS_MHI_Handle * handle = &( AmiGUS_MHI_Base->agb_ClientHandle );
+  APTR card = handle->agch_CardBase;
   struct AmiGUS_MHI_Buffer * current = handle->agch_CurrentBuffer;
   const APTR tail = ( const APTR ) &( handle->agch_Buffers.mlh_Tail );
   /* Read-back remaining FIFO samples in BYTES */
@@ -120,53 +121,53 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUS_MHI_Base * base)
 ) {
 
-  const UWORD status = ReadReg16( AmiGUS_MHI_Base->agb_CardBase,
-                                  AMIGUS_CODEC_INT_CONTROL );
+  struct MinList * clients = &( AmiGUS_MHI_Base->agb_Clients );
+  struct AmiGUS_MHI_Handle * handle;
+  LONG result = 0;
 
-  if ( status & ( AMIGUS_CODEC_INT_F_FIFO_EMPTY
-                | AMIGUS_CODEC_INT_F_FIFO_WATERMRK )) {
+  FOR_LIST( clients, handle, struct AmiGUS_MHI_Handle * ) {
 
-    if ( MHIF_PLAYING == AmiGUS_MHI_Base->agb_ClientHandle.agch_Status ) {
+    APTR card = handle->agch_CardBase;
+    const UWORD status = ReadReg16( card, AMIGUS_CODEC_INT_CONTROL );
 
-      HandlePlayback();
-/*
-    if ( status & AMIGUS_INT_F_PLAY_FIFO_EMPTY ) {
+    /*
+    // This is super-spammy - but tells you what is wrong if int is stalling!
+    LOG_INT(( "INT: h 0x%08lx c 0x%08lx s 0x%04lx\n",
+              handle, card, status ));
+     */
+    if ( status & ( AMIGUS_CODEC_INT_F_FIFO_EMPTY
+                  | AMIGUS_CODEC_INT_F_FIFO_WATERMRK )) {
 
-      /*
-       Recovery from buffer underruns is a bit tricky.
-       DMA from FIFO to DAC will stay disabled until worker task prepared some
-       buffers and triggered a full playback init cycle to make it run again.
-      * /
-      AmiGUS_MHI_Base_Base->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
+      if ( MHIF_PLAYING == handle->agch_Status ) {
+  
+        HandlePlayback( handle );
+      }
+
+      /* Clear AmiGUS control flags here!!! */
+      WriteReg16( card,
+                  AMIGUS_CODEC_INT_CONTROL,
+                  AMIGUS_INT_F_CLEAR
+                  | AMIGUS_CODEC_INT_F_FIFO_EMPTY
+                  | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
+      result = 1;
     }
-*/
-    }
-
-    /* Clear AmiGUS control flags here!!! */
-    WriteReg16( AmiGUS_MHI_Base->agb_CardBase,
-                AMIGUS_CODEC_INT_CONTROL,
-                AMIGUS_INT_F_CLEAR
-                | AMIGUS_CODEC_INT_F_FIFO_EMPTY
-                | AMIGUS_CODEC_INT_F_FIFO_WATERMRK );
-    return 1;
   }
 
-  return 0;
+  return result;
 }
 
-// TRUE = failure
-BOOL CreateInterruptHandler( VOID ) {
+LONG CreateInterruptHandler( VOID ) {
 
-  if (AmiGUS_MHI_Base->agb_Interrupt) {
+  if ( AmiGUS_MHI_Base->agb_Interrupt ) {
 
-    LOG_D(("D: INT server in use!\n"));
-    return FALSE;
+    LOG_D(( "D: INT server in use!\n" ));
+    return ENoError;
   }
 
-  LOG_D(("D: Creating INT server\n"));
+  LOG_D(( "D: Creating INT server\n" ));
   Disable();
 
-  AmiGUS_MHI_Base->agb_Interrupt = (struct Interrupt *)
+  AmiGUS_MHI_Base->agb_Interrupt = ( struct Interrupt * )
       AllocMem(
           sizeof( struct Interrupt ),
           MEMF_CLEAR | MEMF_PUBLIC
@@ -182,14 +183,14 @@ BOOL CreateInterruptHandler( VOID ) {
 
     Enable();
 
-    LOG_D(("D: Created INT server\n"));
-    return FALSE;
+    LOG_D(( "D: Created INT server\n" ));
+    return ENoError;
   }
 
   Enable();
-  LOG_D(("D: Failed creating INT server\n"));
-  // TODO: Display error?
-  return TRUE;
+  LOG_D(( "D: Failed creating INT server\n" ));
+
+  return EAllocateInterrupt;
 }
 
 VOID DestroyInterruptHandler( VOID ) {

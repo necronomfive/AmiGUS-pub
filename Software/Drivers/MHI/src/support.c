@@ -139,13 +139,6 @@ VOID DisplayError( ULONG error ) {
   LOG_E(( "E: AmiGUS %ld - %s\n", error, errors[ i ].iMessage ));
 }
 
-VOID NonConflictingNewMinList( struct MinList * list ) {
-
-  list->mlh_Head = ( struct MinNode * ) &list->mlh_Tail;
-  list->mlh_Tail = NULL;
-  list->mlh_TailPred = ( struct MinNode * ) list;
-}
-
 VOID ShowError_v34( STRPTR title, STRPTR message, STRPTR button, LONG error ) {
 
   struct IntuiText body;

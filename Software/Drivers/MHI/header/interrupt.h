@@ -20,8 +20,8 @@
 #include "exec/types.h"
 #include "SDI_compiler.h"
 
-VOID HandlePlayback( VOID );
-BOOL CreateInterruptHandler( VOID );
+VOID HandlePlayback( struct AmiGUS_MHI_Handle * handle );
+LONG CreateInterruptHandler( VOID );
 VOID DestroyInterruptHandler( VOID );
 
 #endif /* INTERRUPT_H */

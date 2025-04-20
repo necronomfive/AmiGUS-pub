@@ -1,5 +1,5 @@
 Next:
-- Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
+- Write missing comments and ReadMe.mds
 - Decide on debug + cpu variants
 - Create Install disk script
 - Switch to AmiGUS ints instead AHI timing
@@ -13,6 +13,7 @@ Next:
 - Mixer UI elements and their responsiveness
 - Get mpeg.device working as per https://aminet.net/package/mus/play/dmdev
 - Make CAMD on https://aminet.net/package/mus/midi/camd / https://aminet.net/package/mus/play/projectomega / https://aminet.net/package/driver/other/uaemidi / https://aminet.net/package/mus/midi/camd40 / https://aminet.net/package/driver/other/mmp
+- Start applying vendor patches to VS1063a firmware
 - Fully split Recording + Playback parts in AHI to allow 1 client each
 
 Done:
@@ -27,3 +28,6 @@ Done:
 - Implement MHI equalizer
 - Fix stupid sounds blooping from one song to the next
 - MHI Volume handline - test SCI_VOL 1063ds p.53
+- Fix MHI Unit Tests
+- AHI/MHI: move reservation of expansion device from driver loading to alloc/dealloc
+- Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests

@@ -19,7 +19,6 @@
 #include <proto/dos.h>
 #include <proto/exec.h>
 
-#include "amigus_codec.h"
 #include "amigus_mhi.h"
 #include "debug.h"
 #include "errors.h"
@@ -37,15 +36,8 @@ struct AmiGUS_MHI        * AmiGUS_MHI_Base   = 0;
 
 #endif
 
-// # d e fine USE_FAKE_DEVICE
-
 /* Closes all the libraries opened by LibInit() */
 VOID CustomLibClose( LIBRARY_TYPE * base ) {
-
-#ifdef USE_FAKE_DEVICE
-  FreeMem( base->agb_CardBase, 256);
-  FreeMem( base->agb_ConfigDevice, sizeof( struct ConfigDev ));
-#endif
 
 #ifndef BASE_GLOBAL
   struct ExecBase *SysBase = base->agb_SysBase;
@@ -78,8 +70,6 @@ VOID CustomLibClose( LIBRARY_TYPE * base ) {
 }
 
 LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
-
-  LONG error;
 
   /* Prevent use of customized library versions on CPUs not targetted. */
 #ifdef _M68060
@@ -139,18 +129,8 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
   AmiGUS_MHI_Base = base;
 #endif
 
-  LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", base));
-#ifndef USE_FAKE_DEVICE
-  error = FindAmiGusCodec( base );
-#else
-  error = 0;
-  base->agb_CardBase = AllocMem( 256, MEMF_PUBLIC | MEMF_CLEAR );
-  base->agb_ConfigDevice = AllocMem( sizeof( struct ConfigDev ),
-                                     MEMF_PUBLIC | MEMF_CLEAR );
-#endif
-  if ( error ) {
+  NEW_LIST( &( base->agb_Clients ));
 
-    DisplayError( error );
-  }
+  LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", base));
   return ENoError;
 }

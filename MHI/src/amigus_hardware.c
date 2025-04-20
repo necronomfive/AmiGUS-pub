@@ -65,6 +65,12 @@ UWORD ReadCodecSPI( APTR card, UWORD SPIregister ) {
                   AMIGUS_CODEC_SPI_READ_TRIGGER );
 }
 
+UWORD ReadVS1063Mem( APTR amiGUS, UWORD address ) {
+
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
+  return ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM );
+}
+
 VOID WriteReg16( APTR card, ULONG offset, UWORD value ) {
 
   *(( UWORD * )(( ULONG ) card + offset )) = value;
@@ -107,6 +113,12 @@ VOID WriteCodecSPI( APTR card, UWORD SPIregister, UWORD SPIvalue ) {
             AMIGUS_CODEC_SPI_ADDRESS, 
             AMIGUS_CODEC_SPI_WRITE_DATA,
             AMIGUS_CODEC_SPI_WRITE_TRIGGER );
+}
+
+VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
+
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
 }
 
 /*

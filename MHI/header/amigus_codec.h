@@ -18,13 +18,14 @@
 #define AMIGUS_CODEC_H
 
 #include <exec/types.h>
+#include <libraries/configvars.h>
 
 /* Forward declaration here. */
-struct AmiGUS_MHI;
+struct AmiGUS_MHI_Handle;
 
-LONG FindAmiGusCodec( struct AmiGUS_MHI *base );
-VOID StartAmiGusCodecPlayback( VOID );
-VOID StopAmiGusCodecPlayback( VOID );
-VOID SleepCodecTicks( ULONG ticks );
+LONG FindAmiGusCodec( struct ConfigDev ** device );
+VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
+VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
+VOID SleepCodecTicks( APTR amiGUS, ULONG ticks );
 
 #endif /* AMIGUS_CODEC_H */

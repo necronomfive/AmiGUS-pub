@@ -47,6 +47,24 @@ VOID FlushAllBuffers( struct AmiGUS_MHI_Handle * clientHandle ) {
   LOG_D(( "D: All buffers flushed.\n" ));
 }
 
+VOID InitHandle( struct AmiGUS_MHI_Handle * handle ) {
+
+  ULONG i;
+
+  handle->agch_CardBase = handle->agch_ConfigDevice->cd_BoardAddr;
+
+  NonConflictingNewMinList( &( handle->agch_Buffers ));
+  handle->agch_CurrentBuffer = NULL;
+
+  handle->agch_MHI_Panning = 50;
+  handle->agch_MHI_Volume = 50;
+  for ( i = 0; i < sizeof( handle->agch_MHI_Equalizer ) ; ++i ) {
+
+    handle->agch_MHI_Equalizer[ i ] = 50;
+  }
+  handle->agch_Status = MHIF_STOPPED;
+}
+
 VOID UpdateEqualizer( APTR card,
                       struct AmiGUS_MHI_Handle * handle,
                       UBYTE index,
@@ -71,42 +89,22 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 ) {
 
   struct AmiGUS_MHI_Handle * handle = NULL;
-  struct ConfigDev * device = NULL;
   ULONG error = ENoError;
-  ULONG i;
 
   LOG_D(( "D: MHIAllocDecoder start\n" ));
 
   if ( base != AmiGUS_MHI_Base ) {
 
-    DisplayError( ELibraryBaseInconsistency );
+    error = ELibraryBaseInconsistency;
   }
-/*TODO: 
-  Forbid();
-  if (( !AmiGUS_MHI_Base->agb_CardBase )
-        || ( !AmiGUS_MHI_Base->agb_ConfigDevice )) {
-
-    error = EAmiGUSNotFound;
-
-  } else if ( AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver ) {
-
-    error = EAmiGUSInUseError;
-
-  } else if ( AmiGUS_MHI_Base->agb_UsageCounter ) {
-
-    error = EDriverInUse;
-
-  } else {
-
-    // Now we own the card!
-    ++AmiGUS_MHI_Base->agb_UsageCounter;
-    AmiGUS_MHI_Base->agb_ConfigDevice->cd_Driver = ( APTR ) AmiGUS_MHI_Base;
-  }
-  Permit();
-*/
   if ( !error ) {
  
+    // TODO: Alloc und add to list.
     handle = &AmiGUS_MHI_Base->agb_ClientHandle;
+    /*
+    handle = AllocMem( sizeof( struct AmiGUS_MHI_Handle ),
+                       MEMF_PUBLIC | MEMF_CLEAR );
+                       */
     Forbid();
     error = FindAmiGusCodec( &( handle->agch_ConfigDevice ));
     if ( !error ) {
@@ -117,27 +115,18 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   }
   if ( !error ) {
 
-    APTR card = handle->agch_ConfigDevice->cd_BoardAddr;
-    handle->agch_CardBase = card;
+    InitHandle( handle );
     handle->agch_Task = task;
     handle->agch_Signal = signal;
-    handle->agch_Status = MHIF_STOPPED;
-    handle->agch_CurrentBuffer = NULL;
-    for ( i = 0; i < sizeof( handle->agch_MHI_Equalizer ) ; ++i ) {
-
-      handle->agch_MHI_Equalizer[ i ] = 50;
-    }
-    handle->agch_MHI_Panning = 50;
-    handle->agch_MHI_Volume = 50;
-    NonConflictingNewMinList( &handle->agch_Buffers );
-
     LOG_D(( "D: AmiGUS MHI accepted task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
 
     LOG_D(( "D: Initializing VS1063 codec\n" ));
-    InitVS1063Codec( card );
-    InitVS1063Equalizer( card, TRUE, AmiGUSDefaultEqualizer );
-    UpdateVS1063VolumePanning( card,
+    InitVS1063Codec( handle->agch_CardBase );
+    InitVS1063Equalizer( handle->agch_CardBase,
+                         TRUE,
+                         AmiGUSDefaultEqualizer );
+    UpdateVS1063VolumePanning( handle->agch_CardBase,
                                handle->agch_MHI_Volume,
                                handle->agch_MHI_Panning );
     error = CreateInterruptHandler();
@@ -146,11 +135,16 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   if ( error ) {
 
     if ( handle ) {
-      // TODO: if alloc'ed: free here
+
+      // FreeMem( handle, sizeof( struct AmiGUS_MHI_Handle ));
+      handle = NULL;
     }
 
     // Takes care of the log entry, too. :)
     DisplayError( error );
+  } else {
+
+    // TODO: AddTail();
   }
   
   LOG_D(( "D: MHIAllocDecoder done\n" ));

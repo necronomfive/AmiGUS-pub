@@ -25,9 +25,50 @@
 /* Forward declaration here. */
 struct AmiGUS_MHI_Handle;
 
+/**
+ * Finds an available, matching AmiGUS codec device and 
+ * fills its properties into the provided device.
+ *
+ * Does not prevent any conflicts due to concurrency,
+ * but works fine in Permit()/Forbid().
+ *
+ * @param[out] device "struct ConfigDev *" provided by expansion.library
+ *                    if a suitable AmiGUS codec device is available,
+ *                    NULL otherwise.
+ *
+ * @return ENoError if an AmiGUS codec device was found,
+ *         error value describing the reason otherwise.
+ */
 LONG FindAmiGusCodec( struct ConfigDev ** device );
+
+/**
+ * Starts playback of the AmiGUS codec as "owned" by the handle
+ * provided from / to the player software.
+ *
+ * @param handle AmiGUS MHI handle as provided to the player by the driver
+ *               and used to identify the player's MHI context.
+ */
 VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
+
+/**
+ * Stops playback of the AmiGUS codec as "owned" by the handle
+ * provided from / to the player software.
+ *
+ * @param handle AmiGUS MHI handle as provided to the player by the driver
+ *               and used to identify the player's MHI context.
+ */
 VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
+
+/**
+ * Busy waiting "sleep" method using the AmiGUS codec's high resolution timer.
+ * Fine to use for less than a second, waste of CPU time otherwise.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param ticks Time to wait in units of
+ *              1 / AMIGUS_TIMER_CLOCK = 1 / 24576000 seconds,
+ *              use MILLIS_PER_SECOND and MICROS_PER_SECOND for
+ *              fine granular steering.
+ */
 VOID SleepCodecTicks( APTR amiGUS, ULONG ticks );
 
 #endif /* AMIGUS_CODEC_H */

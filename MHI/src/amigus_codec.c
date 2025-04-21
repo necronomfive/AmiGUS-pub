@@ -27,6 +27,8 @@
 #include "interrupt.h"
 #include "support.h"
 
+/* Public functions below: */
+
 LONG FindAmiGusCodec( struct ConfigDev ** device ) {
 
   LONG result = EAmiGUSNotFound;

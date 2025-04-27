@@ -23,6 +23,8 @@
 
 /*
  * defines are limited to 32 chars due to a SAS/C insufficiency !!!
+ *
+ * So define below is just kind of a ruler...
  */
 #define SASC_MAXIMUM_DEFINE_LENGTH_IS_32 12345678
 
@@ -34,12 +36,16 @@
 #define AMIGUS_HAGEN_PRODUCT_ID          17
 #define AMIGUS_CODEC_PRODUCT_ID          18
 
+/* All AmiGUS timers behave the same */
+
+#define AMIGUS_TIMER_CLOCK               24576000  /* Hz = 1/s = quarz clock */
+
 #define AMIGUS_TIMER_START               0x8000
 #define AMIGUS_TIMER_STOP                0x0000
 #define AMIGUS_TIMER_ONCE                0x0001
 #define AMIGUS_TIMER_CONTINOUES          0x0000
 
-#define AMIGUS_TIMER_CLOCK               24576000  /* Hz = 1/s = quarz clock */
+/* General time properties - Constants calculated out by C's preprocessor :) */
 
 #define MILLIS_PER_SECOND                1000
 #define MICROS_PER_SECOND                1000000
@@ -76,11 +82,12 @@
 #define AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY 0x0001
 #define AMIGUS_PCM_INT_F_PLAY_FIFO_FULL  0x0002
 #define AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK 0x0004
-#define AMIGUS_PCM_INT_F_SPI_FINISH      0x0008
 #define AMIGUS_PCM_INT_F_REC_FIFO_EMPTY  0x0010
 #define AMIGUS_PCM_INT_F_REC_FIFO_FULL   0x0020
 #define AMIGUS_PCM_INT_F_REC_FIFO_WTRMRK 0x0040
 #define AMIGUS_PCM_INT_F_TIMER_ENABLE    0x4000
+
+#define AMIGUS_INT_F_SPI_TRANSFER_FINISH 0x0008
 #define AMIGUS_INT_F_SET                 0x8000
 #define AMIGUS_INT_F_CLEAR               0x0000
 
@@ -141,8 +148,8 @@
 #define AMIGUS_PCM_REC_FIFO_WORDS        2048
 #define AMIGUS_PCM_REC_FIFO_LONGS        1024
 
-#define AMIGUS_OUTPUTS_COUNT             1
-#define AMIGUS_INPUTS_COUNT              4
+#define AMIGUS_PCM_OUTPUTS_COUNT         1
+#define AMIGUS_PCM_INPUTS_COUNT          4
 
 /******************************************************************************
  * AmiGUS Codec hardware definitions below
@@ -217,6 +224,8 @@
 #define VS1063_CODEC_SCI_HDAT1          0x0009 // page 50
 #define VS1063_CODEC_SCI_VOL            0x000B // page 53
 
+#define VS1063_CODEC_VOLUME_MAPPING     104    // 0-100 -> 101 byte + 3 padding
+
 // VS1063 codec's addresses of memory mapped registers
 // all parameter memory 0x1E00-0x1E3F is mapped to 0xC0C0-0xC0FF - page 49
 #define VS1063_CODEC_ADDRESS_END_FILL   0xC0C6 // 0x1E06 p.70 + 57
@@ -231,6 +240,8 @@
 #define VS1063_CODEC_ADDRESS_EQ5_FREQ4  0xC0DA // 0x1E1A p.77 -  2000 - 15000Hz
 #define VS1063_CODEC_ADDRESS_EQ5_LEVEL5 0xC0DB // 0x1E1B p.77 (-32 - +32)*0.5dB
 #define VS1063_CODEC_ADDRESS_EQ5_UPDATE 0xC0DC // 0x1E1C p.77 strobe for update
+
+#define VS1063_CODEC_EQ_SETTINGS_SIZE   9      // 5 levels + 4 frequencies = 9
 
 #define VS1063_CODEC_ADDRESS_GPIO_DDR   0xC017 // page 86
 #define VS1063_CODEC_ADDRESS_I2S_CONFIG 0xC040 // page 86
@@ -261,26 +272,144 @@
  * Low-Level hardware access functions
  *****************************************************************************/
 
+/**
+ * Reads an unsigned 16bit word from the AmiGUS card's registers.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param offset Offset of the register to read.
+ *
+ * @return 16bit word read from the AmiGUS card.
+ */
 UWORD ReadReg16( APTR amiGUS, ULONG offset );
+
+/**
+ * Reads an unsigned 32bit long from the AmiGUS card's registers.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param offset Offset of the register to read.
+ *
+ * @return 32bit long read from the AmiGUS card.
+ */
 ULONG ReadReg32( APTR amiGUS, ULONG offset );
+
+/**
+ * Reads an unsigned 16bit word from the AmiGUS card's codec's SPI interface.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param SPIregister Register address to read from the AmiGUS codec's
+ *                    SPI interface.
+ * @return 16bit word read from the AmiGUS card.
+ */
 UWORD ReadCodecSPI( APTR amiGUS, UWORD SPIregister );  
+
+/**
+ * Reads an unsigned 16bit word from the AmiGUS card's VS1063 codec's memory.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param address Memory address to read from the AmiGUS codec.
+ *
+ * @return 16bit word read from the AmiGUS card.
+ */
 UWORD ReadVS1063Mem( APTR amiGUS, UWORD address );
 
+/**
+ * Writes an unsigned 16bit word to the AmiGUS card's registers.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param offset Offset of the register to write.
+ * @param value Value to write to the register.
+ *
+ * @return 16bit word read from the AmiGUS card.
+ */
 VOID WriteReg16( APTR amiGUS, ULONG offset, UWORD value );
+
+/**
+ * Writes an unsigned 32bit long to the AmiGUS card's registers.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param offset Offset of the register to write.
+ * @param value Value to write to the register.
+ *
+ * @return 32bit word long from the AmiGUS card.
+ */
 VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
+
+/**
+ * Writes an unsigned 16bit word to the AmiGUS card's codec's SPI interface.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param SPIregister AmiGUS codec's SPI interface's register address
+ *                    to write into.
+ * @param SPIvalue Value to write to the register.
+ */
 VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue );
+
+/**
+ * Writes an unsigned 16bit word to the AmiGUS card's VS1063 codec's memory.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param address Memory address to read from the AmiGUS codec.
+ * @param value Value to write to the memory address.
+ */
 VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value );
 
 /******************************************************************************
  * Low-Level hardware feature lookup tables
  *****************************************************************************/
 
+/**
+ * Array of supported sample rates, shall always be in sync with 
+ * - AMIGUS_SAMPLE_RATE_* in amigus_hardware.h and
+ * - AMIGUS_PCM_SAMPLE_RATE_COUNT in amigus_hardware.h.
+ *
+ * Maps sample rates to the required value in the AmiGUS registers
+ * via the indexes.
+ * Required register value = Index value -> Sample rate.
+ */
 extern const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ];
-extern const STRPTR AmiGUSOutputs[ AMIGUS_OUTPUTS_COUNT ];
-extern const STRPTR AmiGUSInputs[ AMIGUS_INPUTS_COUNT ];
-extern const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ];
-extern const WORD AmiGUSDefaultEqualizer[];
-extern const WORD AmiGUSAmigaAmpEqualizer[];
-extern const UBYTE AmiGUSVolumeMapping[];
+
+/**
+ * Array of available AmiGUS output lines.
+ * Output index -> Textual description.
+ */
+extern const STRPTR AmiGUSOutputs[ AMIGUS_PCM_OUTPUTS_COUNT ];
+
+/**
+ * Array of available AmiGUS input line names.
+ * Input index -> Textual description.
+ */
+extern const STRPTR AmiGUSInputs[ AMIGUS_PCM_INPUTS_COUNT ];
+
+/**
+ * Array of available AmiGUS input lines.
+ * Input index -> Required register value.
+ */
+extern const UWORD AmiGUSInputFlags[ AMIGUS_PCM_INPUTS_COUNT ];
+
+/**
+ * Industry standard default equilizer split frequencies.
+ *
+ * 125 - 500 - 2000 - 8000 Hz
+ */
+extern const WORD AmiGUSDefaultEqualizer[ VS1063_CODEC_EQ_SETTINGS_SIZE ];
+
+/**
+ * AmigaAmp default equilizer split frequencies according to default skin.
+ *
+ * 150 - 775 - 4243 - 12961 Hz (Who can hear >12961 Hz in music anyway?)
+ */
+extern const WORD AmiGUSAmigaAmpEqualizer[ VS1063_CODEC_EQ_SETTINGS_SIZE ];
+
+/**
+ * Volume ĺookup values for 0 to 100 volume values input to the dB values
+ * as shown in AmigaAMP UI.
+ *
+ * AmigaAMP's volume slider transforms linear pixel movement to logarithmic
+ * value changes. Unfortunately does the VS1063 require linear input to
+ * transform to logarithmic gain itself. Therefore here a logarithmic lookup
+ * to exponential values to revert that and transform to the correct
+ * linear volume register value for the VS1063.
+ */
+extern const UBYTE AmiGUSVolumeMapping[ VS1063_CODEC_VOLUME_MAPPING ];
 
 #endif /* AMIGUS_HARDWARE_H */

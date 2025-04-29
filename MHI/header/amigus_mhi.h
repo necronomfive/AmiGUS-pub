@@ -43,6 +43,9 @@
 
 #include "library.h"
 
+/*
+ * Query-able facts via MHIQuery function:
+ */
 #define AMIGUS_MHI_AUTHOR           "Christoph `Chritoph` Fassbach"
 #define AMIGUS_MHI_COPYRIGHT        "(c) 2025 Christoph Fassbach / LGPL3"
 #define AMIGUS_MHI_ANNOTATION       "Thanks to: Oliver Achten (AmiGUS), " \
@@ -51,73 +54,114 @@
 #define AMIGUS_MHI_DECODER          "AmiGUS VS1063a codec"
 #define AMIGUS_MHI_VERSION          LIBRARY_IDSTRING
 
+/*
+ * Minimum firmware required to use this version of the MHI driver,
+ * e.g. the codec part's timer came late in the process to ditch the
+ * v36 OS requirement.
+ */
 #define AMIGUS_MHI_FIRMWARE_MINIMUM ( ( 2025 << 20 ) /* year   */ \
                                     + (    3 << 16 ) /* month  */ \
                                     + (   24 << 11 ) /* day    */ \
                                     + (   21 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
+/*
+ * If logging to memory is activated, this is used to mark the start
+ * of the log memory. And as 1 pointer to this marker, 1 pointer to the
+ * library file name and 1 more pointer to the marker are used, the full
+ * start marker is not even in the library, no need to unload the library
+ * so even with library in memory it should unique in memory.
+ */
 #define AMIGUS_MEM_LOG_BORDERS      "********************************"
 
 /******************************************************************************
  * Library base structure components
  *****************************************************************************/
 
+/**
+ * Instances of this struct are used to manage the buffers the client
+ * wants to feed to the driver.
+ *
+ * The client can provide any buffer size,
+ * but ...
+ * a) the AmiGUS Hardware does not allow BYTE access,
+ * b) the BYTE access performance is just bad.
+ * So per default, the buffer is LONGs for optimized access
+ * and we have 0 to 3 additional BYTEs to copy in with performance impact.
+ * As clients (HippoPlayer, AmigaAMP, ...) usually define the buffers in
+ * kB or kiB, we are kind of safe to assume we only see LONGs as both are
+ * dividable by 4. Therefore, 1-3 remaining BYTEs are handled only for the
+ * end of the file and padded with the "end fill bytes" not causing any
+ * nasty noise when decoded.
+ */
 struct AmiGUS_MHI_Buffer {
 
-  struct MinNode                agmb_Node;
+  struct MinNode                agmb_Node;             // Yes, a list node
 
-  ULONG                       * agmb_Buffer;
-  ULONG                         agmb_BufferIndex;
-  ULONG                         agmb_BufferMax;
-  ULONG                         agmb_BufferExtraBytes; // Only 0-3 - :)
+  ULONG                       * agmb_Buffer;           // Client owned buffer
+  ULONG                         agmb_BufferIndex;      // Next index to play
+  ULONG                         agmb_BufferMax;        // Buffer size in LONGs
+  ULONG                         agmb_BufferExtraBytes; // Extra BYTE count, 0-3
 };
 
+/**
+ * Instances of this struct are handed back to the clients to hold the state
+ * of the driver and AmiGUS hardware.
+ *
+ * The driver can hand out multiple client handles,
+ * as long as these are either not bound to an AmiGUS hardware or
+ * there is more hardware around - kind of (untested) multi-card support.
+ */
 struct AmiGUS_MHI_Handle {
 
-  struct MinNode                agch_Node;
+  struct MinNode                agch_Node;          // Another list node
 
-  APTR                          agch_CardBase;
-  struct ConfigDev            * agch_ConfigDevice;
+  APTR                          agch_CardBase;      // Codec base address
+  struct ConfigDev            * agch_ConfigDevice;  // Expansion device address
 
-  struct Task                 * agch_Task;
-  LONG                          agch_Signal;
+  struct Task                 * agch_Task;          // Client task and ...
+  LONG                          agch_Signal;        // ... signal to notify
 
-  struct MinList                agch_Buffers;
-  struct AmiGUS_MHI_Buffer    * agch_CurrentBuffer;
+  struct MinList                agch_Buffers;       // AmiGUS_MHI_Buffer list
+  struct AmiGUS_MHI_Buffer    * agch_CurrentBuffer; // Buffer to play next
 
-  UBYTE                         agch_MHI_Panning;
-  UBYTE                         agch_MHI_Volume;
-  UWORD                         agch_reserved0;
-  UBYTE                         agch_MHI_Equalizer[ 11 ]; /* 10 band, 1 gain */
-  UBYTE                         agch_Status;
+  UBYTE                         agch_MHI_Panning;   // Balance applied
+  UBYTE                         agch_MHI_Volume;    // Playback volume 
+  UWORD                         agch_reserved0;     // Padding LONG alignment
+  UBYTE                         agch_MHI_Equalizer[ 11 ]; // 10 band, 1 gain
+  UBYTE                         agch_Status;        // MHI status of client
 };
 
 /******************************************************************************
  * Library base structure
  *****************************************************************************/
 
-/* This is the private structure. The official one does not contain all
-the private fields! */
+/**
+ * Private AmiGUS MHI library base structure.
+ *
+ * There is no public one, pointers to libraries opened, interrupts,
+ * list of client handles, logs. Nothing to play around with.
+ */
 struct AmiGUS_MHI {
   /* Library base stuff */
-  struct BaseLibrary            agb_BaseLibrary;
+  struct BaseLibrary            agb_BaseLibrary;   // Instance of library.h
 
-  struct ExecBase             * agb_SysBase;
-  struct DosLibrary           * agb_DOSBase;
-  struct IntuitionBase        * agb_IntuitionBase;
-  struct Library              * agb_ExpansionBase;
+  struct ExecBase             * agb_SysBase;       // Exec, allocations etc.
+  struct DosLibrary           * agb_DOSBase;       // DOS, logs and so on
+  struct IntuitionBase        * agb_IntuitionBase; // For error messages
+  struct Library              * agb_ExpansionBase; // Finding devices
 
   /* AmiGUS specific member variables */
-  struct Interrupt            * agb_Interrupt;
+  struct Interrupt            * agb_Interrupt;     // Shared interrupt handler
 
   /* Client info */
-  struct MinList                agb_Clients;
+  struct MinList                agb_Clients;       // AmiGUS_MHI_Handle list
 
-  BPTR                          agb_LogFile;       /* Debug log file handle  */
-  APTR                          agb_LogMem;        /* Debug log memory blob  */
+  BPTR                          agb_LogFile;       // Debug log file handle
+  APTR                          agb_LogMem;        // Debug log memory blob
 };
 
+/* Used to switch between relying on globals or not. */
 #if defined(BASE_GLOBAL)
   extern struct AmiGUS_MHI        * AmiGUS_MHI_Base;
   extern struct DosLibrary        * DOSBase;
@@ -131,9 +175,5 @@ struct AmiGUS_MHI {
   #define IntuitionBase             base->agb_IntuitionBase
   #define SysBase                   base->agb_SysBase
 #endif
-
-/******************************************************************************
- * Library flag definitions
- *****************************************************************************/
 
 #endif /* AMIGUS_MHI_H */

@@ -26,6 +26,32 @@
 #include "errors.h"
 #include "support.h"
 
+/******************************************************************************
+ * Debug helper functions - private functions.
+ *****************************************************************************/
+
+#if defined( USE_FILE_LOGGING ) | defined( USE_MEM_LOGGING )
+
+/**
+ * Puts a single character to a location pointed to,
+ * moving the location forward afterwards.
+ * Core of memory and file debug prints below.
+ *
+ * @param c Character to place.
+ * @param target Pointer to the target location pointer.
+ */
+ASM( VOID ) debug_mPutChProc( REG( d0, UBYTE c ), REG( a3, UBYTE ** target )) {
+
+  **target = c;
+  ++( *target );
+}
+
+#endif
+
+/******************************************************************************
+ * Debug helper functions - public function definitions.
+ *****************************************************************************/
+
 #define NOT_USE_RawPutCharC
 #ifdef USE_RawPutCharC
 
@@ -74,16 +100,6 @@ VOID debug_kprintf( STRPTR format, ... ) {
     |      |  |      | |     | /-+-> 4 bytes later, the next argument follows
     |      |  |      | |     | | |   */
     ( APTR ) (( LONG ) &format + 4 ));
-}
-
-#endif
-
-#if defined( USE_FILE_LOGGING ) | defined( USE_MEM_LOGGING )
-
-ASM( VOID ) debug_mPutChProc( REG( d0, UBYTE c ), REG( a3, UBYTE ** target )) {
-
-  **target = c;
-  ++( *target );
 }
 
 #endif

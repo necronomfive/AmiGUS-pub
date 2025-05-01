@@ -25,6 +25,10 @@
 /* Forward declaration here. */
 struct AmiGUS_MHI_Handle;
 
+/******************************************************************************
+ * Codec convenience functions.
+ *****************************************************************************/
+
 /**
  * Finds an available, matching AmiGUS codec device and 
  * fills its properties into the provided device.

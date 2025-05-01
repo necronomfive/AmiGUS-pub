@@ -21,6 +21,10 @@
 
 #include <exec/types.h>
 
+/******************************************************************************
+ * VS1063 codec convenience functions.
+ *****************************************************************************/
+
 /**
  * Prepares the VS1063 codec chip for use on the AmiGUS card.
  * Sets the clock as needed and enables I2C interface at 192kHz sample rate.

@@ -22,6 +22,32 @@
 #include "debug.h"
 #include "support.h"
 
+/******************************************************************************
+ * VS1063 codec convenience functions - private functions.
+ *****************************************************************************/
+
+/**
+ * Resets the codec.
+ * Usually not required, only if cancelling playback during a song fails...
+ *
+ * @param amiGUS         Pointer to the AmiGUS codec's register bank.
+ */
+VOID ResetVS1063( APTR amiGUS ) {
+
+  LOG_D(( "D: Resetting VS1063 codec...\n"));
+  WriteCodecSPI( amiGUS,
+                 VS1063_CODEC_SCI_MODE,
+                 VS1063_CODEC_F_SM_RESET );
+  // page 56 - 11.3 Software Reset
+  SleepCodecTicks( amiGUS, VS1063_CODEC_RESET_DELAY_TICKS );
+
+  LOG_D(( "D: ... done.\n"));
+}
+
+/******************************************************************************
+ * VS1063 codec convenience functions - public function definitions.
+ *****************************************************************************/
+
 VOID InitVS1063Codec( APTR amiGUS ) {
 
   // Set SC_MULT to XTALI x 5.0 in SC_CLOCKF,
@@ -260,16 +286,4 @@ VOID CancelVS1063Playback( APTR amiGUS ) {
   LOG_V(( "V: Playback ended, HDAT0 = 0x%04lx, HDAT1 = 0x%04lx\n",
           ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT0 ),
           ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 )));
-}
-
-VOID ResetVS1063( APTR amiGUS ) {
-
-  LOG_D(( "D: Resetting VS1063 codec...\n"));
-  WriteCodecSPI( amiGUS,
-                 VS1063_CODEC_SCI_MODE,
-                 VS1063_CODEC_F_SM_RESET );
-  // page 56 - 11.3 Software Reset
-  SleepCodecTicks( amiGUS, VS1063_CODEC_RESET_DELAY_TICKS );
-
-  LOG_D(( "D: ... done.\n"));
 }

@@ -27,7 +27,9 @@
 #include "interrupt.h"
 #include "support.h"
 
-/* Public functions below: */
+/******************************************************************************
+ * Codec convenience functions - public function definitions.
+ *****************************************************************************/
 
 LONG FindAmiGusCodec( struct ConfigDev ** device ) {
 

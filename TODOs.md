@@ -7,7 +7,6 @@ Next:
   (as the buffer sizing can then be steered)
 - Try snap upward 96kHz Mode
 - Real 24bit recording
-- Left/right swapped in stereo 8bit vs 16bit + 24bit 
 - Calibration of all audio sources' volumes with each other
 - Calibrate volume AHI Mono vs Stereo
 - Mixer UI elements and their responsiveness
@@ -31,3 +30,4 @@ Done:
 - Fix MHI Unit Tests
 - AHI/MHI: move reservation of expansion device from driver loading to alloc/dealloc
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
+- Left/right swapped in stereo 8bit vs 16bit + 24bit

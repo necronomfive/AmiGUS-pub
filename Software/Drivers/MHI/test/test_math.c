@@ -14,18 +14,22 @@
  * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AMIGUS_CODEC_H
-#define AMIGUS_CODEC_H
-
 #include <exec/types.h>
-#include <libraries/configvars.h>
+#include <libraries/dos.h>
 
-/* Forward declaration here. */
-struct AmiGUS_MHI_Handle;
+#include <proto/exec.h>
+#include <proto/dos.h>
 
-LONG FindAmiGusCodec( struct ConfigDev ** device );
-VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
-VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
-VOID SleepCodecTicks( APTR amiGUS, ULONG ticks );
+#include "math.h"
 
-#endif /* AMIGUS_CODEC_H */
+struct ExecBase          * SysBase;
+struct DosLibrary        * DOSBase;
+
+int main(int argc, char const *argv[]) {
+
+  SysBase = ( * (( struct ExecBase ** ) 4 ));
+  DOSBase = ( struct DosLibrary * ) OpenLibrary( "dos.library", 0L );
+  Printf( "12 * 3 = %ld\n", _CXM33( 12, 3 ));
+  Printf( "12 / 3 = %ld\n", _divs( 12, 3 ));
+  CloseLibrary(( struct Library * ) DOSBase );
+}

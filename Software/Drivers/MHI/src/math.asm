@@ -1,4 +1,3 @@
-/*
  * This file is part of the mhiAmiGUS.library.
  *
  * mhiAmiGUS.library is free software: you can redistribute it and/or modify
@@ -12,20 +11,28 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
- */
+ 
+	xdef __CXM33
 
-#ifndef AMIGUS_CODEC_H
-#define AMIGUS_CODEC_H
+	xdef __CXD33
+	xdef __divs
 
-#include <exec/types.h>
-#include <libraries/configvars.h>
 
-/* Forward declaration here. */
-struct AmiGUS_MHI_Handle;
+	section text,code
 
-LONG FindAmiGusCodec( struct ConfigDev ** device );
-VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
-VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
-VOID SleepCodecTicks( APTR amiGUS, ULONG ticks );
+* Math glue function for SAS/C, used e.g. in MHI EQ
+* in : d0, d1
+* out: d0 = d0 * d1
+__CXM33:
+    muls d1,d0
+    rts
 
-#endif /* AMIGUS_CODEC_H */
+* Math glue function for SAS/C + VBCC, used e.g. in MHI EQ
+* in : d0, d1
+* out: d0 = d0 / d1
+__CXD33:
+__divs:
+    divs d1,d0
+	rts
+
+	end

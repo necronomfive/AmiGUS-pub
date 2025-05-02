@@ -213,6 +213,7 @@
 #define VS1063_CODEC_SCI_WRAMADDR       0x0007 // page 49
 #define VS1063_CODEC_SCI_HDAT0          0x0008 // page 50
 #define VS1063_CODEC_SCI_HDAT1          0x0009 // page 50
+#define VS1063_CODEC_SCI_VOL            0x000B // page 53
 
 // VS1063 codec's addresses of memory mapped registers
 // all parameter memory 0x1E00-0x1E3F is mapped to 0xC0C0-0xC0FF - page 49
@@ -268,39 +269,6 @@ VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value );
 VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue );
 VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value );
 
-VOID InitVS1063Codec( APTR amiGUS );
-
-/**
- * Initializes and sets the equalizer to settings.
- *
- * @param amiGUS         Pointer to AmiGUS Codec part card base.
- * @param enable         TRUE to enable the equalizer,
- *                       FALSE to disable it.
- * @param settings       Nine element WORD array, with alternatingly:
- *                       0 - band 1 setting - between -32 and +32,
- *                       1 - border frequency 1 -   20 -   150Hz,
- *                       2 - band 2 setting - between -32 and +32,
- *                       3 - border frequency 2 -   50 -  1000Hz,
- *                       4 - band 3 setting - between -32 and +32,
- *                       5 - border frequency 3 - 1000 - 15000Hz,
- *                       6 - band 4 setting - between -32 and +32,
- *                       7 - border frequency 4 - 2000 - 15000Hz,
- *                       8 - band 5 setting - between -32 and +32.
- */
-VOID InitVS1063Equalizer( APTR amiGUS, BOOL enable, const WORD * settings );
-
-/**
- * Updates a single equalizer band to a desired setting.
- *
- * @param amiGUS         Pointer to AmiGUS Codec part card base.
- * @param equalizerLevel One equalizer level between
- *                       VS1063_CODEC_ADDRESS_EQ5_LEVEL1 and
- *                       VS1063_CODEC_ADDRESS_EQ5_LEVEL5.
- * @param value          A new equalizer setting for this frequency band or
- *                       level, between -32 and +32.
- */
-VOID UpdateVS1063Equalizer( APTR amiGUS, UWORD equalizerLevel, WORD value );
-
 /******************************************************************************
  * Low-Level hardware feature lookup tables
  *****************************************************************************/
@@ -311,5 +279,6 @@ extern const STRPTR AmiGUSInputs[ AMIGUS_INPUTS_COUNT ];
 extern const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ];
 extern const WORD AmiGUSDefaultEqualizer[];
 extern const WORD AmiGUSAmigaAmpEqualizer[];
+extern const UBYTE AmiGUSVolumeMapping[];
 
 #endif /* AMIGUS_HARDWARE_H */

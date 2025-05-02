@@ -65,6 +65,12 @@ UWORD ReadCodecSPI( APTR card, UWORD SPIregister ) {
                   AMIGUS_CODEC_SPI_READ_TRIGGER );
 }
 
+UWORD ReadVS1063Mem( APTR amiGUS, UWORD address ) {
+
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
+  return ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM );
+}
+
 VOID WriteReg16( APTR card, ULONG offset, UWORD value ) {
 
   *(( UWORD * )(( ULONG ) card + offset )) = value;
@@ -107,6 +113,12 @@ VOID WriteCodecSPI( APTR card, UWORD SPIregister, UWORD SPIvalue ) {
             AMIGUS_CODEC_SPI_ADDRESS, 
             AMIGUS_CODEC_SPI_WRITE_DATA,
             AMIGUS_CODEC_SPI_WRITE_TRIGGER );
+}
+
+VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
+
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAMADDR, address );
+  WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
 }
 
 /*
@@ -192,4 +204,29 @@ const WORD AmiGUSAmigaAmpEqualizer[ 9 ] = {
   0, /* +/- 0dB */  4243, /* Hz */
   0, /* +/- 0dB */ 12961, /* Hz */
   0  /* +/- 0dB */
+};
+
+const UBYTE AmiGUSVolumeMapping[ 104 ] = {
+  0xFE /*  0% */, 
+  72 /*  1% */, 66 /*  2% */, 60 /*  3% */, 54 /*  4% */, 51 /*   5% */,
+  48 /*  6% */, 45 /*  7% */, 42 /*  8% */, 41 /*  9% */, 39 /*  10% */,
+  37 /* 11% */, 36 /* 12% */, 34 /* 13% */, 33 /* 14% */, 32 /*  15% */,
+  31 /* 16% */, 30 /* 17% */, 30 /* 18% */, 29 /* 19% */, 28 /*  20% */,
+  27 /* 21% */, 26 /* 22% */, 26 /* 23% */, 25 /* 24% */, 24 /*  25% */,
+  23 /* 26% */, 23 /* 27% */, 22 /* 28% */, 21 /* 29% */, 21 /*  30% */,
+  20 /* 31% */, 20 /* 32% */, 19 /* 33% */, 19 /* 34% */, 18 /*  35% */,
+  18 /* 36% */, 17 /* 37% */, 17 /* 38% */, 16 /* 39% */, 16 /*  40% */,
+  15 /* 41% */, 15 /* 42% */, 15 /* 43% */, 14 /* 44% */, 14 /*  45% */,
+  13 /* 46% */, 13 /* 47% */, 12 /* 48% */, 12 /* 49% */, 12 /*  50% */,
+  11 /* 51% */, 11 /* 52% */, 11 /* 53% */, 10 /* 54% */, 10 /*  55% */,
+  10 /* 56% */,  9 /* 57% */,  9 /* 58% */,  8 /* 59% */,  8 /*  60% */,
+   8 /* 61% */,  7 /* 62% */,  7 /* 63% */,  7 /* 64% */,  7 /*  65% */,
+   6 /* 66% */,  6 /* 67% */,  6 /* 68% */,  6 /* 69% */,  6 /*  70% */,
+   5 /* 71% */,  5 /* 72% */,  5 /* 73% */,  5 /* 74% */,  5 /*  75% */,
+   4 /* 76% */,  4 /* 77% */,  4 /* 78% */,  4 /* 79% */,  4 /*  80% */,
+   3 /* 81% */,  3 /* 82% */,  3 /* 83% */,  3 /* 84% */,  3 /*  85% */,
+   2 /* 86% */,  2 /* 87% */,  2 /* 88% */,  2 /* 89% */,  2 /*  90% */,
+   1 /* 91% */,  1 /* 92% */,  1 /* 93% */,  1 /* 94% */,  1 /*  95% */,
+   0 /* 96% */,  0 /* 97% */,  0 /* 98% */,  0 /* 99% */,  0 /* 100% */,
+  99          , 99          , 99 // padding back to LONGs
 };

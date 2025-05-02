@@ -55,9 +55,7 @@
                                     + (   21 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
-#define AMIGUS_MEM_LOG_MARKER        "********************************"   \
-                                     " AmiGUS "                           \
-                                     "********************************\n"
+#define AMIGUS_MEM_LOG_BORDERS      "********************************"
 
 /******************************************************************************
  * Library base structure components
@@ -74,13 +72,23 @@ struct AmiGUS_MHI_Buffer {
 };
 
 struct AmiGUS_MHI_Handle {
+
+  struct MinNode                agch_Node;
+
+  APTR                          agch_CardBase;
+  struct ConfigDev            * agch_ConfigDevice;
+
   struct Task                 * agch_Task;
   LONG                          agch_Signal;
 
   struct MinList                agch_Buffers;
   struct AmiGUS_MHI_Buffer    * agch_CurrentBuffer;
 
-  ULONG                         agch_Status;
+  UBYTE                         agch_MHI_Panning;
+  UBYTE                         agch_MHI_Volume;
+  UWORD                         agch_reserved0;
+  UBYTE                         agch_MHI_Equalizer[ 11 ]; /* 10 band, 1 gain */
+  UBYTE                         agch_Status;
 };
 
 /******************************************************************************
@@ -99,17 +107,10 @@ struct AmiGUS_MHI {
   struct Library              * agb_ExpansionBase;
 
   /* AmiGUS specific member variables */
-  struct ConfigDev            * agb_ConfigDevice;
-  APTR                          agb_CardBase;
   struct Interrupt            * agb_Interrupt;
 
   /* Client info */
-  struct AmiGUS_MHI_Handle      agb_ClientHandle;
-
-  /* Only 1 AmiGUS supported per machine currently, sorry */
-  BYTE                          agb_UsageCounter;
-  UBYTE                         agb_Reserved0;
-  UWORD                         agb_Reserved1;
+  struct MinList                agb_Clients;
 
   BPTR                          agb_LogFile;       /* Debug log file handle  */
   APTR                          agb_LogMem;        /* Debug log memory blob  */

@@ -37,8 +37,8 @@
 *.i*86
 *.x86_64
 *.hex
-*/test/test_*
-!*/test/test_*.c
+test/test_*
+!test/test_*.c
 
 # Debug files
 *.dSYM/

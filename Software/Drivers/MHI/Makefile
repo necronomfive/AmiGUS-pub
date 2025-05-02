@@ -66,7 +66,7 @@ HDIR   = header/
 LIB_NAME        = mhiamigus
 LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
-LIB_REVISION    = 2
+LIB_REVISION    = 5
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS      =
@@ -192,7 +192,8 @@ install: all
 	$(INSTALL1)
 
 clean:
-	-$(RM) $(DDIR) $(BDIR) $(RM_SUFFIX)
+	-$(RM) $(DDIR) $(BDIR) adf $(RM_SUFFIX)
+	-$(RM) support/$(WILDCARD).o
 
 dist-clean: clean
 	make -f Makefile-Includes clean
@@ -220,15 +221,62 @@ $(BDIR)%.o: $(SDIR)%.asm $(HDIR)*
 
 ###############################################################################
 
-test: test_playback
+test: test_cancel \
+      test_dialog \
+      test_equalizer \
+      test_file \
+      test_math \
+      test_playback \
+      test_sleep
+
+test_cancel: FOLDERS $(LIB_OBJS)
+	@echo " "
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
+            $(BDIR)amigus_vs1063.o \
+            $(BDIR)debug.o $(BDIR)support.o \
+            $(LFLAGST2)
+	@echo " "
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
 
 test_dialog: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
 
+test_equalizer: FOLDERS $(LIB_OBJS)
+	@echo " "
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
+            $(BDIR)amigus_vs1063.o \
+            $(BDIR)debug.o $(BDIR)support.o \
+            $(LFLAGST2)
+	@echo " "
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
+
 test_file: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
+
+test_list: FOLDERS $(LIB_OBJS)
+	@echo " "
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
+            $(BDIR)debug.o $(BDIR)support.o \
+            $(LFLAGST2)
+	@echo " "
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
+
+test_math: FOLDERS $(LIB_OBJS)
+	@echo " "
+	$(CC) $(CFLAGS) test/$@.o test/$@.c
+	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) test/$@.o \
+            $(BDIR)math.o
+	@echo " "
+	$(RUNNER) test/$@
+	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
 
 test_playback: FOLDERS $(LIB_OBJS)
 	@echo " "
@@ -245,8 +293,39 @@ test_sleep: FOLDERS
 	@echo " "
 	vc +kick13 test/$@.c -o test/$@
 
-test_library: $(PRAGMA_FILE)
-	$(CC) DATA=far NOMINC $(CFLAGS) SAVEDS IGN=73 OBJNAME $(BDIR)$@.o test/$@.c
-	$(LD) NOICONS FROM LIB:c.o,$(BDIR)$@.o TO test/$@ LIB LIB:sc.lib,LIB:amiga.lib
-	-cp test/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file test/test_library       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+###############################################################################
+
+support: mhi_lib_check get_mem_log MHIplay
+
+get_mem_log:
+	$(CC) $(CFLAGS) support/$@.o support/$@.c
+	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
+	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+
+mhi_lib_check:
+	$(CC) $(CFLAGS) support/$@.o support/$@.c
+	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
+	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+
+MHIplay:
+	$(CC) $(CFLAGS) support/$@.o support/$@.c
+	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
+	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+
+###############################################################################
+
+ADF: all support
+	mkdir -p adf
+	# bzip2 -c -d src/empty.adf.bz2 > target/AmiGUS.adf
+	adf_floppy_create target/AmiGUS.adf dd
+	adf_format -l AmiGUS -t 0 -f target/AmiGUS.adf
+	fuseadf target/AmiGUS.adf adf/
+	cp target/mhiamigus.library adf/
+	cp target/mhi_lib_check adf/
+	cp target/get_mem_log adf/
+	cp target/MHIplay adf/
+	umount adf/
+	-cp target/AmiGUS.adf /media/chritoph/HXC/

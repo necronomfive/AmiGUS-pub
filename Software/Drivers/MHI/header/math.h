@@ -14,18 +14,7 @@
  * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AMIGUS_CODEC_H
-#define AMIGUS_CODEC_H
+#include "SDI_compiler.h"
 
-#include <exec/types.h>
-#include <libraries/configvars.h>
-
-/* Forward declaration here. */
-struct AmiGUS_MHI_Handle;
-
-LONG FindAmiGusCodec( struct ConfigDev ** device );
-VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
-VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
-VOID SleepCodecTicks( APTR amiGUS, ULONG ticks );
-
-#endif /* AMIGUS_CODEC_H */
+ASM( LONG ) SAVEDS _CXM33( REG( d0, WORD a ), REG( d1, WORD b ));
+ASM( LONG ) _divs( REG( d0, LONG a ), REG( d1, LONG b ));

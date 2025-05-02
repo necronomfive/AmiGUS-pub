@@ -132,11 +132,11 @@ BOOL testAlignedPlayback( VOID ) {
   outBuffer32[ 9 ] = 0;
 
   printf("Call 1:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Call 2:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Call 3:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Calls done.\n");
 
   for ( u = 0 ; u <= 8 ; ++u ) {
@@ -202,11 +202,11 @@ BOOL testUnalignedPlayback( VOID ) {
   outBuffer32[ 10 ] = 0;
 
   printf("Call 1:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Call 2:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Call 3:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Calls done.\n");
 
   for ( u = 0 ; u < 11 ; ++u ) {

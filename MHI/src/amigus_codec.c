@@ -129,7 +129,7 @@ VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle ) {
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_TIMER );
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   WriteReg16( card,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_ENABLE );

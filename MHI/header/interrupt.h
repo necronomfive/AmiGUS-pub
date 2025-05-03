@@ -22,6 +22,10 @@
 #include "exec/types.h"
 #include "SDI_compiler.h"
 
+/******************************************************************************
+ * Interrupt functions.
+ *****************************************************************************/
+
 /**
  * Creates the interupt handler for the MHI driver library.
  *

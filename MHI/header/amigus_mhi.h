@@ -56,8 +56,8 @@
 
 /*
  * Minimum firmware required to use this version of the MHI driver,
- * e.g. the codec part's timer came late in the process to ditch the
- * v36 OS requirement.
+ * e.g. the codec part's timer came late in the process to ditch
+ * the AmigaOS 2.0/v36 requirement.
  */
 #define AMIGUS_MHI_FIRMWARE_MINIMUM ( ( 2025 << 20 ) /* year   */ \
                                     + (    3 << 16 ) /* month  */ \

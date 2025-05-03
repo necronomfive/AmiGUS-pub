@@ -21,6 +21,11 @@
 
 #include "SDI_compiler.h"
 
+/******************************************************************************
+ * Math functions required to make the code built
+ * for 68000 as some 32bit arithmetic is missing there.
+ *****************************************************************************/
+
 /**
  * Math glue function for SAS/C, used e.g. in MHI EQ.
  * Needed as SAS/C does not want to understand a
@@ -45,6 +50,7 @@ ASM( LONG ) SAVEDS _CXM33( REG( d0, WORD a ), REG( d1, WORD b ));
  *
  * @return Quotient a / b.
  */
+ASM( LONG ) _CXD33( REG( d0, LONG a ), REG( d1, LONG b ));
 ASM( LONG ) _divs( REG( d0, LONG a ), REG( d1, LONG b ));
 
 #endif /* MATH_H */

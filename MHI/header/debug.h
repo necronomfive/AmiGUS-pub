@@ -83,7 +83,7 @@ VOID RawPutChar( BYTE putCh );
  * - Whatever parameter you pass in here will ALWAYS be promoted to LONG!
  */
 
-#define USE_FILE_LOGGING
+//#define USE_SERIAL_LOGGING
 
 #if defined (USE_SERIAL_LOGGING)
 

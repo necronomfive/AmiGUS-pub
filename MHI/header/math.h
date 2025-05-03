@@ -21,7 +21,30 @@
 
 #include "SDI_compiler.h"
 
+/**
+ * Math glue function for SAS/C, used e.g. in MHI EQ.
+ * Needed as SAS/C does not want to understand a
+ * 16bit x 16bit multiplication is enough in this particular case.
+ * And as we are not linking any standard libraries here...
+ *
+ * @param a One factor.
+ * @param b Second factor.
+ *
+ * @return Product a * b.
+ */
 ASM( LONG ) SAVEDS _CXM33( REG( d0, WORD a ), REG( d1, WORD b ));
+
+/**
+ * Math glue function for SAS/C + VBCC, used e.g. in MHI EQ.
+ * Needed as both do not want to understand a
+ * 32bit / 16bit division is enough in this particular case.
+ * And as we are not linking any standard libraries here...
+ *
+ * @param a Dividend.
+ * @param b Divisor.
+ *
+ * @return Quotient a / b.
+ */
 ASM( LONG ) _divs( REG( d0, LONG a ), REG( d1, LONG b ));
 
 #endif /* MATH_H */

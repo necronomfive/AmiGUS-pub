@@ -161,7 +161,10 @@ struct AmiGUS_MHI {
   APTR                          agb_LogMem;        // Debug log memory blob
 };
 
-/* Used to switch between relying on globals or not. */
+/*
+ * All libraries' base pointers used by the MHI driver library.
+ * Also used to switch between relying on globals or not.
+ */
 #if defined(BASE_GLOBAL)
   extern struct AmiGUS_MHI        * AmiGUS_MHI_Base;
   extern struct DosLibrary        * DOSBase;

@@ -132,6 +132,7 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase );
 /**
  * Hook to plug your own library's cleanup, de-initialization,
  * or close code into.
+ * Closes all the libraries opened by CustomLibInit()
  *
  * @param base Pointer to the allocated library base structure.
  */

@@ -58,7 +58,7 @@ LONG FindAmiGusCodec( struct ConfigDev ** device ) {
     if ( configDevice->cd_Driver ) {
 
       LOG_E(( "E: AmiGUS at 0x%08lx in use\n", ( * device )->cd_BoardAddr ));
-      result = EAmiGUSInUseError;
+      result = EDriverInUse;
       continue;
     }
     serial = configDevice->cd_Rom.er_SerialNumber;

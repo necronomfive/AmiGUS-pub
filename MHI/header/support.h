@@ -21,6 +21,10 @@
 
 #include <exec/types.h>
 
+/******************************************************************************
+ * List / MinList helper macros.
+ *****************************************************************************/
+
 /**
  * Initializes a List or a MinList as empty.
  * 
@@ -38,6 +42,12 @@
 
 /**
  * Iterates with a for-loop over all elements of a List or a MinList.
+ * Usage:
+ * struct MinList * l = ...;
+ * struct MyMinNode * n = ...;
+ * FOR_LIST( l, n, struct MyMinNode *) {
+ *   // do something for every node n in list l. :)
+ * }
  * 
  * Careful, 
  * this involves some cruel casts and trashes everything
@@ -53,21 +63,20 @@
           != ( node_type ) (( struct List * ) list)->lh_Tail ;\
         node = ( node_type ) (( struct Node * ) node)->ln_Succ )
 
+/******************************************************************************
+ * Error messaging functions.
+ *****************************************************************************/
+
 /**
- * Displays an error message in a requester.
+ * Displays an error message in a requester,
+ * and writes it to the logs.
  *
  * Displays an error message, showing the error code and
  * a error message defined in errors[]. If a code can not
  * be resolved, the EUnknownError text is displayed.
  *
- * @param aBase Library base pointer used for calling functions
- *              of other libraries from it.
  * @param aError Error Id to display error message for.
  */
 VOID DisplayError( ULONG aError );
-
-VOID ShowError( STRPTR title, STRPTR message, STRPTR button );
-
-VOID ShowAlert( ULONG alertNum );
 
 #endif /* SUPPORT_H */

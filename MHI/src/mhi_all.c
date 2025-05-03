@@ -249,6 +249,11 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
 
   mhiBuffer = AllocMem( sizeof( struct AmiGUS_MHI_Buffer ),
                         MEMF_PUBLIC | MEMF_CLEAR );
+  if ( !mhiBuffer ) {
+
+    DisplayError( EAllocateBuffer );
+    return FALSE;
+  }
   mhiBuffer->agmb_Buffer = ( ULONG * ) buffer;
   mhiBuffer->agmb_BufferMax = size >> 2;
   mhiBuffer->agmb_BufferExtraBytes = size & 0x00000003;

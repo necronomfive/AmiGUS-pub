@@ -31,6 +31,10 @@
 #include "interrupt.h"
 #include "support.h"
 
+/******************************************************************************
+ * MHI interface - private functions.
+ *****************************************************************************/
+
 VOID FlushAllBuffers( struct AmiGUS_MHI_Handle * clientHandle ) {
 
   struct List * buffers = ( struct List * )&clientHandle->agch_Buffers;
@@ -83,6 +87,10 @@ VOID UpdateEqualizer( APTR card,
   handle->agch_MHI_Equalizer[ index ] = percent;
   UpdateVS1063Equalizer( card, handle->agch_MHI_Equalizer );
 }
+
+/******************************************************************************
+ * MHI interface - public functions.
+ *****************************************************************************/
 
 ASM( APTR ) SAVEDS MHIAllocDecoder(
   REG( a0, struct Task * task ),
@@ -158,23 +166,21 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
 }
 
 ASM( VOID ) SAVEDS MHIFreeDecoder(
-  REG( a3, APTR handle ), 
+  REG( a3, struct AmiGUS_MHI_Handle * handle ), 
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct MinList * clients = &( AmiGUS_MHI_Base->agb_Clients );
   struct AmiGUS_MHI_Handle * currentHandle;
-  struct AmiGUS_MHI_Handle * clientHandle =
-    ( struct AmiGUS_MHI_Handle * ) handle;
-  struct Task * task = clientHandle->agch_Task;
-  LONG signal = clientHandle->agch_Signal;
+  struct Task * task = handle->agch_Task;
+  LONG signal = handle->agch_Signal;
   ULONG error = EHandleUnknown;
 
 
   LOG_D(( "D: MHIFreeDecoder start for task 0x%08lx\n", task ));
   FOR_LIST ( clients, currentHandle, struct AmiGUS_MHI_Handle * ) {
     
-    if ( clientHandle == currentHandle ) {
+    if ( handle == currentHandle ) {
 
       error = ENoError;
       break;
@@ -190,14 +196,14 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   }
 
   Forbid();
-  if (( clientHandle->agch_ConfigDevice->cd_Driver == handle )) {
+  if (( handle->agch_ConfigDevice->cd_Driver == handle )) {
 
-    clientHandle->agch_Task = NULL;
-    clientHandle->agch_Signal = 0;
-    clientHandle->agch_ConfigDevice->cd_Driver = NULL;
+    handle->agch_Task = NULL;
+    handle->agch_Signal = 0;
+    handle->agch_ConfigDevice->cd_Driver = NULL;
 
-    Remove(( struct Node * ) clientHandle );
-    FreeMem( clientHandle, sizeof( struct AmiGUS_MHI_Handle ));
+    Remove(( struct Node * ) handle );
+    FreeMem( handle, sizeof( struct AmiGUS_MHI_Handle ));
 
   } else {
 
@@ -210,7 +216,7 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 
   } else {
 
-    FlushAllBuffers( clientHandle );
+    FlushAllBuffers( handle );
 
     LOG_D(( "D: AmiGUS MHI free'd up task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
@@ -224,24 +230,17 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 }
 
 ASM( BOOL ) SAVEDS MHIQueueBuffer(
-  REG( a3, APTR handle ),
+  REG( a3, struct AmiGUS_MHI_Handle * handle ),
   REG( a0, APTR buffer ),
   REG( d0, ULONG size),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
-  struct AmiGUS_MHI_Handle * clientHandle =
-    ( struct AmiGUS_MHI_Handle * ) handle;
-  struct List * buffers = ( struct List * )&clientHandle->agch_Buffers;
+
+  struct List * buffers = ( struct List * ) &( handle->agch_Buffers );
   struct AmiGUS_MHI_Buffer * mhiBuffer;
 
   LOG_D(( "D: MHIQueueBuffer start\n" ));
-/*
-  if ( &AmiGUS_MHI_Base->agb_ClientHandle != clientHandle ) {
 
-    LOG_D(( "D: MHIQueueBuffer failed, unknown handle.\n" ));
-    return FALSE;
-  }
-    */
   if ( ( ULONG ) buffer & 0x00000003 ) {
 
     LOG_D(( "D: MHIQueueBuffer failed, buffer not LONG aligned.\n" ));
@@ -261,16 +260,16 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
   LOG_V(( "V: Enqueueing MHI buffer 0x%08lx, current 0x%08lx, data 0x%08lx, "
           "size %ld BYTEs = %ld LONGs\n",
           mhiBuffer,
-          clientHandle->agch_CurrentBuffer,
+          handle->agch_CurrentBuffer,
           buffer,
           size,
           mhiBuffer->agmb_BufferMax ));
   Disable();
   AddTail( buffers, ( struct Node * ) mhiBuffer );
   Enable();
-  if ( !(clientHandle->agch_CurrentBuffer )) {
+  if ( !( handle->agch_CurrentBuffer )) {
 
-    clientHandle->agch_CurrentBuffer = mhiBuffer;
+    handle->agch_CurrentBuffer = mhiBuffer;
   }
 
   LOG_D(( "D: MHIQueueBuffer done\n" ));
@@ -278,13 +277,11 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
 }
 
 ASM( APTR ) SAVEDS MHIGetEmpty(
-  REG( a3, APTR handle ),
+  REG( a3, struct AmiGUS_MHI_Handle * handle ),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
-  struct AmiGUS_MHI_Handle * clientHandle =
-    ( struct AmiGUS_MHI_Handle * ) handle;
-  struct List * buffers = ( struct List * ) &clientHandle->agch_Buffers;
+  struct List * buffers = ( struct List * ) &( handle->agch_Buffers );
   struct AmiGUS_MHI_Buffer * mhiBuffer;
 
   LOG_D(( "D: MHIGetEmpty start\n" ));
@@ -306,9 +303,9 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
       Remove(( struct Node * ) mhiBuffer );
       Enable();
       FreeMem( mhiBuffer, sizeof( struct AmiGUS_MHI_Buffer ));
-      if ( mhiBuffer == clientHandle->agch_CurrentBuffer ) {
+      if ( mhiBuffer == handle->agch_CurrentBuffer ) {
 
-        clientHandle->agch_CurrentBuffer = NULL;
+        handle->agch_CurrentBuffer = NULL;
       }
 
       return result;
@@ -320,61 +317,53 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
 }
 
 ASM( UBYTE ) SAVEDS MHIGetStatus(
-  REG( a3, APTR handle ),
+  REG( a3, struct AmiGUS_MHI_Handle * handle ),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
-  struct AmiGUS_MHI_Handle * clientHandle =
-    ( struct AmiGUS_MHI_Handle * ) handle;
 
-  LOG_D(( "D: MHIGetStatus %ld start/done\n", clientHandle->agch_Status ));
-  return ( UBYTE ) clientHandle->agch_Status;
+  LOG_D(( "D: MHIGetStatus %ld start/done\n", handle->agch_Status ));
+  return ( UBYTE ) handle->agch_Status;
 }
 
 ASM( VOID ) SAVEDS MHIPlay(
-  REG( a3, APTR handle ),
+  REG( a3, struct AmiGUS_MHI_Handle * handle ),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
-  struct AmiGUS_MHI_Handle * clientHandle =
-    ( struct AmiGUS_MHI_Handle * ) handle;
   LOG_D(( "D: MHIPlay start\n" ));
-  StartAmiGusCodecPlayback( clientHandle );
-  clientHandle->agch_Status = MHIF_PLAYING;
+  StartAmiGusCodecPlayback( handle );
+  handle->agch_Status = MHIF_PLAYING;
   LOG_D(( "D: MHIPlay done\n" ));
   return;
 }
 
 ASM( VOID ) SAVEDS MHIStop(
-  REG( a3, APTR handle ),
+  REG( a3, struct AmiGUS_MHI_Handle * handle ),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
-  struct AmiGUS_MHI_Handle * clientHandle =
-    ( struct AmiGUS_MHI_Handle * ) handle;
   LOG_D(( "D: MHIStop start\n" ));
-  StopAmiGusCodecPlayback( clientHandle );
-  FlushAllBuffers( clientHandle );
-  clientHandle->agch_Status = MHIF_STOPPED;
+  StopAmiGusCodecPlayback( handle );
+  FlushAllBuffers( handle );
+  handle->agch_Status = MHIF_STOPPED;
   LOG_D(( "D: MHIStop done\n" ));
   return;
 }
 
 ASM( VOID ) SAVEDS MHIPause(
-  REG( a3, APTR handle ),
+  REG( a3, struct AmiGUS_MHI_Handle * handle ),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
-  struct AmiGUS_MHI_Handle * clientHandle =
-    ( struct AmiGUS_MHI_Handle * ) handle;
   LOG_D(( "D: MHIPause start\n" ));
 
-  if ( clientHandle->agch_Status == MHIF_PAUSED ) {
+  if ( handle->agch_Status == MHIF_PAUSED ) {
 
-    clientHandle->agch_Status = MHIF_PLAYING;
+    handle->agch_Status = MHIF_PLAYING;
 
-  } else if( clientHandle->agch_Status == MHIF_PLAYING ) {
+  } else if( handle->agch_Status == MHIF_PLAYING ) {
 
-    clientHandle->agch_Status = MHIF_PAUSED;
+    handle->agch_Status = MHIF_PAUSED;
   }
   LOG_D(( "D: MHIPause done\n" ));
   return;
@@ -450,17 +439,15 @@ ASM( ULONG ) SAVEDS MHIQuery(
 }
 
 ASM( VOID ) SAVEDS MHISetParam(
-  REG( a3, APTR handle ),
+  REG( a3, struct AmiGUS_MHI_Handle * handle ),
   REG( d0, UWORD param ),
   REG( d1, ULONG value ),
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
-  struct AmiGUS_MHI_Handle * clientHandle =
-    ( struct AmiGUS_MHI_Handle * ) handle;
-  APTR card = clientHandle->agch_CardBase;
-  UBYTE * volume = &( clientHandle->agch_MHI_Volume );
-  UBYTE * panning = &( clientHandle->agch_MHI_Panning );
+  APTR card = handle->agch_CardBase;
+  UBYTE * volume = &( handle->agch_MHI_Volume );
+  UBYTE * panning = &( handle->agch_MHI_Panning );
 
   LOG_D(( "D: MHISetParam start\n" ));
   LOG_D(( "V: Param %ld, Value %ld\n", param, value ));
@@ -484,57 +471,57 @@ ASM( VOID ) SAVEDS MHISetParam(
     // 0=max.cut .. 50=unity gain .. 100=max.boost
     case MHIP_BAND1: {
 
-      UpdateEqualizer( card, clientHandle, 0, value );
+      UpdateEqualizer( card, handle, 0, value );
       break;
     }
     case MHIP_BAND2: {
 
-      UpdateEqualizer( card, clientHandle, 1, value );
+      UpdateEqualizer( card, handle, 1, value );
       break;
     }
     case MHIP_BAND3: {
 
-      UpdateEqualizer( card, clientHandle, 2, value );
+      UpdateEqualizer( card, handle, 2, value );
       break;
     }
     case MHIP_BAND4: {
 
-      UpdateEqualizer( card, clientHandle, 3, value );
+      UpdateEqualizer( card, handle, 3, value );
       break;
     }
     case MHIP_BAND5: {
 
-      UpdateEqualizer( card, clientHandle, 4, value );
+      UpdateEqualizer( card, handle, 4, value );
       break;
     }
     case MHIP_BAND6: {
 
-      UpdateEqualizer( card, clientHandle, 5, value );
+      UpdateEqualizer( card, handle, 5, value );
       break;
     }
     case MHIP_BAND7: {
 
-      UpdateEqualizer( card, clientHandle, 6, value );
+      UpdateEqualizer( card, handle, 6, value );
       break;
     }
     case MHIP_BAND8: {
 
-      UpdateEqualizer( card, clientHandle, 7, value );
+      UpdateEqualizer( card, handle, 7, value );
       break;
     }
     case MHIP_BAND9: {
 
-      UpdateEqualizer( card, clientHandle, 8, value );
+      UpdateEqualizer( card, handle, 8, value );
       break;
     }
     case MHIP_BAND10: {
 
-      UpdateEqualizer( card, clientHandle, 9, value );
+      UpdateEqualizer( card, handle, 9, value );
       break;
     }
     case MHIP_PREFACTOR: {
 
-      UpdateEqualizer( card, clientHandle, 10, value );
+      UpdateEqualizer( card, handle, 10, value );
       break;
     }
     // 0=stereo .. 100=mono

@@ -50,7 +50,7 @@
 /**
  * Type for error message declarations.
  */
-struct TErrorMessage {
+struct ErrorMessage {
   ULONG iError;    // Unique error code/ID/number from TErrorCodes.
   UBYTE* iMessage; // Message to show.
   UBYTE* iButton;  // Text for the button to close the dialog.
@@ -59,7 +59,7 @@ struct TErrorMessage {
 /**
  * Mapping between error code, error message and button label.
  */
-struct TErrorMessage errors[] = {
+struct ErrorMessage errors[] = {
   { ENoError, "", "" },
 
   /* Insert errors below. */

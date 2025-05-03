@@ -22,7 +22,7 @@
 /**
  * Enumeration of all possible error codes.
  */
-enum TErrorCodes
+enum ErrorCodes
   {
   ENoError = 0,
   /* Insert errors below. */

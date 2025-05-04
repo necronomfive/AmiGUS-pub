@@ -83,9 +83,7 @@ VOID RawPutChar( BYTE putCh );
  * - Whatever parameter you pass in here will ALWAYS be promoted to LONG!
  */
 
-//#define USE_SERIAL_LOGGING
-
-#if defined (USE_SERIAL_LOGGING)
+#if defined (SER_LOG)
 
 // LOG_INT(X) would deadlock
 // #define LOG_V(X) debug_kprintf X
@@ -94,7 +92,7 @@ VOID RawPutChar( BYTE putCh );
 #define LOG_W(X) debug_kprintf X
 #define LOG_E(X) debug_kprintf X
 
-#elif defined (USE_FILE_LOGGING)
+#elif defined (FILE_LOG)
 
 // LOG_INT(X) would crash
 #define LOG_V(X) debug_fprintf X
@@ -103,7 +101,7 @@ VOID RawPutChar( BYTE putCh );
 #define LOG_W(X) debug_fprintf X
 #define LOG_E(X) debug_fprintf X
 
-#elif defined (USE_MEM_LOGGING)
+#elif defined (MEM_LOG)
 
 #define LOG_INT(X) debug_mprintf X
 #define LOG_V(X)   debug_mprintf X

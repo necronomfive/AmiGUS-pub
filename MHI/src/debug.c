@@ -30,7 +30,7 @@
  * Debug helper functions - private functions.
  *****************************************************************************/
 
-#if defined( USE_FILE_LOGGING ) | defined( USE_MEM_LOGGING )
+#if defined( FILE_LOG ) | defined( MEM_LOG )
 
 /**
  * Puts a single character to a location pointed to,
@@ -104,7 +104,7 @@ VOID debug_kprintf( STRPTR format, ... ) {
 
 #endif
 
-#ifdef USE_FILE_LOGGING
+#ifdef FILE_LOG
 
 VOID debug_fprintf( STRPTR format, ... ) {
 
@@ -162,8 +162,8 @@ VOID debug_fprintf( STRPTR format, ... ) {
   Write( AmiGUS_MHI_Base->agb_LogFile, buffer, printBuffer - buffer - 1 );
 }
 
-#endif /* USE_FILE_LOGGING */
-#ifdef USE_MEM_LOGGING
+#endif /* FILE_LOG */
+#ifdef MEM_LOG
 
 VOID debug_mprintf( STRPTR format, ... ) {
 
@@ -289,4 +289,4 @@ VOID debug_mprintf( STRPTR format, ... ) {
     ( APTR )(( ULONG ) AmiGUS_MHI_Base->agb_LogMem - 1 );
 }
 
-#endif /* USE_MEM_LOGGING */
+#endif /* MEM_LOG */

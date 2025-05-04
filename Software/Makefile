@@ -17,17 +17,24 @@ TOOLS/CLEAN = $(foreach TOOL,$(TOOLS),$(TOOL)/clean)
 
 ADF_IMAGE  = /tmp/AmiGUS.adf
 ADF_DIR    = /tmp/AmiGUS-ADF
-TARGET_DIR = /tmp/AmiGUS/
+TARGET_DIR = /tmp/AmiGUS
 TARGET_LHA = /tmp/AmiGUS-`date +%Y%m%d`.lha
 TOOL_DIR   = $(TARGET_DIR)/Tools
-AUDIOMODES_DIR = $(TARGET_DIR)/AHI4/AudioModes
-AHI_DIR = $(TARGET_DIR)/AHI4/AHI
+AHI_DIR = $(TARGET_DIR)/AHI4
+AUDIOMODES_DIR = $(AHI_DIR)/AudioModes
+AHIFILE_DIR = $(AHI_DIR)/AHI
 MHI_DIR = $(TARGET_DIR)/MHI
 
 release: all
 	-umount $(ADF_DIR)
 	rm -rf $(TARGET_DIR) $(TARGET_LHA) $(ADF_DIR) $(ADF_IMAGE)
-	mkdir -p $(ADF_DIR) $(TOOL_DIR) $(AUDIOMODES_DIR) $(AHI_DIR) $(MHI_DIR)
+	mkdir -p $(ADF_DIR) $(TOOL_DIR) $(AUDIOMODES_DIR) $(AHIFILE_DIR) $(MHI_DIR)
+
+	cp drawer.info                     $(TARGET_DIR).info
+	cp drawer.info                     $(TOOL_DIR).info
+	cp drawer.info                     $(AHI_DIR).info
+	cp drawer.info                     $(MHI_DIR).info
+
 	cp Tools/FlashFPGA/FlashGUI        $(TOOL_DIR)
 	cp Tools/FlashFPGA/FlashGUI.info   $(TOOL_DIR)
 	cp Tools/Mixer/Mixer               $(TOOL_DIR)
@@ -40,11 +47,11 @@ release: all
 	cp Tools/PlayWAV/PlayWav.info      $(TOOL_DIR)
 	cp Tools/Record/Record             $(TOOL_DIR)
 	cp Tools/Record/Record.info        $(TOOL_DIR)
-	cp Drivers/AHI4/target/*.audio*    $(AHI_DIR)
+	cp Drivers/AHI4/target/*.audio*    $(AHIFILE_DIR)
 	cp Drivers/AHI4/target/AMIGUS      $(AUDIOMODES_DIR)
 	cp Drivers/MHI/target/*            $(MHI_DIR)
 
-	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)`
+	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)`*
 
 	adf_floppy_create $(ADF_IMAGE) dd
 	adf_format -l AmiGUS -t 0 -f $(ADF_IMAGE)

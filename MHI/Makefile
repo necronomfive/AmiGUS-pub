@@ -27,7 +27,7 @@ ifeq ($(findstring /home,$(HOME)), /home)
   RM            = rm -rf
   RM_SUFFIX     =
   CP            = cp
-  RUNNER        = vamos
+  RUNNER        = vamos -c ../.vamosrc
   IGNORE_VAMOS  = -
   LHA           = jlha
 

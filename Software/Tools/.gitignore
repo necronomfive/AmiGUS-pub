@@ -1,0 +1,11 @@
+# Object files
+*.o
+*.lnk
+
+# Target files
+FlashFPGA/FlashGUI
+Mixer/Mixer
+PlayMIDI/PlayMidi
+PlayMP3/PlayMP3
+PlayWAV/PlayWav
+Record/Record

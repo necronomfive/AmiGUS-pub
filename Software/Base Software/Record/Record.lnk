@@ -1,4 +1,0 @@
-FROM LIB:c.o "Record.o"+"asmroutines.o"
-TO "Record"
-LIB LIB:sc.lib LIB:amiga.lib
-

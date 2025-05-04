@@ -1,4 +1,0 @@
-FROM LIB:c.o "PlayMP3.o"+"asmroutines.o"
-TO "PlayMP3"
-LIB LIB:sc.lib LIB:amiga.lib
-

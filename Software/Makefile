@@ -52,7 +52,7 @@ release: all
 	cp Drivers/AHI4/target/AMIGUS      $(AUDIOMODES_DIR)
 	cp Drivers/MHI/target/*            $(MHI_DIR)
 
-	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)`*
+	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)` `basename $(TARGET_DIR)`.info
 
 	adf_floppy_create $(ADF_IMAGE) dd
 	adf_format -l AmiGUS -t 0 -f $(ADF_IMAGE)

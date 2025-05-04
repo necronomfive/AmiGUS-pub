@@ -1,17 +1,19 @@
 /*
- * This file is part of the mhiAmiGUS.library.
+ * This file is part of the mhiamigus.library.
  *
- * mhiAmiGUS.library is free software: you can redistribute it and/or modify
+ * mhiamigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiAmiGUS.library is distributed in the hope that it will be useful,
+ * mhiamigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mhiamigus.library.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <stdio.h>
@@ -130,11 +132,11 @@ BOOL testAlignedPlayback( VOID ) {
   outBuffer32[ 9 ] = 0;
 
   printf("Call 1:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Call 2:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Call 3:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Calls done.\n");
 
   for ( u = 0 ; u <= 8 ; ++u ) {
@@ -200,11 +202,11 @@ BOOL testUnalignedPlayback( VOID ) {
   outBuffer32[ 10 ] = 0;
 
   printf("Call 1:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Call 2:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Call 3:\n");
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   printf("Calls done.\n");
 
   for ( u = 0 ; u < 11 ; ++u ) {

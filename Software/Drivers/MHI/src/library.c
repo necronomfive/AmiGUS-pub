@@ -1,17 +1,19 @@
 /*
- * This file is part of the mhiAmiGUS.library.
+ * This file is part of the mhiamigus.library.
  *
- * mhiAmiGUS.library is free software: you can redistribute it and/or modify
+ * mhiamigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiAmiGUS.library is distributed in the hope that it will be useful,
+ * mhiamigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mhiamigus.library.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <exec/types.h>
@@ -32,38 +34,134 @@
 #define NO_BASE_REDEFINE
 #include "amigus_mhi.h"
 
-/* Private forward declarations */
+/******************************************************************************
+ * OS required library basics - private macros.
+ *****************************************************************************/
+
+/**
+ * Allow at least usage of exec functions below,
+ * everything else is not initialized and not needed.
+ */
+#define SysBase base->SysBase
+
+/*
+ * Custom Version of exec/initializers.h, for 1.3 compatibility.
+ */
+#define WORDINIT( _a_ ) UWORD _a_ ##W1; UWORD _a_ ##W2; UWORD _a_ ##ARG;
+#define LONGINIT( _a_ ) UBYTE _a_ ##A1; UBYTE _a_ ##A2; ULONG _a_ ##ARG;
+#define INITBYTE( offset, value )  \
+        0xe000, ( UWORD ) ( offset ), \
+        ( UWORD ) (( value ) << 8 )
+#define INITWORD( offset, value )  \
+        0xd000, ( UWORD ) ( offset ), \
+        ( UWORD ) ( value )
+#define INITLONG( offset, value )  \
+        0xc000, ( UWORD ) ( offset ), \
+        ( UWORD ) (( value ) >> 16 ), ( UWORD ) (( value ) & 0xffff )
+
+/******************************************************************************
+ * OS required library basics - private function declarations.
+ *****************************************************************************/
 
 // 'cause otherwise VBCC does not swallow the ASM macros
 typedef struct Library * LIB_PTR;
 
+/**
+ * Library initialization - run only once when library is put into memory.
+ *
+ * @param base     Pointer to the allocated library base structure.
+ * @param seglist  List of library code segments
+ * @param _SysBase Exec library pointer
+ *
+ * @return Pointer to the allocated library base structure,
+ *         NULL otherwise.
+ */
 static ASM( LIB_PTR ) SAVEDS LibInit(
   REG( d0, struct BaseLibrary * base ),
   REG( a0, SEGLISTPTR seglist ),
   REG( a6, struct Library * _SysBase ));
 
+/**
+ * Library opening code - run every time when the library is OpenLibrary-ed.
+ *
+ * @param base Pointer to the allocated library base structure.
+ *
+ * @return Pointer to the allocated library base structure.
+ */
 static ASM( LIB_PTR ) SAVEDS LibOpen(
   REG( a6, struct BaseLibrary * base ));
 
+/**
+ * Library closing code - run every time when the library is CloseLibrary-ed.
+ *
+ * @param base Pointer to the allocated library base structure.
+ *
+ * @return NULL if the library is still opened at least once,
+ *         return value of LibExpunge otherwise.
+ */
 static ASM( SEGLISTPTR ) SAVEDS LibClose(
   REG( a6, struct BaseLibrary * base ));
 
+/**
+ * Library extinction - run only once when library is erased from memory.
+ *
+ * @param base Pointer to the allocated library base structure.
+ *
+ * @return NULL if the library is still opened at least once,
+ *         list of the code segments to erase/return to empty pool otherwise.
+ */
 static ASM( SEGLISTPTR ) SAVEDS LibExpunge(
   REG( a6, struct BaseLibrary * base ));
 
-#define SysBase base->SysBase
+/******************************************************************************
+ * OS required library basics - private data declarations.
+ *****************************************************************************/
 
-////////////////////////////////////////////////////////////////////7
+/**
+ * Just the library name as C-string.
+ */
+extern const char LibName[];
 
+/**
+ * Full library version string to be printed by
+ * version <library> full
+ * via shell.
+ */
+extern const char _LibVersionString[];
+
+/**
+ * Library initialization table,
+ * - Size of the libraries base structure -
+ *   how much memory shall be allocated when the library is loaded?
+ * - Library function list, terminated by -1.
+ * - Library initializers, with the address of the wierd struct LibInitData.
+ * - Pointer to the LibInit function.
+ */
+extern const APTR LibInitTab[];
+
+/******************************************************************************
+ * OS required library basics - private functions.
+ *****************************************************************************/
+
+/**
+ * First function in an "executable" is called on startup by AmigaOS.
+ * Therefore an empty function prevents disasters here.
+ *
+ * @return 0 as OS return code.
+ */
 ASM( LONG ) SAVEDS LibNull( VOID ) {
 
     return 0;
 }
- 
-extern const char LibName[];
-extern const char _LibVersionString[];
-extern const APTR LibInitTab[];
 
+/******************************************************************************
+ * OS required library basics - private data definitions.
+ *****************************************************************************/
+
+/**
+ * Feeds the OS's library loader with the required information.
+ * May not be omitted and shall not be optimized away either!
+ */
 static const struct Resident _00RomTag = {
   RTC_MATCHWORD,
   ( struct Resident * ) &_00RomTag,
@@ -77,9 +175,18 @@ static const struct Resident _00RomTag = {
   ( APTR ) LibInitTab
 };
 
+// As per above:
 const char _LibVersionString[] = "$VER: " LIBRARY_IDSTRING "\r\n";
+
+// As per above:
 const char LibName[] = STR( LIBRARY_NAME );
 
+/**
+ * Table of all functions to be externally defined by the library.
+ * With minimum functionality required by the OS and
+ * finally the functions defined by the actual library to serve some purpose.
+ * Terminated by -1.
+ */
 const APTR LibFunctions[] = {
   /* Basic library open, close, flush functions */
   ( APTR ) LibOpen,
@@ -92,18 +199,10 @@ const APTR LibFunctions[] = {
   ( APTR ) -1
 };
 
-#define WORDINIT( _a_ ) UWORD _a_ ##W1; UWORD _a_ ##W2; UWORD _a_ ##ARG;
-#define LONGINIT( _a_ ) UBYTE _a_ ##A1; UBYTE _a_ ##A2; ULONG _a_ ##ARG;
-#define INITBYTE( offset, value )  \
-        0xe000, ( UWORD ) ( offset ), \
-        ( UWORD ) (( value ) << 8 )
-#define INITWORD( offset, value )  \
-        0xd000, ( UWORD ) ( offset ), \
-        ( UWORD ) ( value )
-#define INITLONG( offset, value )  \
-        0xc000, ( UWORD ) ( offset ), \
-        ( UWORD ) (( value ) >> 16 ), ( UWORD ) (( value ) & 0xffff )
-
+/**
+ * Mysterious library init structure.
+ * Do not touch - nothing to win here!
+ */
 struct LibInitData {
 
   WORDINIT( w1 )
@@ -129,6 +228,10 @@ struct LibInitData {
   ( ULONG ) 0
 };
 
+/**
+ * Mysterious library init table.
+ * Do not touch - nothing to win here!
+ */
 const APTR LibInitTab[] = {
 
   ( APTR ) sizeof( LIBRARY_TYPE ),
@@ -136,6 +239,10 @@ const APTR LibInitTab[] = {
   ( APTR ) &LibInitializers,
   ( APTR ) LibInit
 };
+
+/******************************************************************************
+ * OS required library basics - private function definitions.
+ *****************************************************************************/
 
 static ASM( LIB_PTR ) SAVEDS LibInit(
   REG( d0, struct BaseLibrary * base ),

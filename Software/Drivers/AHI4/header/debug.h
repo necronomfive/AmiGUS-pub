@@ -7,11 +7,13 @@
  *
  * AmiGUS.audio driver is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
+ * along with AmiGUS.audio driver.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef DEBUG_H
@@ -54,26 +56,25 @@ VOID RawPutChar(BYTE putCh);
  * All of these will need double ((...)) to workaround a SAS/C insufficiency!
  */
 
-#define USE_FILE_LOGGING
-#if defined (USE_SERIAL_LOGGING)
+ #if defined (SER_LOG)
 
-// LOG_INT(X) would deadlock
-// #define LOG_V(X) debug_kprintf X
-#define LOG_D(X) debug_kprintf X
-#define LOG_I(X) debug_kprintf X
-#define LOG_W(X) debug_kprintf X
-#define LOG_E(X) debug_kprintf X
-
-#elif defined (USE_FILE_LOGGING)
-
-// LOG_INT(X) would crash
-#define LOG_V(X) debug_fprintf X
-#define LOG_D(X) debug_fprintf X
-#define LOG_I(X) debug_fprintf X
-#define LOG_W(X) debug_fprintf X
-#define LOG_E(X) debug_fprintf X
-
-#elif defined (USE_MEM_LOGGING)
+ // LOG_INT(X) would deadlock
+ // #define LOG_V(X) debug_kprintf X
+ #define LOG_D(X) debug_kprintf X
+ #define LOG_I(X) debug_kprintf X
+ #define LOG_W(X) debug_kprintf X
+ #define LOG_E(X) debug_kprintf X
+ 
+ #elif defined (FILE_LOG)
+ 
+ // LOG_INT(X) would crash
+ #define LOG_V(X) debug_fprintf X
+ #define LOG_D(X) debug_fprintf X
+ #define LOG_I(X) debug_fprintf X
+ #define LOG_W(X) debug_fprintf X
+ #define LOG_E(X) debug_fprintf X
+ 
+ #elif defined (MEM_LOG)
 
 #define LOG_INT(X) debug_mprintf X
 #define LOG_V(X)   debug_mprintf X

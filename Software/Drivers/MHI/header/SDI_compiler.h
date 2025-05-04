@@ -29,9 +29,9 @@
 **
 ** To keep confusion level low: When changing this file, please note it in
 ** above history list and indicate that the change was not made by myself
-** (e.g.�add your name or nick name).
+** (e.g. add your name or nick name).
 **
-** Dirk St�cker <stoecker@epost.de>
+** Dirk Stoecker <stoecker@epost.de>
 */
 
 #ifdef ASM

@@ -1,23 +1,29 @@
 /*
- * This file is part of the mhiAmiGUS.library.
+ * This file is part of the mhiamigus.library.
  *
- * mhiAmiGUS.library is free software: you can redistribute it and/or modify
+ * mhiamigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiAmiGUS.library is distributed in the hope that it will be useful,
+ * mhiamigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mhiamigus.library.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef SUPPORT_H
 #define SUPPORT_H
 
 #include <exec/types.h>
+
+/******************************************************************************
+ * List / MinList helper macros.
+ *****************************************************************************/
 
 /**
  * Initializes a List or a MinList as empty.
@@ -36,6 +42,12 @@
 
 /**
  * Iterates with a for-loop over all elements of a List or a MinList.
+ * Usage:
+ * struct MinList * l = ...;
+ * struct MyMinNode * n = ...;
+ * FOR_LIST( l, n, struct MyMinNode *) {
+ *   // do something for every node n in list l. :)
+ * }
  * 
  * Careful, 
  * this involves some cruel casts and trashes everything
@@ -51,21 +63,20 @@
           != ( node_type ) (( struct List * ) list)->lh_Tail ;\
         node = ( node_type ) (( struct Node * ) node)->ln_Succ )
 
+/******************************************************************************
+ * Error messaging functions.
+ *****************************************************************************/
+
 /**
- * Displays an error message in a requester.
+ * Displays an error message in a requester,
+ * and writes it to the logs.
  *
  * Displays an error message, showing the error code and
  * a error message defined in errors[]. If a code can not
  * be resolved, the EUnknownError text is displayed.
  *
- * @param aBase Library base pointer used for calling functions
- *              of other libraries from it.
  * @param aError Error Id to display error message for.
  */
 VOID DisplayError( ULONG aError );
-
-VOID ShowError( STRPTR title, STRPTR message, STRPTR button );
-
-VOID ShowAlert( ULONG alertNum );
 
 #endif /* SUPPORT_H */

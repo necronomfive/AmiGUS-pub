@@ -1,32 +1,28 @@
 /*
- * This file is part of the mhiAmiGUS.library driver.
+ * This file is part of the mhiamigus.library.
  *
- * mhiAmiGUS.library driver is free software: you can redistribute it and/or modify
+ * mhiamigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiAmiGUS.library driver is distributed in the hope that it will be useful,
+ * mhiamigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiAmiGUS.library driver.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mhiamigus.library.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "amigus_hardware.h"
 #include "debug.h"
 #include "SDI_compiler.h"
 
-UWORD ReadReg16( APTR card, ULONG offset ) {
-
-  return *(( UWORD * )(( ULONG ) card + offset ));
-}
-
-ULONG ReadReg32( APTR card, ULONG offset ) {
-
-  return *(( ULONG * )(( ULONG ) card + offset ));
-}
+/******************************************************************************
+ * Low-Level hardware access functions - private functions.
+ *****************************************************************************/
 
 INLINE UWORD ReadSPI(
   APTR card,
@@ -52,6 +48,42 @@ INLINE UWORD ReadSPI(
 
   } while ( status & blockedSPImask );
   return ReadReg16( card, offsetSPIread );
+}
+
+INLINE VOID WriteSPI(
+  APTR card,
+  UWORD SPIregister,
+  UWORD SPIvalue,
+  UWORD blockedSPImask,
+  UWORD offsetSPIstatus,
+  UWORD offsetSPIaddress,
+  UWORD offsetSPIwrite,
+  UWORD offsetSPItrigger ) {
+
+  UWORD status;
+
+  do {
+
+    status = ReadReg16( card, offsetSPIstatus );
+
+  } while ( status & blockedSPImask );
+  WriteReg16( card, offsetSPIaddress, SPIregister );
+  WriteReg16( card, offsetSPIwrite, SPIvalue );
+  WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
+}
+
+/******************************************************************************
+ * Low-Level hardware access functions - public function definitions.
+ *****************************************************************************/
+
+UWORD ReadReg16( APTR card, ULONG offset ) {
+
+  return *(( UWORD * )(( ULONG ) card + offset ));
+}
+
+ULONG ReadReg32( APTR card, ULONG offset ) {
+
+  return *(( ULONG * )(( ULONG ) card + offset ));
 }
 
 UWORD ReadCodecSPI( APTR card, UWORD SPIregister ) {
@@ -81,28 +113,6 @@ VOID WriteReg32( APTR card, ULONG offset, ULONG value ) {
   *(( ULONG * )(( ULONG ) card + offset )) = value;
 }
 
-INLINE VOID WriteSPI(
-  APTR card,
-  UWORD SPIregister,
-  UWORD SPIvalue,
-  UWORD blockedSPImask,
-  UWORD offsetSPIstatus,
-  UWORD offsetSPIaddress,
-  UWORD offsetSPIwrite,
-  UWORD offsetSPItrigger ) {
-
-  UWORD status;
-
-  do {
-
-    status = ReadReg16( card, offsetSPIstatus );
-
-  } while ( status & blockedSPImask );
-  WriteReg16( card, offsetSPIaddress, SPIregister );
-  WriteReg16( card, offsetSPIwrite, SPIvalue );
-  WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
-}
-
 VOID WriteCodecSPI( APTR card, UWORD SPIregister, UWORD SPIvalue ) {
 
   WriteSPI( card,
@@ -121,18 +131,10 @@ VOID WriteVS1063Mem( APTR amiGUS, UWORD address, UWORD value ) {
   WriteCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM, value );
 }
 
-/*
- * ---------------------------------------------------
- * Data definitions
- * ---------------------------------------------------
- */
+/******************************************************************************
+ * Low-Level hardware feature lookup tables - public data definitions.
+ *****************************************************************************/
 
-/*
- * Array of supported sample rates, shall always be in 
- * sync with 
- * - AMIGUS_SAMPLE_RATE_* in amigus_hardware.h and
- * - AMIGUS_AHI_NUM_SAMPLE_RATES in amigus_public.h.
- */
 const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
 
    8000, // AMIGUS_PCM_SAMPLE_RATE_8000  @ index 0x0000
@@ -146,21 +148,21 @@ const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
   96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0008
 };
 
-const STRPTR AmiGUSOutputs[ AMIGUS_OUTPUTS_COUNT ] = {
+const STRPTR AmiGUSOutputs[ AMIGUS_PCM_OUTPUTS_COUNT ] = {
 
   "Line Out"
 };
 
-const STRPTR AmiGUSInputs[ AMIGUS_INPUTS_COUNT ] = {
+const STRPTR AmiGUSInputs[ AMIGUS_PCM_INPUTS_COUNT ] = {
 
   "External / see Mixer",
   "MHI / Codec",
   "WaveTable",
-  // "AHI / PCM",                    // Requires splitting 1 card for 2 clients
+  // "AHI / PCM",         // Deactivated - needs splitting 1 card for 2 clients
   "ALL / What-You-Hear"
 };
 
-const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ] = {
+const UWORD AmiGUSInputFlags[ AMIGUS_PCM_INPUTS_COUNT ] = {
 
   AMIGUS_PCM_S_REC_F_ADC_SRC,        // External above
   AMIGUS_PCM_S_REC_F_CODEC_SRC,
@@ -190,7 +192,7 @@ const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ] = {
  *
  * So much for defining other frequency patterns like:
  */
-const WORD AmiGUSDefaultEqualizer[ 9 ] = {
+const WORD AmiGUSDefaultEqualizer[ VS1063_CODEC_EQ_SETTINGS_SIZE ] = {
   0, /* +/- 0dB */   125, /* Hz */
   0, /* +/- 0dB */   500, /* Hz */
   0, /* +/- 0dB */  2000, /* Hz */
@@ -198,7 +200,7 @@ const WORD AmiGUSDefaultEqualizer[ 9 ] = {
   0  /* +/- 0dB */
 };
 
-const WORD AmiGUSAmigaAmpEqualizer[ 9 ] = {
+const WORD AmiGUSAmigaAmpEqualizer[ VS1063_CODEC_EQ_SETTINGS_SIZE ] = {
   0, /* +/- 0dB */   150, /* Hz */
   0, /* +/- 0dB */   775, /* Hz */
   0, /* +/- 0dB */  4243, /* Hz */
@@ -206,7 +208,7 @@ const WORD AmiGUSAmigaAmpEqualizer[ 9 ] = {
   0  /* +/- 0dB */
 };
 
-const UBYTE AmiGUSVolumeMapping[ 104 ] = {
+const UBYTE AmiGUSVolumeMapping[ VS1063_CODEC_VOLUME_MAPPING ] = {
   0xFE /*  0% */, 
   72 /*  1% */, 66 /*  2% */, 60 /*  3% */, 54 /*  4% */, 51 /*   5% */,
   48 /*  6% */, 45 /*  7% */, 42 /*  8% */, 41 /*  9% */, 39 /*  10% */,

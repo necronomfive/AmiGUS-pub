@@ -1,3 +1,14 @@
+TARGET_DIR         = /tmp/AmiGUS
+ADF_DIR            = /tmp/AmiGUS-ADF
+TOOL_DIR           = $(TARGET_DIR)/Tools
+AHI_DIR            = $(TARGET_DIR)/AHI4
+AHIFILE_DIR        = $(AHI_DIR)/AHI
+AUDIOMODES_DIR     = $(AHI_DIR)/AudioModes
+MHI_DIR            = $(TARGET_DIR)/MHI
+
+TARGET_LHA         = /tmp/AmiGUS-`date +%Y%m%d`.lha
+ADF_IMAGE          = /tmp/AmiGUS-`date +%Y%m%d`.adf
+
 DRIVER_MAKES = $(shell find Drivers -mindepth 1 -maxdepth 2 -type f -name Makefile)
 DRIVERS = $(dir $(DRIVER_MAKES))
 DRIVERS/ALL = $(foreach DRIVER,$(DRIVERS),$(DRIVER)/all)
@@ -14,16 +25,6 @@ TOOLS/CLEAN = $(foreach TOOL,$(TOOLS),$(TOOL)/clean)
 .PHONY: $(DRIVERS/ALL) $(DRIVERS/CLEAN) $(DRIVERS/DIST-CLEAN) \
         $(TOOLS/ALL) $(TOOLS/CLEAN) \
 		dist-clean clean all
-
-ADF_IMAGE  = /tmp/AmiGUS.adf
-ADF_DIR    = /tmp/AmiGUS-ADF
-TARGET_DIR = /tmp/AmiGUS
-TARGET_LHA = /tmp/AmiGUS-`date +%Y%m%d`.lha
-TOOL_DIR   = $(TARGET_DIR)/Tools
-AHI_DIR = $(TARGET_DIR)/AHI4
-AUDIOMODES_DIR = $(AHI_DIR)/AudioModes
-AHIFILE_DIR = $(AHI_DIR)/AHI
-MHI_DIR = $(TARGET_DIR)/MHI
 
 release: all
 	-umount $(ADF_DIR)

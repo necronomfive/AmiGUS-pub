@@ -1,17 +1,17 @@
 #
-# This file is part of the AmiGUS Flash Utility.
+# This file is part of the AmiGUS Record Utility.
 #
-# AmiGUS Flash Utility is free software: you can redistribute it and/or modify
+# AmiGUS Record Utility is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License only.
 #
-# AmiGUS Flash Utility is distributed in the hope that it will be useful,
+# AmiGUS Record Utility is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with AmiGUS Flash Utility.  If not, see <http://www.gnu.org/licenses/>.
+# along with AmiGUS Record Utility.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 ifeq ($(findstring /home,$(HOME)), /home)

@@ -53,7 +53,7 @@
  *****************************************************************************/
 #define LIBRARY_NAME      "AmiGUS.audio"
 #define LIBRARY_VERSION   4
-#define LIBRARY_REVISION  16
+#define LIBRARY_REVISION  17
 #define LIBRARY_DATETXT	  __AMIGADATE__
 #define LIBRARY_VERSTXT	 GSTR( LIBRARY_VERSION ) ".0" GSTR( LIBRARY_REVISION )
 

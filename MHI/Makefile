@@ -1,17 +1,19 @@
 #
-# This file is part of the mhiAmiGUS.library.
+# This file is part of the mhiamigus.library.
 #
-# mhiAmiGUS.library is free software: you can redistribute it and/or modify
+# mhiamigus.library is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, version 3 of the License only.
 #
-# mhiAmiGUS.library is distributed in the hope that it will be useful,
+# mhiamigus.library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU LesserGeneral Public License for more details.
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
+# along with mhiamigus.library.
+#
+# If not, see <http://www.gnu.org/licenses/>.
 #
 
 ifeq ($(findstring /home,$(HOME)), /home)
@@ -25,7 +27,7 @@ ifeq ($(findstring /home,$(HOME)), /home)
   RM            = rm -rf
   RM_SUFFIX     =
   CP            = cp
-  RUNNER        = vamos
+  RUNNER        = vamos -c ../.vamosrc
   IGNORE_VAMOS  = -
   LHA           = jlha
 
@@ -63,10 +65,13 @@ BDIR   = build/
 SDIR   = src/
 HDIR   = header/
 
+LIB_CPU        ?= 000
+LIB_LOG        ?= FILE_LOG
+
 LIB_NAME        = mhiamigus
-LIB_FILE        = $(LIB_NAME).library
+LIB_FILE        = $(LIB_NAME).library-$(LIB_CPU)-$(LIB_LOG)
 LIB_VERSION     = 1
-LIB_REVISION    = 5
+LIB_REVISION    = 6
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS      =
@@ -83,15 +88,15 @@ NDK_C_INCLUDE   = $(NDK)Include_H
 
 C_SRCS          = $(wildcard $(SDIR)$(WILDCARD).c)
 BDIR_C_SRCS     = $(foreach C_SRC,$(C_SRCS),$(subst $(SDIR),$(BDIR),$(C_SRC)))
-BDIR_C_OBJS     = $(BDIR_C_SRCS:%c=%o)
+BDIR_C_OBJS     = $(BDIR_C_SRCS:%.c=%-$(LIB_CPU)-$(LIB_LOG).o)
 
 A_SRCS          = $(wildcard $(SDIR)$(WILDCARD).asm)
 BDIR_A_SRCS     = $(foreach A_SRC,$(A_SRCS),$(subst $(SDIR),$(BDIR),$(A_SRC)))
-BDIR_A_OBJS     = $(BDIR_A_SRCS:%asm=%o)
+BDIR_A_OBJS     = $(BDIR_A_SRCS:%.asm=%.o)
 
-LIB_OBJS        = $(BDIR)library.o \
-                  $(filter-out %/library.o,$(BDIR_C_OBJS)) \
-                  $(filter-out %/library.o,$(BDIR_A_OBJS))
+LIB_OBJS        = $(BDIR)library-$(LIB_CPU)-$(LIB_LOG).o \
+                  $(filter-out %/library-$(LIB_CPU)-$(LIB_LOG).o,$(BDIR_C_OBJS)) \
+                  $(filter-out %/library-$(LIB_CPU)-$(LIB_LOG).o,$(BDIR_A_OBJS))
 
 ###########################
 
@@ -105,13 +110,13 @@ ifeq (34,$(USEVBCC))
   endif
 
   AFLAGS        = -I$(NDK_ASM_INCLUDE) -quiet -phxass -Fhunk -o
-  CFLAGS        = -c -Os -+ -c99 -cpu=68000                \
-                  -I$(MHI_INCLUDE) -I$(HDIR)                       \
-                  -D__NOLIBBASE__                                  \
-                  -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__  \
-                  -DLIB_VERSION=$(LIB_VERSION)                     \
-                  -DLIB_REVISION=$(LIB_REVISION) -DLIB_CPU=000     \
-                  -DLIB_COMPILER=VBCC -DLIB_HOST=$(LIB_HOST)       \
+  CFLAGS        = -c -Os -+ -c99 -cpu=68$(LIB_CPU)                     \
+                  -I$(MHI_INCLUDE) -I$(HDIR)                           \
+                  -D__NOLIBBASE__ -D$(LIB_LOG)                         \
+                  -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__      \
+                  -DLIB_VERSION=$(LIB_VERSION)                         \
+                  -DLIB_REVISION=$(LIB_REVISION) -DLIB_CPU=$(LIB_CPU)  \
+                  -DLIB_COMPILER=VBCC -DLIB_HOST=$(LIB_HOST)           \
                   -o
   LFLAGS        = -bamigahunk -x -s -mrel -Cvbcc -Bstatic -nostdlib -o
   LFLAGS1       =
@@ -130,13 +135,13 @@ else ifdef USEVBCC
   endif
 
   AFLAGS        = -I$(NDK_ASM_INCLUDE) -quiet -phxass -Fhunk -o
-  CFLAGS        = -O2 -c                                           \
-                  -I$(MHI_INCLUDE) -I$(HDIR)                       \
-                  -D__NOLIBBASE__                                  \
-                  -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__  \
-                  -DLIB_VERSION=$(LIB_VERSION)                     \
-                  -DLIB_REVISION=$(LIB_REVISION) -DLIB_CPU=000     \
-                  -DLIB_COMPILER=VBCC -DLIB_HOST=$(LIB_HOST)       \
+  CFLAGS        = -O2 -c -cpu=68$(LIB_CPU)                             \
+                  -I$(MHI_INCLUDE) -I$(HDIR)                           \
+                  -D__NOLIBBASE__ -D$(LIB_LOG)                         \
+                  -DLIB_FILE=$(LIB_FILE) -DLIB_DATE=__AMIGADATE__      \
+                  -DLIB_VERSION=$(LIB_VERSION)                         \
+                  -DLIB_REVISION=$(LIB_REVISION) -DLIB_CPU=$(LIB_CPU)  \
+                  -DLIB_COMPILER=VBCC -DLIB_HOST=$(LIB_HOST)           \
                   -o
   LFLAGS        = -bamigahunk -x -s -mrel -Cvbcc -Bstatic -nostdlib -o
   LFLAGS1       =
@@ -154,14 +159,14 @@ else
   CFLAGS        = RESETOPTIONS                                                 \
                   PARAMETERS=REGISTER DATA=FAR CODE=FAR                        \
                   NOSTACKCHECK NOCHECKABORT NOICONS                            \
-                  STRINGMERGE UNSIGNEDCHAR                                     \
+                  STRINGMERGE UNSIGNEDCHAR CPU=68$(LIB_CPU)                    \
                   OPTIMIZE OPTIMIZERGLOBAL OPTIMIZERINLINE OPTIMIZERINLOCAL    \
                   OPTIMIZERLOOP OPTIMIZERPEEPHOLE OPTIMIZERSCHEDULE            \
                   IDIR=$(MHI_INCLUDE) IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)       \
-                  DEF __NOLIBBASE__                                            \
+                  DEF __NOLIBBASE__ DEF $(LIB_LOG)                             \
                   DEF LIB_FILE=$(LIB_FILE) DEF LIB_DATE=__AMIGADATE__          \
                   DEF LIB_VERSION=$(LIB_VERSION)                               \
-                  DEF LIB_REVISION=$(LIB_REVISION) DEF LIB_CPU=000             \
+                  DEF LIB_REVISION=$(LIB_REVISION) DEF LIB_CPU=$(LIB_CPU)      \
                   DEF LIB_COMPILER=SAS/C DEF LIB_HOST=$(LIB_HOST)              \
                   OBJNAME
 
@@ -191,8 +196,11 @@ install: all
 	$(INSTALL0)
 	$(INSTALL1)
 
-clean:
-	-$(RM) $(DDIR) $(BDIR) adf $(RM_SUFFIX)
+clean-intermediate:
+	-$(RM) $(BDIR) $(RM_SUFFIX)
+
+clean: clean-intermediate
+	-$(RM) $(DDIR) adf $(RM_SUFFIX)
 	-$(RM) support/$(WILDCARD).o
 
 dist-clean: clean
@@ -213,7 +221,7 @@ $(LIB_FILE_DEST): $(LIB_OBJS)
 
 ###############################################################################
 
-$(BDIR)%.o: $(SDIR)%.c $(HDIR)*
+$(BDIR)%-$(LIB_CPU)-$(LIB_LOG).o: $(SDIR)%.c $(HDIR)*
 	$(CC) $(CFLAGS) $@ $<
 
 $(BDIR)%.o: $(SDIR)%.asm $(HDIR)*

@@ -7,11 +7,13 @@
  *
  * AmiGUS.audio driver is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
+ * along with AmiGUS.audio driver.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <proto/expansion.h>
@@ -79,7 +81,7 @@ LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase ) {
 VOID StartAmiGusPcmPlayback( VOID ) {
 
   ULONG i;
-#ifdef USE_MEM_LOGGING
+#ifdef MEM_LOG
   ULONG prefillSize = 1200; /* in LONGs */
 #else
   ULONG prefillSize = 12; /* in LONGs */

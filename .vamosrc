@@ -25,7 +25,7 @@ AHI4Develop=developer:AHI4/Developer
 
 sc=developer:sc
 lib=sc:lib
-include=NDK_3.2:Include_H,sc:include
+include=NDK_3.2:Include_H,sc:include.stripped
 cxxinclude=sc:cxxinclude
 
 vbcc=developer:vbcc

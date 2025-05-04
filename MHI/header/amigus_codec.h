@@ -1,17 +1,19 @@
 /*
- * This file is part of the mhiAmiGUS.library.
+ * This file is part of the mhiamigus.library.
  *
- * mhiAmiGUS.library is free software: you can redistribute it and/or modify
+ * mhiamigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiAmiGUS.library is distributed in the hope that it will be useful,
+ * mhiamigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mhiamigus.library.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef AMIGUS_CODEC_H
@@ -23,9 +25,54 @@
 /* Forward declaration here. */
 struct AmiGUS_MHI_Handle;
 
+/******************************************************************************
+ * Codec convenience functions.
+ *****************************************************************************/
+
+/**
+ * Finds an available, matching AmiGUS codec device and 
+ * fills its properties into the provided device.
+ *
+ * Does not prevent any conflicts due to concurrency,
+ * but works fine in Permit()/Forbid().
+ *
+ * @param[out] device "struct ConfigDev *" provided by expansion.library
+ *                    if a suitable AmiGUS codec device is available,
+ *                    NULL otherwise.
+ *
+ * @return ENoError if an AmiGUS codec device was found,
+ *         error value describing the reason otherwise.
+ */
 LONG FindAmiGusCodec( struct ConfigDev ** device );
+
+/**
+ * Starts playback of the AmiGUS codec as "owned" by the handle
+ * provided from / to the player software.
+ *
+ * @param handle AmiGUS MHI handle as provided to the player by the driver
+ *               and used to identify the player's MHI context.
+ */
 VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
+
+/**
+ * Stops playback of the AmiGUS codec as "owned" by the handle
+ * provided from / to the player software.
+ *
+ * @param handle AmiGUS MHI handle as provided to the player by the driver
+ *               and used to identify the player's MHI context.
+ */
 VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
+
+/**
+ * Busy waiting "sleep" method using the AmiGUS codec's high resolution timer.
+ * Fine to use for less than a second, waste of CPU time otherwise.
+ *
+ * @param amiGUS Pointer to the AmiGUS codec's register bank.
+ * @param ticks Time to wait in units of
+ *              1 / AMIGUS_TIMER_CLOCK = 1 / 24576000 seconds,
+ *              use MILLIS_PER_SECOND and MICROS_PER_SECOND for
+ *              fine granular steering.
+ */
 VOID SleepCodecTicks( APTR amiGUS, ULONG ticks );
 
 #endif /* AMIGUS_CODEC_H */

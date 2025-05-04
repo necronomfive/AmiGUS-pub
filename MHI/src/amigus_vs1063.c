@@ -1,17 +1,19 @@
 /*
- * This file is part of the mhiAmiGUS.library driver.
+ * This file is part of the mhiamigus.library.
  *
- * mhiAmiGUS.library driver is free software: you can redistribute it and/or modify
+ * mhiamigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiAmiGUS.library driver is distributed in the hope that it will be useful,
+ * mhiamigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiAmiGUS.library driver.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mhiamigus.library.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "amigus_codec.h"
@@ -19,6 +21,32 @@
 #include "amigus_vs1063.h"
 #include "debug.h"
 #include "support.h"
+
+/******************************************************************************
+ * VS1063 codec convenience functions - private functions.
+ *****************************************************************************/
+
+/**
+ * Resets the codec.
+ * Usually not required, only if cancelling playback during a song fails...
+ *
+ * @param amiGUS         Pointer to the AmiGUS codec's register bank.
+ */
+VOID ResetVS1063( APTR amiGUS ) {
+
+  LOG_D(( "D: Resetting VS1063 codec...\n"));
+  WriteCodecSPI( amiGUS,
+                 VS1063_CODEC_SCI_MODE,
+                 VS1063_CODEC_F_SM_RESET );
+  // page 56 - 11.3 Software Reset
+  SleepCodecTicks( amiGUS, VS1063_CODEC_RESET_DELAY_TICKS );
+
+  LOG_D(( "D: ... done.\n"));
+}
+
+/******************************************************************************
+ * VS1063 codec convenience functions - public function definitions.
+ *****************************************************************************/
 
 VOID InitVS1063Codec( APTR amiGUS ) {
 
@@ -258,16 +286,4 @@ VOID CancelVS1063Playback( APTR amiGUS ) {
   LOG_V(( "V: Playback ended, HDAT0 = 0x%04lx, HDAT1 = 0x%04lx\n",
           ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT0 ),
           ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 )));
-}
-
-VOID ResetVS1063( APTR amiGUS ) {
-
-  LOG_D(( "D: Resetting VS1063 codec...\n"));
-  WriteCodecSPI( amiGUS,
-                 VS1063_CODEC_SCI_MODE,
-                 VS1063_CODEC_F_SM_RESET );
-  // page 56 - 11.3 Software Reset
-  SleepCodecTicks( amiGUS, VS1063_CODEC_RESET_DELAY_TICKS );
-
-  LOG_D(( "D: ... done.\n"));
 }

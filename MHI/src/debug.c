@@ -1,17 +1,19 @@
 /*
- * This file is part of the mhiAmiGUS.library.
+ * This file is part of the mhiamigus.library.
  *
- * mhiAmiGUS.library is free software: you can redistribute it and/or modify
+ * mhiamigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiAmiGUS.library is distributed in the hope that it will be useful,
+ * mhiamigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mhiamigus.library.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <proto/dos.h>
@@ -23,6 +25,32 @@
 #include "debug.h"
 #include "errors.h"
 #include "support.h"
+
+/******************************************************************************
+ * Debug helper functions - private functions.
+ *****************************************************************************/
+
+#if defined( FILE_LOG ) | defined( MEM_LOG )
+
+/**
+ * Puts a single character to a location pointed to,
+ * moving the location forward afterwards.
+ * Core of memory and file debug prints below.
+ *
+ * @param c Character to place.
+ * @param target Pointer to the target location pointer.
+ */
+ASM( VOID ) debug_mPutChProc( REG( d0, UBYTE c ), REG( a3, UBYTE ** target )) {
+
+  **target = c;
+  ++( *target );
+}
+
+#endif
+
+/******************************************************************************
+ * Debug helper functions - public function definitions.
+ *****************************************************************************/
 
 #define NOT_USE_RawPutCharC
 #ifdef USE_RawPutCharC
@@ -76,17 +104,7 @@ VOID debug_kprintf( STRPTR format, ... ) {
 
 #endif
 
-#if defined( USE_FILE_LOGGING ) | defined( USE_MEM_LOGGING )
-
-ASM( VOID ) debug_mPutChProc( REG( d0, UBYTE c ), REG( a3, UBYTE ** target )) {
-
-  **target = c;
-  ++( *target );
-}
-
-#endif
-
-#ifdef USE_FILE_LOGGING
+#ifdef FILE_LOG
 
 VOID debug_fprintf( STRPTR format, ... ) {
 
@@ -144,8 +162,8 @@ VOID debug_fprintf( STRPTR format, ... ) {
   Write( AmiGUS_MHI_Base->agb_LogFile, buffer, printBuffer - buffer - 1 );
 }
 
-#endif /* USE_FILE_LOGGING */
-#ifdef USE_MEM_LOGGING
+#endif /* FILE_LOG */
+#ifdef MEM_LOG
 
 VOID debug_mprintf( STRPTR format, ... ) {
 
@@ -271,4 +289,4 @@ VOID debug_mprintf( STRPTR format, ... ) {
     ( APTR )(( ULONG ) AmiGUS_MHI_Base->agb_LogMem - 1 );
 }
 
-#endif /* USE_MEM_LOGGING */
+#endif /* MEM_LOG */

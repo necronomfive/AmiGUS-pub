@@ -1,17 +1,19 @@
 /*
- * This file is part of the mhiAmiGUS.library.
+ * This file is part of the mhiamigus.library.
  *
- * mhiAmiGUS.library is free software: you can redistribute it and/or modify
+ * mhiamigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiAmiGUS.library is distributed in the hope that it will be useful,
+ * mhiamigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiAmiGUS.library.  If not, see <http://www.gnu.org/licenses/>.
+ * along with mhiamigus.library.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <proto/expansion.h>
@@ -24,6 +26,10 @@
 #include "errors.h"
 #include "interrupt.h"
 #include "support.h"
+
+/******************************************************************************
+ * Codec convenience functions - public function definitions.
+ *****************************************************************************/
 
 LONG FindAmiGusCodec( struct ConfigDev ** device ) {
 
@@ -52,7 +58,7 @@ LONG FindAmiGusCodec( struct ConfigDev ** device ) {
     if ( configDevice->cd_Driver ) {
 
       LOG_E(( "E: AmiGUS at 0x%08lx in use\n", ( * device )->cd_BoardAddr ));
-      result = EAmiGUSInUseError;
+      result = EDriverInUse;
       continue;
     }
     serial = configDevice->cd_Rom.er_SerialNumber;
@@ -123,7 +129,7 @@ VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle ) {
               | AMIGUS_CODEC_INT_F_FIFO_EMPTY
               | AMIGUS_CODEC_INT_F_FIFO_WATERMRK
               | AMIGUS_CODEC_INT_F_TIMER );
-  HandlePlayback( handle );
+  FillCodecBuffer( handle );
   WriteReg16( card,
               AMIGUS_CODEC_FIFO_CONTROL,
               AMIGUS_CODEC_FIFO_F_DMA_ENABLE );

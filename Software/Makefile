@@ -13,7 +13,7 @@ TOOLS/CLEAN = $(foreach TOOL,$(TOOLS),$(TOOL)/clean)
 
 .PHONY: $(DRIVERS/ALL) $(DRIVERS/CLEAN) $(DRIVERS/DIST-CLEAN) \
         $(TOOLS/ALL) $(TOOLS/CLEAN) \
-		clean all
+		dist-clean clean all
 
 ADF_IMAGE  = /tmp/AmiGUS.adf
 ADF_DIR    = /tmp/AmiGUS-ADF
@@ -64,7 +64,7 @@ all: tools drivers
 
 tools: $(TOOLS/ALL)
 
-drivers: prepare-ahi prepare-mhi $(DRIVERS/ALL)
+drivers: $(DRIVERS/ALL)
 
 prepare-ahi:
 	mkdir -p /tmp/ahi4-installation Drivers/AHI4/include
@@ -82,13 +82,17 @@ prepare-mhi:
 	touch prepare-mhi
 
 clean: $(DRIVERS/CLEAN) $(TOOLS/CLEAN)
+	rm -rf $(ADF_IMAGE) $(ADF_DIR) $(TARGET_DIR) $(TARGET_LHA)
 
-dist-clean: $(DRIVERS/DIST-CLEAN)
+dist-clean: $(DRIVERS/DIST-CLEAN) clean
+	rm -rf Drivers/*/include
+	rm -rf /tmp/mhi-installation prepare-mhi
+	rm -rf /tmp/ahi4-installation prepare-ahi
 
 $(DRIVERS/CLEAN) $(TOOLS/ALL) $(TOOLS/CLEAN):
 	$(MAKE) -C $(@D) $(@F)
 
-$(DRIVERS/ALL):
+$(DRIVERS/ALL): prepare-ahi prepare-mhi
 	for CPU in $(CPUS)                                              ;\
 	do                                                               \
 		for LOGGING in $(LOGGINGS)                                  ;\

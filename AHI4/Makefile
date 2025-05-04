@@ -7,11 +7,13 @@
 #
 # AmiGUS.audio driver is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU LesserGeneral Public License for more details.
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
+# along with AmiGUS.audio driver.
+#
+# If not, see <http://www.gnu.org/licenses/>.
 #
 
 ifeq ($(findstring /home,$(HOME)), /home)
@@ -63,6 +65,9 @@ BDIR   = build/
 SDIR   = src/
 HDIR   = header/
 
+LIB_CPU        ?= 000
+LIB_LOG        ?= FILE_LOG
+
 AHI_INCLUDE     = include
 NDK_ASM_INCLUDE = $(NDK)Include_I
 NDK_C_INCLUDE   = $(NDK)Include_H
@@ -74,10 +79,10 @@ MODE_FILE_FLAGS = -quiet -phxass -I$(NDK_ASM_INCLUDE) -I$(AHI_INCLUDE)/ASM -Fbin
 
 SRCS            = $(wildcard $(SDIR)$(WILDCARD).c)
 BDIR_SRCS       = $(foreach SRC,$(SRCS),$(subst $(SDIR),$(BDIR),$(SRC)))
-BDIR_OBJS       = $(BDIR_SRCS:%c=%o)
-LIB_OBJS        = $(BDIR)library.o \
-                  $(filter-out %/library.o,$(BDIR_OBJS))
-LIB_DST         = $(DDIR)AmiGUS.audio
+BDIR_OBJS       = $(BDIR_SRCS:%.c=%-$(LIB_CPU)-$(LIB_LOG).o)
+LIB_OBJS        = $(BDIR)library-$(LIB_CPU)-$(LIB_LOG).o \
+                  $(filter-out %/library-$(LIB_CPU)-$(LIB_LOG).o,$(BDIR_OBJS))
+LIB_DST         = $(DDIR)AmiGUS.audio-$(LIB_CPU)-$(LIB_LOG)
 
 # activate VBCC builds by adding `USEVBCC=1` to the make call!
 ifdef USEVBCC
@@ -88,7 +93,7 @@ ifdef USEVBCC
     LDIR        = $(VBCC)/targets/m68k-amigaos/lib/
   endif
   
-  CFLAGS        = -O2 -c -I$(AHI_INCLUDE)/C -I$(HDIR)                          \
+  CFLAGS        = -O2 -c -cpu=68$(LIB_CPU) -I$(AHI_INCLUDE)/C -I$(HDIR)       \
                   -D__NOLIBBASE__ -D$(HOST_TOOLCHAIN) -o
   LFLAGS        = -nostdlib -o
   LFLAGS1       =
@@ -104,11 +109,12 @@ else
                   IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)    \
                   OBJNAME
 
-  CFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(HOST_TOOLCHAIN)  \
+  CFLAGS        = RESETOPTIONS                                                \
+                  DEF __NOLIBBASE__ DEF $(LIB_LOG) DEF $(HOST_TOOLCHAIN)      \
                   PARAMETERS=REGISTER DATA=FAR CODE=FAR                       \
                   NOSTACKCHECK NOCHECKABORT NOICONS                           \
                   IDIR=$(AHI_INCLUDE)/C IDIR=$(NDK_C_INCLUDE) IDIR=$(HDIR)    \
-                  STRINGMERGE UNSIGNEDCHAR                                    \
+                  STRINGMERGE UNSIGNEDCHAR CPU=68$(LIB_CPU)                   \
                   OPTIMIZE OPTIMIZERGLOBAL OPTIMIZERINLINE OPTIMIZERINLOCAL   \
                   OPTIMIZERLOOP OPTIMIZERPEEPHOLE OPTIMIZERSCHEDULE           \
                   OBJNAME
@@ -135,7 +141,7 @@ $(MODE_FILE_DST): $(MODE_FILE_SRC)
 $(LIB_DST): $(LIB_OBJS)
 	$(LD) $(LFLAGS) $@ $(LFLAGS1) $^
 	
-$(BDIR)%.o: $(SDIR)%.c $(HDIR)*
+$(BDIR)%-$(LIB_CPU)-$(LIB_LOG).o: $(SDIR)%.c $(HDIR)*
 	$(CC) $(CFLAGS) $@ $<
 
 install: all

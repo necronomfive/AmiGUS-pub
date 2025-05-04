@@ -7,11 +7,13 @@
  *
  * AmiGUS.audio driver is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU LesserGeneral Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with AmiGUS.audio driver.  If not, see <http://www.gnu.org/licenses/>.
+ * along with AmiGUS.audio driver.
+ *
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <proto/dos.h>
@@ -76,7 +78,7 @@ VOID debug_kprintf( STRPTR format, ... ) {
 
 #endif
 
-#ifdef USE_FILE_LOGGING
+#ifdef FILE_LOG
 
 VOID debug_fprintf( STRPTR format, ... ) {
 
@@ -109,8 +111,8 @@ VOID debug_fprintf( STRPTR format, ... ) {
     (APTR) ((LONG) &format +4) );
 }
 
-#endif /* USE_FILE_LOGGING */
-#ifdef USE_MEM_LOGGING
+#endif /* FILE_LOG */
+#ifdef MEM_LOG
 
 ASM(VOID) debug_mPutChProc( REG(d0, UBYTE c), REG(a3, UBYTE ** target) ) {
 
@@ -209,4 +211,4 @@ VOID debug_mprintf( STRPTR format, ... ) {
   AmiGUSBase->agb_LogMem = ( APTR )(( ULONG ) AmiGUSBase->agb_LogMem - 1 );
 }
 
-#endif /* USE_MEM_LOGGING */
+#endif /* MEM_LOG */

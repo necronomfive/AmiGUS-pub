@@ -9,3 +9,9 @@ PlayMIDI/PlayMidi
 PlayMP3/PlayMP3
 PlayWAV/PlayWav
 Record/Record
+
+# Codecraft session files
+*.session
+
+# UAE extras
+*.uaem

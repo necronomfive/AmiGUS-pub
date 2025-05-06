@@ -5,6 +5,7 @@ AHI_DIR            = $(TARGET_DIR)/AHI4
 AHIFILE_DIR        = $(AHI_DIR)/AHI
 AUDIOMODES_DIR     = $(AHI_DIR)/AudioModes
 MHI_DIR            = $(TARGET_DIR)/MHI
+FW_DIR            = $(TARGET_DIR)/Firmware
 
 TARGET_LHA         = /tmp/AmiGUS-`date +%Y%m%d`.lha
 ADF_IMAGE          = /tmp/AmiGUS-`date +%Y%m%d`.adf
@@ -29,12 +30,13 @@ TOOLS/CLEAN = $(foreach TOOL,$(TOOLS),$(TOOL)/clean)
 release: all
 	-umount $(ADF_DIR)
 	rm -rf $(TARGET_DIR) $(TARGET_LHA) $(ADF_DIR) $(ADF_IMAGE)
-	mkdir -p $(ADF_DIR) $(TOOL_DIR) $(AUDIOMODES_DIR) $(AHIFILE_DIR) $(MHI_DIR)
+	mkdir -p $(ADF_DIR) $(TOOL_DIR) $(AUDIOMODES_DIR) $(AHIFILE_DIR) $(MHI_DIR) $(FW_DIR)
 
 	cp drawer.info                     $(TARGET_DIR).info
 	cp drawer.info                     $(TOOL_DIR).info
 	cp drawer.info                     $(AHI_DIR).info
 	cp drawer.info                     $(MHI_DIR).info
+	cp drawer.info                     $(FW_DIR).info
 
 	cp Tools/FlashFPGA/FlashGUI        $(TOOL_DIR)
 	cp Tools/FlashFPGA/FlashGUI.info   $(TOOL_DIR)
@@ -51,6 +53,20 @@ release: all
 	cp Drivers/AHI4/target/*.audio*    $(AHIFILE_DIR)
 	cp Drivers/AHI4/target/AMIGUS      $(AUDIOMODES_DIR)
 	cp Drivers/MHI/target/*            $(MHI_DIR)
+
+	LATEST_FW=`find ../FPGA/Releases/Amiga/ | sort | tail -n 1` ;\
+	BASENAME_FW=`basename $$LATEST_FW`                          ;\
+	cp $$LATEST_FW                     $(FW_DIR)                ;\
+	cp fw.info                         $(FW_DIR)/$$BASENAME_FW.info
+
+	cp Drivers/MHI/COPYING             $(TARGET_DIR)/GPL.txt
+	cp readme.info                     $(TARGET_DIR)/GPL.txt.info
+	cp Drivers/MHI/COPYING.LESSER      $(TARGET_DIR)/LGPL.txt
+	cp readme.info                     $(TARGET_DIR)/LGPL.txt.info
+	cp CC-BY-NC-ND.txt                 $(TARGET_DIR)/CC-BY-NC-ND.txt
+	cp readme.info                     $(TARGET_DIR)/CC-BY-NC-ND.txt.info
+	cp ReadMeFirst.txt                 $(TARGET_DIR)/ReadMeFirst.txt
+	cp readme.info                     $(TARGET_DIR)/ReadMeFirst.txt.info
 
 	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)` `basename $(TARGET_DIR)`.info
 

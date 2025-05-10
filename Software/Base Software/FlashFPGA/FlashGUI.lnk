@@ -1,4 +1,0 @@
-FROM LIB:c.o "FlashGUI.o"
-TO "FlashGUI"
-LIB LIB:sc.lib LIB:amiga.lib
-

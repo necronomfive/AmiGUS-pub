@@ -1,4 +1,0 @@
-FROM LIB:c.o "PlayWav.o"+"asmroutines.o"
-TO "PlayWav"
-LIB LIB:sc.lib LIB:amiga.lib
-

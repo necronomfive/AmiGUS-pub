@@ -33,10 +33,10 @@ release: all
 	mkdir -p $(ADF_DIR) $(TOOL_DIR) $(AUDIOMODES_DIR) $(AHIFILE_DIR) $(MHI_DIR) $(FW_DIR)
 
 	cp Installer/drawer.info           $(TARGET_DIR).info
-	cp Installer/drawer.info           $(TOOL_DIR).info
-	cp Installer/drawer.info           $(AHI_DIR).info
-	cp Installer/drawer.info           $(MHI_DIR).info
-	cp Installer/drawer.info           $(FW_DIR).info
+	cp Installer/Tools.info            $(TOOL_DIR).info
+	cp Installer/AHI4.info             $(AHI_DIR).info
+	cp Installer/MHI.info              $(MHI_DIR).info
+	cp Installer/Firmware.info         $(FW_DIR).info
 
 	cp Tools/FlashFPGA/FlashGUI        $(TOOL_DIR)
 	cp Tools/FlashFPGA/FlashGUI.info   $(TOOL_DIR)
@@ -60,13 +60,15 @@ release: all
 	cp Installer/fw.info               $(FW_DIR)/$$BASENAME_FW.info
 
 	cp Drivers/MHI/COPYING             $(TARGET_DIR)/GPL.txt
-	cp Installer/readme.info           $(TARGET_DIR)/GPL.txt.info
+	cp Installer/GPL.txt.info          $(TARGET_DIR)/GPL.txt.info
 	cp Drivers/MHI/COPYING.LESSER      $(TARGET_DIR)/LGPL.txt
-	cp Installer/readme.info           $(TARGET_DIR)/LGPL.txt.info
+	cp Installer/LGPL.txt.info         $(TARGET_DIR)/LGPL.txt.info
 	cp Installer/CC-BY-NC-ND.txt       $(TARGET_DIR)/CC-BY-NC-ND.txt
-	cp Installer/readme.info           $(TARGET_DIR)/CC-BY-NC-ND.txt.info
+	cp Installer/CC-BY-NC-ND.txt.info  $(TARGET_DIR)/CC-BY-NC-ND.txt.info
 	cp Installer/ReadMeFirst.txt       $(TARGET_DIR)/ReadMeFirst.txt
-	cp Installer/readme.info           $(TARGET_DIR)/ReadMeFirst.txt.info
+	cp Installer/ReadMeFirst.txt.info  $(TARGET_DIR)/ReadMeFirst.txt.info
+
+	cp Installer/Disk.info             $(TARGET_DIR)/
 
 	cp "Installer/AmiGUS installer"    $(TARGET_DIR)/
 	cp Installer/English.info          $(TARGET_DIR)/

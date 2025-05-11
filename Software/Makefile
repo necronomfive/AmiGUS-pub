@@ -32,11 +32,11 @@ release: all
 	rm -rf $(TARGET_DIR) $(TARGET_LHA) $(ADF_DIR) $(ADF_IMAGE)
 	mkdir -p $(ADF_DIR) $(TOOL_DIR) $(AUDIOMODES_DIR) $(AHIFILE_DIR) $(MHI_DIR) $(FW_DIR)
 
-	cp drawer.info                     $(TARGET_DIR).info
-	cp drawer.info                     $(TOOL_DIR).info
-	cp drawer.info                     $(AHI_DIR).info
-	cp drawer.info                     $(MHI_DIR).info
-	cp drawer.info                     $(FW_DIR).info
+	cp Installer/drawer.info           $(TARGET_DIR).info
+	cp Installer/drawer.info           $(TOOL_DIR).info
+	cp Installer/drawer.info           $(AHI_DIR).info
+	cp Installer/drawer.info           $(MHI_DIR).info
+	cp Installer/drawer.info           $(FW_DIR).info
 
 	cp Tools/FlashFPGA/FlashGUI        $(TOOL_DIR)
 	cp Tools/FlashFPGA/FlashGUI.info   $(TOOL_DIR)
@@ -57,16 +57,20 @@ release: all
 	LATEST_FW=`find ../FPGA/Releases/Amiga/ | sort | tail -n 1` ;\
 	BASENAME_FW=`basename $$LATEST_FW`                          ;\
 	cp $$LATEST_FW                     $(FW_DIR)                ;\
-	cp fw.info                         $(FW_DIR)/$$BASENAME_FW.info
+	cp Installer/fw.info               $(FW_DIR)/$$BASENAME_FW.info
 
 	cp Drivers/MHI/COPYING             $(TARGET_DIR)/GPL.txt
-	cp readme.info                     $(TARGET_DIR)/GPL.txt.info
+	cp Installer/readme.info           $(TARGET_DIR)/GPL.txt.info
 	cp Drivers/MHI/COPYING.LESSER      $(TARGET_DIR)/LGPL.txt
-	cp readme.info                     $(TARGET_DIR)/LGPL.txt.info
-	cp CC-BY-NC-ND.txt                 $(TARGET_DIR)/CC-BY-NC-ND.txt
-	cp readme.info                     $(TARGET_DIR)/CC-BY-NC-ND.txt.info
-	cp ReadMeFirst.txt                 $(TARGET_DIR)/ReadMeFirst.txt
-	cp readme.info                     $(TARGET_DIR)/ReadMeFirst.txt.info
+	cp Installer/readme.info           $(TARGET_DIR)/LGPL.txt.info
+	cp Installer/CC-BY-NC-ND.txt       $(TARGET_DIR)/CC-BY-NC-ND.txt
+	cp Installer/readme.info           $(TARGET_DIR)/CC-BY-NC-ND.txt.info
+	cp Installer/ReadMeFirst.txt       $(TARGET_DIR)/ReadMeFirst.txt
+	cp Installer/readme.info           $(TARGET_DIR)/ReadMeFirst.txt.info
+
+	cp "Installer/AmiGUS installer"    $(TARGET_DIR)/
+	cp Installer/English.info          $(TARGET_DIR)/
+	cp Installer/Deutsch.info          $(TARGET_DIR)/
 
 	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)` `basename $(TARGET_DIR)`.info
 

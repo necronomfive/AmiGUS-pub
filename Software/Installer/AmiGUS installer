@@ -147,12 +147,13 @@
                                         "PlayMP3"
                                         "PlayMIDI"
                                         "Record"
-                                        "Debug Tools")
-                               (default %110111111)
+                                        "Debug Tools"
+                                        "Manual")
+                               (default %1110111111)
                                ))
 
 (if
-  (BITAND what %000000011)
+  (BITAND what %0000000011)
   (
     (set drivers_target
       (askdir
@@ -165,7 +166,7 @@
 )
 
 (if
-  (BITAND what %000000001)
+  (BITAND what %0000000001)
   (
     (set driver_name "AHI driver")
     (install_driver)
@@ -206,7 +207,7 @@
 (complete 15)
 
 (if
-  (BITAND what %000000010)
+  (BITAND what %0000000010)
   (
     (set driver_name "MHI driver")
     (install_driver)
@@ -236,7 +237,7 @@
 (complete 30)
 
 (if
-  (BITAND what %111111100)
+  (BITAND what %0111111100)
   (
     (set tools_target
       (askdir (prompt #which_tools_target)
@@ -250,8 +251,10 @@
   )
 )
 
+(complete 35)
+
 (if
-  (BITAND what %000000100)
+  (BITAND what %0000000100)
   (copyfiles
     (source (tackon source_folder "Mixer"))
     (dest tools_target)
@@ -262,9 +265,20 @@
 (complete 40)
 
 (if
-  (BITAND what %000001000)
+  (BITAND what %0000001000)
   (copyfiles
     (source (tackon source_folder "FlashGUI"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(complete 45)
+
+(if
+  (BITAND what %0000010000)
+  (copyfiles
+    (source (tackon source_folder "PlayWAV"))
     (dest tools_target)
     (infos)
   )
@@ -273,9 +287,20 @@
 (complete 50)
 
 (if
-  (BITAND what %000010000)
+  (BITAND what %0000100000)
   (copyfiles
-    (source (tackon source_folder "PlayWAV"))
+    (source (tackon source_folder "PlayMP3"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(complete 55)
+
+(if
+  (BITAND what %0001000000)
+  (copyfiles
+    (source (tackon source_folder "PlayMIDI"))
     (dest tools_target)
     (infos)
   )
@@ -284,29 +309,7 @@
 (complete 60)
 
 (if
-  (BITAND what %000100000)
-  (copyfiles
-    (source (tackon source_folder "PlayMP3"))
-    (dest tools_target)
-    (infos)
-  )
-)
-
-(complete 70)
-
-(if
-  (BITAND what %001000000)
-  (copyfiles
-    (source (tackon source_folder "PlayMIDI"))
-    (dest tools_target)
-    (infos)
-  )
-)
-
-(complete 80)
-
-(if
-  (BITAND what %010000000)
+  (BITAND what %0010000000)
   (copyfiles
     (source (tackon source_folder "Record"))
     (dest tools_target)
@@ -314,14 +317,49 @@
   )
 )
 
-(complete 90)
+(complete 65)
 
 (if
-  (BITAND what %100000000)
+  (BITAND what %0100000000)
   (copyfiles
     (source (tackon source_folder "DebugTools"))
     (dest tools_target)
     (infos)
+  )
+)
+
+(complete 75)
+
+(if
+  (BITAND what %1000000000)
+  (
+    (if 
+      (= (exists "Manual") 2)
+      (set source_folder "Manual")
+      (
+        (askdisk
+          (prompt "Insert disk AmiGUS Manual in any drive")
+          (help "asdf")
+          (dest "AmiGUS-Manual")
+          (assigns)
+        )
+        (set source_folder "AmiGUS-Manual:")
+      )
+    )
+    (set manual_target
+      (askdir (prompt #which_manual_target)
+        (help #which_manual_target_help)
+        (default "SYS:Expansion")
+      )
+    )
+    (set manual_target (tackon manual_target "AmiGUS"))
+    (makedir manual_target (infos))
+    (copyfiles
+      (source source_folder)
+      (dest manual_target)
+      (all)
+      (infos)
+    )
   )
 )
 

@@ -1,14 +1,17 @@
 TARGET_DIR         = /tmp/AmiGUS
-ADF_DIR            = /tmp/AmiGUS-ADF
+ADF_DIR1           = /tmp/AmiGUS-ADF1
+ADF_DIR2           = /tmp/AmiGUS-ADF2
 TOOL_DIR           = $(TARGET_DIR)/Tools
 AHI_DIR            = $(TARGET_DIR)/AHI4
 AHIFILE_DIR        = $(AHI_DIR)/AHI
 AUDIOMODES_DIR     = $(AHI_DIR)/AudioModes
 MHI_DIR            = $(TARGET_DIR)/MHI
-FW_DIR            = $(TARGET_DIR)/Firmware
+FW_DIR             = $(TARGET_DIR)/Firmware
+MANUAL_DIR         = $(TARGET_DIR)/Manual
 
 TARGET_LHA         = /tmp/AmiGUS-`date +%Y%m%d`.lha
-ADF_IMAGE          = /tmp/AmiGUS-`date +%Y%m%d`.adf
+ADF_IMAGE1         = /tmp/AmiGUS-Tools-`date +%Y%m%d`.adf
+ADF_IMAGE2         = /tmp/AmiGUS-Manual-`date +%Y%m%d`.adf
 
 DRIVER_MAKES = $(shell find Drivers -mindepth 1 -maxdepth 2 -type f -name Makefile)
 DRIVERS = $(dir $(DRIVER_MAKES))
@@ -28,60 +31,72 @@ TOOLS/CLEAN = $(foreach TOOL,$(TOOLS),$(TOOL)/clean)
 		dist-clean clean all
 
 release: all
-	-umount $(ADF_DIR)
-	rm -rf $(TARGET_DIR) $(TARGET_LHA) $(ADF_DIR) $(ADF_IMAGE)
-	mkdir -p $(ADF_DIR) $(TOOL_DIR) $(AUDIOMODES_DIR) $(AHIFILE_DIR) $(MHI_DIR) $(FW_DIR)
+	-umount $(ADF_DIR1)
+	rm -rf $(TARGET_DIR) $(TARGET_LHA) $(ADF_DIR1) $(ADF_IMAGE1) $(ADF_DIR2) $(ADF_IMAGE2)
+	mkdir -p $(ADF_DIR1) $(ADF_DIR2) $(TOOL_DIR) $(AUDIOMODES_DIR) $(AHIFILE_DIR) $(MHI_DIR) $(FW_DIR)
 
-	cp Installer/drawer.info           $(TARGET_DIR).info
-	cp Installer/Tools.info            $(TOOL_DIR).info
-	cp Installer/AHI4.info             $(AHI_DIR).info
-	cp Installer/MHI.info              $(MHI_DIR).info
-	cp Installer/Firmware.info         $(FW_DIR).info
+	cp Installer/drawer.info                    $(TARGET_DIR).info
+	cp Installer/Tools.info                     $(TOOL_DIR).info
+	cp Installer/AHI4.info                      $(AHI_DIR).info
+	cp Installer/MHI.info                       $(MHI_DIR).info
+	cp Installer/Firmware.info                  $(FW_DIR).info
 
-	cp Tools/FlashFPGA/FlashGUI        $(TOOL_DIR)
-	cp Tools/FlashFPGA/FlashGUI.info   $(TOOL_DIR)
-	cp Tools/Mixer/Mixer               $(TOOL_DIR)
-	cp Tools/Mixer/Mixer.info          $(TOOL_DIR)
-	cp Tools/PlayMIDI/PlayMidi         $(TOOL_DIR)
-	cp Tools/PlayMIDI/PlayMidi.info    $(TOOL_DIR)
-	cp Tools/PlayMP3/PlayMP3           $(TOOL_DIR)
-	cp Tools/PlayMP3/PlayMP3.info      $(TOOL_DIR)
-	cp Tools/PlayWAV/PlayWav           $(TOOL_DIR)
-	cp Tools/PlayWAV/PlayWav.info      $(TOOL_DIR)
-	cp Tools/Record/Record             $(TOOL_DIR)
-	cp Tools/Record/Record.info        $(TOOL_DIR)
-	cp Drivers/AHI4/target/*.audio*    $(AHIFILE_DIR)
-	cp Drivers/AHI4/target/AMIGUS      $(AUDIOMODES_DIR)
-	cp Drivers/MHI/target/*            $(MHI_DIR)
+	cp Tools/FlashFPGA/FlashGUI                 $(TOOL_DIR)
+	cp Tools/FlashFPGA/FlashGUI.info            $(TOOL_DIR)
+	cp Tools/Mixer/Mixer                        $(TOOL_DIR)
+	cp Tools/Mixer/Mixer.info                   $(TOOL_DIR)
+	cp Tools/PlayMIDI/PlayMidi                  $(TOOL_DIR)
+	cp Tools/PlayMIDI/PlayMidi.info             $(TOOL_DIR)
+	cp Tools/PlayMP3/PlayMP3                    $(TOOL_DIR)
+	cp Tools/PlayMP3/PlayMP3.info               $(TOOL_DIR)
+	cp Tools/PlayWAV/PlayWav                    $(TOOL_DIR)
+	cp Tools/PlayWAV/PlayWav.info               $(TOOL_DIR)
+	cp Tools/Record/Record                      $(TOOL_DIR)
+	cp Tools/Record/Record.info                 $(TOOL_DIR)
+	cp Drivers/AHI4/target/*.audio*             $(AHIFILE_DIR)
+	cp Drivers/AHI4/target/AMIGUS               $(AUDIOMODES_DIR)
+	cp Drivers/MHI/target/*                     $(MHI_DIR)
 
 	LATEST_FW=`find ../FPGA/Releases/Amiga/ | sort | tail -n 1` ;\
 	BASENAME_FW=`basename $$LATEST_FW`                          ;\
-	cp $$LATEST_FW                     $(FW_DIR)                ;\
-	cp Installer/fw.info               $(FW_DIR)/$$BASENAME_FW.info
+	cp $$LATEST_FW                              $(FW_DIR)       ;\
+	cp Installer/fw.info                        $(FW_DIR)/$$BASENAME_FW.info
 
-	cp Drivers/MHI/COPYING             $(TARGET_DIR)/GPL.txt
-	cp Installer/GPL.txt.info          $(TARGET_DIR)/GPL.txt.info
-	cp Drivers/MHI/COPYING.LESSER      $(TARGET_DIR)/LGPL.txt
-	cp Installer/LGPL.txt.info         $(TARGET_DIR)/LGPL.txt.info
-	cp Installer/CC-BY-NC-ND.txt       $(TARGET_DIR)/CC-BY-NC-ND.txt
-	cp Installer/CC-BY-NC-ND.txt.info  $(TARGET_DIR)/CC-BY-NC-ND.txt.info
-	cp Installer/ReadMeFirst.txt       $(TARGET_DIR)/ReadMeFirst.txt
-	cp Installer/ReadMeFirst.txt.info  $(TARGET_DIR)/ReadMeFirst.txt.info
+	cp Drivers/MHI/COPYING                      $(TARGET_DIR)/GPL.txt
+	cp Installer/GPL.txt.info                   $(TARGET_DIR)/GPL.txt.info
+	cp Drivers/MHI/COPYING.LESSER               $(TARGET_DIR)/LGPL.txt
+	cp Installer/LGPL.txt.info                  $(TARGET_DIR)/LGPL.txt.info
+	cp Installer/CC-BY-NC-ND.txt                $(TARGET_DIR)/CC-BY-NC-ND.txt
+	cp Installer/CC-BY-NC-ND.txt.info           $(TARGET_DIR)/CC-BY-NC-ND.txt.info
+	cp Installer/ReadMeFirst.txt                $(TARGET_DIR)/ReadMeFirst.txt
+	cp Installer/ReadMeFirst.txt.info           $(TARGET_DIR)/ReadMeFirst.txt.info
 
-	cp Installer/Disk.info             $(TARGET_DIR)/
+	cp Installer/Disk.info                      $(TARGET_DIR)/
 
-	cp "Installer/AmiGUS installer"    $(TARGET_DIR)/
-	cp Installer/English.info          $(TARGET_DIR)/
-	cp Installer/Deutsch.info          $(TARGET_DIR)/
+	cp "Installer/AmiGUS installer"             $(TARGET_DIR)/
+	cp Installer/English.info                   $(TARGET_DIR)/
+	cp Installer/Deutsch.info                   $(TARGET_DIR)/
+
+	adf_floppy_create $(ADF_IMAGE1) dd
+	adf_format -l AmiGUS-Tools -t 0 -f $(ADF_IMAGE1)
+	fuseadf $(ADF_IMAGE1) $(ADF_DIR1)/
+	cp -R $(TARGET_DIR)/* $(ADF_DIR1)/
+	umount $(ADF_DIR1)/
+	-cp $(ADF_IMAGE1) /media/chritoph/HXC/
+
+	mkdir -p $(MANUAL_DIR)
+	cp ../Documentation/AmiGUS/AmiGUS.guide     $(MANUAL_DIR)
+	cp -R ../Documentation/AmiGUS/ilbm          $(MANUAL_DIR)
+	cp Installer/AmiGUS.guide.info              $(MANUAL_DIR)
+
+	adf_floppy_create $(ADF_IMAGE2) dd
+	adf_format -l AmiGUS-Manual -t 0 -f $(ADF_IMAGE2)
+	fuseadf $(ADF_IMAGE2) $(ADF_DIR2)/
+	cp -R $(MANUAL_DIR)/* $(ADF_DIR2)/
+	umount $(ADF_DIR2)/
+	-cp $(ADF_IMAGE2) /media/chritoph/HXC/
 
 	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)` `basename $(TARGET_DIR)`.info
-
-	adf_floppy_create $(ADF_IMAGE) dd
-	adf_format -l AmiGUS -t 0 -f $(ADF_IMAGE)
-	fuseadf $(ADF_IMAGE) $(ADF_DIR)/
-	cp -R $(TARGET_DIR)/* $(ADF_DIR)/
-	umount $(ADF_DIR)/
-	-cp $(ADF_IMAGE) /media/chritoph/HXC/
 
 all: tools drivers
 
@@ -105,7 +120,7 @@ prepare-mhi:
 	touch prepare-mhi
 
 clean: $(DRIVERS/CLEAN) $(TOOLS/CLEAN)
-	rm -rf $(ADF_IMAGE) $(ADF_DIR) $(TARGET_DIR) $(TARGET_LHA)
+	rm -rf $(ADF_IMAGE1) $(ADF_DIR1) $(ADF_IMAGE2) $(ADF_DIR2) $(TARGET_DIR) $(TARGET_LHA)
 
 dist-clean: $(DRIVERS/DIST-CLEAN) clean
 	rm -rf Drivers/*/include

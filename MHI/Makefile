@@ -183,7 +183,7 @@ endif
 
 ##################################
 
-.PHONY: all install test INCLUDES FOLDERS clean dist-clean dist
+.PHONY: all install test support INCLUDES FOLDERS clean dist-clean dist
 
 all: FOLDERS $(LIB_FILE_DEST)
 
@@ -303,7 +303,7 @@ test_sleep: FOLDERS
 
 ###############################################################################
 
-support: mhi_lib_check get_mem_log MHIplay
+support: FOLDERS mhi_lib_check get_mem_log MHIplay
 
 get_mem_log:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c

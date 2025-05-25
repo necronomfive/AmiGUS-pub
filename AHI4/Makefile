@@ -128,7 +128,7 @@ else
   LD            = $(RUNNER) slink
 endif
 
-.PHONY: all install test INCLUDES FOLDERS clean dist-clean dist
+.PHONY: all install test support INCLUDES FOLDERS clean dist-clean dist
 
 all: FOLDERS $(MODE_FILE_DST) $(LIB_DST)
 
@@ -184,6 +184,13 @@ test_support: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(IGNORE_VAMOS)$(RUNNER) test/$@
 	-@$(RM) test/$@ test/$@.o $(RM_SUFFIX)
+
+###############################################################################
+
+support: FOLDERS
+	echo "Hi"
+
+###############################################################################
 
 INCLUDES:
 	make -f Makefile-Includes all 

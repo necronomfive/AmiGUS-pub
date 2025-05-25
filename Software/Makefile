@@ -18,6 +18,7 @@ DRIVERS = $(dir $(DRIVER_MAKES))
 DRIVERS/ALL = $(foreach DRIVER,$(DRIVERS),$(DRIVER)/all)
 DRIVERS/CLEAN = $(foreach DRIVER,$(DRIVERS),$(DRIVER)clean)
 DRIVERS/DIST-CLEAN = $(foreach DRIVER,$(DRIVERS),$(DRIVER)/dist-clean)
+DRIVERS/SUPPORT = $(foreach DRIVER,$(DRIVERS),$(DRIVER)support)
 
 CPUS = 000 020 040
 LOGGINGS = NO_LOG SER_LOG FILE_LOG MEM_LOG
@@ -26,9 +27,12 @@ TOOLS = $(shell find Tools -mindepth 1 -maxdepth 1 -type d)
 TOOLS/ALL = $(foreach TOOL,$(TOOLS),$(TOOL)/all)
 TOOLS/CLEAN = $(foreach TOOL,$(TOOLS),$(TOOL)/clean)
 
-.PHONY: $(DRIVERS/ALL) $(DRIVERS/CLEAN) $(DRIVERS/DIST-CLEAN) \
+.PHONY: $(DRIVERS/ALL) $(DRIVERS/SUPPORT) $(DRIVERS/CLEAN) $(DRIVERS/DIST-CLEAN) \
         $(TOOLS/ALL) $(TOOLS/CLEAN) \
 		dist-clean clean all
+
+#echo:
+#	echo $(DRIVERS/SUPPORT)
 
 release: all
 	-umount $(ADF_DIR1)
@@ -55,7 +59,9 @@ release: all
 	cp Tools/Record/Record.info                 $(TOOL_DIR)
 	cp Drivers/AHI4/target/*.audio*             $(AHIFILE_DIR)
 	cp Drivers/AHI4/target/AMIGUS               $(AUDIOMODES_DIR)
-	cp Drivers/MHI/target/*                     $(MHI_DIR)
+	cp Drivers/MHI/target/*.library*            $(MHI_DIR)
+	# TODO: AHI support tools
+	# TODO: MHI support tools
 
 	LATEST_FW=`find ../FPGA/Releases/Amiga/ | sort | tail -n 1` ;\
 	BASENAME_FW=`basename $$LATEST_FW`                          ;\
@@ -98,11 +104,14 @@ release: all
 
 	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)` `basename $(TARGET_DIR)`.info
 
-all: tools drivers
+all: tools drivers support
 
 tools: $(TOOLS/ALL)
 
-drivers: $(DRIVERS/ALL)
+support: $(DRIVERS/SUPPORT)
+	echo $(DRIVERS/SUPPORT)
+
+drivers: $(DRIVERS/ALL) 
 
 prepare-ahi:
 	mkdir -p /tmp/ahi4-installation Drivers/AHI4/include
@@ -117,6 +126,9 @@ prepare-mhi:
 	wget  -P /tmp/mhi-installation https://aminet.net/driver/audio/mhi_dev.lha
 	cd       /tmp/mhi-installation ; jlha x mhi_dev.lha
 	cp -R    /tmp/mhi-installation/Include/libraries            Drivers/MHI/include
+	cp -R    /tmp/mhi-installation/Include/proto                Drivers/MHI/include
+	cp -R    /tmp/mhi-installation/Include/pragmas              Drivers/MHI/include
+	cp -R    /tmp/mhi-installation/Include/clib                 Drivers/MHI/include
 	touch prepare-mhi
 
 clean: $(DRIVERS/CLEAN) $(TOOLS/CLEAN)
@@ -127,7 +139,8 @@ dist-clean: $(DRIVERS/DIST-CLEAN) clean
 	rm -rf /tmp/mhi-installation prepare-mhi
 	rm -rf /tmp/ahi4-installation prepare-ahi
 
-$(DRIVERS/CLEAN) $(TOOLS/ALL) $(TOOLS/CLEAN):
+$(DRIVERS/CLEAN) $(DRIVERS/SUPPORT) $(TOOLS/ALL) $(TOOLS/CLEAN):
+	echo -C $(@D) $(@F)
 	$(MAKE) -C $(@D) $(@F)
 
 $(DRIVERS/ALL): prepare-ahi prepare-mhi

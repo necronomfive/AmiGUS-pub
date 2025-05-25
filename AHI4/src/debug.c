@@ -127,7 +127,13 @@ VOID debug_mprintf( STRPTR format, ... ) {
    * even if it fails.
    */
   static BOOL attempted = FALSE;
-  
+  const STRPTR memMarker[] = {
+
+    AMIGUS_MEM_LOG_BORDERS,
+    STR( LIB_FILE ),
+    AMIGUS_MEM_LOG_BORDERS
+  };
+
   if ( !AmiGUSBase->agb_LogMem ) {
 
     // Yep, defaults to 
@@ -186,11 +192,10 @@ VOID debug_mprintf( STRPTR format, ... ) {
       AmiGUSBase->agb_LogMem,
       AmiGUSBase->agb_LogMem
     );
-    RawDoFmt(
-      AMIGUS_MEM_LOG_MARKER,
-      NULL,
-      &debug_mPutChProc,
-      &AmiGUSBase->agb_LogMem );
+    RawDoFmt( "%s %s %s\n",
+              ( APTR ) memMarker,
+              &debug_mPutChProc,
+              &AmiGUSBase->agb_LogMem );
     /* Move mem blob pointer back to overwrite trailing zero next comment */
     AmiGUSBase->agb_LogMem = ( APTR )(( ULONG ) AmiGUSBase->agb_LogMem - 1 );
     debug_kprintf( "AmiGUS Log ready\n" );

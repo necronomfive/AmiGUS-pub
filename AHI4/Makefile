@@ -187,8 +187,11 @@ test_support: FOLDERS $(LIB_OBJS)
 
 ###############################################################################
 
-support: FOLDERS
-	echo "Hi"
+support: FOLDERS get_mem_log
+
+get_mem_log:
+	$(CC) $(CFLAGS) support/$@.o support/$@.c
+	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
 
 ###############################################################################
 

@@ -57,9 +57,14 @@
                                     + (   22 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
-#define AMIGUS_MEM_LOG_MARKER        "********************************"   \
-                                     " AmiGUS "                           \
-                                     "********************************\n"
+/*
+ * If logging to memory is activated, this is used to mark the start
+ * of the log memory. And as 1 pointer to this marker, 1 pointer to the
+ * library file name and 1 more pointer to the marker are used, the full
+ * start marker is not even in the library, no need to unload the library
+ * so even with library in memory it should unique in memory.
+ */
+#define AMIGUS_MEM_LOG_BORDERS      "********************************"
 
 /******************************************************************************
  * Library base structure components

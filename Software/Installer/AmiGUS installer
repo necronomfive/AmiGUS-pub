@@ -349,10 +349,9 @@
     (set manual_target
       (askdir (prompt #which_manual_target)
         (help #which_manual_target_help)
-        (default "SYS:Expansion")
+        (default tools_target)
       )
     )
-    (set manual_target (tackon manual_target "AmiGUS"))
     (makedir manual_target (infos))
     (copyfiles
       (source source_folder)

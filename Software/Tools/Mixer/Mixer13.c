@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#define DEBUG
+#define DEBUG
 
 #include <exec/types.h>
 #include <exec/memory.h>
@@ -764,7 +764,7 @@ void drawSliderValue(struct slider *b)
 	sprintf (cval,"%d",b->val);
 	slider_text.IText = cval;
 
-	SetAPen(rp, 1);		
+	SetAPen(rp, 2);		
 	PrintIText(rp, &slider_text,
 		(width - IntuiTextLength(&slider_text)) / 2 + x,
 		y+h);
@@ -773,13 +773,16 @@ void drawSliderValue(struct slider *b)
 
 void setSliderValue(struct slider *b,int val)
 {
-//	RemoveGadget(myWin, &b->gad);
+	RemoveGadget(myWin, &b->gad);
 	
 	b->val = val;
-//	b->prop.VertPot = 0xffff-((b->val * 0xffff) / b->max);		
+	b->prop.VertPot = 0xffff-((b->val * 0xffff) / b->max);		
 //	AddGadget(myWin, &b->gad, 0);
+
+	AddGadget(myWin, &b->gad,-1);
 	
-	NewModifyProp(&b->gad,myWin,NULL,FREEVERT|PROPBORDERLESS,0,0xffff - ((b->val * 0xffff) / b->max),0,0xffff / b->max,0);
+	NewModifyProp(&b->gad,myWin,NULL,FREEVERT|PROPBORDERLESS,0,0xffff - ((b->val * 0xffff) / b->max),0,0xffff / b->max,-1);	
+	RefreshGadgets(&b->gad,myWin,NULL);
 	
 	drawSliderValue(b);	
 	
@@ -994,7 +997,7 @@ void drawCycle(struct cycle *b)
 	DrawLine(rp, x+wid-1, y, x+wid-1, y+h-1);
 	DrawLine(rp, x+wid-2, y+1, x+wid-2, y+h-1);
 
-	AddGadget(myWin, &b->gad, 0);
+	AddGadget(myWin, &b->gad, -1);
 }
 
 void createButton(struct button *b, int gadid, char *text, int x, int y, int w)
@@ -1071,7 +1074,7 @@ void drawButton(struct button *b)
 		(width - IntuiTextLength(&button_text)) / 2 + x,
 		y);
 
-	AddGadget(myWin, &b->gad, 0);
+	AddGadget(myWin, &b->gad, -1);
 }
 
 void drawBorders(struct RastPort *rp,UWORD topBorder,struct TextFont *font)
@@ -1195,63 +1198,63 @@ void createAllGadgets(UWORD topBorder)
 	offsety   = 32+topBorder;
 
 	createSlider(&slider_ahi_l, MYGAD_SLIDER_AHI_L, "L", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_ahi_l.gad, 0);
+	AddGadget(myWin, &slider_ahi_l.gad, -1);
 	drawSlider(&slider_ahi_l);
 
 	offsetx  += 20;
 	offsety  += 0;
 
 	createSlider(&slider_ahi_r, MYGAD_SLIDER_AHI_R, "R", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_ahi_r.gad, 0);	
+	AddGadget(myWin, &slider_ahi_r.gad, -1);	
 	drawSlider(&slider_ahi_r);
 	
 	offsetx  += 32;
 	offsety   += 0;
 
 	createSlider(&slider_ahi_mix, MYGAD_SLIDER_AHI_MIX, "Mix", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_ahi_mix.gad, 0);	
+	AddGadget(myWin, &slider_ahi_mix.gad, -1);	
 	drawSlider(&slider_ahi_mix);
 	
 	offsetx  += 40;
 	offsety   += 0;
 
 	createSlider(&slider_mhi_l, MYGAD_SLIDER_MHI_L, "L", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_mhi_l.gad, 0);
+	AddGadget(myWin, &slider_mhi_l.gad, -1);
 	drawSlider(&slider_mhi_l);
 
 	offsetx  += 20;
 	offsety   += 0;
 
 	createSlider(&slider_mhi_r, MYGAD_SLIDER_MHI_R, "R", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_mhi_r.gad, 0);	
+	AddGadget(myWin, &slider_mhi_r.gad, -1);	
 	drawSlider(&slider_mhi_r);
 	
 	offsetx  += 32;
 	offsety   += 0;
 
 	createSlider(&slider_mhi_mix, MYGAD_SLIDER_MHI_MIX, "Mix", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_mhi_mix.gad, 0);	
+	AddGadget(myWin, &slider_mhi_mix.gad, -1);	
 	drawSlider(&slider_mhi_mix);
 
 	offsetx  += 40;
 	offsety   += 0;
 
 	createSlider(&slider_hgn_l, MYGAD_SLIDER_HGN_L, "L", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_hgn_l.gad, 0);
+	AddGadget(myWin, &slider_hgn_l.gad, -1);
 	drawSlider(&slider_hgn_l);
 
 	offsetx  += 20;
 	offsety   += 0;
 
 	createSlider(&slider_hgn_r, MYGAD_SLIDER_HGN_R, "R", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_hgn_r.gad, 0);	
+	AddGadget(myWin, &slider_hgn_r.gad, -1);
 	drawSlider(&slider_hgn_r);
 	
 	offsetx  += 32;
 	offsety   += 0;
 
 	createSlider(&slider_hgn_mix, MYGAD_SLIDER_HGN_MIX, "Mix", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_hgn_mix.gad, 0);	
+	AddGadget(myWin, &slider_hgn_mix.gad, -1);
 	drawSlider(&slider_hgn_mix);
 
 
@@ -1259,21 +1262,21 @@ void createAllGadgets(UWORD topBorder)
 	offsety   += 0;
 
 	createSlider(&slider_adc_l, MYGAD_SLIDER_ADC_L, "L", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_adc_l.gad, 0);
+	AddGadget(myWin, &slider_adc_l.gad, -1);
 	drawSlider(&slider_adc_l);
 
 	offsetx  += 20;
 	offsety   += 0;
 
 	createSlider(&slider_adc_r, MYGAD_SLIDER_ADC_R, "R", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_adc_r.gad, 0);	
+	AddGadget(myWin, &slider_adc_r.gad, -1);
 	drawSlider(&slider_adc_r);
 
 	offsetx  += 32;
 	offsety   += 0;
 
 	createSlider(&slider_adc_mix, MYGAD_SLIDER_ADC_MIX, "Mix", offsetx,offsety, 16, 64, 99, 50);
-	AddGadget(myWin, &slider_adc_mix.gad, 0);	
+	AddGadget(myWin, &slider_adc_mix.gad, -1);
 	drawSlider(&slider_adc_mix);
 
 	/* ========== Checkbox Gadgets =========== */
@@ -1283,49 +1286,49 @@ void createAllGadgets(UWORD topBorder)
 	offsety   += 0;
 
 	createChkbox(&box_paula, MYGAD_CHKBOX_PAULA,"Paula", offsetx, offsety, 0);		
-	AddGadget(myWin, &box_paula.gad, 0);	
+	AddGadget(myWin, &box_paula.gad, -1);
 	drawChkbox(&box_paula);
 						
 	offsetx  += 0;
 	offsety   += 16;
 
 	createChkbox(&box_cdrom, MYGAD_CHKBOX_CDROM,"CDROM", offsetx, offsety, 0);		
-	AddGadget(myWin, &box_cdrom.gad, 0);	
+	AddGadget(myWin, &box_cdrom.gad, -1);
 	drawChkbox(&box_cdrom);
 	
 	offsetx  += 0;
 	offsety   += 16;
 
 	createChkbox(&box_line, MYGAD_CHKBOX_LINE,"Line", offsetx, offsety, 0);		
-	AddGadget(myWin, &box_line.gad, 0);	
+	AddGadget(myWin, &box_line.gad, -1);
 	drawChkbox(&box_line);
 	
 	offsetx  = 24;
 	offsety   = topBorder + 132-15;
 
 	createChkbox(&box_ahi, MYGAD_CHKBOX_AHI,"Lock", offsetx, offsety, 0);		
-	AddGadget(myWin, &box_ahi.gad, 0);	
+	AddGadget(myWin, &box_ahi.gad, -1);
 	drawChkbox(&box_ahi);
 
 	offsetx  += 92;
 	offsety   += 0;
 
 	createChkbox(&box_mhi, MYGAD_CHKBOX_MHI,"Lock", offsetx, offsety, 0);		
-	AddGadget(myWin, &box_mhi.gad, 0);	
+	AddGadget(myWin, &box_mhi.gad, -1);
 	drawChkbox(&box_mhi);
 	
 	offsetx  += 92;
 	offsety   += 0;
 
 	createChkbox(&box_hgn, MYGAD_CHKBOX_HGN,"Lock", offsetx, offsety, 0);		
-	AddGadget(myWin, &box_hgn.gad, 0);	
+	AddGadget(myWin, &box_hgn.gad, -1);
 	drawChkbox(&box_hgn);
 	
 	offsetx  += 92;
 	offsety   += 0;
 
 	createChkbox(&box_adc, MYGAD_CHKBOX_ADC,"Lock", offsetx, offsety, 0);		
-	AddGadget(myWin, &box_adc.gad, 0);	
+	AddGadget(myWin, &box_adc.gad, -1);
 	drawChkbox(&box_adc);
 	
 	/* ========== Button Gadgets =========== */
@@ -1334,21 +1337,21 @@ void createAllGadgets(UWORD topBorder)
 	offsety   += 20;
 	
 	createButton(&button_save, MYGAD_BUTTON_SAVE,"Save", offsetx, offsety, 72);		
-	AddGadget(myWin, &button_save.gad, 0);	
+	AddGadget(myWin, &button_save.gad, -1);
 	drawButton(&button_save);
 						
 	offsetx  +=96;
 	offsety   += 0;
 
 	createButton(&button_use, MYGAD_BUTTON_USE,"Use", offsetx, offsety, 72);		
-	AddGadget(myWin, &button_use.gad, 0);	
+	AddGadget(myWin, &button_use.gad, -1);
 	drawButton(&button_use);
 						
 	offsetx  += 96;
 	offsety   += 0;
 
 	createButton(&button_reset, MYGAD_BUTTON_RESET,"Reset", offsetx, offsety, 72);		
-	AddGadget(myWin, &button_reset.gad, 0);	
+	AddGadget(myWin, &button_reset.gad, -1);
 	drawButton(&button_reset);
 
 	/* ========== Cycle Gadgets =========== */
@@ -1357,14 +1360,14 @@ void createAllGadgets(UWORD topBorder)
 	offsety   += 0;
 
 	createCycle(&cycle_levels, MYGAD_CYCLE_LEVELS,"SLOW", offsetx, offsety, 66,4,1);		
-	AddGadget(myWin, &cycle_levels.gad, 0);	
+	AddGadget(myWin, &cycle_levels.gad, -1);
 	drawCycle(&cycle_levels);		
 
 	offsetx  -= 78;
 	offsety   -= 42;
 
 	createCycle(&cycle_toslink, MYGAD_CYCLE_TOSLINK,"48kHz", offsetx, offsety, 74,3,0);		
-	AddGadget(myWin, &cycle_toslink.gad, 0);	
+	AddGadget(myWin, &cycle_toslink.gad, -1);
 	drawCycle(&cycle_toslink);			
 }
 
@@ -1988,7 +1991,8 @@ void processWindowEvents(struct Window *mywin,struct mixData *mixDat,APTR boardB
 				mixDat->ahi_locked = TRUE;
 				mixDat->mhi_locked = TRUE;
 				mixDat->wav_locked = TRUE;
-				mixDat->adc_locked = TRUE;					
+				mixDat->adc_locked = TRUE;
+				SetMixer(boardBase,mixDat);				
 				break;
 		}				
 			

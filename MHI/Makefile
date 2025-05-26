@@ -71,7 +71,7 @@ LIB_LOG        ?= FILE_LOG
 LIB_NAME        = mhiamigus
 LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
-LIB_REVISION    = 6
+LIB_REVISION    = 7
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =

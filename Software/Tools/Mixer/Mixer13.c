@@ -762,11 +762,11 @@ void drawSliderValue(struct slider *b)
 	b->val = val;
 
 	sprintf (cval,"%d",b->val);
-	slider_text.IText = cval;
+	button_text.IText = cval;
 
-	SetAPen(rp, 2);		
-	PrintIText(rp, &slider_text,
-		(width - IntuiTextLength(&slider_text)) / 2 + x,
+	SetAPen(rp, 3);		
+	PrintIText(rp, &button_text,
+		(width - IntuiTextLength(&button_text)) / 2 + x,
 		y+h);
 
 }
@@ -985,7 +985,7 @@ void drawCycle(struct cycle *b)
 	cycle_text.IText = b->text;
 	width = wid - cycle_text.LeftEdge - 4;
 	PrintIText(rp, &cycle_text,
-		(width - IntuiTextLength(&button_text)) / 2 + x,
+		(width - IntuiTextLength(&cycle_text)) / 2 + x,
 		y);
 
 	SetAPen(rp, myShinePen);

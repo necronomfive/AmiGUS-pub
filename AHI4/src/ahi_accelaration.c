@@ -19,7 +19,7 @@
 
 #include <exec/libraries.h>
 
-#include "SDI_ahi_sub.h"
+#include "SDI_ahi_sub_protos.h"
 
 #ifndef LOG_D
 #define LOG_D(X)

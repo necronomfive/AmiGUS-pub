@@ -29,7 +29,7 @@
 #include "errors.h"
 #include "interrupt.h"
 #include "support.h"
-#include "SDI_ahi_sub.h"
+#include "SDI_ahi_sub_protos.h"
 #include "worker.h"
 
 /* Basic functions - Actions */

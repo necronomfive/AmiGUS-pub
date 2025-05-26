@@ -19,8 +19,28 @@
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
-#include <dos/dos.h>
+#include <exec/types.h>
+#include <exec/execbase.h>
 #include <exec/libraries.h>
+#include <exec/semaphores.h>
+#include <libraries/dos.h>
+
+/**
+ * So what is that library.h/.c thing about?
+ * - This is an AmigaOS v34+ compatible as-easy-as-possible usable
+ *   library skeleton.
+ * - Just plug-in
+ * -- your LIBRARY_FUNCTIONS,
+ * -- your LIBRARY_TYPE,
+ * -- your library's main include file,
+ * -- provide LIBRARY_NAME, LIBRARY_VERSI0N, LIBRARY_REVISION,
+ *    and LIBRARY_IDSTRING however you like and you are good to go.
+ * - Limitations:
+ * -- Library filename and LIBRARY_NAME need to be case sensitive the same,
+ * -- In OS v34, libraries have to be in LIBS: - not even subfolders,
+ * -- struct BaseLibrary needs to be the first element in your library's
+ *    lib structure.
+ */
 
 /******************************************************************************
  * Define your library's public functions here,
@@ -44,6 +64,13 @@
                           ( APTR ) AHIsub_HardwareControl
 
 /******************************************************************************
+ * Define your library's base type here, will be used in library.c.
+ *****************************************************************************/
+#define LIBRARY_TYPE      struct AmiGUSBase
+
+LIBRARY_TYPE;
+
+/******************************************************************************
  * Define your library's properties here,
  * will be used in library.c.
  *****************************************************************************/
@@ -51,41 +78,13 @@
 #define STR_VALUE(x)      #x
 #define STR(x)            STR_VALUE(x)
 
-#define LIBRARY_NAME      "AmiGUS.audio"
-#define LIBRARY_VERSION   4
-#define LIBRARY_REVISION  18
-#define LIBRARY_DATETXT	  __AMIGADATE__
-#define LIBRARY_VERSTXT	 STR( LIBRARY_VERSION ) ".0" STR( LIBRARY_REVISION )
-
-#if defined( _M68060 )
-  #define LIBRARY_CPUTXT  " 060"
-#elif defined( _M68040 )
-  #define LIBRARY_CPUTXT  " 040"
-#elif defined( _M68030 )
-  #define LIBRARY_CPUTXT  " 030"
-#elif defined( _M68020 )
-  #define LIBRARY_CPUTXT  " 020"
-#elif defined( __MORPHOS__ )
-  #define LIBRARY_CPUTXT  " MorphOS"
-#else
-  #define LIBRARY_CPUTXT  " 000"
-#endif
-
-#if defined( __VBCC__ )
-  #define LIBRARY_COMPILERTXT " vbcc"
-#elif defined( __SASC )
-  #define LIBRARY_COMPILERTXT " SAS/C"
-#endif
-
-#ifdef CROSS_TOOLCHAIN
-  #define LIBRARY_HOSTTXT " cross"
-#else
-  #define LIBRARY_HOSTTXT " native"
-#endif
-
-#define LIBRARY_IDSTRING \
-  LIBRARY_NAME " " LIBRARY_VERSTXT " " LIBRARY_DATETXT \
-  LIBRARY_CPUTXT LIBRARY_COMPILERTXT LIBRARY_HOSTTXT "\r\n"
+#define LIBRARY_NAME      LIB_FILE
+#define LIBRARY_VERSION   LIB_VERSION
+#define LIBRARY_REVISION  LIB_REVISION
+#define LIBRARY_IDSTRING  STR( LIB_FILE )" "                         \
+                          STR( LIB_VERSION )".00"STR( LIB_REVISION ) \
+                          " "LIB_DATE" "STR( LIB_CPU )" "            \
+                          STR( LIB_COMPILER )" "STR( LIB_HOST )
 
 /******************************************************************************
  * SegList pointer definition
@@ -105,27 +104,43 @@
  *****************************************************************************/
 struct BaseLibrary {
 
-  struct Library                LibNode;
-  UWORD                         Unused0;                 /* better alignment */
-  SEGLISTPTR                    SegList;
+  struct Library                LibNode;       // Standard library node
+  UWORD                         Unused0;       // Padding for better alignment
+  SEGLISTPTR                    SegList;       // List of library code segments
+  struct SignalSemaphore        LockSemaphore; // Prevents lib race conditions
+  struct ExecBase             * SysBase;       // Pointer to exec library
 };
-
-/******************************************************************************
- * Define your library's base type here, will be used in library.c.
- *****************************************************************************/
-#define LIBRARY_TYPE      struct AmiGUSBase
 
 /******************************************************************************
  * Your library's own base structure shall have its own include,
  * maybe together with your library specific functions.
- * Include it here!
+ * Include it here and in library.c!
  *****************************************************************************/
-#include "amigus_ahi_sub.h"
+
+ #include "amigus_ahi_sub.h"
 
 /******************************************************************************
  * Now go ahead and implement these functions in your library adapter code!
  *****************************************************************************/
-LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase );
-VOID CustomLibClose( struct BaseLibrary * base );
+
+/**
+ * Hook to plug your own library's initialization code into.
+ *
+ * @param base Pointer to the allocated library base structure.
+ * @param sysBase Pointer to exec library as needed before.
+ *
+ * @return 0 expected in success case,
+ *         anything else will be treated as failure.
+ */
+LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase );
+
+/**
+ * Hook to plug your own library's cleanup, de-initialization,
+ * or close code into.
+ * Closes all the libraries opened by CustomLibInit()
+ *
+ * @param base Pointer to the allocated library base structure.
+ */
+VOID CustomLibClose( LIBRARY_TYPE * base );
 
 #endif /* LIBRARY_H */

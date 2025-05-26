@@ -318,7 +318,7 @@ BOOL CreateWorkerProcess( VOID ) {
   
   AmiGUSBase->agb_WorkerProcess =
       CreateNewProcTags( NP_Entry, (ULONG) &WorkerProcess,
-                         NP_Name, (ULONG) LIBRARY_NAME,
+                         NP_Name, (ULONG) STR( LIB_FILE ),
                          NP_Priority, (ULONG) 127,
                          TAG_DONE, 0 
                        );

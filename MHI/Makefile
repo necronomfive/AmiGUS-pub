@@ -152,7 +152,7 @@ else ifdef USEVBCC
   AS            = vasmm68k_mot
   LD            = vc +aos68k
 else
-  AFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(HOST_TOOLCHAIN)   \
+  AFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(LIB_HOST)         \
                   IDIR=$(MHI_INCLUDE) IDIR=NDK_3.2:Include_I IDIR=$(HDIR)      \
                   OBJNAME
 
@@ -309,7 +309,7 @@ get_mem_log:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
 	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
 	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/GetMemMhiLog
 
 mhi_lib_check:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c

@@ -32,25 +32,36 @@
 
 #include "amigus_ahi_sub.h"
 
-UBYTE memMarker[] = AMIGUS_MEM_LOG_BORDERS \
-                    " " STR( LIB_FILE ) " " \
-                    AMIGUS_MEM_LOG_BORDERS;
-
 BOOL CheckStartAddress( LONG address ) {
 
-  BOOL result = FALSE;
+  BOOL result;
 
-  if (( UBYTE * ) address != memMarker ) {
+  result = !strncmp(( UBYTE * ) address, 
+                     AMIGUS_MEM_LOG_BORDERS, 
+                     sizeof( AMIGUS_MEM_LOG_BORDERS ) - 1 );
+  if ( !result ) return result;
 
-    result = !strncmp(( UBYTE * ) address, memMarker, sizeof( memMarker) - 1 );
-  }
+  address += sizeof( AMIGUS_MEM_LOG_BORDERS ) - 1;
+  result = !strncmp(( UBYTE * ) address, 
+                     " " STR( LIB_FILE ) " ", 
+                     sizeof( " " STR( LIB_FILE ) " " ) - 1 );
+  if ( !result ) return result;
+
+  address += sizeof( " " STR( LIB_FILE ) " " ) - 1;
+  result = !strncmp(( UBYTE * ) address, 
+                     AMIGUS_MEM_LOG_BORDERS, 
+                     sizeof( AMIGUS_MEM_LOG_BORDERS ) - 1 );
   return result;
 }
 
 VOID WriteMemoryLog( LONG startAddress, STRPTR filename ) {
 
   BPTR file;
-  LONG endAddress = startAddress + sizeof( memMarker);
+  LONG endAddress = startAddress 
+    + sizeof( AMIGUS_MEM_LOG_BORDERS)
+    + sizeof( " " STR( LIB_FILE ) " " )
+    + sizeof( AMIGUS_MEM_LOG_BORDERS)
+    - 2;
 
   printf( "Found start memMarker at 0x%08lx\n", startAddress );
   file = Open( filename, MODE_NEWFILE );
@@ -120,7 +131,7 @@ int main( int argc, char const *argv[] ) {
       UBYTE buffer[ 64 ];
 
       printf( "Checking for settings first...\n" );
-      i = GetVar( "AmiGUS-MHI-LOG-ADDRESS", buffer, sizeof( buffer ), 0 );  
+      i = GetVar( "AmiGUS-AHI-LOG-ADDRESS", buffer, sizeof( buffer ), 0 );  
       if ( i > 0 ) {
   
         StrToLong( buffer, ( LONG * ) &startAddress );

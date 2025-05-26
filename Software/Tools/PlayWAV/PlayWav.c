@@ -96,7 +96,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SMPL_RATE_32000		0x5
 #define SMPL_RATE_44100		0x6
 #define SMPL_RATE_48000		0x7
-#define SMPL_RATE_96000		0x8
+#define SMPL_RATE_64000		0x8
+#define SMPL_RATE_96000		0x9
 
 /* Memory Buffers */
 
@@ -198,7 +199,7 @@ int main(int argc,char **argv)
 	
 	SetTaskPri(FindTask(NULL),30);
 	
-    printf("\n==========================\n  AmiGUS WAV Player V0.5 \n (C)2025 by Oliver Achten \n==========================\n\n");
+    printf("\n==========================\n  AmiGUS WAV Player V0.52 \n (C)2025 by Oliver Achten \n==========================\n\n");
 	
 	sample_fmt = SMPL_FMT_LITTLE_ENDIAN|SMPL_FMT_STEREO_16BIT;
 	sample_rate = SMPL_RATE_44100;
@@ -255,7 +256,7 @@ int main(int argc,char **argv)
 			else if (strcmp(argv[i],"-unsigned")==0)
 			{
 				sample_fmt &= 0xffdf;
-				sample_fmt |= 0x0000;				
+				sample_fmt |= 0x0020;				
 			}				
 			else if (strcmp(argv[i],"-8000")==0)
 			{
@@ -297,6 +298,11 @@ int main(int argc,char **argv)
 				sample_rate &= 0xfff0;
 				sample_rate |= SMPL_RATE_48000;
 			}
+			else if (strcmp(argv[i],"-64000")==0)
+			{
+				sample_rate &= 0xfff0;
+				sample_rate |= SMPL_RATE_64000;
+			}			
 			else if (strcmp(argv[i],"-96000")==0)
 			{
 				sample_rate &= 0xfff0;
@@ -317,22 +323,22 @@ int main(int argc,char **argv)
 	
 	/* ================ Open libraries ================ */
 
-	if((SysBase=OpenLibrary("exec.library",36L))==NULL)
+	if((SysBase=OpenLibrary("exec.library",0L))==NULL)
 	{
-		printf("ERROR: this tool needs Kickstart 2.0 or higher\n\n");
+		printf("ERROR: can't open 'exec.library'\n\n");
 		return 0;
 	}
 	
 	if((ExpansionBase=OpenLibrary("expansion.library",0L))==NULL)
 	{
-        printf("ERROR: can't open 'expansion.library'\n");
+        printf("ERROR: can't open 'expansion.library'\n\n");
         return 0;
 	}
 	
 	if((DOSBase=OpenLibrary("dos.library",0L))==NULL)
     {
 		CloseLibrary(DOSBase);		
-        printf("ERROR: can't open 'dos.library'");
+        printf("ERROR: can't open 'dos.library'\n\n");
         return 0;
     }
 	
@@ -382,7 +388,7 @@ int main(int argc,char **argv)
 	
 	if (intdata = AllocMem(sizeof(struct IntData), MEMF_PUBLIC|MEMF_CLEAR))
     {
-		intdata->buf_size = (BUF_SIZE>>2)-1;			/* Size of data transferred per buffer (in DWORDs) */
+		intdata->buf_size = (BUF_SIZE>>5)-1;			/* Size of data transferred per buffer (in DWORDs) */
 		intdata->buf_count = 0;							/* Current buffer number (reset to 0) */
 		intdata->buf_segments = BUF_NUM;				/* Number of buffer segments */
 		intdata->buf_half_segments = (BUF_NUM >> 1);	/* 1/2 nuber of buffer segments */

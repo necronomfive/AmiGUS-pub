@@ -74,7 +74,7 @@ LIB_VERSION     = 1
 LIB_REVISION    = 6
 LIB_PREFIX      = _LIB_
 
-LIB_LIBS      =
+LIB_LIBS        =
 LIB_FILE_DEST   = $(DDIR)$(LIB_FILE)
 
 FD_FILE         = $(HDIR)$(LIB_NAME)_lib.fd

@@ -37,8 +37,8 @@ ifeq ($(findstring /home,$(HOME)), /home)
   # ~/.netrc format:
   # machine <ip> login username password pass
   # Could do --user username:pass instead - but not cool in repo ;)
-  INSTALL1      = curl --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.4/cf0/Libs/MHI/
-  INSTALL0      = cp $(LIB_FILE_DEST) ~/Documents/FS-UAE/Shared/MHI/
+  INSTALL1      = curl --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.4/cf0/Libs/MHI/$(LIB_NAME).library
+  INSTALL0      = cp $(LIB_FILE_DEST) ~/Documents/FS-UAE/Shared/MHI/$(LIB_NAME).library
 else
   AMIGAOS       = 1
   
@@ -56,7 +56,7 @@ else
 
   LIB_HOST      = native
 
-  INSTALL0      = copy FROM $(LIB_FILE_DEST)	TO	Libs:MHI/		CLONE
+  INSTALL0      = copy FROM $(LIB_FILE_DEST)	TO	Libs:MHI/$(LIB_NAME).library		CLONE
   INSTALL1      = avail flush >NIL:
 endif
 
@@ -69,13 +69,13 @@ LIB_CPU        ?= 000
 LIB_LOG        ?= FILE_LOG
 
 LIB_NAME        = mhiamigus
-LIB_FILE        = $(LIB_NAME).library-$(LIB_CPU)-$(LIB_LOG)
+LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
 LIB_REVISION    = 6
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =
-LIB_FILE_DEST   = $(DDIR)$(LIB_FILE)
+LIB_FILE_DEST   = $(DDIR)$(LIB_FILE)-$(LIB_CPU)-$(LIB_LOG)
 
 FD_FILE         = $(HDIR)$(LIB_NAME)_lib.fd
 PRAGMA_FILE     = $(HDIR)$(LIB_NAME)_pragmas.h

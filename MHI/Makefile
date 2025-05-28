@@ -67,7 +67,10 @@ HDIR   = header/
 
 LIB_CPU        ?= 000
 LIB_LOG        ?= FILE_LOG
-
+# NO_LOG
+# SER_LOG
+# FILE_LOG
+# MEM_LOG
 LIB_NAME        = mhiamigus
 LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1

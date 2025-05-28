@@ -90,7 +90,7 @@ VOID WriteMemoryLog( LONG startAddress, STRPTR filename ) {
 
 int main( int argc, char const *argv[] ) {
 
-  STRPTR filename = "ram:MemLog.txt";
+  STRPTR filename = "ram:MhiMemLog.txt";
   LONG startAddress = 0;
   BOOL found = FALSE;
   ULONG i;

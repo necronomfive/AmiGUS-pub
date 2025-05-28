@@ -67,7 +67,10 @@ HDIR   = header/
 
 LIB_CPU        ?= 000
 LIB_LOG        ?= MEM_LOG
-
+# NO_LOG
+# SER_LOG
+# FILE_LOG
+# MEM_LOG
 LIB_NAME        = AmiGUS
 LIB_FILE        = $(LIB_NAME).audio
 LIB_VERSION     = 4

@@ -36,9 +36,9 @@
 VOID FillBuffer( BYTE buffer ) {
 
   ULONG i = 0;
-  const ULONG longSize = AmiGUSBase->agb_BufferMax[ buffer ];
+  const ULONG longSize = AmiGUS_AHI_Base->agb_BufferMax[ buffer ];
   const ULONG halfLongSize = longSize >> 1;
-  ULONG *longBuffer = (ULONG *)AmiGUSBase->agb_Buffer[ buffer ];
+  ULONG *longBuffer = (ULONG *)AmiGUS_AHI_Base->agb_Buffer[ buffer ];
 
 //  LOG_D(( "D: FB%1ld\n", buffer ));
   for ( ; halfLongSize > i; ++i) {
@@ -49,8 +49,8 @@ VOID FillBuffer( BYTE buffer ) {
   
     longBuffer[ i ] = 0x44444444;
   }
-  AmiGUSBase->agb_BufferIndex[ buffer ] = 0;
-  AmiGUSBase->agb_watermark = longSize << 1;
+  AmiGUS_AHI_Base->agb_BufferIndex[ buffer ] = 0;
+  AmiGUS_AHI_Base->agb_watermark = longSize << 1;
 }
 
 #endif
@@ -59,8 +59,8 @@ VOID FillBuffer( BYTE buffer ) {
 VOID FillBuffer( BYTE buffer ) {
 
   ULONG i = 0;
-  const ULONG longSize = AmiGUSBase->agb_BufferMax[ buffer ];
-  ULONG *longBuffer = (ULONG *)AmiGUSBase->agb_Buffer[ buffer ];
+  const ULONG longSize = AmiGUS_AHI_Base->agb_BufferMax[ buffer ];
+  ULONG *longBuffer = (ULONG *)AmiGUS_AHI_Base->agb_Buffer[ buffer ];
 
 //  LOG_D(( "D: FB%1ld -> %08lx\n", buffer, longBuffer ));
 //  LOG_D(( "D: FB%1ld\n", buffer ));
@@ -72,8 +72,8 @@ VOID FillBuffer( BYTE buffer ) {
       longBuffer[ i ] = 0x00000000;
     }
   }
-  AmiGUSBase->agb_BufferIndex[ buffer ] = 0;
-  AmiGUSBase->agb_watermark = longSize << 1;
+  AmiGUS_AHI_Base->agb_BufferIndex[ buffer ] = 0;
+  AmiGUS_AHI_Base->agb_watermark = longSize << 1;
 }
 
 #endif
@@ -85,8 +85,8 @@ typedef ASM(VOID) PostTimerType( REG(a2, struct AHIAudioCtrlDrv *) );
 INLINE VOID FillBuffer( BYTE buffer ) {
 
 //  LOG_D(( "D: FB%1ld\n", buffer ));
-  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
-  struct AHIAudioCtrlDrv *audioCtrl = AmiGUSBase->agb_AudioCtrl;
+  struct AmiGUSPcmPlayback * playback = &AmiGUS_AHI_Base->agb_Playback;
+  struct AHIAudioCtrlDrv *audioCtrl = AmiGUS_AHI_Base->agb_AudioCtrl;
   PreTimerType *preTimer = (PreTimerType *)audioCtrl->ahiac_PreTimer;
   PostTimerType *postTimer = (PostTimerType *)audioCtrl->ahiac_PostTimer;
 
@@ -139,7 +139,7 @@ INLINE VOID FillBuffer( BYTE buffer ) {
 
 INLINE VOID HandlePlayback( VOID ) {
 
-  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
+  struct AmiGUSPcmPlayback * playback = &AmiGUS_AHI_Base->agb_Playback;
 
   ULONG i;
   ULONG k = playback->agpp_CurrentBuffer;
@@ -152,7 +152,7 @@ INLINE VOID HandlePlayback( VOID ) {
     }
     k ^= 0x00000001;
   }
-  if ( AMIGUS_AHI_F_PLAY_UNDERRUN & AmiGUSBase->agb_StateFlags ) {
+  if ( AMIGUS_AHI_F_PLAY_UNDERRUN & AmiGUS_AHI_Base->agb_StateFlags ) {
 
     LOG_W(( "W: Recovering from playback buffer underrun.\n" ));
     /*
@@ -175,8 +175,8 @@ INLINE VOID HandlePlayback( VOID ) {
 
 INLINE VOID HandleRecording( VOID ) {
 
-  struct AmiGUSPcmRecording * recording = &( AmiGUSBase->agb_Recording );
-  struct AHIAudioCtrlDrv *audioCtrl = AmiGUSBase->agb_AudioCtrl;
+  struct AmiGUSPcmRecording * recording = &( AmiGUS_AHI_Base->agb_Recording );
+  struct AHIAudioCtrlDrv *audioCtrl = AmiGUS_AHI_Base->agb_AudioCtrl;
   struct AHIRecordMessage *message = &( recording->agpr_RecordingMessage );
 
   ULONG i;
@@ -218,7 +218,7 @@ INLINE VOID HandleRecording( VOID ) {
     }
     k ^= 0x00000001;
   }
-  if ( AMIGUS_AHI_F_REC_OVERFLOW & AmiGUSBase->agb_StateFlags ) {
+  if ( AMIGUS_AHI_F_REC_OVERFLOW & AmiGUS_AHI_Base->agb_StateFlags ) {
 
     LOG_W(( "W: Recovering from recording buffer overflow.\n" ));
     /*
@@ -241,65 +241,68 @@ INLINE VOID HandleRecording( VOID ) {
 
   ULONG signals = TRUE;
 
-  LOG_D(("D: Worker for AmiGUSBase @ %08lx starting...\n", (LONG) AmiGUSBase));
+  LOG_D(( "D: Worker for AmiGUS_AHI_Base @ %08lx starting...\n",
+          (LONG) AmiGUS_AHI_Base ));
 
-  AmiGUSBase->agb_WorkerWorkSignal = AllocSignal( -1 );
-  AmiGUSBase->agb_WorkerStopSignal = AllocSignal( -1 );
+  AmiGUS_AHI_Base->agb_WorkerWorkSignal = AllocSignal( -1 );
+  AmiGUS_AHI_Base->agb_WorkerStopSignal = AllocSignal( -1 );
   
-  if ( ( -1 != AmiGUSBase->agb_WorkerWorkSignal )
-    && ( -1 != AmiGUSBase->agb_WorkerStopSignal )) {
+  if ( ( -1 != AmiGUS_AHI_Base->agb_WorkerWorkSignal )
+    && ( -1 != AmiGUS_AHI_Base->agb_WorkerStopSignal )) {
 
     /* Tell master worker is alive */
     Signal(
-      (struct Task *) AmiGUSBase->agb_MainProcess,
-      1 << AmiGUSBase->agb_MainSignal
+      (struct Task *) AmiGUS_AHI_Base->agb_MainProcess,
+      1 << AmiGUS_AHI_Base->agb_MainSignal
     );
     // SetSignal(0, 1 << agb_WorkerStopSignal );
     while ( signals ) {
 
-      if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUSBase->agb_StateFlags ) {
+      if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUS_AHI_Base->agb_StateFlags ) {
 
         HandlePlayback();
       }
-      if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
+      if ( AMIGUS_AHI_F_REC_STARTED & AmiGUS_AHI_Base->agb_StateFlags ) {
 
         HandleRecording();
       }
 
-      AmiGUSBase->agb_WorkerReady = TRUE;
+      AmiGUS_AHI_Base->agb_WorkerReady = TRUE;
       signals = Wait(
           SIGBREAKF_CTRL_C
-        | ( 1 << AmiGUSBase->agb_WorkerWorkSignal )
-        | ( 1 << AmiGUSBase->agb_WorkerStopSignal )
+        | ( 1 << AmiGUS_AHI_Base->agb_WorkerWorkSignal )
+        | ( 1 << AmiGUS_AHI_Base->agb_WorkerStopSignal )
       );
       /* 
        All signals break the wait, 
        but only "work" continues the playback loop, 
        so the others are masked away.
        */
-       signals &= ( 1 << AmiGUSBase->agb_WorkerWorkSignal );
+       signals &= ( 1 << AmiGUS_AHI_Base->agb_WorkerWorkSignal );
     }
   } else {
     /* Well... */
     DisplayError( EWorkerProcessSignalsFailed );
   }
-  LOG_D(("D: Worker for AmiGUSBase @ %08lx ending...\n", (LONG) AmiGUSBase));
+  LOG_D(( "D: Worker for AmiGUS_AHI_Base @ %08lx ending...\n",
+          (LONG) AmiGUS_AHI_Base ));
 
-  FreeSignal( AmiGUSBase->agb_WorkerWorkSignal );
-  AmiGUSBase->agb_WorkerWorkSignal = -1;
-  FreeSignal( AmiGUSBase->agb_WorkerStopSignal );
-  AmiGUSBase->agb_WorkerStopSignal = -1;
+  FreeSignal( AmiGUS_AHI_Base->agb_WorkerWorkSignal );
+  AmiGUS_AHI_Base->agb_WorkerWorkSignal = -1;
+  FreeSignal( AmiGUS_AHI_Base->agb_WorkerStopSignal );
+  AmiGUS_AHI_Base->agb_WorkerStopSignal = -1;
 
   /* Stop multitasking here - master will resume it TODO: ??? */
   //  Forbid();
 
   Signal(
-      (struct Task *) AmiGUSBase->agb_MainProcess,
-      1 << AmiGUSBase->agb_MainSignal
+      (struct Task *) AmiGUS_AHI_Base->agb_MainProcess,
+      1 << AmiGUS_AHI_Base->agb_MainSignal
   );
-  AmiGUSBase->agb_WorkerProcess = NULL;
-  AmiGUSBase->agb_WorkerReady = FALSE;
-  LOG_D(("D: Worker for AmiGUSBase @ %08lx ended.\n", (LONG) AmiGUSBase));
+  AmiGUS_AHI_Base->agb_WorkerProcess = NULL;
+  AmiGUS_AHI_Base->agb_WorkerReady = FALSE;
+  LOG_D(( "D: Worker for AmiGUS_AHI_Base @ %08lx ended.\n",
+          (LONG) AmiGUS_AHI_Base ));
 }
 
 /*
@@ -309,33 +312,33 @@ BOOL CreateWorkerProcess( VOID ) {
 
   /* Prevent worker from waking up until we are ready. */
   Forbid();
-  if ( AmiGUSBase->agb_WorkerProcess ) {
+  if ( AmiGUS_AHI_Base->agb_WorkerProcess ) {
 
     Permit();
     LOG_D(("D: Worker already exists!\n"));
     return FALSE;
   }
   
-  AmiGUSBase->agb_WorkerProcess =
+  AmiGUS_AHI_Base->agb_WorkerProcess =
       CreateNewProcTags( NP_Entry, (ULONG) &WorkerProcess,
                          NP_Name, (ULONG) STR( LIB_FILE ),
                          NP_Priority, (ULONG) 127,
                          TAG_DONE, 0 
                        );
-  if ( AmiGUSBase->agb_WorkerProcess ) {
+  if ( AmiGUS_AHI_Base->agb_WorkerProcess ) {
 
-    AmiGUSBase->agb_WorkerProcess->pr_Task.tc_UserData = AmiGUSBase;
+    AmiGUS_AHI_Base->agb_WorkerProcess->pr_Task.tc_UserData = AmiGUS_AHI_Base;
 
   } /* Potential error handling later */
 
   /* Well... Worker can only wake up if we ... */
   Permit();
 
-  if ( AmiGUSBase->agb_WorkerProcess ) {
+  if ( AmiGUS_AHI_Base->agb_WorkerProcess ) {
     /* Wait for worker signalling main */
-    Wait( 1 << AmiGUSBase->agb_MainSignal );
+    Wait( 1 << AmiGUS_AHI_Base->agb_MainSignal );
     /* Check if worker is alive or dead */
-    if ( !AmiGUSBase->agb_WorkerProcess ) {
+    if ( !AmiGUS_AHI_Base->agb_WorkerProcess ) {
       /* Worker died meanwhile */
       DisplayError( EWorkerProcessDied );
       return TRUE;
@@ -349,7 +352,7 @@ BOOL CreateWorkerProcess( VOID ) {
 
 VOID DestroyWorkerProcess(VOID) {
 
-  if ( !AmiGUSBase->agb_WorkerProcess ) {
+  if ( !AmiGUS_AHI_Base->agb_WorkerProcess ) {
 
     LOG_D(("D: No worker process to destroy!\n"));
     return;
@@ -357,16 +360,16 @@ VOID DestroyWorkerProcess(VOID) {
 
   LOG_D(("D: Destroying worker process\n"));
 
-  if ( -1 != AmiGUSBase->agb_WorkerStopSignal ) {
+  if ( -1 != AmiGUS_AHI_Base->agb_WorkerStopSignal ) {
 
     /* Kill the playback worker to stop the playback */
-    Signal(( struct Task * ) AmiGUSBase->agb_WorkerProcess,
-          1 << AmiGUSBase->agb_WorkerStopSignal );
+    Signal(( struct Task * ) AmiGUS_AHI_Base->agb_WorkerProcess,
+          1 << AmiGUS_AHI_Base->agb_WorkerStopSignal );
 
     /* Wait for the worker to die and imply Permit() */
-    Wait( 1 << AmiGUSBase->agb_MainSignal );
+    Wait( 1 << AmiGUS_AHI_Base->agb_MainSignal );
   }
-  if ( !AmiGUSBase->agb_WorkerProcess ) {
+  if ( !AmiGUS_AHI_Base->agb_WorkerProcess ) {
     LOG_D(("D: Destroyed worker process\n"));
   }
 }

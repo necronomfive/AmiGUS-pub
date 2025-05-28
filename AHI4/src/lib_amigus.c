@@ -37,7 +37,7 @@ struct IntuitionBase     * IntuitionBase     = 0;
 struct Library           * UtilityBase       = 0;
 struct Library           * ExpansionBase     = 0;
 struct Device            * TimerBase         = 0;
-struct AmiGUSBase        * AmiGUSBase        = 0;
+struct AmiGUS_AHI_Base        * AmiGUS_AHI_Base        = 0;
 
 #endif
 
@@ -47,7 +47,7 @@ struct AmiGUSBase        * AmiGUSBase        = 0;
 
 LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 
-  struct AmiGUSBase * amiGUSBase = (struct AmiGUSBase *)base;
+  struct AmiGUS_AHI_Base * amiGUSBase = (struct AmiGUS_AHI_Base *)base;
   LONG error;
 
   /* Prevent use of customized library versions on CPUs not targetted. */
@@ -125,7 +125,7 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
   UtilityBase   = amiGUSBase->agb_UtilityBase;
   ExpansionBase = amiGUSBase->agb_ExpansionBase;
   TimerBase     = amiGUSBase->agb_TimerBase;
-  AmiGUSBase    = amiGUSBase;
+  AmiGUS_AHI_Base    = amiGUSBase;
 #endif
 
   LOG_D(( "D: AmiGUS base ready @ 0x%08lx\n", amiGUSBase ));
@@ -140,10 +140,10 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 
 VOID CustomLibClose( LIBRARY_TYPE * base ) {
 
-  struct AmiGUSBase * amiGUSBase = (struct AmiGUSBase *)base;
+  struct AmiGUS_AHI_Base * amiGUSBase = (struct AmiGUS_AHI_Base *)base;
 
 #ifndef BASE_GLOBAL
-  struct ExecBase *SysBase = AmiGUSBase->agb_SysBase;
+  struct ExecBase *SysBase = AmiGUS_AHI_Base->agb_SysBase;
 #endif
 
   if( amiGUSBase->agb_TimerBase ) {

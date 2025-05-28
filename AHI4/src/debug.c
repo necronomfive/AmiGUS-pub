@@ -139,9 +139,9 @@ VOID debug_fprintf( STRPTR format, ... ) {
     }
 #endif
 
-    AmiGUSBase->agb_LogFile = Open( logFilePath, MODE_NEWFILE );
+    AmiGUS_AHI_Base->agb_LogFile = Open( logFilePath, MODE_NEWFILE );
 
-    if ( !AmiGUSBase->agb_LogFile ) {
+    if ( !AmiGUS_AHI_Base->agb_LogFile ) {
 
       errorShown = TRUE;
       DisplayError( EOpenLogFile );
@@ -159,7 +159,7 @@ VOID debug_fprintf( STRPTR format, ... ) {
     ( APTR ) (( LONG ) &format + 4 ),
     &debug_mPutChProc,
     &printBuffer );
-  Write( AmiGUSBase->agb_LogFile, buffer, printBuffer - buffer - 1 );
+  Write( AmiGUS_AHI_Base->agb_LogFile, buffer, printBuffer - buffer - 1 );
 }
 
 #endif /* FILE_LOG */
@@ -179,7 +179,7 @@ VOID debug_mprintf( STRPTR format, ... ) {
     AMIGUS_MEM_LOG_BORDERS
   };
 
-  if ( !AmiGUSBase->agb_LogMem ) {
+  if ( !AmiGUS_AHI_Base->agb_LogMem ) {
 
     // Yep, defaults to 
     LONG size = 32 << 20;             // 32MB somewhere
@@ -222,36 +222,36 @@ VOID debug_mprintf( STRPTR format, ... ) {
 
     if ( 0 < ( LONG ) where ) {
 
-      AmiGUSBase->agb_LogMem = AllocAbs( size, where );
+      AmiGUS_AHI_Base->agb_LogMem = AllocAbs( size, where );
     }
-    if ( !AmiGUSBase->agb_LogMem ) {
+    if ( !AmiGUS_AHI_Base->agb_LogMem ) {
 
-      AmiGUSBase->agb_LogMem = AllocAbs( size, ( APTR ) 0x0a000000 );
+      AmiGUS_AHI_Base->agb_LogMem = AllocAbs( size, ( APTR ) 0x0a000000 );
     }
-    if ( !AmiGUSBase->agb_LogMem ) {
+    if ( !AmiGUS_AHI_Base->agb_LogMem ) {
 
-      AmiGUSBase->agb_LogMem = AllocAbs( size, ( APTR ) 0x00400000 );
+      AmiGUS_AHI_Base->agb_LogMem = AllocAbs( size, ( APTR ) 0x00400000 );
     }
-    if ( !AmiGUSBase->agb_LogMem ) {
+    if ( !AmiGUS_AHI_Base->agb_LogMem ) {
 
-      AmiGUSBase->agb_LogMem = AllocAbs( size, ( APTR ) 0x48000000 );
+      AmiGUS_AHI_Base->agb_LogMem = AllocAbs( size, ( APTR ) 0x48000000 );
     }
-    if ( !AmiGUSBase->agb_LogMem ) {
+    if ( !AmiGUS_AHI_Base->agb_LogMem ) {
 
       size = ( 2 << 19 ) - 4;
-      AmiGUSBase->agb_LogMem = AllocAbs( size, ( APTR ) 0x00400000 );
+      AmiGUS_AHI_Base->agb_LogMem = AllocAbs( size, ( APTR ) 0x00400000 );
     }
-    if ( AmiGUSBase->agb_LogMem ) {
+    if ( AmiGUS_AHI_Base->agb_LogMem ) {
 
       LONG i;
       for ( i = 0; i < size; i += 4 ) {
-        *( ULONG * )(( LONG ) AmiGUSBase->agb_LogMem + i ) = 0;
+        *( ULONG * )(( LONG ) AmiGUS_AHI_Base->agb_LogMem + i ) = 0;
       }
     } else {
 
-      AmiGUSBase->agb_LogMem = AllocMem( size, MEMF_CLEAR | MEMF_PUBLIC );
+      AmiGUS_AHI_Base->agb_LogMem = AllocMem( size, MEMF_CLEAR | MEMF_PUBLIC );
     }
-    if ( !AmiGUSBase->agb_LogMem ) {
+    if ( !AmiGUS_AHI_Base->agb_LogMem ) {
 
       debug_kprintf( "AmiGUS Log giving up...\n" );
       errorShown = TRUE;
@@ -259,17 +259,17 @@ VOID debug_mprintf( STRPTR format, ... ) {
       return;
     }
     debug_kprintf( "AmiGUS Log @ 0x%08lx = %ld (retrieved), size %ld\n",
-                   ( LONG ) AmiGUSBase->agb_LogMem,
-                   ( LONG ) AmiGUSBase->agb_LogMem,
+                   ( LONG ) AmiGUS_AHI_Base->agb_LogMem,
+                   ( LONG ) AmiGUS_AHI_Base->agb_LogMem,
                    size );
 
     RawDoFmt( "%s %s %s\n",
               ( APTR ) memMarker,
               &debug_mPutChProc,
-              &AmiGUSBase->agb_LogMem );
+              &AmiGUS_AHI_Base->agb_LogMem );
     /* Move mem blob pointer back to overwrite trailing zero next comment */
-    AmiGUSBase->agb_LogMem =
-      ( APTR )(( ULONG ) AmiGUSBase->agb_LogMem - 1 );
+    AmiGUS_AHI_Base->agb_LogMem =
+      ( APTR )(( ULONG ) AmiGUS_AHI_Base->agb_LogMem - 1 );
     debug_kprintf( "AmiGUS Log ready\n" );
   }
 
@@ -283,10 +283,10 @@ VOID debug_mprintf( STRPTR format, ... ) {
     |      |  |      | |     | | |   */
     ( APTR ) (( LONG ) &format + 4 ),
     &debug_mPutChProc,
-    &AmiGUSBase->agb_LogMem );
+    &AmiGUS_AHI_Base->agb_LogMem );
   /* Move mem blob pointer back to overwrite trailing zero next comment */
-  AmiGUSBase->agb_LogMem =
-    ( APTR )(( ULONG ) AmiGUSBase->agb_LogMem - 1 );
+  AmiGUS_AHI_Base->agb_LogMem =
+    ( APTR )(( ULONG ) AmiGUS_AHI_Base->agb_LogMem - 1 );
 }
 
 #endif /* MEM_LOG */

@@ -66,7 +66,7 @@
 /******************************************************************************
  * Define your library's base type here, will be used in library.c.
  *****************************************************************************/
-#define LIBRARY_TYPE      struct AmiGUSBase
+#define LIBRARY_TYPE      struct AmiGUS_AHI_Base
 
 LIBRARY_TYPE;
 

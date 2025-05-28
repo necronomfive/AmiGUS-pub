@@ -48,6 +48,9 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   UBYTE isRealtime = FALSE;
   UBYTE canRecord = FALSE;
   UBYTE bitsPerAmiGusSample = 0;
+  struct AmiGUS_AHI_Base * base = AmiGUS_AHI_Base;
+  struct AmiGUSPcmPlayback * playback = &( base->agb_Playback );
+  struct AmiGUSPcmRecording * recording = &( base->agb_Recording );
 
   /* 
    * Will rely on AHI provided mixing and timing,
@@ -65,7 +68,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
    * ------------------------------------------------------
    */
   Disable();
-  if ( AmiGUSBase->agb_UsageCounter ) {
+  if ( base->agb_UsageCounter ) {
 
     // TODO: Allow 2 clients here - 1 for recording, 1 for playback! Need to be super independent though and some rework before...
     Enable();
@@ -74,11 +77,11 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   
   } else {
 
-    ++AmiGUSBase->agb_UsageCounter;
+    ++base->agb_UsageCounter;
     Enable();
   }
   // Magic: AudioControl of client "owns" this card :)
-  aAudioCtrl->ahiac_DriverData = AmiGUSBase->agb_CardBase;
+  aAudioCtrl->ahiac_DriverData = base->agb_CardBase;
   LOG_D(("D: Alloc`ed AmiGUS AHI hardware\n"));
 
   /*
@@ -158,7 +161,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
    * ------------------------------------------------------
    */
   modeOffset = modeId - AMIGUS_AHI_MIN_MODE;
-  AmiGUSBase->agb_AhiModeOffset = modeOffset;
+  base->agb_AhiModeOffset = modeOffset;
   playProps = &PlaybackPropertiesById[ modeOffset ];
   recProps = &RecordingPropertiesById[ modeOffset ];
   LOG_I(( "I: AHI mode is 0x%08lx, offset %ld, "
@@ -180,32 +183,31 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
           ( 1 << recProps->rp_AhiSampleShift ),
           recProps->rp_AhiSampleShift ));
 
-  AmiGUSBase->agb_HwSampleRateId = sampleRateId;
-  AmiGUSBase->agb_CanRecord = canRecord;
+  base->agb_HwSampleRateId = sampleRateId;
+  base->agb_CanRecord = canRecord;
 
-  AmiGUSBase->agb_Playback.agpp_HwSampleSize = playProps->pp_HwSampleSize;
-  AmiGUSBase->agb_Playback.agpp_CopyFunction = playProps->pp_CopyFunction;
+  playback->agpp_HwSampleSize = playProps->pp_HwSampleSize;
+  playback->agpp_CopyFunction = playProps->pp_CopyFunction;
 
-  AmiGUSBase->agb_Recording.agpr_AhiSampleShift = recProps->rp_AhiSampleShift;
-  AmiGUSBase->agb_Recording.agpr_CopyFunction = recProps->rp_CopyFunction;
-  AmiGUSBase->agb_Recording.agpr_RecordingMessage.ahirm_Type = 
-    recProps->rp_AhiFormatId;
+  recording->agpr_AhiSampleShift = recProps->rp_AhiSampleShift;
+  recording->agpr_CopyFunction = recProps->rp_CopyFunction;
+  recording->agpr_RecordingMessage.ahirm_Type = recProps->rp_AhiFormatId;
 
   /*
    * ------------------------------------------------------
    * Part 4: Prepare slave task communication.
    * ------------------------------------------------------
    */
-  AmiGUSBase->agb_WorkerWorkSignal = -1;
-  AmiGUSBase->agb_WorkerStopSignal = -1;
-  AmiGUSBase->agb_MainProcess = ( struct Process * ) FindTask( NULL );
-  AmiGUSBase->agb_MainSignal = AllocSignal( -1 );
-  if ( -1 == AmiGUSBase->agb_MainSignal ) {
+  base->agb_WorkerWorkSignal = -1;
+  base->agb_WorkerStopSignal = -1;
+  base->agb_MainProcess = ( struct Process * ) FindTask( NULL );
+  base->agb_MainSignal = AllocSignal( -1 );
+  if ( -1 == base->agb_MainSignal ) {
 
     DisplayError( EMainProcessSignalsFailed );
     return AHISF_ERROR;
   }
-  AmiGUSBase->agb_WorkerReady = FALSE;
+  base->agb_WorkerReady = FALSE;
 
   LOG_D(( "D: AHIsub_AllocAudio done, returning 0x%lx.\n", result ));
 
@@ -217,7 +219,7 @@ ASM( VOID ) SAVEDS AHIsub_FreeAudio(
 ) {
   LOG_D(("D: AHIsub_FreeAudio start\n"));
 
-  if ( aAudioCtrl->ahiac_DriverData != AmiGUSBase->agb_CardBase ) {
+  if ( aAudioCtrl->ahiac_DriverData != AmiGUS_AHI_Base->agb_CardBase ) {
 
     LOG_W(( "W: Cannot free a card not alloc'ed!\n" ));
     return;
@@ -229,8 +231,8 @@ ASM( VOID ) SAVEDS AHIsub_FreeAudio(
    * ------------------------------------------------------
    */
   /* Freeing a non-alloc`ed signal, i.e. -1, is harmless */
-  FreeSignal( AmiGUSBase->agb_MainSignal );
-  AmiGUSBase->agb_MainSignal = -1;
+  FreeSignal( AmiGUS_AHI_Base->agb_MainSignal );
+  AmiGUS_AHI_Base->agb_MainSignal = -1;
   LOG_D(("D: Free`ed main signal\n"));
 
   /*
@@ -240,7 +242,7 @@ ASM( VOID ) SAVEDS AHIsub_FreeAudio(
    * ------------------------------------------------------
    */
   Disable();
-  if ( !AmiGUSBase->agb_UsageCounter ) {
+  if ( !AmiGUS_AHI_Base->agb_UsageCounter ) {
 
     Enable();
     DisplayError( EDriverNotInUse );
@@ -248,7 +250,7 @@ ASM( VOID ) SAVEDS AHIsub_FreeAudio(
   
   } else {
 
-    --AmiGUSBase->agb_UsageCounter;
+    --AmiGUS_AHI_Base->agb_UsageCounter;
     Enable();
   }
   aAudioCtrl->ahiac_DriverData = NULL;

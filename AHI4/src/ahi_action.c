@@ -40,7 +40,7 @@ ASM(VOID) SAVEDS AHIsub_Disable(
 
   // LOG_D(("AHIsub_Disable\n"));
 #if 0
-  WriteReg16( AmiGUSBase->agb_CardBase,
+  WriteReg16( AmiGUS_AHI_Base->agb_CardBase,
               AMIGUS_PCM_MAIN_INT_ENABLE,
               AMIGUS_INT_F_MASK_CLEAR
             | AMIGUS_INT_F_PLAY_FIFO_EMPTY
@@ -62,18 +62,18 @@ ASM(VOID) SAVEDS AHIsub_Enable(
   UWORD targetState = AMIGUS_INT_F_MASK_SET;
 
   // LOG_D(("AHIsub_Enable\n"));
-  if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUSBase->agb_StateFlags ) {
+  if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUS_AHI_Base->agb_StateFlags ) {
 
     targetState |=
       AMIGUS_INT_F_PLAY_FIFO_EMPTY | AMIGUS_INT_F_PLAY_FIFO_WATERMARK;
   }
-  if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
+  if ( AMIGUS_AHI_F_REC_STARTED & AmiGUS_AHI_Base->agb_StateFlags ) {
 
     targetState |=
       AMIGUS_INT_F_REC_FIFO_FULL | AMIGUS_INT_F_REC_FIFO_WATERMARK;
   }
   WriteReg16(
-    AmiGUSBase->agb_CardBase,
+    AmiGUS_AHI_Base->agb_CardBase,
     AMIGUS_PCM_MAIN_INT_ENABLE,
     targetState );
 #else
@@ -88,7 +88,7 @@ ASM(ULONG) SAVEDS AHIsub_Start(
 ) {
   LOG_D(("D: AHIsub_Start start\n"));
 
-  if ( aAudioCtrl->ahiac_DriverData != AmiGUSBase->agb_CardBase ) {
+  if ( aAudioCtrl->ahiac_DriverData != AmiGUS_AHI_Base->agb_CardBase ) {
 
     LOG_W(( "W: Cannot start anything on a card not alloc'ed!\n" ));
     return AHIE_UNKNOWN;
@@ -110,7 +110,7 @@ ASM(ULONG) SAVEDS AHIsub_Start(
 
  if ( AHISF_RECORD & aFlags ) {
 
-    if ( !AmiGUSBase->agb_CanRecord ) {
+    if ( !AmiGUS_AHI_Base->agb_CanRecord ) {
       
       DisplayError( ERecordingModeNotSupported );
       return AHIE_UNKNOWN;
@@ -124,8 +124,8 @@ ASM(ULONG) SAVEDS AHIsub_Start(
     }
   }
 
-  LOG_D(( "D: Creating worker process for AmiGUSBase @ %08lx\n",
-          (LONG) AmiGUSBase ));
+  LOG_D(( "D: Creating worker process for AmiGUS_AHI_Base @ %08lx\n",
+          (LONG) AmiGUS_AHI_Base ));
   if ( CreateWorkerProcess() ) {
 
     LOG_D(( "D: No worker, failed.\n" ));
@@ -156,11 +156,11 @@ ASM(VOID) SAVEDS AHIsub_Update(
   REG(a2, struct AHIAudioCtrlDrv *newAudioCtrl)
 ) {
 
-  const struct AHIAudioCtrlDrv *oldAudioCtrl = AmiGUSBase->agb_AudioCtrl;
+  const struct AHIAudioCtrlDrv *oldAudioCtrl = AmiGUS_AHI_Base->agb_AudioCtrl;
 
   LOG_D(( "D: AHIsub_Update start\n" ));
 
-  if ( newAudioCtrl->ahiac_DriverData != AmiGUSBase->agb_CardBase ) {
+  if ( newAudioCtrl->ahiac_DriverData != AmiGUS_AHI_Base->agb_CardBase ) {
 
     LOG_W(( "W: Cannot update anything on a card not alloc'ed!\n" ));
     return;
@@ -188,12 +188,12 @@ ASM(VOID) SAVEDS AHIsub_Update(
           newAudioCtrl->ahiac_MinBuffSamples,
           newAudioCtrl->ahiac_MaxBuffSamples,
           newAudioCtrl->ahiac_BuffType ));
-  AmiGUSBase->agb_AudioCtrl = newAudioCtrl;
+  AmiGUS_AHI_Base->agb_AudioCtrl = newAudioCtrl;
 
   if ( AHISF_PLAY & aFlags ) {
 
-    struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
-    UBYTE modeOffset = AmiGUSBase->agb_AhiModeOffset;
+    struct AmiGUSPcmPlayback * playback = &AmiGUS_AHI_Base->agb_Playback;
+    UBYTE modeOffset = AmiGUS_AHI_Base->agb_AhiModeOffset;
     struct PlaybackProperties * mode = &PlaybackPropertiesById[ modeOffset ];
     UBYTE sampleToByte = mode->pp_AhiSampleShift;
     UWORD hwSampleSize = mode->pp_HwSampleSize;
@@ -231,7 +231,7 @@ ASM(VOID) SAVEDS AHIsub_Stop(
 ) {
   LOG_D(( "D: AHIsub_Stop start\n" ));
 
-  if ( aAudioCtrl->ahiac_DriverData != AmiGUSBase->agb_CardBase ) {
+  if ( aAudioCtrl->ahiac_DriverData != AmiGUS_AHI_Base->agb_CardBase ) {
 
     LOG_W(( "W: Cannot stop anything on a card not alloc'ed!\n" ));
     return;
@@ -241,7 +241,7 @@ ASM(VOID) SAVEDS AHIsub_Stop(
 
     LOG_D(( "D: Read final playback FIFO level %04lx, stopping now.\n",
             ReadReg16(
-              AmiGUSBase->agb_CardBase,
+              AmiGUS_AHI_Base->agb_CardBase,
               AMIGUS_PCM_PLAY_FIFO_USAGE ) ));
 
     StopAmiGusPcmPlayback();
@@ -251,13 +251,13 @@ ASM(VOID) SAVEDS AHIsub_Stop(
 
     LOG_D(( "D: Read final recording FIFO level %04lx, stopping now.\n",
             ReadReg16(
-              AmiGUSBase->agb_CardBase,
+              AmiGUS_AHI_Base->agb_CardBase,
               AMIGUS_PCM_REC_FIFO_USAGE ) ));
     StopAmiGusPcmRecording();
     DestroyRecordingBuffers();
   }
   if (!(( AMIGUS_AHI_F_PLAY_STARTED
-        | AMIGUS_AHI_F_REC_STARTED ) & AmiGUSBase->agb_StateFlags )) {
+        | AMIGUS_AHI_F_REC_STARTED ) & AmiGUS_AHI_Base->agb_StateFlags )) {
 
     LOG_D(( "D: No playback or recording, "
             "ending interrupt handler and worker task.\n" ));
@@ -267,7 +267,7 @@ ASM(VOID) SAVEDS AHIsub_Stop(
   } else {
 
     LOG_D(( "D: Driver still in used state, 0x%lx\n",
-            AmiGUSBase->agb_StateFlags ));
+            AmiGUS_AHI_Base->agb_StateFlags ));
   }
 
   LOG_D(( "D: AHIsub_Stop done\n" ));

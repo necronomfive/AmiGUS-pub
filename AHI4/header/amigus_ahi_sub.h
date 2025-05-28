@@ -107,7 +107,7 @@ struct AmiGUSPcmRecording {
 
 /* This is the private structure. The official one does not contain all
 the private fields! */
-struct AmiGUSBase {
+struct AmiGUS_AHI_Base {
   /* Library base stuff */
   struct BaseLibrary            agb_BaseLibrary;
 
@@ -147,7 +147,7 @@ struct AmiGUSBase {
 };
 
 #if defined(BASE_GLOBAL)
-  extern struct AmiGUSBase        * AmiGUSBase;
+  extern struct AmiGUS_AHI_Base   * AmiGUS_AHI_Base;
   extern struct DosLibrary        * DOSBase;
   extern struct Library           * ExpansionBase;
   extern struct IntuitionBase     * IntuitionBase;
@@ -155,13 +155,13 @@ struct AmiGUSBase {
   extern struct Device            * TimerBase;
   extern struct Library           * UtilityBase;
 #elif defined(BASE_REDEFINE)
-  #define AmiGUSBase                (amiGUSBase)
-  #define DOSBase                   amiGUSBase->agb_DOSBase
-  #define ExpansionBase             amiGUSBase->agb_ExpansionBase
-  #define IntuitionBase             amiGUSBase->agb_IntuitionBase
-  #define SysBase                   amiGUSBase->agb_SysBase
-  #define TimerBase                 amiGUSBase->TimerBase
-  #define UtilityBase               amiGUSBase->agb_UtilityBase
+  #define AmiGUS_AHI_Base           (base)
+  #define DOSBase                   base->agb_DOSBase
+  #define ExpansionBase             base->agb_ExpansionBase
+  #define IntuitionBase             base->agb_IntuitionBase
+  #define SysBase                   base->agb_SysBase
+  #define TimerBase                 base->TimerBase
+  #define UtilityBase               base->agb_UtilityBase
 #endif
 
 /******************************************************************************

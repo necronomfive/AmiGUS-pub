@@ -130,7 +130,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
     case AHIDB_MaxRecordSamples: {
 
       const LONG sampleRate = 
-        AmiGUSSampleRates[ AmiGUSBase->agb_HwSampleRateId ];
+        AmiGUSSampleRates[ AmiGUS_AHI_Base->agb_HwSampleRateId ];
       const ULONG byteSize = getRecordingBufferSize( sampleRate );
       result = byteSize >> 2; /* in 16bit stereo AKA long samples */
       LOG_V(( "V: AHIDB_MaxRecordSamples returning %ld BYTEs / %ld samples \n",
@@ -199,7 +199,8 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
 
 Fixed getAhiVolumeFromAmiGUS( ULONG volumeRegisterOffset ) {
 
-  ULONG volume = ReadReg16( AmiGUSBase->agb_CardBase, volumeRegisterOffset );
+  ULONG volume = ReadReg16( AmiGUS_AHI_Base->agb_CardBase,
+                            volumeRegisterOffset );
   if ( 0 != volume ) {
 
     ++volume;
@@ -215,7 +216,7 @@ VOID setAhiVolumeToAmiGUS( Fixed volume, ULONG volumeRegisterOffset ) {
   }
   volume &= 0x0000FFff;
   volume |= volume << 16;
-  WriteReg32( AmiGUSBase->agb_CardBase, volumeRegisterOffset, volume );
+  WriteReg32( AmiGUS_AHI_Base->agb_CardBase, volumeRegisterOffset, volume );
 }
 
 ASM(LONG) SAVEDS AHIsub_HardwareControl(
@@ -225,7 +226,7 @@ ASM(LONG) SAVEDS AHIsub_HardwareControl(
 ) {
 
   LONG result = FALSE;
-  if ( !AmiGUSBase->agb_CardBase ) {
+  if ( !AmiGUS_AHI_Base->agb_CardBase ) {
 
     /* No card - not supported! */
     LOG_W(( "W: AHIsub_HardwareControl - No card found!\n" ));
@@ -263,13 +264,13 @@ ASM(LONG) SAVEDS AHIsub_HardwareControl(
     }
     case AHIC_Input: {
 
-      AmiGUSBase->agb_Recording.agpr_HwSourceId = ( UWORD )aArgument;
+      AmiGUS_AHI_Base->agb_Recording.agpr_HwSourceId = ( UWORD )aArgument;
       result = TRUE;
       break;
     }
     case AHIC_Input_Query: {
 
-      result = AmiGUSBase->agb_Recording.agpr_HwSourceId;
+      result = AmiGUS_AHI_Base->agb_Recording.agpr_HwSourceId;
       break;
     }
     case AHIC_Output:

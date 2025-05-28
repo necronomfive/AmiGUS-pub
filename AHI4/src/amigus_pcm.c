@@ -25,7 +25,7 @@
 #include "debug.h"
 #include "errors.h"
 
-LONG FindAmiGusPcm( struct AmiGUSBase *amiGUSBase ) {
+LONG FindAmiGusPcm( struct AmiGUS_AHI_Base *amiGUSBase ) {
 
   struct ConfigDev *configDevice = 0;
   ULONG serial;
@@ -86,8 +86,8 @@ VOID StartAmiGusPcmPlayback( VOID ) {
 #else
   ULONG prefillSize = 12; /* in LONGs */
 #endif
-  UWORD modeOffset = AmiGUSBase->agb_AhiModeOffset;
-  APTR amiGUS = AmiGUSBase->agb_CardBase;
+  UWORD modeOffset = AmiGUS_AHI_Base->agb_AhiModeOffset;
+  APTR amiGUS = AmiGUS_AHI_Base->agb_CardBase;
   LOG_D(("D: Init & start AmiGUS PCM playback @ 0x%08lx\n", amiGUS));
 
   WriteReg16( amiGUS,
@@ -137,18 +137,18 @@ VOID StartAmiGusPcmPlayback( VOID ) {
               PlaybackPropertiesById[ modeOffset ].pp_HwFormatId );
 
   // Start playback finally
-  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
-  AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_PLAY_STARTED;
+  AmiGUS_AHI_Base->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
+  AmiGUS_AHI_Base->agb_StateFlags |= AMIGUS_AHI_F_PLAY_STARTED;
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_SAMPLE_RATE,
-              AmiGUSBase->agb_HwSampleRateId
+              AmiGUS_AHI_Base->agb_HwSampleRateId
             | AMIGUS_PCM_S_PLAY_F_INTERPOLATE
             | AMIGUS_PCM_SAMPLE_F_ENABLE );
 }
 
 VOID StopAmiGusPcmPlayback( VOID ) {
 
-  APTR amiGUS = AmiGUSBase->agb_CardBase;
+  APTR amiGUS = AmiGUS_AHI_Base->agb_CardBase;
   LOG_D(("D: Stop AmiGUS PCM playback @ 0x%08lx\n", amiGUS));
 
   WriteReg16( amiGUS, 
@@ -169,13 +169,13 @@ VOID StopAmiGusPcmPlayback( VOID ) {
   WriteReg16( amiGUS,
               AMIGUS_PCM_PLAY_FIFO_RESET,
               AMIGUS_PCM_FIFO_RESET_STROBE );
-  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
+  AmiGUS_AHI_Base->agb_StateFlags &= AMIGUS_AHI_F_PLAY_STOP_MASK;
 }
 
 VOID StartAmiGusPcmRecording( VOID ) {
 
-  APTR amiGUS = AmiGUSBase->agb_CardBase;
-  struct AmiGUSPcmRecording *recording = &AmiGUSBase->agb_Recording;
+  APTR amiGUS = AmiGUS_AHI_Base->agb_CardBase;
+  struct AmiGUSPcmRecording *recording = &AmiGUS_AHI_Base->agb_Recording;
   UWORD flags16;
   ULONG flags32;
 
@@ -217,16 +217,16 @@ VOID StartAmiGusPcmRecording( VOID ) {
   WriteReg32( amiGUS, AMIGUS_PCM_REC_VOLUME, flags32 ); 
   LOG_V(( "V: Set AMIGUS_PCM_REC_VOLUME = 0x%08lx\n", flags32 ));
 
-  flags16 = AmiGUSBase->agb_AhiModeOffset;
+  flags16 = AmiGUS_AHI_Base->agb_AhiModeOffset;
   flags16 = RecordingPropertiesById[ flags16 ].rp_HwFormatId;
   WriteReg16( amiGUS, AMIGUS_PCM_REC_SAMPLE_FORMAT, flags16 );
   LOG_V(( "V: Set AMIGUS_PCM_REC_SAMPLE_FORMAT = 0x%04lx\n", flags16 ));
 
   // Start recording finally
-  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;
-  AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_REC_STARTED;
+  AmiGUS_AHI_Base->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;
+  AmiGUS_AHI_Base->agb_StateFlags |= AMIGUS_AHI_F_REC_STARTED;
 
-  flags16 = AmiGUSBase->agb_HwSampleRateId
+  flags16 = AmiGUS_AHI_Base->agb_HwSampleRateId
           | AmiGUSInputFlags[ recording->agpr_HwSourceId ]
           | AMIGUS_PCM_SAMPLE_F_ENABLE;
   WriteReg16( amiGUS, AMIGUS_PCM_REC_SAMPLE_RATE, flags16 );
@@ -235,7 +235,7 @@ VOID StartAmiGusPcmRecording( VOID ) {
 
 VOID StopAmiGusPcmRecording( VOID ) {
 
-  APTR amiGUS = AmiGUSBase->agb_CardBase;
+  APTR amiGUS = AmiGUS_AHI_Base->agb_CardBase;
   LOG_D(("D: Stop AmiGUS PCM recording @ 0x%08lx\n", amiGUS));
 
   WriteReg16( amiGUS, 
@@ -258,5 +258,5 @@ VOID StopAmiGusPcmRecording( VOID ) {
   WriteReg16( amiGUS,
               AMIGUS_PCM_REC_FIFO_RESET,
               AMIGUS_PCM_FIFO_RESET_STROBE );
-  AmiGUSBase->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;
+  AmiGUS_AHI_Base->agb_StateFlags &= AMIGUS_AHI_F_REC_STOP_MASK;
 }

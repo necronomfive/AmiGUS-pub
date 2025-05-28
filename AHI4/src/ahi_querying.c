@@ -156,7 +156,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
     }
     case AHIDB_Inputs: {
 
-      result = AMIGUS_INPUTS_COUNT;
+      result = AMIGUS_PCM_INPUTS_COUNT;
       break;
     }
     case AHIDB_Input: {
@@ -166,7 +166,7 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
     }
     case AHIDB_Outputs: {
 
-      result = AMIGUS_OUTPUTS_COUNT;
+      result = AMIGUS_PCM_OUTPUTS_COUNT;
       break;
     }
     case AHIDB_Output: {

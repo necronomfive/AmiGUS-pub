@@ -149,7 +149,7 @@ BOOL testLcm( VOID ) {
 BOOL testGetBufferSizes( VOID ) {
 
   BOOL failed = FALSE;
-  #define NUM_SAMPLE_RATES 9
+  #define NUM_SAMPLE_RATES 10
   const LONG sampleRates[ NUM_SAMPLE_RATES ] = {
 
      8000, // AMIGUS_SAMPLE_RATE_8000  @ index 0x0000
@@ -160,7 +160,8 @@ BOOL testGetBufferSizes( VOID ) {
     32000, // AMIGUS_SAMPLE_RATE_32000 @ index 0x0005
     44100, // AMIGUS_SAMPLE_RATE_44100 @ index 0x0006
     48000, // AMIGUS_SAMPLE_RATE_48000 @ index 0x0007
-    96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0008
+    64000, // AMIGUS_SAMPLE_RATE_64000 @ index 0x0008
+    96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0009
   };
   #define NUM_SAMPLE_SIZES 3
   const UBYTE sampleSizes[ NUM_SAMPLE_SIZES ] = { 1, 2, 4 };
@@ -223,7 +224,7 @@ ULONG alignBufferSamplesRef( ULONG ahiBuffSamples ) {
 
 BOOL testAlignBuffSamples( VOID ) {
 
-  #define NUM_SAMPLE_RATES 9
+  #define NUM_SAMPLE_RATES 10
   const LONG sampleRates[ NUM_SAMPLE_RATES ] = {
 
      8000, // AMIGUS_SAMPLE_RATE_8000  @ index 0x0000
@@ -234,7 +235,8 @@ BOOL testAlignBuffSamples( VOID ) {
     32000, // AMIGUS_SAMPLE_RATE_32000 @ index 0x0005
     44100, // AMIGUS_SAMPLE_RATE_44100 @ index 0x0006
     48000, // AMIGUS_SAMPLE_RATE_48000 @ index 0x0007
-    96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0008
+    64000, // AMIGUS_SAMPLE_RATE_64000 @ index 0x0008
+    96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0009
   };
   LONG shift;          /* 1 - 3 */
   UBYTE modeId;         /* 0 - 20 */

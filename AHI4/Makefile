@@ -216,9 +216,11 @@ test_buffers: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(CC) $(CFLAGS) test/$@.o test/$@.c
 	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
-            $(BDIR)buffers.o \
-            $(BDIR)amigus_ahi_modes.o $(BDIR)copies.o \
-            $(BDIR)debug.o $(BDIR)support.o \
+            $(BDIR)buffers-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)amigus_ahi_modes-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)copies-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)debug-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)support-$(LIB_CPU)-$(LIB_LOG).o \
             $(LFLAGST2)
 	@echo " "
 	$(RUNNER) test/$@
@@ -228,8 +230,8 @@ test_copies: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(CC) $(CFLAGS) test/$@.o test/$@.c
 	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
-            $(BDIR)copies.o \
-            $(BDIR)amigus_ahi_modes.o \
+            $(BDIR)copies-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)amigus_ahi_modes-$(LIB_CPU)-$(LIB_LOG).o \
             $(LFLAGST2)
 	@echo " "
 	$(RUNNER) test/$@
@@ -239,8 +241,8 @@ test_support: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(CC) $(CFLAGS) test/$@.o test/$@.c
 	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
-            $(BDIR)support.o \
-            $(BDIR)debug.o \
+            $(BDIR)support-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)debug-$(LIB_CPU)-$(LIB_LOG).o \
             $(LFLAGST2)
 	@echo " "
 	$(IGNORE_VAMOS)$(RUNNER) test/$@

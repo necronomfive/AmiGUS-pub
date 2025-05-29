@@ -15,7 +15,7 @@
 /******************************************************************************
  * Mocked functions and stubbed external symbols below:
  *****************************************************************************/
-struct AmiGUSBase * AmiGUSBase;
+struct AmiGUS_AHI_Base * AmiGUS_AHI_Base;
 
 /* Taken over from lib_amigus.c */
 /*
@@ -39,8 +39,8 @@ const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
   24000, // AMIGUS_PCM_SAMPLE_RATE_24000 @ index 0x0004
   32000, // AMIGUS_PCM_SAMPLE_RATE_32000 @ index 0x0005
   44100, // AMIGUS_PCM_SAMPLE_RATE_44100 @ index 0x0006
-  48000, // AMIGUS_PCM_SAMPLE_RATE_48000 @ index 0x0007
-  96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0008
+  48000  // AMIGUS_PCM_SAMPLE_RATE_48000 @ index 0x0007
+//96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0008
 };
 
 UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
@@ -149,7 +149,7 @@ BOOL testLcm( VOID ) {
 BOOL testGetBufferSizes( VOID ) {
 
   BOOL failed = FALSE;
-  #define NUM_SAMPLE_RATES 9
+  #define NUM_SAMPLE_RATES 10
   const LONG sampleRates[ NUM_SAMPLE_RATES ] = {
 
      8000, // AMIGUS_SAMPLE_RATE_8000  @ index 0x0000
@@ -160,7 +160,8 @@ BOOL testGetBufferSizes( VOID ) {
     32000, // AMIGUS_SAMPLE_RATE_32000 @ index 0x0005
     44100, // AMIGUS_SAMPLE_RATE_44100 @ index 0x0006
     48000, // AMIGUS_SAMPLE_RATE_48000 @ index 0x0007
-    96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0008
+    64000, // AMIGUS_SAMPLE_RATE_64000 @ index 0x0008
+    96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0009
   };
   #define NUM_SAMPLE_SIZES 3
   const UBYTE sampleSizes[ NUM_SAMPLE_SIZES ] = { 1, 2, 4 };
@@ -209,7 +210,7 @@ BOOL testGetBufferSizes( VOID ) {
 ULONG alignBufferSamplesRef( ULONG ahiBuffSamples ) {
 
   struct PlaybackProperties * mode = 
-    &PlaybackPropertiesById[ AmiGUSBase->agb_AhiModeOffset ];
+    &PlaybackPropertiesById[ AmiGUS_AHI_Base->agb_AhiModeOffset ];
   ULONG mask = mode->pp_AhiBufferMask;
   UBYTE shift = mode->pp_AhiSampleShift;
   ULONG aligned = ahiBuffSamples;
@@ -223,7 +224,7 @@ ULONG alignBufferSamplesRef( ULONG ahiBuffSamples ) {
 
 BOOL testAlignBuffSamples( VOID ) {
 
-  #define NUM_SAMPLE_RATES 9
+  #define NUM_SAMPLE_RATES 10
   const LONG sampleRates[ NUM_SAMPLE_RATES ] = {
 
      8000, // AMIGUS_SAMPLE_RATE_8000  @ index 0x0000
@@ -234,7 +235,8 @@ BOOL testAlignBuffSamples( VOID ) {
     32000, // AMIGUS_SAMPLE_RATE_32000 @ index 0x0005
     44100, // AMIGUS_SAMPLE_RATE_44100 @ index 0x0006
     48000, // AMIGUS_SAMPLE_RATE_48000 @ index 0x0007
-    96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0008
+    64000, // AMIGUS_SAMPLE_RATE_64000 @ index 0x0008
+    96000  // AMIGUS_SAMPLE_RATE_96000 @ index 0x0009
   };
   LONG shift;          /* 1 - 3 */
   UBYTE modeId;         /* 0 - 20 */
@@ -266,7 +268,7 @@ BOOL testAlignBuffSamples( VOID ) {
       for ( i = 0; NUM_SAMPLE_RATES > i; ++i ) {
 
         suggestedBufferSize = sampleRates[ i ] / 100;
-        AmiGUSBase->agb_AhiModeOffset = modeId;
+        AmiGUS_AHI_Base->agb_AhiModeOffset = modeId;
 
         alignedBufferSize = AlignByteSizeForSamples( suggestedBufferSize ) >>
           PlaybackPropertiesById[ modeId ].pp_AhiSampleShift;
@@ -298,9 +300,10 @@ BOOL testAlignBuffSamples( VOID ) {
           h4, h5, h5, h5, h6,
           h0, h1, h1, h1, h2 );
 
+  modeId = AmiGUS_AHI_Base->agb_AhiModeOffset;
   printf( "Example mask: 0x%08lx, Example ~ mask: 0x%08lx\n",
-          PlaybackPropertiesById[ AmiGUSBase->agb_AhiModeOffset ].pp_AhiBufferMask,
-          ~PlaybackPropertiesById[ AmiGUSBase->agb_AhiModeOffset ].pp_AhiBufferMask );
+          PlaybackPropertiesById[ modeId ].pp_AhiBufferMask,
+          ~PlaybackPropertiesById[ modeId ].pp_AhiBufferMask );
   return failed;
 }
 
@@ -311,10 +314,10 @@ int main(int argc, char const *argv[]) {
 
   BOOL failed = FALSE;
 
-  AmiGUSBase = malloc( sizeof( struct AmiGUSBase ) );
-  memset( AmiGUSBase, 0, sizeof( struct AmiGUSBase ) );
+  AmiGUS_AHI_Base = malloc( sizeof( struct AmiGUS_AHI_Base ) );
+  memset( AmiGUS_AHI_Base, 0, sizeof( struct AmiGUS_AHI_Base ) );
 
-  if ( !AmiGUSBase ) {
+  if ( !AmiGUS_AHI_Base ) {
 
     printf( "Memory allocation failed!" );
     return 20;
@@ -325,7 +328,7 @@ int main(int argc, char const *argv[]) {
   failed |= testGetBufferSizes();
 //  failed |= testAlignBuffSamples();
 
-  free( AmiGUSBase );
+  free( AmiGUS_AHI_Base );
 
   return ( failed ) ? 15 : 0;
 }

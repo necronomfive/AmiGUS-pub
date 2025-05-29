@@ -37,61 +37,17 @@ struct IntuitionBase     * IntuitionBase     = 0;
 struct Library           * UtilityBase       = 0;
 struct Library           * ExpansionBase     = 0;
 struct Device            * TimerBase         = 0;
-struct AmiGUSBase        * AmiGUSBase        = 0;
+struct AmiGUS_AHI_Base        * AmiGUS_AHI_Base        = 0;
 
 #endif
 
-/* Closes all the libraries opened by LibInit() */
-VOID CustomLibClose( struct BaseLibrary * base ) {
+/******************************************************************************
+ * Library skeleton required library hooks - public function definitions.
+ *****************************************************************************/
 
-  struct AmiGUSBase * amiGUSBase = (struct AmiGUSBase *)base;
+LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 
-#ifndef BASE_GLOBAL
-  struct ExecBase *SysBase = AmiGUSBase->agb_SysBase;
-#endif
-
-  if( amiGUSBase->agb_TimerBase ) {
-
-    CloseDevice( amiGUSBase->agb_TimerRequest );
-  }
-  if( amiGUSBase->agb_TimerRequest ) {
-
-    FreeMem( amiGUSBase->agb_TimerRequest, sizeof(struct IORequest) );
-  }  
-  if ( amiGUSBase->agb_LogFile ) {
-
-    Close( amiGUSBase->agb_LogFile );
-  }
-  /*
-  Remember: memory cannot be overwritten if we do not return it. :)
-  So... we leak it here... 
-  if ( amiGUSBase->agb_LogMem ) {
-
-    FreeMem( amiGUSBase->agb_LogMem, ... );
-  }    
-  */
-
-  if( amiGUSBase->agb_DOSBase ) {
-
-    CloseLibrary( (struct Library *) amiGUSBase->agb_DOSBase );
-  }
-  if( amiGUSBase->agb_IntuitionBase ) {
-
-    CloseLibrary( (struct Library *) amiGUSBase->agb_IntuitionBase );
-  }
-  if( amiGUSBase->agb_UtilityBase ) {
-
-    CloseLibrary( (struct Library *) amiGUSBase->agb_UtilityBase );
-  }
-  if( amiGUSBase->agb_ExpansionBase ) {
-
-    CloseLibrary( (struct Library *) amiGUSBase->agb_ExpansionBase );
-  }
-}
-
-LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
-
-  struct AmiGUSBase * amiGUSBase = (struct AmiGUSBase *)base;
+  struct AmiGUS_AHI_Base * amiGUSBase = (struct AmiGUS_AHI_Base *)base;
   LONG error;
 
   /* Prevent use of customized library versions on CPUs not targetted. */
@@ -169,7 +125,7 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
   UtilityBase   = amiGUSBase->agb_UtilityBase;
   ExpansionBase = amiGUSBase->agb_ExpansionBase;
   TimerBase     = amiGUSBase->agb_TimerBase;
-  AmiGUSBase    = amiGUSBase;
+  AmiGUS_AHI_Base    = amiGUSBase;
 #endif
 
   LOG_D(( "D: AmiGUS base ready @ 0x%08lx\n", amiGUSBase ));
@@ -180,4 +136,51 @@ LONG CustomLibInit( struct BaseLibrary * base, struct ExecBase * sysBase ) {
   }
   LOG_I(( "I: %s\n", LIBRARY_IDSTRING ));
   return ENoError;
+}
+
+VOID CustomLibClose( LIBRARY_TYPE * base ) {
+
+  struct AmiGUS_AHI_Base * amiGUSBase = (struct AmiGUS_AHI_Base *)base;
+
+#ifndef BASE_GLOBAL
+  struct ExecBase *SysBase = AmiGUS_AHI_Base->agb_SysBase;
+#endif
+
+  if( amiGUSBase->agb_TimerBase ) {
+
+    CloseDevice( amiGUSBase->agb_TimerRequest );
+  }
+  if( amiGUSBase->agb_TimerRequest ) {
+
+    FreeMem( amiGUSBase->agb_TimerRequest, sizeof(struct IORequest) );
+  }  
+  if ( amiGUSBase->agb_LogFile ) {
+
+    Close( amiGUSBase->agb_LogFile );
+  }
+  /*
+  Remember: memory cannot be overwritten if we do not return it. :)
+  So... we leak it here... 
+  if ( amiGUSBase->agb_LogMem ) {
+
+    FreeMem( amiGUSBase->agb_LogMem, ... );
+  }    
+  */
+
+  if( amiGUSBase->agb_DOSBase ) {
+
+    CloseLibrary( (struct Library *) amiGUSBase->agb_DOSBase );
+  }
+  if( amiGUSBase->agb_IntuitionBase ) {
+
+    CloseLibrary( (struct Library *) amiGUSBase->agb_IntuitionBase );
+  }
+  if( amiGUSBase->agb_UtilityBase ) {
+
+    CloseLibrary( (struct Library *) amiGUSBase->agb_UtilityBase );
+  }
+  if( amiGUSBase->agb_ExpansionBase ) {
+
+    CloseLibrary( (struct Library *) amiGUSBase->agb_ExpansionBase );
+  }
 }

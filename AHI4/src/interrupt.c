@@ -28,14 +28,14 @@
 
 INLINE VOID HandlePlayback( VOID ) {
 
-  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
+  struct AmiGUSPcmPlayback * playback = &AmiGUS_AHI_Base->agb_Playback;
 
   ULONG *current = &( playback->agpp_CurrentBuffer );
   BOOL canSwap = TRUE;
   LONG copied = 0;        /* Sum of BYTEs actually filled into FIFO this run */
   ULONG watermark = playback->agpp_Watermark;
   /* Read-back remaining FIFO samples in BYTES */
-  LONG reminder = ReadReg16( AmiGUSBase->agb_CardBase,
+  LONG reminder = ReadReg16( AmiGUS_AHI_Base->agb_CardBase,
                              AMIGUS_PCM_PLAY_FIFO_USAGE ) << 1;
   /* Size of a single (mono / stereo) sample in BYTEs*/
   LONG minHwSampleSize =  playback->agpp_HwSampleSize; 
@@ -66,25 +66,25 @@ INLINE VOID HandlePlayback( VOID ) {
       break;
     }
   }
-  WriteReg16( AmiGUSBase->agb_CardBase,
+  WriteReg16( AmiGUS_AHI_Base->agb_CardBase,
               AMIGUS_PCM_PLAY_FIFO_WATERMARK,
               watermark );
   LOG_INT(( "INT: Playback t %4ld c %4ld wm %4ld wr %ld\n",
             target,
             copied,
             watermark,
-            AmiGUSBase->agb_WorkerReady ));
+            AmiGUS_AHI_Base->agb_WorkerReady ));
 }
 
 INLINE VOID HandleRecording( VOID ) {
 
-  struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
+  struct AmiGUSPcmRecording * recording = &AmiGUS_AHI_Base->agb_Recording;
 
   ULONG *current = &( recording->agpr_CurrentBuffer );
   BOOL canSwap = TRUE;
   LONG copied = 0;        /* Sum of BYTEs actually filled into FIFO this run */
   LONG target =                 /* Read-back remaining FIFO samples in BYTES */
-    ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_USAGE ) << 1;
+    ReadReg16( AmiGUS_AHI_Base->agb_CardBase, AMIGUS_PCM_REC_FIFO_USAGE ) << 1;
 
   while ( copied < target ) {
 
@@ -113,16 +113,16 @@ INLINE VOID HandleRecording( VOID ) {
     "INT: Recording t %4ld c %4ld wm %4ld wr %ld b%ld-i %ld\n",
     target,
     copied,
-    ReadReg16( AmiGUSBase->agb_CardBase, AMIGUS_PCM_REC_FIFO_WATERMARK ),
-    AmiGUSBase->agb_WorkerReady,
+    ReadReg16( AmiGUS_AHI_Base->agb_CardBase, AMIGUS_PCM_REC_FIFO_WATERMARK ),
+    AmiGUS_AHI_Base->agb_WorkerReady,
     *current,
     recording->agpr_BufferIndex[ *current ] ));
 }
 
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
-  REG(a1, struct AmiGUSBasePrivate * amiGUSBase)
+  REG(a1, struct AmiGUS_AHI_BasePrivate * amiGUSBase)
 ) {
-  const UWORD status = ReadReg16( AmiGUSBase->agb_CardBase,
+  const UWORD status = ReadReg16( AmiGUS_AHI_Base->agb_CardBase,
                                   AMIGUS_PCM_INT_CONTROL );
   if ( !( status & ( AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
                    | AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK
@@ -132,7 +132,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
     return 0;
   }
 
-  if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUSBase->agb_StateFlags ) {
+  if ( AMIGUS_AHI_F_PLAY_STARTED & AmiGUS_AHI_Base->agb_StateFlags ) {
 
     HandlePlayback();
 
@@ -143,10 +143,10 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
        DMA from FIFO to DAC will stay disabled until worker task prepared some
        buffers and triggered a full playback init cycle to make it run again.
       */
-      AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
+      AmiGUS_AHI_Base->agb_StateFlags |= AMIGUS_AHI_F_PLAY_UNDERRUN;
     }
   }
-  if ( AMIGUS_AHI_F_REC_STARTED & AmiGUSBase->agb_StateFlags ) {
+  if ( AMIGUS_AHI_F_REC_STARTED & AmiGUS_AHI_Base->agb_StateFlags ) {
 
     HandleRecording();
 
@@ -157,12 +157,12 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
        DMA from ADC to FIFO will stay disabled until worker task cleared up
        some buffers and triggered a record init cycle to make it run again.
       */
-      AmiGUSBase->agb_StateFlags |= AMIGUS_AHI_F_REC_OVERFLOW;
+      AmiGUS_AHI_Base->agb_StateFlags |= AMIGUS_AHI_F_REC_OVERFLOW;
     }
   }
 
   /* Clear AmiGUS control flags here!!! */
-  WriteReg16( AmiGUSBase->agb_CardBase,
+  WriteReg16( AmiGUS_AHI_Base->agb_CardBase,
               AMIGUS_PCM_INT_CONTROL,
               AMIGUS_INT_F_CLEAR
             | AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
@@ -170,10 +170,10 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
             | AMIGUS_PCM_INT_F_REC_FIFO_FULL
             | AMIGUS_PCM_INT_F_REC_FIFO_WTRMRK );
   /* Signal sub task */
-  if ( AmiGUSBase->agb_WorkerReady ) {
+  if ( AmiGUS_AHI_Base->agb_WorkerReady ) {
 
-    Signal( (struct Task *) AmiGUSBase->agb_WorkerProcess,
-            1 << AmiGUSBase->agb_WorkerWorkSignal );
+    Signal( (struct Task *) AmiGUS_AHI_Base->agb_WorkerProcess,
+            1 << AmiGUS_AHI_Base->agb_WorkerWorkSignal );
 
   } else {
 
@@ -186,7 +186,7 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
 // TRUE = failure
 BOOL CreateInterruptHandler( VOID ) {
 
-  if (AmiGUSBase->agb_Interrupt) {
+  if (AmiGUS_AHI_Base->agb_Interrupt) {
 
     LOG_D(("D: INT server in use!\n"));
     return FALSE;
@@ -195,19 +195,19 @@ BOOL CreateInterruptHandler( VOID ) {
   LOG_D(("D: Creating INT server\n"));
   Disable();
 
-  AmiGUSBase->agb_Interrupt = (struct Interrupt *)
+  AmiGUS_AHI_Base->agb_Interrupt = (struct Interrupt *)
       AllocMem(
           sizeof(struct Interrupt),
           MEMF_CLEAR | MEMF_PUBLIC
       );
-  if ( AmiGUSBase->agb_Interrupt ) {
+  if ( AmiGUS_AHI_Base->agb_Interrupt ) {
 
-    AmiGUSBase->agb_Interrupt->is_Node.ln_Pri = 100;
-    AmiGUSBase->agb_Interrupt->is_Node.ln_Name = "AMIGUS_AHI_INT";
-    AmiGUSBase->agb_Interrupt->is_Data = AmiGUSBase;
-    AmiGUSBase->agb_Interrupt->is_Code = (void (* )())handleInterrupt;
+    AmiGUS_AHI_Base->agb_Interrupt->is_Node.ln_Pri = 100;
+    AmiGUS_AHI_Base->agb_Interrupt->is_Node.ln_Name = "AMIGUS_AHI_INT";
+    AmiGUS_AHI_Base->agb_Interrupt->is_Data = AmiGUS_AHI_Base;
+    AmiGUS_AHI_Base->agb_Interrupt->is_Code = (void (* )())handleInterrupt;
 
-    AddIntServer(INTB_PORTS, AmiGUSBase->agb_Interrupt);
+    AddIntServer(INTB_PORTS, AmiGUS_AHI_Base->agb_Interrupt);
 
     Enable();
 
@@ -223,7 +223,7 @@ BOOL CreateInterruptHandler( VOID ) {
 
 VOID DestroyInterruptHandler( VOID ) {
 
-  if ( !AmiGUSBase->agb_Interrupt ) {
+  if ( !AmiGUS_AHI_Base->agb_Interrupt ) {
 
     LOG_D(("D: No INT server to destroy!\n"));
     return;
@@ -232,11 +232,11 @@ VOID DestroyInterruptHandler( VOID ) {
   LOG_D(("D: Destroying INT server\n"));
 
   Disable();
-  RemIntServer( INTB_PORTS, AmiGUSBase->agb_Interrupt );
+  RemIntServer( INTB_PORTS, AmiGUS_AHI_Base->agb_Interrupt );
   Enable();
 
-  FreeMem( AmiGUSBase->agb_Interrupt, sizeof(struct Interrupt) );
-  AmiGUSBase->agb_Interrupt = NULL;
+  FreeMem( AmiGUS_AHI_Base->agb_Interrupt, sizeof(struct Interrupt) );
+  AmiGUS_AHI_Base->agb_Interrupt = NULL;
 
   LOG_D(("D: Destroyed INT server\n"));
 }

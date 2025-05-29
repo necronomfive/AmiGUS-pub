@@ -17,7 +17,7 @@
 /******************************************************************************
  * Mocked functions and stubbed external symbols below:
  *****************************************************************************/
-struct AmiGUSBase * AmiGUSBase;
+struct AmiGUS_AHI_Base * AmiGUS_AHI_Base;
 
 /* Taken over from lib_amigus.c */
 /*
@@ -89,11 +89,11 @@ int main(int argc, char const *argv[]) {
 
   LONG error;
   BOOL failed = FALSE;
-  struct AmiGUSBase * amiGUSBase;
+  struct AmiGUS_AHI_Base * amiGUSBase;
 
-  AmiGUSBase = malloc( sizeof( struct AmiGUSBase ) );
-  memset( AmiGUSBase, 0, sizeof( struct AmiGUSBase ) );
-  amiGUSBase = AmiGUSBase;
+  AmiGUS_AHI_Base = malloc( sizeof( struct AmiGUS_AHI_Base ) );
+  memset( AmiGUS_AHI_Base, 0, sizeof( struct AmiGUS_AHI_Base ) );
+  amiGUSBase = AmiGUS_AHI_Base;
 
   if ( !amiGUSBase ) {
 

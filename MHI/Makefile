@@ -37,8 +37,8 @@ ifeq ($(findstring /home,$(HOME)), /home)
   # ~/.netrc format:
   # machine <ip> login username password pass
   # Could do --user username:pass instead - but not cool in repo ;)
-  INSTALL1      = curl --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.4/cf0/Libs/MHI/
-  INSTALL0      = cp $(LIB_FILE_DEST) ~/Documents/FS-UAE/Shared/MHI/
+  INSTALL1      = curl --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.4/cf0/Libs/MHI/$(LIB_NAME).library
+  INSTALL0      = cp $(LIB_FILE_DEST) ~/Documents/FS-UAE/Shared/MHI/$(LIB_NAME).library
 else
   AMIGAOS       = 1
   
@@ -56,7 +56,7 @@ else
 
   LIB_HOST      = native
 
-  INSTALL0      = copy FROM $(LIB_FILE_DEST)	TO	Libs:MHI/		CLONE
+  INSTALL0      = copy FROM $(LIB_FILE_DEST)	TO	Libs:MHI/$(LIB_NAME).library		CLONE
   INSTALL1      = avail flush >NIL:
 endif
 
@@ -67,15 +67,18 @@ HDIR   = header/
 
 LIB_CPU        ?= 000
 LIB_LOG        ?= FILE_LOG
-
+# NO_LOG
+# SER_LOG
+# FILE_LOG
+# MEM_LOG
 LIB_NAME        = mhiamigus
-LIB_FILE        = $(LIB_NAME).library-$(LIB_CPU)-$(LIB_LOG)
+LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
-LIB_REVISION    = 6
+LIB_REVISION    = 7
 LIB_PREFIX      = _LIB_
 
-LIB_LIBS      =
-LIB_FILE_DEST   = $(DDIR)$(LIB_FILE)
+LIB_LIBS        =
+LIB_FILE_DEST   = $(DDIR)$(LIB_FILE)-$(LIB_CPU)-$(LIB_LOG)
 
 FD_FILE         = $(HDIR)$(LIB_NAME)_lib.fd
 PRAGMA_FILE     = $(HDIR)$(LIB_NAME)_pragmas.h
@@ -152,7 +155,7 @@ else ifdef USEVBCC
   AS            = vasmm68k_mot
   LD            = vc +aos68k
 else
-  AFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(HOST_TOOLCHAIN)   \
+  AFLAGS        = RESETOPTIONS DEFINE=__NOLIBBASE__ DEFINE=$(LIB_HOST)         \
                   IDIR=$(MHI_INCLUDE) IDIR=NDK_3.2:Include_I IDIR=$(HDIR)      \
                   OBJNAME
 
@@ -183,7 +186,7 @@ endif
 
 ##################################
 
-.PHONY: all install test INCLUDES FOLDERS clean dist-clean dist
+.PHONY: all install test support INCLUDES FOLDERS clean dist-clean dist
 
 all: FOLDERS $(LIB_FILE_DEST)
 
@@ -241,8 +244,9 @@ test_cancel: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(CC) $(CFLAGS) test/$@.o test/$@.c
 	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
-            $(BDIR)amigus_vs1063.o \
-            $(BDIR)debug.o $(BDIR)support.o \
+            $(BDIR)amigus_vs1063-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)debug-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)support-$(LIB_CPU)-$(LIB_LOG).o \
             $(LFLAGST2)
 	@echo " "
 	$(RUNNER) test/$@
@@ -256,8 +260,9 @@ test_equalizer: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(CC) $(CFLAGS) test/$@.o test/$@.c
 	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
-            $(BDIR)amigus_vs1063.o \
-            $(BDIR)debug.o $(BDIR)support.o \
+            $(BDIR)amigus_vs1063-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)debug-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)support-$(LIB_CPU)-$(LIB_LOG).o \
             $(LFLAGST2)
 	@echo " "
 	$(RUNNER) test/$@
@@ -271,7 +276,8 @@ test_list: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(CC) $(CFLAGS) test/$@.o test/$@.c
 	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
-            $(BDIR)debug.o $(BDIR)support.o \
+            $(BDIR)debug-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)support-$(LIB_CPU)-$(LIB_LOG).o \
             $(LFLAGST2)
 	@echo " "
 	$(RUNNER) test/$@
@@ -290,8 +296,9 @@ test_playback: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(CC) $(CFLAGS) test/$@.o test/$@.c
 	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
-            $(BDIR)interrupt.o \
-            $(BDIR)debug.o $(BDIR)support.o \
+            $(BDIR)interrupt-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)debug-$(LIB_CPU)-$(LIB_LOG).o \
+            $(BDIR)support-$(LIB_CPU)-$(LIB_LOG).o \
             $(LFLAGST2)
 	@echo " "
 	$(RUNNER) test/$@
@@ -303,13 +310,13 @@ test_sleep: FOLDERS
 
 ###############################################################################
 
-support: mhi_lib_check get_mem_log MHIplay
+support: FOLDERS mhi_lib_check get_mem_log MHIplay
 
 get_mem_log:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
 	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
 	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/GetMemMhiLog
 
 mhi_lib_check:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c

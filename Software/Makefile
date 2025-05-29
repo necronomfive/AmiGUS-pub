@@ -57,11 +57,17 @@ release: all
 	cp Tools/PlayWAV/PlayWav.info               $(TOOL_DIR)
 	cp Tools/Record/Record                      $(TOOL_DIR)
 	cp Tools/Record/Record.info                 $(TOOL_DIR)
+	cp Drivers/AHI4/target/get_mem_log          $(AHI_DIR)/GetAhiMemLog
+	cp Installer/program.info                   $(AHI_DIR)/GetAhiMemLog.info
 	cp Drivers/AHI4/target/*.audio*             $(AHIFILE_DIR)
 	cp Drivers/AHI4/target/AMIGUS               $(AUDIOMODES_DIR)
+	cp Drivers/MHI/target/get_mem_log           $(MHI_DIR)/GetMhiMemLog
+	cp Installer/program.info                   $(MHI_DIR)/GetMhiMemLog.info
+	cp Drivers/MHI/target/mhi_lib_check         $(MHI_DIR)/MHILibCheck
+	cp Installer/program.info                   $(MHI_DIR)/MHILibCheck.info
+	cp Drivers/MHI/target/MHIplay               $(MHI_DIR)/MHIplay
+	cp Installer/program.info                   $(MHI_DIR)/MHIplay.info
 	cp Drivers/MHI/target/*.library*            $(MHI_DIR)
-	# TODO: AHI support tools
-	# TODO: MHI support tools
 
 	LATEST_FW=`find ../FPGA/Releases/Amiga/ | sort | tail -n 1` ;\
 	BASENAME_FW=`basename $$LATEST_FW`                          ;\
@@ -91,6 +97,7 @@ release: all
 	-cp $(ADF_IMAGE1) /media/chritoph/HXC/
 
 	mkdir -p $(MANUAL_DIR)
+	cp Installer/Disk.info                      $(MANUAL_DIR)/
 	cp ../Documentation/AmiGUS/AmiGUS.guide     $(MANUAL_DIR)
 	cp -R ../Documentation/AmiGUS/ilbm          $(MANUAL_DIR)
 	cp Installer/AmiGUS.guide.info              $(MANUAL_DIR)

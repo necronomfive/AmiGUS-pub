@@ -867,7 +867,7 @@ are slower!
     Beware: this is just for allocation and protecting the resulting logs. 
     The drivers do not stop producing more logs behind the end of that 
     memory slab.
-    Even after a crash, the GetMem#?Log tools can retrieve the respective 
+    Even after a crash, the Get#?MemLog tools can retrieve the respective 
     log files.
 
 We hope you will never need this information, 

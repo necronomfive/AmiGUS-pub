@@ -22,8 +22,7 @@
 
 (set #which_tools_target
 (cat "The AmiGUS tools can be installed wherever you like them to be - "
-     "so please select the your prefered location.\n"
-     "(A folder called \"AmiGUS\" will be created there.)\n\n"
+     "so please select the your prefered location.\n\n"
 ))
 
 (set #which_tools_target_help
@@ -31,6 +30,76 @@
      "AmiGUS base tools should be installed. It can be anywhere you like.\n\n"
      @askdir-help
 ))
+
+
+(set #which_debug_target
+(cat "The debug tools can be installed wherever you like them to be - "
+     "so please select the your prefered location.\n"
+     "(A folder called \"debug\" will be created there.)\n\n"
+))
+
+(set #which_debug_target_help
+(cat "\nThis section lets you choose in which drawer or on which disk the "
+     "AmiGUS debug tools should be installed. It can be anywhere you like.\n\n"
+     @askdir-help
+))
+
+(set #which_cpu
+(cat "Please select which CPU version of the %s driver shall be installed.\n\n"
+))
+
+(set #which_cpu_help
+(cat "\nThis section lets you chose which CPU optimized version of the %s driver shall be installed. "
+     "If in doubt, please select 68000, you may loose a little performance, but avoid crashes. \n\n"
+))
+
+(set #which_debug_driver
+(cat "Do you want to use a driver with debug output enabled? "
+     "Please only do so if you know what you are doing or were asked to do so.\n"
+     "(WARNING: SLOWER!)\n\n"
+))
+
+(set #which_debug_driver_help
+(cat "\nDebug versions produce log output with different targets, "
+     "the Amiga's serial port, a file, or just into some memory area. "
+     "All of these options are slower than the release version, "
+     "may randomly crash or destroy your hard disk. "
+     "Please do not toy around here, if you are unsure.\n\n"
+     "You have been warned!"
+))
+
+(set #release_driver
+(cat "No - release is fine (RECOMMENDED)"
+))
+
+(set #serial_debug_driver
+(cat "Yes - serial debug output"
+))
+
+(set #file_debug_driver
+(cat "Yes - file logging"
+))
+
+(set #memory_debug_driver
+(cat "Yes - memory logging"
+))
+
+(set #all_versions
+(cat "Do you want to copy all %s driver versions next to the active one for later potential use?"
+))
+
+(set #all_versions_help
+(cat "\nAll available versions of the %s driver would be copied next to the activated one in case you want to switch later."
+))
+
+(set #yes
+(cat "Yes"
+))
+
+(set #no
+(cat "No"
+))
+
 
 ;==============================================================================
 ; German strings
@@ -56,9 +125,8 @@
 ))
 
 (set #which_tools_target
-(cat "Die AmiGUS Werkzeuge können an einen beliebigen Ort installiert werden "
-     "- suchen Sie bitte ihren bevorzugten Ort aus.\n"
-     "(Ein Verzeichnis \"AmiGUS\" wird dort angelegt.)\n\n"
+(cat "Die AmiGUS Basiswerkzeuge können an einen beliebigen Ort installiert werden "
+     "- suchen Sie bitte ihren bevorzugten Ort aus.\n\n"
 ))
 
 (set #which_tools_target_help
@@ -66,6 +134,76 @@
      "Verzeichnis die AmiGUS Basiswerkzeuge installiert werden sollen. "
      "Der Ort ist dabei absolut beliebig. \n\n"
      @askdir-help
+))
+
+(set #which_debug_target
+(cat "Die AmiGUS Debugwerkzeuge können an einen beliebigen Ort installiert werden "
+     "- suchen Sie bitte ihren bevorzugten Ort aus.\n"
+     "(Ein Verzeichnis \"debug\" wird dort angelegt.)\n\n"
+))
+
+(set #which_debug_target_help
+(cat "\nIn diesem Teil können Sie wählen, auf welche Laufwerk oder "
+     "Verzeichnis die AmiGUS Debugwerkzeuge installiert werden sollen. "
+     "Der Ort ist dabei absolut beliebig. \n\n"
+     @askdir-help
+))
+
+(set #which_cpu
+(cat "Bitte wählen Sie aus, welche CPU-optimierte Version des %s Treibers installiert werden soll.\n\n"
+))
+
+(set #which_cpu_help
+(cat "\nIn diesem Teil können Sie wählen, für welche CPU die optimierte %s Treiberversion installiert werden soll. "
+     "Im Zweifelsfall wählen Sie bitte 68000. Sie verlieren möglicherweise etwas Leistung, aber vermeiden Abstürze. \n\n"
+))
+
+(set #which_debug_driver
+(cat "Möchten Sie einen Treiber mit debug-Ausgabe verwenden? "
+     "Bitte wählen Sie diese nur, wenn Sie wissen, was sie tun oder darum gebeten wurden.\n"
+     "(WARNUNG: LANGSAMER!)\n\n"
+))
+
+(set #which_debug_driver_help
+(cat "\nDebugversionen produzieren log-Ausgaben mit verschiedenen Zielen, "
+     "den seriellen Port des Amiga, eine Datei, oder einfach einen Speicherbereich. "
+     "Alle diese Optionen sind langsamer als die Version ohne Logging, "
+     "können zufällig abstürzen oder die Festplatte beschädigen. "
+     "Bitte spielen Sie hier nicht herum, wenn sie unsicher sind, was das bedeutet.\n\n"
+     "Sie wurden gewarnt!"
+))
+
+(set #release_driver
+(cat "Nein - release ist besser (RECOMMENDED)"
+))
+
+(set #serial_debug_driver
+(cat "Ja - serielle debug-Ausgabe"
+))
+
+(set #file_debug_driver
+(cat "Ja - debug-Ausgabe in eine Datei"
+))
+
+(set #memory_debug_driver
+(cat "Ja - debug-Ausgabe im Speicher"
+))
+
+(set #all_versions
+(cat "Möchten Sie alle %s Treiber Versionen neben dem Aktiven ablegen, falls Sie ihn später mal brauchen?"
+))
+
+(set #all_versions_help
+(cat "\nAlle verfügbaren Versionen des %s Treibers würden neben dem Aktiven abgelegt werden, "
+     "um einen schnellen und einfachen Wechsel zwischen den Treibern zu ermöglichen. "
+))
+
+(set #yes
+(cat "Ja"
+))
+
+(set #no
+(cat "Nein"
 ))
 
 ))
@@ -90,8 +228,8 @@
     (
       (set install_driver_cpu 
         (askchoice
-          (prompt "Please select which CPU version of "driver_name" shall be installed.")
-          (help "my help")
+          (prompt (#which_cpu driver_name))
+          (help (#which_cpu_help driver_name))
           (choices "68000" "68020" "68040")
           (default install_driver_cpu)
         )
@@ -99,15 +237,14 @@
 
       (set install_driver_debug
         (askchoice
-          (prompt "Do you want to use a driver with debug output enabled? "
-                  "Please only do so if you know what you are doing or were asked to do so.\n"
-                  "(WARNING: SLOWER!)\n\n"
+          (prompt #which_debug_driver)
+          (help #which_debug_driver_help)
+          (choices
+            #release_driver
+            #serial_debug_driver
+            #file_debug_driver
+            #memory_debug_driver
           )
-          (help "my help")
-          (choices "No - release is fine(RECOMMENDED)"
-                   "Yes - serial debug output"
-                   "Yes - file logging"
-                   "Yes - memory logging")
           (default install_driver_debug)
         )
       )
@@ -118,9 +255,9 @@
     (>= @user-level 2)
     (set install_driver_all
       (askbool
-        (prompt "Do you want to copy all "driver_name" versions next to the active one for later potential use?")
-        (help "more help")
-        (choices "Yes" "No")
+        (prompt (#all_versions driver_name))
+        (help #all_versions_help)
+        (choices #yes #no)
         (default install_driver_all)
       )
     )
@@ -130,7 +267,7 @@
   (set install_driver_debug (select install_driver_debug "-NO_LOG" "-SER_LOG" "-FILE_LOG" "-MEM_LOG"))
 ))
 
-
+;=============================================================================
 ; say hi!
 (welcome)
 (set old_level @user-level)
@@ -168,7 +305,7 @@
 (if
   (BITAND what %0000000001)
   (
-    (set driver_name "AHI driver")
+    (set driver_name "AHI")
     (install_driver)
 
     (set source_folder "AHI4/AHI")
@@ -209,7 +346,7 @@
 (if
   (BITAND what %0000000010)
   (
-    (set driver_name "MHI driver")
+    (set driver_name "MHI")
     (install_driver)
 
     (set source_folder "MHI")
@@ -236,16 +373,17 @@
 
 (complete 30)
 
+(set tools_target "SYS:Expansion/AmiGUS")
 (if
-  (BITAND what %0111111100)
+  (BITAND what %0011111100)
   (
     (set tools_target
       (askdir (prompt #which_tools_target)
         (help #which_tools_target_help)
-        (default "SYS:Expansion")
+        (default tools_target)
+        (newpath)
       )
     )
-    (set tools_target (tackon tools_target "AmiGUS"))
     (makedir tools_target (infos))
     (set source_folder "Tools")
   )
@@ -321,10 +459,40 @@
 
 (if
   (BITAND what %0100000000)
-  (copyfiles
-    (source (tackon source_folder "DebugTools"))
-    (dest tools_target)
-    (infos)
+  (
+    (set debug_target
+      (askdir (prompt #which_debug_target)
+        (help #which_debug_target_help)
+        (default tools_target)
+        (newpath)
+      )
+    )
+    (set debug_target (tackon debug_target "debug"))
+    (makedir debug_target (infos))
+
+    (set source_folder "AHI4")
+    (copyfiles
+      (source (tackon source_folder "GetAhiMemLog"))
+      (dest debug_target)
+      (infos)
+    )
+
+    (set source_folder "MHI")
+    (copyfiles
+      (source (tackon source_folder "GetMhiMemLog"))
+      (dest debug_target)
+      (infos)
+    )
+    (copyfiles
+      (source (tackon source_folder "MHILibCheck"))
+      (dest debug_target)
+      (infos)
+    )
+    (copyfiles
+      (source (tackon source_folder "MHIplay"))
+      (dest debug_target)
+      (infos)
+    )
   )
 )
 
@@ -350,14 +518,20 @@
       (askdir (prompt #which_manual_target)
         (help #which_manual_target_help)
         (default tools_target)
+        (newpath)
       )
     )
     (makedir manual_target (infos))
     (copyfiles
       (source source_folder)
+      (pattern "#?.guide")
       (dest manual_target)
-      (all)
       (infos)
+    )
+    (copyfiles
+      (source (tackon source_folder "ilbm"))
+      (dest (tackon manual_target "ilbm"))
+      (all)
     )
   )
 )

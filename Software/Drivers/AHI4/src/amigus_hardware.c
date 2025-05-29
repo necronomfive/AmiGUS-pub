@@ -18,38 +18,34 @@
 
 #include "amigus_hardware.h"
 
-UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
+/******************************************************************************
+ * Low-Level hardware access functions - public function definitions.
+ *****************************************************************************/
 
-  return *(( UWORD * )(( ULONG ) amiGUS + offset ));
+UWORD ReadReg16( APTR card, ULONG offset ) {
+
+  return *(( UWORD * )(( ULONG ) card + offset ));
 }
 
-void WriteReg16( APTR amiGUS, ULONG offset, UWORD value ) {
+ULONG ReadReg32( APTR card, ULONG offset ) {
 
-  *(( UWORD * )(( ULONG ) amiGUS + offset )) = value;
+  return *(( ULONG * )(( ULONG ) card + offset ));
 }
 
-ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
+VOID WriteReg16( APTR card, ULONG offset, UWORD value ) {
 
-  return *(( ULONG * )(( ULONG ) amiGUS + offset ));
+  *(( UWORD * )(( ULONG ) card + offset )) = value;
 }
 
-void WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
+VOID WriteReg32( APTR card, ULONG offset, ULONG value ) {
 
-  *(( ULONG * )(( ULONG ) amiGUS + offset )) = value;
+  *(( ULONG * )(( ULONG ) card + offset )) = value;
 }
 
-/*
- * ---------------------------------------------------
- * Data definitions
- * ---------------------------------------------------
- */
+/******************************************************************************
+ * Low-Level hardware feature lookup tables - public data definitions.
+ *****************************************************************************/
 
-/*
- * Array of supported sample rates, shall always be in 
- * sync with 
- * - AMIGUS_SAMPLE_RATE_* in amigus_hardware.h and
- * - AMIGUS_AHI_NUM_SAMPLE_RATES in amigus_public.h.
- */
 const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
 
    8000, // AMIGUS_PCM_SAMPLE_RATE_8000  @ index 0x0000
@@ -60,24 +56,25 @@ const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
   32000, // AMIGUS_PCM_SAMPLE_RATE_32000 @ index 0x0005
   44100, // AMIGUS_PCM_SAMPLE_RATE_44100 @ index 0x0006
   48000, // AMIGUS_PCM_SAMPLE_RATE_48000 @ index 0x0007
-  96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0008
+  64000  // AMIGUS_PCM_SAMPLE_RATE_64000 @ index 0x0008
+  // 96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0009
 };
 
-const STRPTR AmiGUSOutputs[ AMIGUS_OUTPUTS_COUNT ] = {
+const STRPTR AmiGUSOutputs[ AMIGUS_PCM_OUTPUTS_COUNT ] = {
 
   "Line Out"
 };
 
-const STRPTR AmiGUSInputs[ AMIGUS_INPUTS_COUNT ] = {
+const STRPTR AmiGUSInputs[ AMIGUS_PCM_INPUTS_COUNT ] = {
 
   "External / see Mixer",
   "MHI / Codec",
   "WaveTable",
-  // "AHI / PCM",                    // Requires splitting 1 card for 2 clients
+  // "AHI / PCM",                    // Deactivated - needs splitting 1 card for 2 clients
   "ALL / What-You-Hear"
 };
 
-const UWORD AmiGUSInputFlags[ AMIGUS_INPUTS_COUNT ] = {
+const UWORD AmiGUSInputFlags[ AMIGUS_PCM_INPUTS_COUNT ] = {
 
   AMIGUS_PCM_S_REC_F_ADC_SRC,        // External above
   AMIGUS_PCM_S_REC_F_CODEC_SRC,

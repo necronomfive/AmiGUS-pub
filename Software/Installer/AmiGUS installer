@@ -9,7 +9,7 @@
 (set #which_drivers_target
 (cat "Drivers will need to be installed to the corresponding system folders, "
      "LIBS:, DEVS:, etc..\n"
-     "In which system disk shall the AmiGUS drivers be installed?\n\n"
+     "In which system disk shall the AmiGUS drivers be installed?\n"
 ))
 
 (set #which_drivers_target_help
@@ -22,7 +22,7 @@
 
 (set #which_tools_target
 (cat "The AmiGUS tools can be installed wherever you like them to be - "
-     "so please select the your prefered location.\n\n"
+     "so please select the your prefered location.\n"
 ))
 
 (set #which_tools_target_help
@@ -33,9 +33,9 @@
 
 
 (set #which_debug_target
-(cat "The debug tools can be installed wherever you like them to be - "
+(cat "Debug tools can be installed wherever you like them to be - "
      "so please select the your prefered location.\n"
-     "(A folder called \"debug\" will be created there.)\n\n"
+     "(A folder called \"debug\" will be created there.)\n"
 ))
 
 (set #which_debug_target_help
@@ -49,13 +49,14 @@
 ))
 
 (set #which_cpu_help
-(cat "\nThis section lets you chose which CPU optimized version of the %s driver shall be installed. "
-     "If in doubt, please select 68000, you may loose a little performance, but avoid crashes. \n\n"
+(cat "\nThis section lets you chose which CPU optimized version of the %s "
+     "driver shall be installed. If in doubt, please select 68000, you may "
+     "loose a little performance, but avoid crashes. \n\n"
 ))
 
 (set #which_debug_driver
-(cat "Do you want to use a driver with debug output enabled? "
-     "Please only do so if you know what you are doing or were asked to do so.\n"
+(cat "Do you want to use a driver with debug output enabled? Please only do "
+     "so if you know what you are doing or were asked to do so.\n"
      "(WARNING: SLOWER!)\n\n"
 ))
 
@@ -85,11 +86,13 @@
 ))
 
 (set #all_versions
-(cat "Do you want to copy all %s driver versions next to the active one for later potential use?"
+(cat "Do you want to copy all %s driver versions next to the active one for "
+     "later potential use?"
 ))
 
 (set #all_versions_help
-(cat "\nAll available versions of the %s driver would be copied next to the activated one in case you want to switch later."
+(cat "\nAll available versions of the %s driver would be copied next to the "
+     "activated one in case you want to switch later."
 ))
 
 (set #yes
@@ -98,6 +101,77 @@
 
 (set #no
 (cat "No"
+))
+
+(set #what_components
+(cat "Please select what should be installed."
+))
+
+(set #what_components_help
+(cat "\nThis section lets you choose which parts of the AmiGUS software "
+     "package shall be installed. All of them should work independently "
+     "from each other.\n\n"
+))
+
+(set #component_ahi
+(cat "AHI driver"
+))
+
+(set #component_mhi
+(cat "MHI driver"
+))
+
+(set #component_mixer
+(cat "Mixer"
+))
+
+(set #component_flash
+(cat "FlashGUI"
+))
+
+(set #component_wav
+(cat "PlayWAV"
+))
+
+(set #component_mp3
+(cat "PlayMP3"
+))
+
+(set #component_midi
+(cat "PlayMIDI"
+))
+
+(set #component_record
+(cat "Record"
+))
+
+(set #component_debug
+(cat "Debug Tools"
+))
+
+(set #component_manual
+(cat "Manual"
+))
+
+(set #insert_manual_disk
+(cat "Insert disk \"AmiGUS Manual\" in any drive, please."
+))
+
+(set #insert_manual_disk_help
+(cat "\nThe AmiGUS AmigaGuide manual did not fit on the same disk, to install "
+     "it, you will need to insert the corresponding disk containing the "
+     "manual.\n\n"
+))
+
+(set #which_manual_target
+(cat "Where shall the AmiGUS AmigaGuide manual be installed?\n"
+))
+
+(set #which_manual_target_help
+(cat "\nThe AmiGUS AmigaGuide manual consists of the actual AmigaGuide file "
+     "and a folder with the embedded or linked images. You can choose the "
+     "location for both here.\n\n"
+     @askdir-help
 ))
 
 
@@ -112,64 +186,69 @@
 (cat "Die Treiber werden in die passenden Systemverzeichnisse installiert, "
      "LIBS:, DEVS:, etc..\n"
      "Auf welches Systemlaufwerk sollen die AmiGUS Treiber installiert "
-     "werden?\n\n"
+     "werden?\n"
 ))
 
 (set #which_drivers_target_help
-(cat "\nIn diesem Teil kÃ¶nnen Sie wÃ¤hlen, auf welche Laufwerk oder "
+(cat "\nIn diesem Teil können Sie wählen, auf welche Laufwerk oder "
      "in welches Verzeichnis die AmiGUS Treiber installiert werden sollen. "
      "Sie sollten normalerweise an dieselbe Stelle installiert werden "
      "wie die aktuelle Workbench, weil das ist, wo AHI und MHI sie "
-     "erwarten wÃ¼rden.\n\n"
+     "erwarten würden.\n\n"
      @askdir-help
 ))
 
 (set #which_tools_target
-(cat "Die AmiGUS Basiswerkzeuge kÃ¶nnen an einen beliebigen Ort installiert werden "
-     "- suchen Sie bitte ihren bevorzugten Ort aus.\n\n"
+(cat "Die AmiGUS Basiswerkzeuge können an einen beliebigen Ort installiert "
+     "werden - suchen Sie bitte ihren bevorzugten Ort aus.\n"
 ))
 
 (set #which_tools_target_help
-(cat "\nIn diesem Teil kÃ¶nnen Sie wÃ¤hlen, auf welche Laufwerk oder "
+(cat "\nIn diesem Teil können Sie wählen, auf welche Laufwerk oder "
      "Verzeichnis die AmiGUS Basiswerkzeuge installiert werden sollen. "
      "Der Ort ist dabei absolut beliebig. \n\n"
      @askdir-help
 ))
 
 (set #which_debug_target
-(cat "Die AmiGUS Debugwerkzeuge kÃ¶nnen an einen beliebigen Ort installiert werden "
-     "- suchen Sie bitte ihren bevorzugten Ort aus.\n"
-     "(Ein Verzeichnis \"debug\" wird dort angelegt.)\n\n"
+(cat "Die AmiGUS Debugwerkzeuge können an einen beliebigen Ort installiert "
+     "werden - suchen Sie bitte ihren bevorzugten Ort aus.\n"
+     "(Ein Verzeichnis \"debug\" wird dort angelegt.)\n"
 ))
 
 (set #which_debug_target_help
-(cat "\nIn diesem Teil kÃ¶nnen Sie wÃ¤hlen, auf welche Laufwerk oder "
+(cat "\nIn diesem Teil können Sie wählen, auf welche Laufwerk oder "
      "Verzeichnis die AmiGUS Debugwerkzeuge installiert werden sollen. "
      "Der Ort ist dabei absolut beliebig. \n\n"
      @askdir-help
 ))
 
 (set #which_cpu
-(cat "Bitte wÃ¤hlen Sie aus, welche CPU-optimierte Version des %s Treibers installiert werden soll.\n\n"
+(cat "Bitte wählen Sie aus, welche CPU-optimierte Version des %s Treibers "
+     "installiert werden soll.\n\n"
 ))
 
 (set #which_cpu_help
-(cat "\nIn diesem Teil kÃ¶nnen Sie wÃ¤hlen, fÃ¼r welche CPU die optimierte %s Treiberversion installiert werden soll. "
-     "Im Zweifelsfall wÃ¤hlen Sie bitte 68000. Sie verlieren mÃ¶glicherweise etwas Leistung, aber vermeiden AbstÃ¼rze. \n\n"
+(cat "\nIn diesem Teil können Sie wählen, für welche CPU die optimierte %s "
+     "Treiberversion installiert werden soll. Im Zweifelsfall wählen Sie "
+     "bitte 68000. Sie verlieren möglicherweise etwas Leistung, aber "
+     "vermeiden Abstürze. \n\n"
 ))
 
 (set #which_debug_driver
-(cat "MÃ¶chten Sie einen Treiber mit debug-Ausgabe verwenden? "
-     "Bitte wÃ¤hlen Sie diese nur, wenn Sie wissen, was sie tun oder darum gebeten wurden.\n"
+(cat "Möchten Sie einen Treiber mit debug-Ausgabe verwenden? "
+     "Bitte wählen Sie diese nur, wenn Sie wissen, was sie tun oder darum "
+     "gebeten wurden.\n"
      "(WARNUNG: LANGSAMER!)\n\n"
 ))
 
 (set #which_debug_driver_help
 (cat "\nDebugversionen produzieren log-Ausgaben mit verschiedenen Zielen, "
-     "den seriellen Port des Amiga, eine Datei, oder einfach einen Speicherbereich. "
-     "Alle diese Optionen sind langsamer als die Version ohne Logging, "
-     "kÃ¶nnen zufÃ¤llig abstÃ¼rzen oder die Festplatte beschÃ¤digen. "
-     "Bitte spielen Sie hier nicht herum, wenn sie unsicher sind, was das bedeutet.\n\n"
+     "den seriellen Port des Amiga, eine Datei, oder einfach einen "
+     "Speicherbereich. Alle diese Optionen sind langsamer als die Version "
+     "ohne Logging, können zufällig abstürzen oder die Festplatte "
+     "beschädigen. Bitte spielen Sie hier nicht herum, wenn sie unsicher "
+     "sind, was das bedeutet.\n\n"
      "Sie wurden gewarnt!"
 ))
 
@@ -190,12 +269,14 @@
 ))
 
 (set #all_versions
-(cat "MÃ¶chten Sie alle %s Treiber Versionen neben dem Aktiven ablegen, falls Sie ihn spÃ¤ter mal brauchen?"
+(cat "Möchten Sie alle %s Treiber Versionen neben dem Aktiven ablegen, falls "
+     "Sie ihn später mal brauchen?"
 ))
 
 (set #all_versions_help
-(cat "\nAlle verfÃ¼gbaren Versionen des %s Treibers wÃ¼rden neben dem Aktiven abgelegt werden, "
-     "um einen schnellen und einfachen Wechsel zwischen den Treibern zu ermÃ¶glichen. "
+(cat "\nAlle verfügbaren Versionen des %s Treibers würden neben dem Aktiven "
+     "abgelegt werden, um einen schnellen und einfachen Wechsel zwischen den "
+     "Treibern zu ermöglichen. "
 ))
 
 (set #yes
@@ -204,6 +285,77 @@
 
 (set #no
 (cat "Nein"
+))
+
+(set #what_components
+(cat "Bitte die zu installierenden Komponenten auswählen."
+))
+
+(set #what_components_help
+(cat "\nIn diesem Abschnitt können sie auswählen, welche Teile des AmiGUS "
+     "Softwarepakets installiert werden sollen. Alle Teile sollten unabhängig "
+     "voneinander funktionieren.\n\n"
+))
+
+(set #component_ahi
+(cat "AHI Treiber"
+))
+
+(set #component_mhi
+(cat "MHI Treiber"
+))
+
+(set #component_mixer
+(cat "Mixer"
+))
+
+(set #component_flash
+(cat "FlashGUI"
+))
+
+(set #component_wav
+(cat "PlayWAV"
+))
+
+(set #component_mp3
+(cat "PlayMP3"
+))
+
+(set #component_midi
+(cat "PlayMIDI"
+))
+
+(set #component_record
+(cat "Record"
+))
+
+(set #component_debug
+(cat "Debugwerkzeuge"
+))
+
+(set #component_manual
+(cat "Anleitung"
+))
+
+(set #insert_manual_disk
+(cat "Bitte die \"AmiGUS Manual\"-Diskette in ein Laufwerk einlegen."
+))
+
+(set #insert_manual_disk_help
+(cat "\nDie AmiGUS AmigaGuide-Anleitung passt nicht auf die Toolsdiskette. "
+     "Um sie zu installieren, müssen Sie die entsprechende Diskette einlegen. "
+     "\n\n"
+))
+
+(set #which_manual_target
+(cat "Wo soll das AmiGUS AmigaGuide Handbuch installiert werden?\n"
+))
+
+(set #which_manual_target_help
+(cat "\nDas AmiGUS AmigaGuide Handbuch besteht aus der eigentlichen "
+     "AmigaGuide-Datei und einem Verzeichnis mit den eingebetteten oder "
+     "verlinkten Bildern. Hier können Sie den Ort für beides auswählen.\n\n"
+     @askdir-help
 ))
 
 ))
@@ -256,7 +408,7 @@
     (set install_driver_all
       (askbool
         (prompt (#all_versions driver_name))
-        (help #all_versions_help)
+        (help (#all_versions_help driver_name))
         (choices #yes #no)
         (default install_driver_all)
       )
@@ -274,20 +426,23 @@
 
 (onerror (TERMINATE))
 
-(set what (askoptions (prompt "Please select what should be installed.")
-                               (help "my help")
-                               (choices "AHI driver"
-                                        "MHI driver"
-                                        "Mixer"
-                                        "FlashGUI"
-                                        "PlayWAV"
-                                        "PlayMP3"
-                                        "PlayMIDI"
-                                        "Record"
-                                        "Debug Tools"
-                                        "Manual")
-                               (default %1110111111)
-                               ))
+(set what
+  (askoptions 
+    (prompt #what_components)
+    (help #what_components_help)
+    (choices #component_ahi
+             #component_mhi
+             #component_mixer
+             #component_flash
+             #component_wav
+             #component_mp3
+             #component_midi
+             #component_record 
+             #component_debug
+             #component_manual )
+    (default %1110111111)
+  )
+)
 
 (if
   (BITAND what %0000000011)
@@ -506,8 +661,8 @@
       (set source_folder "Manual")
       (
         (askdisk
-          (prompt "Insert disk AmiGUS Manual in any drive")
-          (help "asdf")
+          (prompt #insert_manual_disk)
+          (help #insert_manual_disk_help)
           (dest "AmiGUS-Manual")
           (assigns)
         )

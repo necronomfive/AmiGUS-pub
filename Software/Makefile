@@ -69,7 +69,7 @@ release: all
 	cp Installer/program.info                   $(MHI_DIR)/MHIplay.info
 	cp Drivers/MHI/target/*.library*            $(MHI_DIR)
 
-	LATEST_FW=`find ../FPGA/Releases/Amiga/ | sort | tail -n 1` ;\
+	LATEST_FW=`find ../FPGA/Releases/Amiga/ | grep "\.upd" | sort | tail -n 1` ;\
 	BASENAME_FW=`basename $$LATEST_FW`                          ;\
 	cp $$LATEST_FW                              $(FW_DIR)       ;\
 	cp Installer/fw.info                        $(FW_DIR)/$$BASENAME_FW.info

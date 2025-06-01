@@ -200,7 +200,7 @@ int main(int argc,char **argv)
 	BPTR	lock;
 		
 	
-	SetTaskPri(FindTask(NULL),25);
+	SetTaskPri(FindTask(NULL),60);
 	
     printf("\n========================\n AmiGUS MP3 Player V0.4 \n(C)2025 by Oliver Achten\n========================\n\n");
 
@@ -298,7 +298,7 @@ int main(int argc,char **argv)
                          MEMF_PUBLIC|MEMF_CLEAR))
     {
 		fifoint->is_Node.ln_Type = NT_INTERRUPT;
-        fifoint->is_Node.ln_Pri = -60;
+        fifoint->is_Node.ln_Pri = 100;
         fifoint->is_Node.ln_Name = "AmiGUS-Main-Int";
         fifoint->is_Data = (APTR)intdata;
         fifoint->is_Code = intServer;
@@ -338,7 +338,6 @@ int main(int argc,char **argv)
 			if (Examine(lock, fib))
 			{
 				filesize = fib->fib_Size;
-				printf("size:%d",filesize);
 				FreeMem(fib,sizeof(struct FileInfoBlock));							
 			}
 			else

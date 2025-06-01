@@ -198,7 +198,7 @@ int main(int argc,char **argv)
 	ULONG 	WaitMask;
 	BPTR	lock;
 	
-	SetTaskPri(FindTask(NULL),30);
+	SetTaskPri(FindTask(NULL),60);
 	
     printf("\n==========================\n  AmiGUS WAV Player V0.6 \n (C)2025 by Oliver Achten \n==========================\n\n");
 	
@@ -453,7 +453,6 @@ int main(int argc,char **argv)
 			if (Examine(lock, fib))
 			{
 				filesize = fib->fib_Size;
-				printf("size:%d",filesize);
 				FreeMem(fib,sizeof(struct FileInfoBlock));							
 			}
 			else

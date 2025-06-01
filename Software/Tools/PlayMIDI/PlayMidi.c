@@ -316,6 +316,14 @@ int main(int argc,char **argv)
 		
 	UBYTE	board_product_id;
 	UWORD	board_manufacturer_id;
+	ULONG	board_serial_id;
+	
+	UWORD	fpga_date_minute;
+	UWORD	fpga_date_hour;
+	UWORD	fpga_date_day;
+	UWORD	fpga_date_month;
+	UWORD	fpga_date_year;	
+	
 	UWORD	control_word;
 	APTR	board_base,memory;
 	BPTR 	filehandle;
@@ -338,9 +346,11 @@ int main(int argc,char **argv)
 	ULONG midiVel;
 	UWORD playvoice;
 	
+	BPTR lock;
+	
 	BOOL	board_found = FALSE;
 	
-    printf("\n=========================\n AmiGUS MIDI Player V0.31 \n(C) 2025 by Oliver Achten\n=========================\n\n");
+    printf("\n=========================\n AmiGUS MIDI Player V0.4 \n(C) 2025 by Oliver Achten\n=========================\n\n");
 
 	if (argc < 2)
 	{
@@ -359,9 +369,9 @@ int main(int argc,char **argv)
 	
 	/* ================ Open libraries ================ */
 
-	if((SysBase=OpenLibrary("exec.library",36L))==NULL)
+	if((SysBase=OpenLibrary("exec.library",0L))==NULL)
 	{
-		printf("ERROR: this tool needs Kickstart 2.0 or higher\n\n");
+		printf("ERROR: something is really screwed here\n\n");
 		return 0;
 	}
 	
@@ -385,10 +395,17 @@ int main(int argc,char **argv)
 	{
 		board_manufacturer_id = myCD->cd_Rom.er_Manufacturer;
 		board_product_id = myCD->cd_Rom.er_Product;
+		board_serial_id = myCD->cd_Rom.er_SerialNumber;
 		board_base = myCD->cd_BoardAddr;
 		if (board_manufacturer_id == AMIGUS_MANUFACTURER_ID && board_product_id == AMIGUS_HAGEN_PRODUCT_ID)
 		{
 			board_found = TRUE;
+			
+			fpga_date_minute = (UWORD)(board_serial_id & (ULONG)0x3f);
+			fpga_date_hour = (UWORD)((board_serial_id & (ULONG)0x7c0)>>6);
+			fpga_date_day = (UWORD)((board_serial_id & (ULONG)0xf800)>>11);
+			fpga_date_month = (UWORD)((board_serial_id & (ULONG)0xf0000)>>16);
+			fpga_date_year = (UWORD)((board_serial_id & (ULONG)0xfff00000)>>20);
 			break;
 		}
 	}
@@ -397,7 +414,8 @@ int main(int argc,char **argv)
 	
 	if (board_found == TRUE)
 	{
-		printf("AmiGUS found at $%lx\n",board_base);
+		printf("AmiGUS (Wave) found at $%lx\n",board_base);
+		printf("FPGA Date: %4d-%02d-%02d, %02d:%02d\n\n",fpga_date_year,fpga_date_month,fpga_date_day,fpga_date_hour,fpga_date_minute);		
 	}
 	else
 	{
@@ -407,33 +425,39 @@ int main(int argc,char **argv)
 
  
 	/* ================ Open Sample File ================ */
-	
-    fib = AllocDosObject(DOS_FIB, NULL);
-    if (!fib)
-    {
-        printf("ERROR: can't open file resources\n");
+
+	filesize = 0;
+					
+	if (lock = Lock(argv[1], ACCESS_READ))
+	{
+		if (((fib = (struct FileInfoBlock*)AllocMem((ULONG)sizeof(struct FileInfoBlock),(ULONG)MEMF_ANY))))
+		{
+			if (Examine(lock, fib))
+			{
+				filesize = fib->fib_Size;
+				FreeMem(fib,sizeof(struct FileInfoBlock));							
+			}
+			else
+			{			
+				printf("ERROR: access file/n");
+				CloseLibrary(DOSBase);
+				return 0;
+			}
+		}
+		UnLock(lock);
+	}
+	else
+	{
+		printf("ERROR: access file/n");
 		CloseLibrary(DOSBase);
-        return 0;
-    }		
+		return 0;		
+	}
 
 	printf("Loading sample file '%s'....\n",argv[1]);
 	printf("\n");	
 	
     if (filehandle = Open(argv[1],MODE_OLDFILE))
     {
-        if (!ExamineFH(filehandle,fib))
-        {
-            printf("ERROR: can't open file resources");
-
-			FreeDosObject(DOS_FIB,fib);
-			
-			Close(filehandle);
-			CloseLibrary(DOSBase);
-            return 0;
-        }
-		
-        filesize = fib->fib_Size;
-        FreeDosObject(DOS_FIB,fib);
         read_data = 0;
 
 		if (filesize != 0)

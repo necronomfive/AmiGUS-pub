@@ -233,7 +233,7 @@ int main(int argc,char **argv)
 	
 	SetTaskPri(FindTask(NULL),30);
 	
-    printf("\n==========================\n   AmiGUS Recorder V0.2\n (C)2025 by Oliver Achten \n==========================\n\n");
+    printf("\n==========================\n   AmiGUS Recorder V0.3\n (C)2025 by Oliver Achten \n==========================\n\n");
 	
 	
 	smpl_fmt = REC_FMT_16BIT|REC_FMT_LITTLE_END;		// Set format		
@@ -379,9 +379,9 @@ int main(int argc,char **argv)
 	
 	/* ================ Open libraries ================ */
 
-	if((SysBase=OpenLibrary("exec.library",36L))==NULL)
+	if((SysBase=OpenLibrary("exec.library",0L))==NULL)
 	{
-		printf("ERROR: this tool needs Kickstart 2.0 or higher\n\n");
+		printf("ERROR: somethings is really screwed here\n\n");
 		return 0;
 	}
 	
@@ -482,9 +482,7 @@ int main(int argc,char **argv)
 		
         return 0;		
 	}
-	
-
-	
+		
 	/* ================ Open & Stream WAV File ================ */
 	    
 	if (memory = AllocMem(MEM_SIZE,MEMF_ANY)){}
@@ -498,44 +496,11 @@ int main(int argc,char **argv)
 		
         return 0;
     }
-	
-    fib = AllocDosObject(DOS_FIB, NULL);
-    if (!fib)
-    {
-        printf("ERROR: can't open file resources\n");
-		CloseLibrary(DOSBase);
-		FreeMem(intdata,sizeof(struct IntData));
-		FreeMem(fifoint, sizeof(struct Interrupt));			
-		FreeMem(memory,MEM_SIZE);
-		FreeSignal(signr);
 		
-        return 0;
-    }		
-	
 	initAmiGUS(board_base);
 
     if (filehandle = Open(argv[1],MODE_NEWFILE))
-    {
-        if (!ExamineFH(filehandle,fib))
-        {
-            printf("ERROR: can't open file resources");
-
-			FreeDosObject(DOS_FIB,fib);
-			
-			Close(filehandle);
-			CloseLibrary(DOSBase);
-			shutdownAmiGUS(board_base);
-			RemIntServer(INTB_PORTS, fifoint);							
-			FreeMem(memory,MEM_SIZE);
-			FreeMem(intdata,sizeof(struct IntData));
-			FreeMem(fifoint, sizeof(struct Interrupt));	
-			FreeSignal(signr);
-			
-            return 0;
-        }
-		
-        FreeDosObject(DOS_FIB,fib);
-		
+    {		
 		printf("Recording WAV file '%s'....",argv[1]);
 		printf("\nPress CTRL-C to abort. \n");
 		printf("   \n");		

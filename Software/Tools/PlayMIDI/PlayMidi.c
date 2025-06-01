@@ -302,6 +302,7 @@ void hagenPlayNote(APTR base, UWORD chNr, UWORD midNote, UWORD midVel, UWORD ctr
 	WriteReg16(base,HAGEN_VOICE_CTRL,ctrl);		// Trigger voice
 }
 
+
 /* Main Program */
 
 int main(int argc,char **argv)
@@ -513,7 +514,7 @@ int main(int argc,char **argv)
 	CloseLibrary(DOSBase);
 
 	/* Create the message port */
-	if (SerialMP=CreateMsgPort())
+	if (SerialMP=CreatePort("Serial",10))
 		{
 		/* Create the IORequest */
 		if (SerialIO = (struct IOExtSer *)
@@ -613,7 +614,7 @@ int main(int argc,char **argv)
 			printf("Error: Could create IORequest\n");
 
 		/* Delete the message port */
-		DeleteMsgPort(SerialMP);
+		DeletePort(SerialMP);
 		}
 	else
 		/* Inform user that the message port could not be created */

@@ -196,10 +196,11 @@ int main(int argc,char **argv)
 	
 	ULONG 	Temp;
 	ULONG 	WaitMask;
+	BPTR	lock;
 	
 	SetTaskPri(FindTask(NULL),30);
 	
-    printf("\n==========================\n  AmiGUS WAV Player V0.52 \n (C)2025 by Oliver Achten \n==========================\n\n");
+    printf("\n==========================\n  AmiGUS WAV Player V0.6 \n (C)2025 by Oliver Achten \n==========================\n\n");
 	
 	sample_fmt = SMPL_FMT_LITTLE_ENDIAN|SMPL_FMT_STEREO_16BIT;
 	sample_rate = SMPL_RATE_44100;
@@ -443,43 +444,46 @@ int main(int argc,char **argv)
         return 0;
     }
 	
-    fib = AllocDosObject(DOS_FIB, NULL);
-    if (!fib)
-    {
-        printf("ERROR: can't open file resources\n");
+	filesize = 0;
+					
+	if (lock = Lock(argv[1], ACCESS_READ))
+	{
+		if (((fib = (struct FileInfoBlock*)AllocMem((ULONG)sizeof(struct FileInfoBlock),(ULONG)MEMF_ANY))))
+		{
+			if (Examine(lock, fib))
+			{
+				filesize = fib->fib_Size;
+				printf("size:%d",filesize);
+				FreeMem(fib,sizeof(struct FileInfoBlock));							
+			}
+			else
+			{			
+				printf("ERROR: access file/n");
+				CloseLibrary(DOSBase);
+				RemIntServer(INTB_PORTS, fifoint);		
+				FreeMem(intdata,sizeof(struct IntData));
+				FreeMem(fifoint, sizeof(struct Interrupt));			
+				FreeMem(memory,MEM_SIZE);
+				return 0;
+			}
+		}
+		UnLock(lock);
+	}
+	else
+	{
+		printf("ERROR: access file/n");
 		CloseLibrary(DOSBase);
+		RemIntServer(INTB_PORTS, fifoint);		
 		FreeMem(intdata,sizeof(struct IntData));
 		FreeMem(fifoint, sizeof(struct Interrupt));			
 		FreeMem(memory,MEM_SIZE);
-		FreeSignal(signr);
-		
-        return 0;
-    }		
-	
+		return 0;		
+	}	
+
 	initAmiGUS(board_base);
 
     if (filehandle = Open(argv[1],MODE_OLDFILE))
     {
-        if (!ExamineFH(filehandle,fib))
-        {
-            printf("ERROR: can't open file resources");
-
-			FreeDosObject(DOS_FIB,fib);
-			
-			Close(filehandle);
-			CloseLibrary(DOSBase);
-			shutdownAmiGUS(board_base);
-			RemIntServer(INTB_PORTS, fifoint);							
-			FreeMem(memory,MEM_SIZE);
-			FreeMem(intdata,sizeof(struct IntData));
-			FreeMem(fifoint, sizeof(struct Interrupt));	
-			FreeSignal(signr);
-			
-            return 0;
-        }
-		
-        filesize = fib->fib_Size;
-        FreeDosObject(DOS_FIB,fib);
         read_data = 0;
 
 		if (filesize != 0)

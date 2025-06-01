@@ -187,6 +187,7 @@ int main(int argc,char **argv)
 	
 	APTR	board_base,memory,read_ptr;
 	BPTR 	filehandle;
+	BPTR 	file;
 	BYTE	signr;
 	
     long 	filesize,read_data;
@@ -196,10 +197,12 @@ int main(int argc,char **argv)
 
 	ULONG 	Temp;
 	ULONG 	WaitMask;
+	BPTR	lock;
+		
 	
 	SetTaskPri(FindTask(NULL),25);
 	
-    printf("\n========================\n AmiGUS MP3 Player V0.32 \n(C)2024 by Oliver Achten\n========================\n\n");
+    printf("\n========================\n AmiGUS MP3 Player V0.4 \n(C)2025 by Oliver Achten\n========================\n\n");
 
 	if (argc != 2)
 	{
@@ -209,22 +212,22 @@ int main(int argc,char **argv)
 	
 	/* ================ Open libraries ================ */
 
-	if((SysBase=OpenLibrary("exec.library",36L))==NULL)
+	if((SysBase=OpenLibrary("exec.library",0L))==NULL)
 	{
-		printf("ERROR: this tool needs Kickstart 2.0 or higher\n\n");
+		printf("ERROR: can't open 'expansion.library'\n\n");
 		return 0;
 	}
 	
 	if((ExpansionBase=OpenLibrary("expansion.library",0L))==NULL)
 	{
-        printf("ERROR: can't open 'expansion.library'\n");
+        printf("ERROR: can't open 'expansion.library'\n\n");
         return 0;
 	}
 	
 	if((DOSBase=OpenLibrary("dos.library",0L))==NULL)
     {
 		CloseLibrary(DOSBase);		
-        printf("ERROR: can't open 'dos.library'");
+        printf("ERROR: can't open 'dos.library'\n\n");
         return 0;
     }
 	
@@ -326,40 +329,46 @@ int main(int argc,char **argv)
         return 0;
     }
 	
-    fib = AllocDosObject(DOS_FIB, NULL);
-    if (!fib)
-    {
-        printf("ERROR: can't open file resources\n");
+	filesize = 0;
+					
+	if (lock = Lock(argv[1], ACCESS_READ))
+	{
+		if (((fib = (struct FileInfoBlock*)AllocMem((ULONG)sizeof(struct FileInfoBlock),(ULONG)MEMF_ANY))))
+		{
+			if (Examine(lock, fib))
+			{
+				filesize = fib->fib_Size;
+				printf("size:%d",filesize);
+				FreeMem(fib,sizeof(struct FileInfoBlock));							
+			}
+			else
+			{			
+				printf("ERROR: access file/n");
+				CloseLibrary(DOSBase);
+				RemIntServer(INTB_PORTS, fifoint);		
+				FreeMem(intdata,sizeof(struct IntData));
+				FreeMem(fifoint, sizeof(struct Interrupt));			
+				FreeMem(memory,MEM_SIZE);
+				return 0;
+			}
+		}
+		UnLock(lock);
+	}
+	else
+	{
+		printf("ERROR: access file/n");
 		CloseLibrary(DOSBase);
+		RemIntServer(INTB_PORTS, fifoint);		
 		FreeMem(intdata,sizeof(struct IntData));
 		FreeMem(fifoint, sizeof(struct Interrupt));			
-		FreeMem(memory,MEM_SIZE);	
-        return 0;
-    }		
-	
+		FreeMem(memory,MEM_SIZE);
+		return 0;		
+	}
+
 	initAmiGUS(board_base);
 	
     if (filehandle = Open(argv[1],MODE_OLDFILE))
     {
-        if (!ExamineFH(filehandle,fib))
-        {
-            printf("ERROR: can't open file resources");
-
-			FreeDosObject(DOS_FIB,fib);
-			
-			Close(filehandle);
-			CloseLibrary(DOSBase);
-			shutdownAmiGUS(board_base);
-			RemIntServer(INTB_PORTS, fifoint);							
-			FreeMem(memory,MEM_SIZE);
-			FreeMem(intdata,sizeof(struct IntData));
-			FreeMem(fifoint, sizeof(struct Interrupt));	
-			
-            return 0;
-        }
-		
-        filesize = fib->fib_Size;
-        FreeDosObject(DOS_FIB,fib);
         read_data = 0;
 
 		if (filesize != 0)

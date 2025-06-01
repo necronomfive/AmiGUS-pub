@@ -1,7 +1,10 @@
 Next:
-- Write missing comments and ReadMe.mds
-- Decide on debug + cpu variants
+- Merge MHI base library back to AHI
+- Merge MHI debug code back to AHI
+- Test AHI, especially mem logging
+- Build 64kHz mode into AHI
 - Create Install disk script
+- Write missing comments and ReadMe.mds
 - Switch to AmiGUS ints instead AHI timing
 - Unify recording and playback buffer sizing 
   (as the buffer sizing can then be steered)
@@ -31,3 +34,4 @@ Done:
 - AHI/MHI: move reservation of expansion device from driver loading to alloc/dealloc
 - Move MHI interrupt.c::HandlePlayback() back to interrupt and create a buffer.c::getNextLong(), adapt tests
 - Left/right swapped in stereo 8bit vs 16bit + 24bit
+- Decide on debug + cpu variants

@@ -43,7 +43,7 @@
 
 #include "copies.h"
 #include "library.h"
-#include "SDI_ahi_sub.h"
+#include "SDI_ahi_sub_protos.h"
 
 #define AMIGUS_AHI_AUTHOR           "Christoph `Chritoph` Fassbach"
 #define AMIGUS_AHI_COPYRIGHT        "(c) 2024 Christoph Fassbach / LGPL3"
@@ -57,9 +57,14 @@
                                     + (   22 <<  6 ) /* hour   */ \
                                     + (   38 <<  0 ) /* minute */ )
 
-#define AMIGUS_MEM_LOG_MARKER        "********************************"   \
-                                     " AmiGUS "                           \
-                                     "********************************\n"
+/*
+ * If logging to memory is activated, this is used to mark the start
+ * of the log memory. And as 1 pointer to this marker, 1 pointer to the
+ * library file name and 1 more pointer to the marker are used, the full
+ * start marker is not even in the library, no need to unload the library
+ * so even with library in memory it should unique in memory.
+ */
+#define AMIGUS_MEM_LOG_BORDERS      "********************************"
 
 /******************************************************************************
  * Library base structure components
@@ -102,7 +107,7 @@ struct AmiGUSPcmRecording {
 
 /* This is the private structure. The official one does not contain all
 the private fields! */
-struct AmiGUSBase {
+struct AmiGUS_AHI_Base {
   /* Library base stuff */
   struct BaseLibrary            agb_BaseLibrary;
 
@@ -142,7 +147,7 @@ struct AmiGUSBase {
 };
 
 #if defined(BASE_GLOBAL)
-  extern struct AmiGUSBase        * AmiGUSBase;
+  extern struct AmiGUS_AHI_Base   * AmiGUS_AHI_Base;
   extern struct DosLibrary        * DOSBase;
   extern struct Library           * ExpansionBase;
   extern struct IntuitionBase     * IntuitionBase;
@@ -150,13 +155,13 @@ struct AmiGUSBase {
   extern struct Device            * TimerBase;
   extern struct Library           * UtilityBase;
 #elif defined(BASE_REDEFINE)
-  #define AmiGUSBase                (amiGUSBase)
-  #define DOSBase                   amiGUSBase->agb_DOSBase
-  #define ExpansionBase             amiGUSBase->agb_ExpansionBase
-  #define IntuitionBase             amiGUSBase->agb_IntuitionBase
-  #define SysBase                   amiGUSBase->agb_SysBase
-  #define TimerBase                 amiGUSBase->TimerBase
-  #define UtilityBase               amiGUSBase->agb_UtilityBase
+  #define AmiGUS_AHI_Base           (base)
+  #define DOSBase                   base->agb_DOSBase
+  #define ExpansionBase             base->agb_ExpansionBase
+  #define IntuitionBase             base->agb_IntuitionBase
+  #define SysBase                   base->agb_SysBase
+  #define TimerBase                 base->TimerBase
+  #define UtilityBase               base->agb_UtilityBase
 #endif
 
 /******************************************************************************

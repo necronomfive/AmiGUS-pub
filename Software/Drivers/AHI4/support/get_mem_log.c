@@ -1,17 +1,17 @@
 /*
- * This file is part of the mhiamigus.library.
+ * This file is part of the AmiGUS.audio driver.
  *
- * mhiamigus.library is free software: you can redistribute it and/or modify
+ * AmiGUS.audio driver is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiamigus.library is distributed in the hope that it will be useful,
+ * AmiGUS.audio driver is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiamigus.library.
+ * along with AmiGUS.audio driver.
  *
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,7 +30,7 @@
 #include <proto/dos.h>
 #include <proto/exec.h>
 
-#include "amigus_mhi.h"
+#include "amigus_ahi_sub.h"
 
 BOOL CheckStartAddress( LONG address ) {
 
@@ -90,7 +90,7 @@ VOID WriteMemoryLog( LONG startAddress, STRPTR filename ) {
 
 int main( int argc, char const *argv[] ) {
 
-  STRPTR filename = "ram:MhiMemLog.txt";
+  STRPTR filename = "ram:AhiMemLog.txt";
   LONG startAddress = 0;
   BOOL found = FALSE;
   ULONG i;
@@ -131,7 +131,7 @@ int main( int argc, char const *argv[] ) {
       UBYTE buffer[ 64 ];
 
       printf( "Checking for settings first...\n" );
-      i = GetVar( "AmiGUS-MHI-LOG-ADDRESS", buffer, sizeof( buffer ), 0 );  
+      i = GetVar( "AmiGUS-AHI-LOG-ADDRESS", buffer, sizeof( buffer ), 0 );  
       if ( i > 0 ) {
   
         StrToLong( buffer, ( LONG * ) &startAddress );

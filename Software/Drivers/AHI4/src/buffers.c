@@ -117,7 +117,7 @@ UWORD getBufferSamples(
 
 ULONG getRecordingBufferSize( LONG sampleRate ) {
 
-  UBYTE modeOffset = AmiGUSBase->agb_AhiModeOffset;
+  UBYTE modeOffset = AmiGUS_AHI_Base->agb_AhiModeOffset;
   struct RecordingProperties * mode = &RecordingPropertiesById[ modeOffset ];
   const LONG recordingDivisor = RECORDING_BUFFER_DIVISOR;
   const UBYTE shift = mode->rp_AhiSampleShift;
@@ -143,7 +143,7 @@ ULONG getRecordingBufferSize( LONG sampleRate ) {
 // TRUE = failure
 BOOL CreatePlaybackBuffers( ULONG bufferSize ) {
 
-  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
+  struct AmiGUSPcmPlayback * playback = &AmiGUS_AHI_Base->agb_Playback;
   const LONG longSize = bufferSize >> 2; /* Buffers are ticking in LONGs! */
 
   if ( playback->agpp_Buffer[0] ) {
@@ -185,7 +185,7 @@ BOOL CreatePlaybackBuffers( ULONG bufferSize ) {
 
 VOID DestroyPlaybackBuffers( VOID ) {
 
-  struct AmiGUSPcmPlayback * playback = &AmiGUSBase->agb_Playback;
+  struct AmiGUSPcmPlayback * playback = &AmiGUS_AHI_Base->agb_Playback;
 
   if ( playback->agpp_Buffer[0] ) {
 
@@ -206,8 +206,9 @@ VOID DestroyPlaybackBuffers( VOID ) {
 
 BOOL CreateRecordingBuffers( VOID ) {
 
-  struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
-  const LONG sampleRate = AmiGUSSampleRates[ AmiGUSBase->agb_HwSampleRateId ];
+  struct AmiGUSPcmRecording * recording = &AmiGUS_AHI_Base->agb_Recording;
+  const LONG sampleRate =
+    AmiGUSSampleRates[ AmiGUS_AHI_Base->agb_HwSampleRateId ];
   ULONG byteSize;
   
   if ( recording->agpr_Buffer[0] ) {
@@ -250,7 +251,7 @@ BOOL CreateRecordingBuffers( VOID ) {
 
 VOID DestroyRecordingBuffers( VOID ) {
 
-  struct AmiGUSPcmRecording * recording = &AmiGUSBase->agb_Recording;
+  struct AmiGUSPcmRecording * recording = &AmiGUS_AHI_Base->agb_Recording;
 
   if ( recording->agpr_Buffer[0] ) {
 
@@ -271,7 +272,7 @@ VOID DestroyRecordingBuffers( VOID ) {
 
 ULONG AlignByteSizeForSamples( ULONG ahiBufferSamples ) {
 
-  UBYTE modeOffset = AmiGUSBase->agb_AhiModeOffset;
+  UBYTE modeOffset = AmiGUS_AHI_Base->agb_AhiModeOffset;
   struct PlaybackProperties * mode = &PlaybackPropertiesById[ modeOffset ];
   const ULONG mask = mode->pp_AhiBufferMask;
   const UBYTE shift = mode->pp_AhiSampleShift;

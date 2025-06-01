@@ -102,7 +102,7 @@ VOID DisplayError( ULONG aError ) {
 
     req.es_StructSize = sizeof( struct EasyStruct );
     req.es_Flags = 0;
-    req.es_Title = LIBRARY_NAME;
+    req.es_Title = STR( LIB_FILE );
     req.es_TextFormat = "Error %ld : %s";
     req.es_GadgetFormat = errors[ i ].iButton;
 

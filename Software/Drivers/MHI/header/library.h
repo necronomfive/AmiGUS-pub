@@ -74,7 +74,7 @@ LIBRARY_TYPE;
 #define STR(x)            STR_VALUE(x)
 
 #define LIBRARY_NAME      LIB_FILE
-#define LIBRARY_VERSI0N   LIB_VERSION
+#define LIBRARY_VERSION   LIB_VERSION
 #define LIBRARY_REVISION  LIB_REVISION
 #define LIBRARY_IDSTRING  STR( LIB_FILE )" "                         \
                           STR( LIB_VERSION )".00"STR( LIB_REVISION ) \

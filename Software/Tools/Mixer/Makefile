@@ -42,20 +42,24 @@ else
   LHA           = lha
 endif
 
-TARGET          = Mixer
+TARGET0         = Mixer
+TARGET1         = Mixer13
 FOLDER          = Mixer
 
 .PHONY: clean release release0 release01
 
-all: $(TARGET)
+all: $(TARGET0) $(TARGET1)
 
 clean:
-	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET) $(RM_SUFFIX)
+	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET0) $(TARGET1) $(RM_SUFFIX)
 
-$(TARGET):
-	$(RUNNER) sc $(TARGET).c asmroutines.a incdir=include: cpu=68000 MATH=standard link
+$(TARGET0):
+	$(RUNNER) sc $(TARGET0).c asmroutines.a incdir=include: cpu=68000 MATH=standard link
 
-release: $(TARGET) release0$(LINUX)
+$(TARGET1):
+	$(RUNNER) sc $(TARGET1).c asmroutines.a incdir=include: cpu=68000 MATH=standard link
+
+release: $(TARGET0) release0$(LINUX)
 
 # Amiga Version:
 release0:
@@ -66,5 +70,5 @@ release01:
 	cd ..                                                       ; \
 	FILES=`find $(FOLDER) -maxdepth 1 -type f`                  ; \
 	$(LHA) a \
-		$(FOLDER)/Release/$(TARGET)_`date +%y%m%d`.lha \
+		$(FOLDER)/Release/$(TARGET0)_`date +%y%m%d`.lha \
 		$$FILES

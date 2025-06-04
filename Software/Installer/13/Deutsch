@@ -18,27 +18,30 @@ RESIDENT C:EDIT
 
 ASSIGN AmiGUS-13-SRC: ""
 
-ECHO "Welcome to the AmiGUS OS 1.3 install script."
+ECHO "Wilkommen beim AmiGUS OS 1.3 Installationsskript."
 ECHO ""
-ECHO "If you want to abort, please press CTRL-C at any point."
-ECHO "If anything is unclear, please refer to the ReadMeFirst.txt"
-ECHO "or check the manual."
+ECHO "Wenn Sie die Installation abbrechen wollen, drücken Sie bitte "
+ECHO "wiederholt CTRL-C. Falls etwas unklar ist, lesen Sie bitte zunächst"
+ECHO "die ReadMeFirst.txt gefolgt von dem Handbuch."
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
-ECHO "|                      Base tools installation                      |"
+ECHO "|                    Basiswerkzeuginstallation                      |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""
-ASK "Do you want to install the AmiGUS base tools? (y/N)"
+ASK "Möchten Sie die AmiGUS Basiswerkzeuge installieren? (y/N)"
 
 IF WARN
-  ECHO "The default installation path for the AmiGUS base tools is:"
+  ECHO "Das Standardinstallationsverzeichnis der AmiGUS Basiswerkzeuge ist:"
   ECHO "*e[33mSYS:Expansion/AmiGUS*e[31m"
-  ECHO "However, this may cause issues with ... very well written software."
+  ECHO "Allerdings kann es Probleme mit ... sehr gut ... programmierten"
+  ECHO "Treibern und Software verursachen, dort weitere Dinge zu"
+  ECHO "installieren."
   ECHO ""
-  ASK "Do you want to adapt the path before installing (y/N)?"
+  ASK "Möchten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
  
   IF WARN
-    ECHO "Enter your desired installation path and push Return:"
+    ECHO "Bitte geben Sie ihr gewünschtes Installationsverzeichnis ein"
+    ECHO "und drücken Sie die Eingabetaste:"
     SETENV >NIL: TOOLSPATH ?
   ELSE
     SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS"
@@ -73,20 +76,24 @@ ENDIF
 
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
-ECHO "|                     Debug tools installation                      |"
+ECHO "|                     Debugwerkzeuginstallation                     |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""
-ASK "Do you want to install the AmiGUS debug tools? (y/N)"
+ASK "Möchten Sie die AmiGUS Debugwerkzeuge installieren? (y/N)"
 
 IF WARN
-  ECHO "The default installation path for the AmiGUS debug tools is:"
+  ECHO "Das Standardinstallationsverzeichnis für die AmiGUS Debugwerkzeuge"
+  ECHO "ist:"
   ECHO "*e[33mSYS:Expansion/AmiGUS/debug*e[31m"
-  ECHO "However, this may cause issues with ... very well written software."
+  ECHO "Allerdings kann es Probleme mit ... sehr gut ... programmierten"
+  ECHO "Treibern und Software verursachen, dort weitere Dinge zu"
+  ECHO "installieren."
   ECHO ""
-  ASK "Do you want to adapt the path before installing (y/N)?"
+  ASK "Möchten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
  
   IF WARN
-    ECHO "Enter your desired installation path and push Return:"
+    ECHO "Bitte geben Sie ihr gewünschtes Installationsverzeichnis ein"
+    ECHO "und drücken Sie die Eingabetaste:"
     SETENV >NIL: TOOLSPATH ?
   ELSE
     SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS/debug"
@@ -123,60 +130,62 @@ ENDIF
 
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
-ECHO "|                      MHI driver installation                      |"
+ECHO "|                      MHI-Treiberinstallation                      |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""
-ECHO "OS 1.3 is a bit ... picky ... about loading libraries."
-ECHO "To make MHI work reliably, the MHI driver needs "
-ECHO "to be installed to the default library location - LIBS:."
+ECHO "OS 1.3 ist etwas ... wählerisch ... wenn es um das Laden von"
+ECHO "Bibliotheken geht."
+ECHO "Um MHI zuverlässig zum Funktionieren zu bewegen, sollte der MHI-"
+ECHO "Treiber an den Standardort für Bibliotheken installiert"
+ECHO "werden - LIBS:."
 ECHO ""
-ASK "Do you want to install mhiamigus.library to LIBS:? (y/N)"
+ASK "Möchten Sie mhiamigus.library nach LIBS: installieren? (y/N)"
 
 IF WARN
-  ECHO "Which MHI driver do you want to install?"
+  ECHO "Welchen MHI-Treiber möchten Sie installieren?"
   ECHO ""
-  ECHO "1) 68000, RELEASE version, no logging, RECOMMENDED!!!"
-  ECHO "2) 68000, DEBUG version, serial logging"
-  ECHO "3) 68000, DEBUG version, file logging"
-  ECHO "4) 68000, DEBUG version, memory logging"
-  ECHO "5) 68020, RELEASE version, no logging, use this if on 68020+"
-  ECHO "6) 68020, DEBUG version, serial logging"
-  ECHO "7) 68020, DEBUG version, file logging"
-  ECHO "8) 68020, DEBUG version, memory logging"
+  ECHO "1) 68000, RELEASE-Version, kein Logging, EMPFOHLEN!!!"
+  ECHO "2) 68000, DEBUG-Version, serielles Logging"
+  ECHO "3) 68000, DEBUG-Version, Dateilogging"
+  ECHO "4) 68000, DEBUG-Version, Speicherlogging"
+  ECHO "5) 68020, RELEASE-Version, kein Logging, für 68020+"
+  ECHO "6) 68020, DEBUG-Version, serielles Logging"
+  ECHO "7) 68020, DEBUG-Version, Dateilogging"
+  ECHO "8) 68020, DEBUG-Version, Speicherlogging"
   ECHO ""
-  ECHO "*e[33mDefault: 1*e[31m - please enter 1-8 and push Return:"
+  ECHO "*e[33mStandard: 1*e[31m - Bitte drücken Sie 1-8 gefolgt von Return:"
   SETENV >NIL: mhi_variant ?
 
   IF $mhi_variant EQ 2
     COPY MHI/mhiamigus.library-000-SER_LOG LIBS:mhiamigus.library CLONE
-    ECHO "Option 2 copied..."
+    ECHO "Option 2 kopiert..."
   ELSE
     IF $mhi_variant EQ 3
       COPY MHI/mhiamigus.library-000-FILE_LOG LIBS:mhiamigus.library CLONE
-      ECHO "Option 3 copied..."
+      ECHO "Option 3 kopiert..."
     ELSE
       IF $mhi_variant EQ 4
         COPY MHI/mhiamigus.library-000-MEM_LOG LIBS:mhiamigus.library CLONE
-        ECHO "Option 4 copied..."
+        ECHO "Option 4 kopiert..."
       ELSE
         IF $mhi_variant EQ 5
           COPY MHI/mhiamigus.library-020-NO_LOG LIBS:mhiamigus.library CLONE
-          ECHO "Option 5 copied..."
+          ECHO "Option 5 kopiert..."
         ELSE
           IF $mhi_variant EQ 6
             COPY MHI/mhiamigus.library-020-SER_LOG LIBS:mhiamigus.library CLONE
-            ECHO "Option 6 copied..."
+            ECHO "Option 6 kopiert..."
           ELSE
             IF $mhi_variant EQ 7
               COPY MHI/mhiamigus.library-020-FILE_LOG LIBS:mhiamigus.library CLONE
-              ECHO "Option 7 copied..."
+              ECHO "Option 7 kopiert..."
             ELSE
               IF $mhi_variant EQ 8
                 COPY MHI/mhiamigus.library-020-MEM_LOG LIBS:mhiamigus.library CLONE
-                ECHO "Option 8 copied..."
+                ECHO "Option 8 kopiert..."
               ELSE
                 COPY MHI/mhiamigus.library-000-NO_LOG LIBS:mhiamigus.library CLONE
-                ECHO "Option 1 copied..."
+                ECHO "Option 1 kopiert..."
               ENDIF
             ENDIF
           ENDIF
@@ -187,8 +196,8 @@ IF WARN
 ENDIF
 
 ECHO ""
-ECHO "Do you want to copy all variants of mhiamigus.library to LIBS: for"
-ASK "potential later use after renaming? (y/N)"
+ECHO "Möchten Sie alle Varianten der mhiamigus.library nach LIBS: kopieren,"
+ASK "um sie möglicherweise später umzubennenen und zu verwenden? (y/N)"
 
 IF WARN
   copy MHI/mhiamigus.library#? LIBS:
@@ -196,7 +205,8 @@ ENDIF
 
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
-ECHO "|                    All done - have a nice day!                    |"
+ECHO "|              Alles fertig - einen schönen Tag noch!               |"
 ECHO "+-------------------------------------------------------------------+"
 
 ENDCLI
+

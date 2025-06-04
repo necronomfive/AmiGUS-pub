@@ -83,7 +83,7 @@ IF WARN
   ECHO "*e[33mSYS:Expansion/AmiGUS/debug*e[31m"
   ECHO "However, this may cause issues with ... very well written software."
   ECHO ""
-  ASK "Do you want to adapt the path before installing (y/N)?"
+  ASK "Do you want to adapt the path before installing? (y/N)"
  
   IF WARN
     ECHO "Enter your desired installation path and push Return:"

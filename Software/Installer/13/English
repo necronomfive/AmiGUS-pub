@@ -51,9 +51,9 @@ IF WARN
   ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:Tools.info TOOLSPATH.info"
 
   ; Prepare EDIT script to replace TOOLSPATH with correct path in installer script
-  ECHO   >  RAM:AmiGUS_editscript1 "GE /TOOLSPATH/" NOLINE
+  ECHO   >  RAM:AmiGUS_editscript1 "GE ?TOOLSPATH?" NOLINE
   GETENV >> RAM:AmiGUS_editscript1 TOOLSPATH
-  ECHO   >> RAM:AmiGUS_editscript1 "/" NOLINE
+  ECHO   >> RAM:AmiGUS_editscript1 "?" NOLINE
 
   ; Prepare 2nd EDIT script to put 1st EDIT script into single line... *sigh*
   ECHO   >  RAM:AmiGUS_editscript2 "CL //"
@@ -101,9 +101,9 @@ IF WARN
   ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:Tools.info TOOLSPATH.info"
 
   ; Prepare EDIT script to replace TOOLSPATH with correct path in installer script
-  ECHO   >  RAM:AmiGUS_editscript1 "GE /TOOLSPATH/" NOLINE
+  ECHO   >  RAM:AmiGUS_editscript1 "GE ?TOOLSPATH?" NOLINE
   GETENV >> RAM:AmiGUS_editscript1 TOOLSPATH
-  ECHO   >> RAM:AmiGUS_editscript1 "/" NOLINE
+  ECHO   >> RAM:AmiGUS_editscript1 "?" NOLINE
 
   ; Prepare 2nd EDIT script to put 1st EDIT script into single line... *sigh*
   ECHO   >  RAM:AmiGUS_editscript2 "CL //"

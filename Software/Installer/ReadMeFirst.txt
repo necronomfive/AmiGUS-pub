@@ -51,4 +51,17 @@ How do I install the hardware or software?
   Worst case, check out https://github.com/necronomfive/AmiGUS-pub/ ,
   please.
 
+-----------------------------------------------------------------------------
+
+Acknowledgements:
+-----------------
+
+reqtools.library 38.390
+Copyright © 1991-1994 Nico François
+
+GadTools Library 34.1 - gadtools.library
+Copyright © 1993 Massimo Tantignone
+
+-----------------------------------------------------------------------------
+
 Enjoy!

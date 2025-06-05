@@ -196,6 +196,51 @@ ENDIF
 
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
+ECHO "|                       additional libraries                        |"
+ECHO "+-------------------------------------------------------------------+"
+ECHO ""
+ECHO "The AmiGUS base tools require OS 1.3 compatible versions"
+ECHO "of gadtools.library 34+ and reqtools.library 38+."
+ECHO ""
+ECHO "These may have been placed into your LIBS: folder already by other"
+ECHO "software, or by yourself."
+ECHO ""
+ASK "Do you want to check or install the required libraries? (y/N)"
+
+ECHO "Provided version of gadtools.library:"
+echo "34.1"
+ECHO "Installed version of gadtools.library:"
+IF EXISTS libs:gadtools.library
+  version libs:gadtools.library
+  ECHO "Do you want to overwrite with the provided version?"
+ELSE
+  ECHO "None."
+  ECHO "Do you want to install the provided version?"
+ENDIF
+
+ASK "(y/N)"
+IF WARN
+  copy Libs/gadtools.library LIBS:
+ENDIF
+
+ECHO "Provided version of reqtools.library:"
+echo "38.390"
+ECHO "Installed version of reqtools.library:"
+IF EXISTS libs:reqtools.library
+  version libs:reqtools.library
+  ECHO "Do you want to overwrite with the provided version?"
+ELSE
+  ECHO "None."
+  ECHO "Do you want to install the provided version?"
+ENDIF
+
+ASK "(y/N)"
+IF WARN
+  copy Libs/reqtools.library LIBS:
+ENDIF
+
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
 ECHO "|                    All done - have a nice day!                    |"
 ECHO "+-------------------------------------------------------------------+"
 

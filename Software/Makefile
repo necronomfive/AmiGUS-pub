@@ -153,6 +153,7 @@ release: all
 	cp Installer/13/Tools.info                  $(ADF_DIR3)/Tools.info
 	cp Installer/13/MHI.info                    $(ADF_DIR3)/MHI.info
 	cp Installer/13/Firmware.info               $(ADF_DIR3)/Firmware.info
+	cp Installer/13/Libs.info                   $(ADF_DIR3)/Libs.info
 
 	cp Tools/Mixer/Mixer13                      $(ADF_DIR3)/Tools
 	cp Tools/Mixer/Mixer13.info                 $(ADF_DIR3)/Tools
@@ -215,11 +216,14 @@ prepare-tools:
 	cd       /tmp/tools-installation ; jlha x gt34_1.lha
 	wget -P  /tmp/tools-installation https://aminet.net/util/libs/ReqToolsDev.lha
 	cd       /tmp/tools-installation ; jlha x ReqToolsDev.lha
-	wget -P  /tmp/tools-installation https://aminet.net/util/libs/ReqToolsUsr.lha
-	cd       /tmp/tools-installation ; jlha x ReqToolsUsr.lha
-	mkdir -p dependencies
+	# wget -P  /tmp/tools-installation https://aminet.net/util/libs/ReqToolsUsr.lha
+	# cd       /tmp/tools-installation ; jlha x ReqToolsUsr.lha
+	wget -P  /tmp/tools-installation https://aminet.net/mus/play/hippoplayer.lha
+	cd       /tmp/tools-installation ; jlha x hippoplayer.lha
+	mkdir -p dependencies/libs
 	cp -R    /tmp/tools-installation/ReqTools/include                   dependencies/
-	cp -R    /tmp/tools-installation/ReqTools/libs                      dependencies/
+	#cp -R    /tmp/tools-installation/ReqTools/libs                      dependencies/
+	cp -R    /tmp/tools-installation/HippoSupport/Libs/reqtools.library dependencies/libs/
 	cp -R    /tmp/tools-installation/GadTools34/gadtools_34.library     dependencies/libs/gadtools.library
 	touch prepare-tools
 

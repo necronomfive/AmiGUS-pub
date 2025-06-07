@@ -212,19 +212,13 @@ drivers: $(DRIVERS/ALL)
 
 prepare-tools:
 	mkdir -p /tmp/tools-installation
-	wget -P  /tmp/tools-installation https://aminet.net/dev/misc/gt34_1.lha
-	cd       /tmp/tools-installation ; jlha x gt34_1.lha
 	wget -P  /tmp/tools-installation https://aminet.net/util/libs/ReqToolsDev.lha
 	cd       /tmp/tools-installation ; jlha x ReqToolsDev.lha
-	# wget -P  /tmp/tools-installation https://aminet.net/util/libs/ReqToolsUsr.lha
-	# cd       /tmp/tools-installation ; jlha x ReqToolsUsr.lha
 	wget -P  /tmp/tools-installation https://aminet.net/mus/play/hippoplayer.lha
 	cd       /tmp/tools-installation ; jlha x hippoplayer.lha
 	mkdir -p dependencies/libs
 	cp -R    /tmp/tools-installation/ReqTools/include                   dependencies/
-	#cp -R    /tmp/tools-installation/ReqTools/libs                      dependencies/
 	cp -R    /tmp/tools-installation/HippoSupport/Libs/reqtools.library dependencies/libs/
-	cp -R    /tmp/tools-installation/GadTools34/gadtools_34.library     dependencies/libs/gadtools.library
 	touch prepare-tools
 
 prepare-ahi:

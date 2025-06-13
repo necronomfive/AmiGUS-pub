@@ -1,0 +1,37 @@
+# AmiGUS Mixer smakefile
+
+CC=sc
+LINKER=slink
+LIBER=oml
+CPU=68060
+MATH=standard
+
+
+
+# List of C object files to include
+OBJS= test.o amiproc.o
+
+# List of final programs to create
+
+all: simple test
+# What to do to do a clean build.
+# Delete object, link, map and gst file.
+
+clean:
+delete \#?.o \#?.lnk \#?.map \#?.gst simple test
+
+# Compile instructions for 'simple' program
+
+simple: simple.o amiproc.o
+sc link to simple simple.o amiproc.o
+
+# Compile instructions for 'test' program
+
+test: test.o amiproc.o
+sc link to test test.o amiproc.o
+
+# Compile instructions for each source file and header
+
+test.o: test.c amiproc.h
+
+amiproc.o: amiproc.c amiproc.h

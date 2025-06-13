@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#define DEBUG
+#define DEBUG
 #define INTUI_V36_NAMES_ONLY
 
 #include <exec/types.h>
@@ -497,10 +497,6 @@ void initCfgMem (APTR cfg_mem)
 	*((ULONG *)((ULONG)cfg_mem+0x008c)) = 0xffffffff;
 }
 
-
-/* Print any error message.  We could do more fancy handling (like
-** an EasyRequest()), but this is only a demo.
-*/
 void errorMessage(STRPTR error)
 {
 if (error)
@@ -660,22 +656,8 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	struct NewGadget ng;
 	struct Gadget *gad;
 
-	/* All the gadget creation calls accept a pointer to the previous gadget, and
-	** link the new gadget to that gadget's NextGadget field.  Also, they exit
-	** gracefully, returning NULL, if any previous gadget was NULL.  This limits
-	** the amount of checking for failure that is needed.  You only need to check
-	** before you tweak any gadget structure or use any of its fields, and finally
-	** once at the end, before you add the gadgets.
-	*/
-
-	/* The following operation is required of any program that uses GadTools.
-	** It gives the toolkit a place to stuff context data.
-	*/
 	gad = CreateContext(glistptr);
 
-	/* Since the NewGadget structure is unmodified by any of the CreateGadget()
-	** calls, we need only change those fields which are different.
-	*/
 	ng.ng_LeftEdge   = 32;
 	ng.ng_TopEdge    = 20+topborder;
 	ng.ng_Width      = 64;
@@ -827,7 +809,7 @@ VOID process_window_events(struct Window *mywin,
 			break;
 		}
 	}
-	
+	board_found = TRUE;
 	if (board_found == TRUE)
 		wPrintF(3,"AmiGUS card found!", FALSE,topborder,font,mywin);
 	else

@@ -11,57 +11,58 @@
 @NODE contents "Table Of Contents"
 @TOC contents
 @{JCENTER}
-@{"       Title                       " LINK main}
+@{"       Title                        " LINK main}
 
-@{" 1     Overview                    " LINK intro}
-@{" 1.1   Introduction                " LINK intro}
-@{" 1.2   AmiGUS Key Features         " LINK features}
-@{" 1.3   Hardware Overview           " LINK overview}
-@{" 1.3.1 Hardware Ports              " LINK ports}
-@{" 1.3.2 Hardware Components         " LINK components}
-@{" 1.4   System Requirements         " LINK system}
-@{" 1.4.1 Minimum Configuration       " LINK system}
-@{" 1.4.2 Recommended Configuration   " LINK system}
+@{" 1     Overview                     " LINK intro}
+@{" 1.1   Introduction                 " LINK intro}
+@{" 1.2   AmiGUS Key Features          " LINK features}
+@{" 1.3   Hardware Overview            " LINK overview}
+@{" 1.3.1 Hardware Ports               " LINK ports}
+@{" 1.3.2 Hardware Components          " LINK components}
+@{" 1.4   System Requirements          " LINK system}
+@{" 1.4.1 Minimum Configuration        " LINK system}
+@{" 1.4.2 Recommended Configuration    " LINK system}
 
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 
-@{" 2     Installation                " LINK hw_inst}
-@{" 2.1   Card Installation           " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up       " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM             " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT   " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other    " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion     " LINK expansion}
-@{" 2.3   External Audio Set-Up       " LINK external}
+@{" 3     Software Tools               " LINK mixer1}
+@{" 3.1   Mixer Tool                   " LINK mixer1}
+@{" 3.1.1 Mixer Panel Descriptions     " LINK mixer2}
+@{" 3.2   FPGA Flash Tool              " LINK flash1}
+@{" 3.2.1 Available Options            " LINK flash2}
 
-@{" 3     Software Tools              " LINK sw_inst}
-@{" 3.1   Installation                " LINK sw_inst}
-@{" 3.2   Mixer Tool                  " LINK mixer1}
-@{" 3.2.1 Mixer Panel Descriptions    " LINK mixer2}
-@{" 3.3   FPGA Flash Tool             " LINK flash1}
-@{" 3.3.1 Available Options           " LINK flash2}
+@{" 4     AHI Driver Framework         " LINK ahi}
+@{" 4.1   Using AHI with AmiGUS        " LINK ahi_amigus}
+@{" 4.2   Selecting AHI Modes          " LINK ahi_modes}
+@{" 4.3   Configuring AmiGUS AHI       " LINK ahi_config}
+@{" 4.3.1 Available Options            " LINK ahi_options}
 
-@{" 4     AHI Driver Framework        " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS       " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes         " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI      " LINK ahi_config}
-@{" 4.3.1 Available Options           " LINK ahi_options}
+@{" 5     MHI Driver Framework         " LINK mhi}
+@{" 5.1   Example: MHI in AmigaAmp     " LINK mhi_amigaamp}
+@{" 5.2   Example: MHI in HippoPlayer  " LINK mhi_hippoplayer}
 
-@{" 5     MHI Driver Framework        " LINK mhi}
-@{" 5.1   Example: MHI in AmigaAmp    " LINK mhi_amigaamp}
-@{" 5.2   Example: MHI in HippoPlayer " LINK mhi_hippoplayer}
+@{" 6     Driver troubleshooting       " LINK drivers}
 
-@{" 6     Driver troubleshooting      " LINK drivers}
-
-@{" 7     Appendices                  " LINK appendix}
-@{" 7.1   Credits                     " LINK credits}
-@{" 7.2   References                  " LINK refs}
+@{" 7     Appendices                   " LINK appendix}
+@{" 7.1   Credits                      " LINK credits}
+@{" 7.2   References                   " LINK refs}
 
 @ENDNODE
 
 @NODE intro "Overview - Introduction"
 @TOC contents
-@{" 1     Overview                    " LINK intro}
-@{" 1.1   Introduction                " LINK intro}
+@{" 1     Overview                     " LINK intro}
+@{" 1.1   Introduction                 " LINK intro}
 
 Thank you very much for purchasing the AmiGUS soundcard. The 
 AmiGUS was designed to enable high-resolution audio playback 
@@ -69,20 +70,20 @@ on your Amiga computer. All audio processing is making extensive
 use of hardware acceleration in order to provide this quality 
 even on low-end Amiga configurations.
 
-@{" 1.2   AmiGUS Key Features         " LINK features}
-@{" 1.3   Hardware Overview           " LINK overview}
-@{" 1.3.1 Hardware Ports              " LINK ports}
-@{" 1.3.2 Hardware Components         " LINK components}
-@{" 1.4   System Requirements         " LINK system}
-@{" 1.4.1 Minimum Configuration       " LINK system}
-@{" 1.4.2 Recommended Configuration   " LINK system}
+@{" 1.2   AmiGUS Key Features          " LINK features}
+@{" 1.3   Hardware Overview            " LINK overview}
+@{" 1.3.1 Hardware Ports               " LINK ports}
+@{" 1.3.2 Hardware Components          " LINK components}
+@{" 1.4   System Requirements          " LINK system}
+@{" 1.4.1 Minimum Configuration        " LINK system}
+@{" 1.4.2 Recommended Configuration    " LINK system}
 @ENDNODE
 
 @NODE features "Overview - AmiGUS Key Features"
 @TOC contents
-@{" 1     Overview                    " LINK intro}
-@{" 1.1   Introduction                " LINK intro}
-@{" 1.2   AmiGUS Key Features         " LINK features}
+@{" 1     Overview                     " LINK intro}
+@{" 1.1   Introduction                 " LINK intro}
+@{" 1.2   AmiGUS Key Features          " LINK features}
 
        - Zorro II bus interface for Amiga 2000, 3000, 4000 computers
          and compatible bus boards
@@ -103,40 +104,40 @@ even on low-end Amiga configurations.
          - Hardware accelerated data transfers to / from DAC, ADC & MP3 chips
        - 32 MB wavetable RAM
 
-@{" 1.3   Hardware Overview           " LINK overview}
-@{" 1.3.1 Hardware Ports              " LINK ports}
-@{" 1.3.2 Hardware Components         " LINK components}
-@{" 1.4   System Requirements         " LINK system}
-@{" 1.4.1 Minimum Configuration       " LINK system}
-@{" 1.4.2 Recommended Configuration   " LINK system}
+@{" 1.3   Hardware Overview            " LINK overview}
+@{" 1.3.1 Hardware Ports               " LINK ports}
+@{" 1.3.2 Hardware Components          " LINK components}
+@{" 1.4   System Requirements          " LINK system}
+@{" 1.4.1 Minimum Configuration        " LINK system}
+@{" 1.4.2 Recommended Configuration    " LINK system}
 @ENDNODE
 
 @NODE overview "Overview - Hardware Overview"
 @TOC contents
-@{" 1     Overview                    " LINK intro}
-@{" 1.1   Introduction                " LINK intro}
-@{" 1.2   AmiGUS Key Features         " LINK features}
-@{" 1.3   Hardware Overview           " LINK overview}
+@{" 1     Overview                     " LINK intro}
+@{" 1.1   Introduction                 " LINK intro}
+@{" 1.2   AmiGUS Key Features          " LINK features}
+@{" 1.3   Hardware Overview            " LINK overview}
 
 In the following picture you can see an overview of the AmiGUS card, 
 its interfaces and the main hardware components which provide the 
 card's functionality.
 @{"Hardware Overview" system "MultiView ilbm/card1.iff"}@{IMG ilbm/card1.iff}
 
-@{" 1.3.1 Hardware Ports              " LINK ports}
-@{" 1.3.2 Hardware Components         " LINK components}
-@{" 1.4   System Requirements         " LINK system}
-@{" 1.4.1 Minimum Configuration       " LINK system}
-@{" 1.4.2 Recommended Configuration   " LINK system}
+@{" 1.3.1 Hardware Ports               " LINK ports}
+@{" 1.3.2 Hardware Components          " LINK components}
+@{" 1.4   System Requirements          " LINK system}
+@{" 1.4.1 Minimum Configuration        " LINK system}
+@{" 1.4.2 Recommended Configuration    " LINK system}
 @ENDNODE
 
 @NODE ports "Overview - Hardware Ports"
 @TOC contents
-@{" 1     Overview                    " LINK intro}
-@{" 1.1   Introduction                " LINK intro}
-@{" 1.2   AmiGUS Key Features         " LINK features}
-@{" 1.3   Hardware Overview           " LINK overview}
-@{" 1.3.1 Hardware Ports              " LINK ports}
+@{" 1     Overview                     " LINK intro}
+@{" 1.1   Introduction                 " LINK intro}
+@{" 1.2   AmiGUS Key Features          " LINK features}
+@{" 1.3   Hardware Overview            " LINK overview}
+@{" 1.3.1 Hardware Ports               " LINK ports}
 
 +--------------------+-----------------------------------------------------+
 | Port Name          | Function                                            |
@@ -169,20 +170,20 @@ card's functionality.
 |                    | audio stereo source via 3.5 mm audio jack.          |
 +--------------------+-----------------------------------------------------+
 
-@{" 1.3.2 Hardware Components         " LINK components}
-@{" 1.4   System Requirements         " LINK system}
-@{" 1.4.1 Minimum Configuration       " LINK system}
-@{" 1.4.2 Recommended Configuration   " LINK system}
+@{" 1.3.2 Hardware Components          " LINK components}
+@{" 1.4   System Requirements          " LINK system}
+@{" 1.4.1 Minimum Configuration        " LINK system}
+@{" 1.4.2 Recommended Configuration    " LINK system}
 @ENDNODE
 
 @NODE components "Overview - Hardware Components"
 @TOC contents
-@{" 1     Overview                    " LINK intro}
-@{" 1.1   Introduction                " LINK intro}
-@{" 1.2   AmiGUS Key Features         " LINK features}
-@{" 1.3   Hardware Overview           " LINK overview}
-@{" 1.3.1 Hardware Ports              " LINK ports}
-@{" 1.3.2 Hardware Components         " LINK components}
+@{" 1     Overview                     " LINK intro}
+@{" 1.1   Introduction                 " LINK intro}
+@{" 1.2   AmiGUS Key Features          " LINK features}
+@{" 1.3   Hardware Overview            " LINK overview}
+@{" 1.3.1 Hardware Ports               " LINK ports}
+@{" 1.3.2 Hardware Components          " LINK components}
 
 +--------------------+-----------------------------------------------------+
 | Component          | Function                                            |
@@ -214,46 +215,46 @@ card's functionality.
 |                    | supports full autoconfig and interrupt handling.    |
 +--------------------+-----------------------------------------------------+
 
-@{" 1.4   System Requirements         " LINK system}
-@{" 1.4.1 Minimum Configuration       " LINK system}
-@{" 1.4.2 Recommended Configuration   " LINK system}
+@{" 1.4   System Requirements          " LINK system}
+@{" 1.4.1 Minimum Configuration        " LINK system}
+@{" 1.4.2 Recommended Configuration    " LINK system}
 @ENDNODE
 
 @NODE system "Overview - System Requirements"
 @TOC contents
-@{" 1     Overview                    " LINK intro}
-@{" 1.1   Introduction                " LINK intro}
-@{" 1.2   AmiGUS Key Features         " LINK features}
-@{" 1.3   Hardware Overview           " LINK overview}
-@{" 1.3.1 Hardware Ports              " LINK ports}
-@{" 1.3.2 Hardware Components         " LINK components}
-@{" 1.4   System Requirements         " LINK system}
+@{" 1     Overview                     " LINK intro}
+@{" 1.1   Introduction                 " LINK intro}
+@{" 1.2   AmiGUS Key Features          " LINK features}
+@{" 1.3   Hardware Overview            " LINK overview}
+@{" 1.3.1 Hardware Ports               " LINK ports}
+@{" 1.3.2 Hardware Components          " LINK components}
+@{" 1.4   System Requirements          " LINK system}
 
 In order to make full use of AmiGUS features, the following range of 
 system configurations is recommended.
 
-@{" 1.4.1 Minimum Configuration       " LINK system}
+@{" 1.4.1 Minimum Configuration        " LINK system}
 
        - Amiga 2000 computer
        - 1 MB Chip, 4 MB Fast-Ram
        - 68000 CPU, 7MHz
        - Kickstart 1.3
 
-@{" 1.4.2 Recommended Configuration   " LINK system}
+@{" 1.4.2 Recommended Configuration    " LINK system}
 
        - Amiga 2000, 3000, 4000 computer
        - 2 MB Chip, 16 MB Fast-Ram
        - 68030 CPU, 25MHz
        - Kickstart 2.x / 3.x
 
-@{" 2     Installation                " LINK hw_inst}
+@{" 2     Installation                 " LINK hw_inst}
 @ENDNODE
 
-@NODE installation "Installation - Card Installation"
+@NODE hw_inst "Installation - Card Installation"
 @TOC contents
-@{" 1     Overview                    " LINK intro}
-@{" 2     Installation                " LINK hw_inst}
-@{" 2.1   Card Installation           " LINK hw_inst}
+@{" 1     Overview                     " LINK intro}
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
 
 Turn off your Amiga computer and lift up the case cover after removing the 
 necessary screws according to your Amiga's User Manual. Find an empty Zorro 
@@ -276,41 +277,47 @@ of the AmiGUS internal audio ports and use-cases.
 When everything is set-up, place the cover back on your Amiga and re-tighten 
 all screws back according to your Amiga's User Manual.
 
-@{" 2.2   Internal Audio Set-Up       " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM             " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT   " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other    " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion     " LINK expansion}
-@{" 2.3   External Audio Set-Up       " LINK external}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 
 @ENDNODE
 
 @NODE cdrom "Installation - Internal CD-ROM"
 @TOC contents
-@{" 2     Installation                " LINK hw_inst}
-@{" 2.1   Card Installation           " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up       " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM             " LINK cdrom}
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
 
 You can directly connect an internal CD-ROM drive to the AmiGUS CDROM Input
 via the supplied audio cable of your drive.
 
 @{"Internal CD-ROM" system "MultiView ilbm/card2.iff"}@{IMG ilbm/card2.iff}
 
-@{" 2.2.2 Paula loop-through AUDIOT   " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other    " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion     " LINK expansion}
-@{" 2.3   External Audio Set-Up       " LINK external}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 
 @ENDNODE
 
 @NODE paulaaudiot "Installation - Internal AUDIOT"
 @TOC contents
-@{" 2     Installation                " LINK hw_inst}
-@{" 2.1   Card Installation           " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up       " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM             " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT   " LINK paulaaudiot}
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
 
 The AUDIOT board needs to be inserted into the video slot and connected 
 to the AmiGUS via the supplied audio cable. 
@@ -323,20 +330,23 @@ used by any card such as a flickerfixer or genlock.
 Please note that the AmiGUS and AUDIOT board must be placed in different 
 slot lanes in order to physically fit.
 
-@{" 2.2.3 Paula loop-through other    " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion     " LINK expansion}
-@{" 2.3   External Audio Set-Up       " LINK external}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 
 @ENDNODE
 
 @NODE paulaother "Installation - Internal other"
 @TOC contents
-@{" 2     Installation                " LINK hw_inst}
-@{" 2.1   Card Installation           " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up       " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM             " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT   " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other    " LINK paulaother}
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
 
 For configurations which already use the video slot, there are options 
 available to loop the internal PAULA signal to the AmiGUS without using 
@@ -352,40 +362,46 @@ Below you will find a list of boards which do supply PAULA audio output.
 | ZZ9000 GFX Board   | The card provides the Amiga audio signal on J6.     |
 +--------------------+-----------------------------------------------------+
 
-@{" 2.2.4 Digital Audio Expansion     " LINK expansion}
-@{" 2.3   External Audio Set-Up       " LINK external}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 
 @ENDNODE
 
 @NODE expansion "Installation - Digital Audio Expansion"
 @TOC contents
-@{" 2     Installation                " LINK hw_inst}
-@{" 2.1   Card Installation           " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up       " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM             " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT   " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other    " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion     " LINK expansion}
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
 
 The digital audio expansion port provides the final mixed audio signal 
 as a 192kHz, 24-bit I2S digital audio stream. 
 
 @{"Digital Audio Expansion" system "MultiView ilbm/card4.iff"}@{IMG ilbm/card4.iff}
 
-@{" 2.3   External Audio Set-Up       " LINK external}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 
 @ENDNODE
 
 @NODE external "Installation - External Audio Set-Up"
 @TOC contents
-@{" 2     Installation                " LINK hw_inst}
-@{" 2.1   Card Installation           " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up       " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM             " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT   " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other    " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion     " LINK expansion}
-@{" 2.3   External Audio Set-Up       " LINK external}
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
 
 Pictured below are the different external audio output ports of the AmiGUS.
 
@@ -403,28 +419,73 @@ The external input can be used to either loop-through the Amiga's external
 audio output by using a Chinch-to-3.5mm adaptor cable, or to connect any 
 other analogue sound source which supports line-level audio output.
 
-@{" 3     Software Tools              " LINK sw_inst}
+
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
+
 @ENDNODE
 
-@NODE sw_inst "Software Tools - Installation"
+@NODE sw_inst "Installation - Software"
 @TOC contents
-@{" 3     Software Tools              " LINK sw_inst}
-@{" 3.1   Installation                " LINK sw_inst}
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
 
 TODO
 
-@{" 3.2   Mixer Tool                  " LINK mixer1}
-@{" 3.2.1 Mixer Panel Descriptions    " LINK mixer2}
-@{" 3.3   FPGA Flash Tool             " LINK flash1}
-@{" 3.3.1 Available Options           " LINK flash2}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
+@ENDNODE
 
+@NODE sw_inst13 "Installation - OS1.3 Software"
+@TOC contents
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+
+TODO
+
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
+@ENDNODE
+
+@NODE sw_inst20 "Installation - OS2.0+ Software"
+@TOC contents
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
+
+TODO
+
+@{" 3     Software Tools               " LINK mixer1}
 @ENDNODE
 
 @NODE mixer1 "Software Tools - Mixer Tool"
 @TOC contents
-@{" 3     Software Tools              " LINK sw_inst}
-@{" 3.1   Installation                " LINK sw_inst}
-@{" 3.2   Mixer Tool                  " LINK mixer1}
+@{" 2     Installation                 " LINK hw_inst}
+@{" 3     Software Tools               " LINK mixer1}
+@{" 3.1   Mixer Tool                   " LINK mixer1}
 
 The AmiGUS Mixer Tool provides individual volume control over the various 
 sound sources which are being processed and mixed by the digital sound 
@@ -438,19 +499,18 @@ Left /Right are always set to equal values when the sliders are changed.
 By using the @{b}Mix@{ub} slider, it is possible to cross-mix the stereo audio signal, 
 thus lessening the amount of channel separation.
 
-@{" 3.2.1 Mixer Panel Descriptions    " LINK mixer2}
-@{" 3.3   FPGA Flash Tool             " LINK flash1}
-@{" 3.3.1 Available Options           " LINK flash2}
+@{" 3.1.1 Mixer Panel Descriptions     " LINK mixer2}
+@{" 3.2   FPGA Flash Tool              " LINK flash1}
+@{" 3.2.1 Available Options            " LINK flash2}
 
 @ENDNODE
 
 
 @NODE mixer2 "Software Tools - Mixer Panel"
 @TOC contents
-@{" 3     Software Tools              " LINK sw_inst}
-@{" 3.1   Installation                " LINK sw_inst}
-@{" 3.2   Mixer Tool                  " LINK mixer1}
-@{" 3.2.1 Mixer Panel Descriptions    " LINK mixer2}
+@{" 3     Software Tools               " LINK mixer1}
+@{" 3.1   Mixer Tool                   " LINK mixer1}
+@{" 3.1.1 Mixer Panel Descriptions     " LINK mixer2}
 
 Below you will find a description of each panel's functionality and 
 configuration options.
@@ -493,37 +553,35 @@ configuration options.
 |                    | loaded when the Amiga is started or reset.          |
 +--------------------+-----------------------------------------------------+
 
-@{" 3.3   FPGA Flash Tool             " LINK flash1}
-@{" 3.3.1 Available Options           " LINK flash2}
+@{" 3.2   FPGA Flash Tool              " LINK flash1}
+@{" 3.2.1 Available Options            " LINK flash2}
 
 @ENDNODE
 
 
 @NODE flash1 "Software Tools - FPGA Flash Tool"
 @TOC contents
-@{" 3     Software Tools              " LINK sw_inst}
-@{" 3.1   Installation                " LINK sw_inst}
-@{" 3.2   Mixer Tool                  " LINK mixer1}
-@{" 3.2.1 Mixer Panel Descriptions    " LINK mixer2}
-@{" 3.3   FPGA Flash Tool             " LINK flash1}
+@{" 3     Software Tools               " LINK mixer1}
+@{" 3.1   Mixer Tool                   " LINK mixer1}
+@{" 3.1.1 Mixer Panel Descriptions     " LINK mixer2}
+@{" 3.2   FPGA Flash Tool              " LINK flash1}
 
 The FPGA Flash Tool provides detailed control over the AmiGUS FPGA firmware 
 settings.
 
 @{"Flash tool" system "MultiView ilbm/flash0.iff"}@{IMG ilbm/flash0.iff}
 
-@{" 3.3.1 Available Options           " LINK flash2}
+@{" 3.2.1 Available Options            " LINK flash2}
 
 @ENDNODE
 
 @NODE flash2 "Software Tools - Available Options"
 @TOC contents
-@{" 3     Software Tools              " LINK sw_inst}
-@{" 3.1   Installation                " LINK sw_inst}
-@{" 3.2   Mixer Tool                  " LINK mixer1}
-@{" 3.2.1 Mixer Panel Descriptions    " LINK mixer2}
-@{" 3.3   FPGA Flash Tool             " LINK flash1}
-@{" 3.3.1 Available Options           " LINK flash2}
+@{" 3     Software Tools               " LINK mixer1}
+@{" 3.1   Mixer Tool                   " LINK mixer1}
+@{" 3.1.1 Mixer Panel Descriptions     " LINK mixer2}
+@{" 3.2   FPGA Flash Tool              " LINK flash1}
+@{" 3.2.1 Available Options            " LINK flash2}
 
 +--------------------+-----------------------------------------------------+
 | Panel              | Description                                         |
@@ -558,13 +616,13 @@ settings.
 |                    | can be re-flashed by using the Load option.         |
 +--------------------+-----------------------------------------------------+
 
-@{" 4     AHI Driver Framework        " LINK ahi}
+@{" 4     AHI Driver Framework         " LINK ahi}
 @ENDNODE
 
 @NODE ahi "AHI Driver Framework"
 @TOC contents
-@{" 3     Software Tools              " LINK sw_inst}
-@{" 4     AHI Driver Framework        " LINK ahi}
+@{" 3     Software Tools               " LINK mixer1}
+@{" 4     AHI Driver Framework         " LINK ahi}
 
 AHI is a retargetable audio subsystem for Amiga-like operating systems, 
 originally developed by Martin Bloom. 
@@ -589,16 +647,16 @@ Please note:
     in AHI's naming, the AHI does not support more than 216 – 1 or 65535 Hz.
     AmiGUS' AHI driver is thereby limited to 48000Hz for the time being.
 
-@{" 4.1   Using AHI with AmiGUS       " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes         " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI      " LINK ahi_config}
-@{" 4.3.1 Available Options           " LINK ahi_options}
+@{" 4.1   Using AHI with AmiGUS        " LINK ahi_amigus}
+@{" 4.2   Selecting AHI Modes          " LINK ahi_modes}
+@{" 4.3   Configuring AmiGUS AHI       " LINK ahi_config}
+@{" 4.3.1 Available Options            " LINK ahi_options}
 @ENDNODE
 
 @NODE ahi_amigus "AHI Driver Framework - Using AHI with AmiGUS"
 @TOC contents
-@{" 4     AHI Driver Framework        " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS       " LINK ahi_amigus}
+@{" 4     AHI Driver Framework         " LINK ahi}
+@{" 4.1   Using AHI with AmiGUS        " LINK ahi_amigus}
 
 AHI shall be your last resort for making software use your AmiGUS. 
   - For playback encoded music like MP3, FLAC, or OGG, please use MHI and 
@@ -607,16 +665,16 @@ AHI shall be your last resort for making software use your AmiGUS.
     engine, e.g. HippoPlayer 2.62 or later,
   - None of that works for your application? – Here comes AHI. And only here.
 
-@{" 4.2   Selecting AHI Modes         " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI      " LINK ahi_config}
-@{" 4.3.1 Available Options           " LINK ahi_options}
+@{" 4.2   Selecting AHI Modes          " LINK ahi_modes}
+@{" 4.3   Configuring AmiGUS AHI       " LINK ahi_config}
+@{" 4.3.1 Available Options            " LINK ahi_options}
 @ENDNODE
 
 @NODE ahi_modes "AHI Driver Framework - Selecting AHI Modes"
 @TOC contents
-@{" 4     AHI Driver Framework        " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS       " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes         " LINK ahi_modes}
+@{" 4     AHI Driver Framework         " LINK ahi}
+@{" 4.1   Using AHI with AmiGUS        " LINK ahi_amigus}
+@{" 4.2   Selecting AHI Modes          " LINK ahi_modes}
 
 AHI modes need to be selected to fit the purpose.
 
@@ -654,16 +712,16 @@ Here are some guidelines:
     Avoid them for games, if you are short on CPU time. Recommended for 
     enjoying music as good as possible!
 
-@{" 4.3   Configuring AmiGUS AHI      " LINK ahi_config}
-@{" 4.3.1 Available Options           " LINK ahi_options}
+@{" 4.3   Configuring AmiGUS AHI       " LINK ahi_config}
+@{" 4.3.1 Available Options            " LINK ahi_options}
 @ENDNODE
 
 @NODE ahi_config "AHI Driver Framework - Configuring AmiGUS AHI"
 @TOC contents
-@{" 4     AHI Driver Framework        " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS       " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes         " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI      " LINK ahi_config}
+@{" 4     AHI Driver Framework         " LINK ahi}
+@{" 4.1   Using AHI with AmiGUS        " LINK ahi_amigus}
+@{" 4.2   Selecting AHI Modes          " LINK ahi_modes}
+@{" 4.3   Configuring AmiGUS AHI       " LINK ahi_config}
 
 After all that theoretical foundation you are ready to select AmiGUS modes 
 using the AHI preferences editor usually installed to Sys:Prefs/AHI. 
@@ -677,16 +735,16 @@ Recommendations:
 
 @{"AHI Prefs" system "MultiView ilbm/ahi0.iff"}@{IMG ilbm/ahi0.iff}
 
-@{" 4.3.1 Available Options           " LINK ahi_options}
+@{" 4.3.1 Available Options            " LINK ahi_options}
 @ENDNODE
 
 @NODE ahi_options "AHI Driver Framework - Available Options"
 @TOC contents
-@{" 4     AHI Driver Framework        " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS       " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes         " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI      " LINK ahi_config}
-@{" 4.3.1 Available Options           " LINK ahi_options}
+@{" 4     AHI Driver Framework         " LINK ahi}
+@{" 4.1   Using AHI with AmiGUS        " LINK ahi_amigus}
+@{" 4.2   Selecting AHI Modes          " LINK ahi_modes}
+@{" 4.3   Configuring AmiGUS AHI       " LINK ahi_config}
+@{" 4.3.1 Available Options            " LINK ahi_options}
 
 +--------------------+-----------------------------------------------------+
 | Panel              | Description                                         |
@@ -739,13 +797,13 @@ Recommendations:
 |                    | AHI preferences editor.                             |
 +--------------------+-----------------------------------------------------+
 
-@{" 5     MHI Driver Framework        " LINK mhi}
+@{" 5     MHI Driver Framework         " LINK mhi}
 @ENDNODE
 
 @NODE mhi "MHI Driver Framework"
 @TOC contents
-@{" 4     AHI Driver Framework        " LINK ahi}
-@{" 5     MHI Driver Framework        " LINK mhi}
+@{" 4     AHI Driver Framework         " LINK ahi}
+@{" 5     MHI Driver Framework         " LINK mhi}
 
 MHI is a standard for retargetable encoded audio for classic Amigas. 
 AmiGUS comes with the VLSI VS1063a audio codec chip supporting
@@ -764,14 +822,14 @@ on AmigaOS 2.0 and above. On AmigaOS 1.3, there are problems loading
 libraries from other locations then Libs:, hence it will be installed to 
 Libs:mhiamigus.library to ensure hassle-free usage.
 
-@{" 5.1   Example: MHI in AmigaAmp    " LINK mhi_amigaamp}
-@{" 5.2   Example: MHI in HippoPlayer " LINK mhi_hippoplayer}
+@{" 5.1   Example: MHI in AmigaAmp     " LINK mhi_amigaamp}
+@{" 5.2   Example: MHI in HippoPlayer  " LINK mhi_hippoplayer}
 @ENDNODE
 
 @NODE mhi_amigaamp "MHI Driver Framework - AmigaAmp"
 @TOC contents
-@{" 5     MHI Driver Framework        " LINK mhi}
-@{" 5.1   Example: MHI in AmigaAmp    " LINK mhi_amigaamp}
+@{" 5     MHI Driver Framework         " LINK mhi}
+@{" 5.1   Example: MHI in AmigaAmp     " LINK mhi_amigaamp}
 
 As Thomas Wenzel not only created @{"AmigaAMP (4)" LINK refs} but also has been 
 co-authoring MHI, integration of both works almost perfectly, 
@@ -798,14 +856,14 @@ Confirm with the "OK" button, close and confirm the preferences dialog
 with the "Save" button. You may need to restart AmigaAMP immediately.
 Add a few mp3 files to your playlist and enjoy!
 
-@{" 5.2   Example: MHI in HippoPlayer " LINK mhi_hippoplayer}
+@{" 5.2   Example: MHI in HippoPlayer  " LINK mhi_hippoplayer}
 @ENDNODE
 
 @NODE mhi_hippoplayer "MHI Driver Framework - HippoPlayer"
 @TOC contents
-@{" 5     MHI Driver Framework        " LINK mhi}
-@{" 5.1   Example: MHI in AmigaAmp    " LINK mhi_amigaamp}
-@{" 5.2   Example: MHI in HippoPlayer " LINK mhi_hippoplayer}
+@{" 5     MHI Driver Framework         " LINK mhi}
+@{" 5.1   Example: MHI in AmigaAmp     " LINK mhi_amigaamp}
+@{" 5.2   Example: MHI in HippoPlayer  " LINK mhi_hippoplayer}
 
 @{"HippoPlayer (5, 6)" LINK refs} by K-P Koljonen does not only work from AmigaOS 1.2 upwards 
 but also has been successfully tested with MHI on AmigaOS 1.3 on 68000. 
@@ -829,13 +887,13 @@ Select it, push the "OK" button, save the preferences using the "Save" button.
 Add a few mp3 files to your playlist and enjoy!
 
 
-@{" 6     Driver troubleshooting      " LINK drivers}
+@{" 6     Driver troubleshooting       " LINK drivers}
 @ENDNODE
 
 @NODE drivers "Driver troubleshooting"
 @TOC contents
-@{" 5     MHI Driver Framework        " LINK mhi}
-@{" 6     Driver troubleshooting      " LINK drivers}
+@{" 5     MHI Driver Framework         " LINK mhi}
+@{" 6     Driver troubleshooting       " LINK drivers}
 
 AHI and MHI drivers come with release and debug versions. Never use the 
 debug versions for normal operations - they may introduce more crashes and 
@@ -873,28 +931,28 @@ are slower!
 We hope you will never need this information, 
 please be patient, we did our best!
 
-@{" 7     Appendices                  " LINK appendix}
+@{" 7     Appendices                   " LINK appendix}
 @ENDNODE
 
 @NODE appendix "Appendices"
-@{" 6     Driver troubleshooting      " LINK drivers}
-@{" 7     Appendices                  " LINK appendix}
-@{" 7.1   Credits                     " LINK credits}
-@{" 7.2   References                  " LINK refs}
+@{" 6     Driver troubleshooting       " LINK drivers}
+@{" 7     Appendices                   " LINK appendix}
+@{" 7.1   Credits                      " LINK credits}
+@{" 7.2   References                   " LINK refs}
 
 @ENDNODE
 
 @NODE credits "Appendices - Credits"
-@{" 7     Appendices                  " LINK appendix}
-@{" 7.1   Credits                     " LINK credits}
-@{" 7.2   References                  " LINK refs}
+@{" 7     Appendices                   " LINK appendix}
+@{" 7.1   Credits                      " LINK credits}
+@{" 7.2   References                   " LINK refs}
 
 @ENDNODE
 
 @NODE refs "Appendices - References"
-@{" 7     Appendices                  " LINK appendix}
-@{" 7.1   Credits                     " LINK credits}
-@{" 7.2   References                  " LINK refs}
+@{" 7     Appendices                   " LINK appendix}
+@{" 7.1   Credits                      " LINK credits}
+@{" 7.2   References                   " LINK refs}
 
 (1) @{"https://aminet.net/driver/audio/ahiusr_4.18.lha" system "openurl https://aminet.net/driver/audio/ahiusr_4.18.lha"}
 

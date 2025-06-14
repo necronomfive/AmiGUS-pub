@@ -122,7 +122,7 @@ release: all
 	###########################################################################
 
 	adf_floppy_create $(ADF_IMAGE2) dd
-	adf_format -l AmiGUS-Manual -t 1 -f $(ADF_IMAGE2)
+	adf_format -l AmiGUS-Manual -t 0 -f $(ADF_IMAGE2)
 	fuseadf $(ADF_IMAGE2) $(ADF_DIR2)/
 	cp -R $(MANUAL_DIR)/* $(ADF_DIR2)/
 	umount $(ADF_DIR2)/

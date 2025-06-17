@@ -443,9 +443,100 @@ other analogue sound source which supports line-level audio output.
 @{" 2.3   External Audio Set-Up        " LINK external}
 @{" 2.4   Software Installation        " LINK sw_inst}
 
-TODO
+The AmiGUS software package comes either 
+- in two lha archives, 
+  - one for OS1.3, and 
+  - one for OS2.0 and above,
+- or on multiple ADF files,
+  - one for OS1.3,
+  - one for OS2.0 and above, and
+  - one shared manual disk.
+
+Please do not use the OS1.3 versions to install your AmiGUS on newer
+AmigaOS versions. They work well, and while we try our best to make 
+the AmiGUS enjoyable on all compatible configurations, we cannot wield
+any magic.
+Thus, there is and there will be no support for AHI below OS2.0, sorry.
 
 @{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+
+Commodore and its successorts only released the Installer for OS2.0 and
+above. Therefore, the AmiGUS OS1.3 disk provides installers in different
+languages as simple shell scripts.
+In all languages, their function is the same: 
+
+They open a window expecting the user to provide input via keyboard.
+Positive acknowledgements are triggered by pressing the <Y> key,
+negative or rejection can be expressed by pushing the <N> key.
+In any case, <Return> or <Enter> key need to follow.
+While the current keyboard layout applies, 
+the keys required stay the same.
+
+You may be asked to enter target installation paths, e.g. for the 
+AmiGUS base tools. Please keep in mind, only the last level of the 
+directory hierarchy may not exist at that point, otherwise an error 
+message will occur and the script be aborted. You may close orphaned
+installation windows entering "endcli" + <Return>.
+
+The default installation path of AmiGUS tools and manual is 
+Sys:Expansion/AmiGUS - which may collide with some versions of 
+Commodore's Janus bridgeboard software. If you experience any issues,
+please delete the AmiGUS software installed to that location, reinstall
+and select another path.
+
+The installation procedure starts with the AmiGUS base tools.
+These are the service tools described in sections @{"3.1 Mixer Tool" LINK mixer1} 
+and @{"3.1 FPGA Flash Tool" LINK flash1}, and the basic functionality
+tools PlayMidi, PlayMP3, PlayWav and Record.
+Recommendation would be to install them to the default path.
+
+The second installation option provides the AmiGUS debug tools.
+These are described in the manual section @{"6 Driver troubleshooting" LINK drivers}.
+They are meant to provide the developers with additional debug 
+information in case an AmiGUS user experiences issues, helping to diagnose
+wether these are related to the card, the drivers or other software.
+For OS1.3, these are only available for the MHI driver so far.
+Recommendation would be to skip installing them.
+If you experience trouble, you can still install them later.
+
+The third installation category tackles the MHI driver, described in
+section @{"5 MHI Driver Framework" LINK mhi}.
+Recommendation would be to install it - it would only reliably work from
+the default path, so there is no choice to change the path.
+But there is a choice which version of the MHI driver you want to install.
+If you are running OS1.3 with a 68020 or 68030 CPU only, feel free to use
+the 68020 version. If you want to try using AmiGUS with an 68000, choose
+that library variant, please. the 68020+ version gives you a tiny
+performance advantage, but will crash on 68000.
+As far as we know, OS1.3 will not work on 68040 or 68060 CPU at all,
+so we did not offer that choice.
+We do offer using various debug versions of the MHI drivers here.
+Please refrain from using them unless you want to debug issues occuring
+in the release versions or were asked to help debugging an issue
+we cannot reproduce on our end.
+Recommendation is to just use the default, 68000 RELEASE version.
+The final choice in this category is putting all available drivers
+without renaming them plainly to disk, to toy arround with them later.
+Well, this might be helpfull if you own a A2630 accelerator and want
+to disable it every now and then, to show off AmiGUS on both, 68030
+and 68000 without reinstalling the drivers.
+Recommendation would be, not to do so.
+
+The next section is to install additional libraries, 
+e.g. reqtools.library 38.390, Copyright © 1991-1994 Nico François,
+as part of the installation. The installation script will try help you
+checking for an already installed version and ask before overwriting
+anything. Recommendation is to do so, as the library is needed for 
+selecting firmware update files in the FlashGUI.
+
+The last step is to optionally install the AmigaGuide manual.
+To use any AmigaGuide on AmigaOSs earlier 3.0, 
+you will need to install "AmigaGuide Development" version from:
+
+https://aminet.net/text/hyper/aguide34.lha
+
+Recommendation is to do so, just to enjoy seeing it working.
+
 @{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 @ENDNODE
 

@@ -47,20 +47,27 @@ What is included?
 
 How do I install the hardware or software?
 - For installation instructions, please check the manual,
-  paper, pdf, docx, or AmigaGuide (on OS2.1 or above).
+  paper, pdf, docx, or AmigaGuide.
   Worst case, check out https://github.com/necronomfive/AmiGUS-pub/ ,
   please.
 
 -----------------------------------------------------------------------------
 
-Acknowledgements:
------------------
+Dependencies:
+-------------
 
-reqtools.library 38.390
-Copyright © 1991-1994 Nico François
+- For file requesters, AmiGUS base tools rely on 
 
-GadTools Library 34.1 - gadtools.library
-Copyright © 1993 Massimo Tantignone
+  reqtools.library 38.390
+  Copyright © 1991-1994 Nico François
+
+- To view the AmigaGuide manual on AmigaOSs earlier 3.0, 
+  you will need to install "AmigaGuide Development" version from
+
+  https://aminet.net/text/hyper/aguide34.lha
+  
+  AmigaGuide_Dev 34.3
+  Copyright 1992-93 Commodore-Amiga, Inc.
 
 -----------------------------------------------------------------------------
 

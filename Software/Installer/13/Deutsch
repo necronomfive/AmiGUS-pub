@@ -20,15 +20,15 @@ ASSIGN AmiGUS-13-SRC: ""
 
 ECHO "Wilkommen beim AmiGUS OS 1.3 Installationsskript."
 ECHO ""
-ECHO "Wenn Sie die Installation abbrechen wollen, drücken Sie bitte "
-ECHO "wiederholt CTRL-C. Falls etwas unklar ist, lesen Sie bitte zunächst"
+ECHO "Wenn Sie die Installation abbrechen wollen, drï¿½cken Sie bitte "
+ECHO "wiederholt CTRL-C. Falls etwas unklar ist, lesen Sie bitte zunï¿½chst"
 ECHO "die ReadMeFirst.txt gefolgt von dem Handbuch."
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
 ECHO "|                    Basiswerkzeuginstallation                      |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""
-ASK "Möchten Sie die AmiGUS Basiswerkzeuge installieren? (y/N)"
+ASK "Mï¿½chten Sie die AmiGUS Basiswerkzeuge installieren? (y/N)"
 
 IF WARN
   ECHO "Das Standardinstallationsverzeichnis der AmiGUS Basiswerkzeuge ist:"
@@ -37,11 +37,11 @@ IF WARN
   ECHO "Treibern und Software verursachen, dort weitere Dinge zu"
   ECHO "installieren."
   ECHO ""
-  ASK "Möchten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
+  ASK "Mï¿½chten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
  
   IF WARN
-    ECHO "Bitte geben Sie ihr gewünschtes Installationsverzeichnis ein"
-    ECHO "und drücken Sie die Eingabetaste:"
+    ECHO "Bitte geben Sie ihr gewï¿½nschtes Installationsverzeichnis ein"
+    ECHO "und drï¿½cken Sie die Eingabetaste:"
     SETENV >NIL: TOOLSPATH ?
   ELSE
     SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS"
@@ -79,21 +79,21 @@ ECHO "+-------------------------------------------------------------------+"
 ECHO "|                     Debugwerkzeuginstallation                     |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""
-ASK "Möchten Sie die AmiGUS Debugwerkzeuge installieren? (y/N)"
+ASK "Mï¿½chten Sie die AmiGUS Debugwerkzeuge installieren? (y/N)"
 
 IF WARN
-  ECHO "Das Standardinstallationsverzeichnis für die AmiGUS Debugwerkzeuge"
+  ECHO "Das Standardinstallationsverzeichnis fï¿½r die AmiGUS Debugwerkzeuge"
   ECHO "ist:"
   ECHO "*e[33mSYS:Expansion/AmiGUS/debug*e[31m"
   ECHO "Allerdings kann es Probleme mit ... sehr gut ... programmierten"
   ECHO "Treibern und Software verursachen, dort weitere Dinge zu"
   ECHO "installieren."
   ECHO ""
-  ASK "Möchten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
+  ASK "Mï¿½chten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
  
   IF WARN
-    ECHO "Bitte geben Sie ihr gewünschtes Installationsverzeichnis ein"
-    ECHO "und drücken Sie die Eingabetaste:"
+    ECHO "Bitte geben Sie ihr gewï¿½nschtes Installationsverzeichnis ein"
+    ECHO "und drï¿½cken Sie die Eingabetaste:"
     SETENV >NIL: TOOLSPATH ?
   ELSE
     SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS/debug"
@@ -133,27 +133,27 @@ ECHO "+-------------------------------------------------------------------+"
 ECHO "|                      MHI-Treiberinstallation                      |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""
-ECHO "OS 1.3 ist etwas ... wählerisch ... wenn es um das Laden von"
+ECHO "OS 1.3 ist etwas ... wï¿½hlerisch ... wenn es um das Laden von"
 ECHO "Bibliotheken geht."
-ECHO "Um MHI zuverlässig zum Funktionieren zu bewegen, sollte der MHI-"
-ECHO "Treiber an den Standardort für Bibliotheken installiert"
+ECHO "Um MHI zuverlï¿½ssig zum Funktionieren zu bewegen, sollte der MHI-"
+ECHO "Treiber an den Standardort fï¿½r Bibliotheken installiert"
 ECHO "werden - LIBS:."
 ECHO ""
-ASK "Möchten Sie mhiamigus.library nach LIBS: installieren? (y/N)"
+ASK "Mï¿½chten Sie mhiamigus.library nach LIBS: installieren? (y/N)"
 
 IF WARN
-  ECHO "Welchen MHI-Treiber möchten Sie installieren?"
+  ECHO "Welchen MHI-Treiber mï¿½chten Sie installieren?"
   ECHO ""
   ECHO "1) 68000, RELEASE-Version, kein Logging, EMPFOHLEN!!!"
   ECHO "2) 68000, DEBUG-Version, serielles Logging"
   ECHO "3) 68000, DEBUG-Version, Dateilogging"
   ECHO "4) 68000, DEBUG-Version, Speicherlogging"
-  ECHO "5) 68020, RELEASE-Version, kein Logging, für 68020+"
+  ECHO "5) 68020, RELEASE-Version, kein Logging, fï¿½r 68020+"
   ECHO "6) 68020, DEBUG-Version, serielles Logging"
   ECHO "7) 68020, DEBUG-Version, Dateilogging"
   ECHO "8) 68020, DEBUG-Version, Speicherlogging"
   ECHO ""
-  ECHO "*e[33mStandard: 1*e[31m - Bitte drücken Sie 1-8 gefolgt von Return:"
+  ECHO "*e[33mStandard: 1*e[31m - Bitte drï¿½cken Sie 1-8 gefolgt von Return:"
   SETENV >NIL: mhi_variant ?
 
   IF $mhi_variant EQ 2
@@ -196,8 +196,8 @@ IF WARN
 ENDIF
 
 ECHO ""
-ECHO "Möchten Sie alle Varianten der mhiamigus.library nach LIBS: kopieren,"
-ASK "um sie möglicherweise später umzubennenen und zu verwenden? (y/N)"
+ECHO "Mï¿½chten Sie alle Varianten der mhiamigus.library nach LIBS: kopieren,"
+ASK "um sie mï¿½glicherweise spï¿½ter umzubennenen und zu verwenden? (y/N)"
 
 IF WARN
   copy MHI/mhiamigus.library#? LIBS:
@@ -208,50 +208,105 @@ ECHO "+-------------------------------------------------------------------+"
 ECHO "|                         weitere Libraries                         |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""
-ECHO "Die AmiGUS Basiswerkzeuge benötigen OS 1.3 kompatible Versionen"
-ECHO "der gadtools.library 34+ und reqtools.library 38+."
+ECHO "Die AmiGUS Basiswerkzeuge benï¿½tigen OS 1.3 kompatible Versionen"
+ECHO "der reqtools.library 38+."
 ECHO ""
-ECHO "Diese könnten bereits durch andere Softwareinstallationen oder durch"
+ECHO "Diese kï¿½nnten bereits durch andere Softwareinstallationen oder durch"
 ECHO "Sie selbst in Ihrem LIBS: Verzeichnis liegen."
 ECHO ""
-ECHO "Möchten Sie die benötigten Libraries prüfen"
+ECHO "Mï¿½chten Sie die benï¿½tigten Libraries prï¿½fen"
 ASK "und gegebenenfalls installieren? (y/N)"
 
-ECHO "Beiliegende Version der gadtools.library:"
-echo "34.1"
-ECHO "Installierte Version der gadtools.library:"
-IF EXISTS libs:gadtools.library
-  version libs:gadtools.library
-  ECHO "Möchten Sie diese mit der beiligenden Version überschreiben?"
-ELSE
-  ECHO "Keine."
-  ECHO "Möchten Sie die beiliegende Version installieren?"
-ENDIF
-
-ASK "(y/N)"
 IF WARN
-  copy Libs/gadtools.library LIBS:
-ENDIF
+  ECHO "Beiliegende Version der reqtools.library:"
+  ECHO "38.390"
+  ECHO "Installierte Version der reqtools.library:"
+  IF EXISTS libs:reqtools.library
+    version libs:reqtools.library
+    ECHO "Mï¿½chten Sie diese mit der beiligenden Version ï¿½berschreiben?"
+  ELSE
+    ECHO "Keine."
+    ECHO "Mï¿½chten Sie die beiliegende Version installieren?"
+  ENDIF
 
-ECHO "Beiliegende Version der reqtools.library:"
-echo "38.390"
-ECHO "Installierte Version der reqtools.library:"
-IF EXISTS libs:reqtools.library
-  version libs:reqtools.library
-  ECHO "Möchten Sie diese mit der beiligenden Version überschreiben?"
-ELSE
-  ECHO "Keine."
-  ECHO "Möchten Sie die beiliegende Version installieren?"
-ENDIF
-
-ASK "(y/N)"
-IF WARN
-  copy Libs/reqtools.library LIBS:
+  ASK "(y/N)"
+  IF WARN
+    copy Libs/reqtools.library LIBS:
+  ENDIF
 ENDIF
 
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
-ECHO "|              Alles fertig - einen schönen Tag noch!               |"
+ECHO "|                         AmigaGuide manual                         |"
+ECHO "+-------------------------------------------------------------------+"
+ECHO ""
+
+ASK "Do you want to install the AmiGUS AmigaGuide manual? (y/N)"
+IF WARN
+  ECHO "The default installation path for the AmiGUS base tools is:"
+  ECHO "*e[33mSYS:Expansion/AmiGUS*e[31m"
+  ECHO "Well, you know the story already most likely..."
+  ECHO ""
+  ASK "Do you want to adapt the path before installing (y/N)?"
+
+  IF WARN
+    ECHO "Enter your desired installation path and push Return:"
+    SETENV >NIL: TOOLSPATH ?
+  ELSE
+    SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS"
+  ENDIF
+
+  IF EXISTS AmiGUS-13-SRC:Manual.info
+    ; Installing from lha archive
+    SETENV >NIL: MANUALPATH "AmiGUS-13-SRC:Manual/"
+  ELSE
+    ; Installing from ADF/Disk
+    SETENV >NIL: MANUALPATH "AmiGUS-Manual:"
+  ENDIF
+
+  ECHO   >  RAM:AmiGUS_installer1 "IF NOT EXISTS TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "  MAKEDIR TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "ENDIF"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:AmiGUS.guide38 TOOLSPATH/AmiGUS.guide"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:AmiGUS.guide38.info TOOLSPATH/AmiGUS.guide.info"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHilbm TOOLSPATH/ilbm"
+
+  ; Prepare EDIT script to replace MANUALPATH with correct path in installer script
+  ECHO   >  RAM:AmiGUS_editscript1 "GE ?MANUALPATH?" NOLINE
+  GETENV >> RAM:AmiGUS_editscript1 MANUALPATH
+  ECHO   >> RAM:AmiGUS_editscript1 "?" NOLINE
+
+  ; Prepare EDIT script to replace TOOLSPATH with correct path in installer script
+  ECHO   >  RAM:AmiGUS_editscript2 "GE ?TOOLSPATH?" NOLINE
+  GETENV >> RAM:AmiGUS_editscript2 TOOLSPATH
+  ECHO   >> RAM:AmiGUS_editscript2 "?" NOLINE
+
+  ; Prepare 2nd EDIT script to put 1st + 2nd EDIT script into single line... *sigh*
+  ECHO   >  RAM:AmiGUS_editscript3 "CL //"
+  
+  ; Run 2nd EDIT script on 1st EDIT script
+  EDIT >NIL: FROM RAM:AmiGUS_editscript1 TO RAM:AmiGUS_editscript4 WITH RAM:AmiGUS_editscript3
+
+  ; Run 2nd EDIT script on 1st EDIT script
+  EDIT >NIL: FROM RAM:AmiGUS_editscript2 TO RAM:AmiGUS_editscript5 WITH RAM:AmiGUS_editscript3
+
+  ; Run 1st EDIT script on installer script
+  EDIT >NIL: FROM RAM:AmiGUS_installer1 TO RAM:AmiGUS_installer2 WITH RAM:AmiGUS_editscript4
+
+  ; Run 2nd EDIT script on installer script
+  EDIT >NIL: FROM RAM:AmiGUS_installer2 TO RAM:AmiGUS_installer3 WITH RAM:AmiGUS_editscript5
+
+  ; Run installer script
+  EXECUTE RAM:AmiGUS_installer3
+
+  ; Clean that mess up again...
+  DELETE >NIL: RAM:AmiGUS_editscript#? RAM:AmiGUS_installer#?
+
+ENDIF
+
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
+ECHO "|              Alles fertig - einen schï¿½nen Tag noch!               |"
 ECHO "+-------------------------------------------------------------------+"
 
 ENDCLI

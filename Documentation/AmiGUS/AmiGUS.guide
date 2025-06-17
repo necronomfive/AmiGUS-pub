@@ -535,7 +535,11 @@ you will need to install "AmigaGuide Development" version from:
 
 https://aminet.net/text/hyper/aguide34.lha
 
-Recommendation is to do so, just to enjoy seeing it working.
+To enable display of images as well, you need to transplant an
+iffparse.library from OS2.0 to your OS1.3 installation.
+
+Recommendation is to do so, just to enjoy seeing AmigaGuides working
+in OS1.3.
 
 @{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 @ENDNODE

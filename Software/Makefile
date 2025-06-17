@@ -116,6 +116,8 @@ release: all
 	cp ../Documentation/AmiGUS/AmiGUS.guide     $(MANUAL_DIR)
 	cp -R ../Documentation/AmiGUS/ilbm          $(MANUAL_DIR)
 	cp Installer/AmiGUS.guide.info              $(MANUAL_DIR)
+	cp Installer/13/AmiGUS.guide38.info         $(MANUAL_DIR)
+	sed -e "s#MultiView#Sys:Utilities/WDisplay#" ../Documentation/AmiGUS/AmiGUS.guide > $(MANUAL_DIR)/AmiGUS.guide38
 
 	###########################################################################
 	# Manual adf
@@ -148,13 +150,12 @@ release: all
 	adf_format -l AmiGUS-OS1.3 -t 0 -f $(ADF_IMAGE3)
 	fuseadf $(ADF_IMAGE3) $(ADF_DIR3)/
 
-	mkdir -p $(ADF_DIR3)/Tools $(ADF_DIR3)/Firmware $(ADF_DIR3)/MHI $(ADF_DIR3)/Manual
+	mkdir -p $(ADF_DIR3)/Tools $(ADF_DIR3)/Firmware $(ADF_DIR3)/MHI
 
 	cp Installer/13/Tools.info                  $(ADF_DIR3)/Tools.info
 	cp Installer/13/MHI.info                    $(ADF_DIR3)/MHI.info
 	cp Installer/13/Firmware.info               $(ADF_DIR3)/Firmware.info
 	cp Installer/13/Libs.info                   $(ADF_DIR3)/Libs.info
-	cp Installer/13/Manual.info                   $(ADF_DIR3)/Manual.info
 
 	cp Tools/Mixer/Mixer13                      $(ADF_DIR3)/Tools
 	cp Tools/Mixer/Mixer13.info                 $(ADF_DIR3)/Tools
@@ -186,9 +187,6 @@ release: all
 	cp Installer/13/CC-BY-NC-ND.txt.info        $(ADF_DIR3)/CC-BY-NC-ND.txt.info
 	cp Installer/ReadMeFirst.txt                $(ADF_DIR3)/ReadMeFirst.txt
 	cp Installer/13/ReadMeFirst.txt.info        $(ADF_DIR3)/ReadMeFirst.txt.info
-
-	cp Installer/13/AmiGUS.guide38.info         $(ADF_DIR3)/Manual
-	sed -e "s#MultiView#Sys:Utilities/WDisplay#" ../Documentation/AmiGUS/AmiGUS.guide > $(ADF_DIR3)/Manual/AmiGUS.guide38
 
 	cp Installer/Disk.info                      $(ADF_DIR3)/
 

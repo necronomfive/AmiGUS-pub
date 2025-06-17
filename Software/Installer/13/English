@@ -246,22 +246,20 @@ IF WARN
     SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS"
   ENDIF
 
-  IF EXISTS AmiGUS-13-SRC:Manual.info
+  IF EXISTS AmiGUS-13-SRC:ilbm
     ; Installing from lha archive
     SETENV >NIL: MANUALPATH "AmiGUS-13-SRC:Manual/"
   ELSE
     ; Installing from ADF/Disk
-    ECHO "Please insert the disk labelled AmiGUS-Manual and push return."
-    ASK ""
     SETENV >NIL: MANUALPATH "AmiGUS-Manual:"
   ENDIF
 
   ECHO   >  RAM:AmiGUS_installer1 "IF NOT EXISTS TOOLSPATH"
   ECHO   >> RAM:AmiGUS_installer1 "  MAKEDIR TOOLSPATH"
   ECHO   >> RAM:AmiGUS_installer1 "ENDIF"
-    ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:AmiGUS.guide38 TOOLSPATH/AmiGUS.guide"
-  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:AmiGUS.guide38.info TOOLSPATH/AmiGUS.guide.info"
   ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHilbm TOOLSPATH/ilbm"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUS.guide38 TOOLSPATH/AmiGUS.guide"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUS.guide38.info TOOLSPATH/AmiGUS.guide.info"
 
   ; Prepare EDIT script to replace MANUALPATH with correct path in installer script
   ECHO   >  RAM:AmiGUS_editscript1 "GE ?MANUALPATH?" NOLINE

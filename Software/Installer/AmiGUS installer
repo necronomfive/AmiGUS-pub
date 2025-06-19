@@ -656,14 +656,19 @@
 (if
   (BITAND what %1000000000)
   (
-    (execute TryManualAssign)
-    (askdisk
-      (prompt #insert_manual_disk)
-      (help #insert_manual_disk_help)
-      (dest "AmiGUS-Manual")
-      (assigns)
+    (if
+      (exists "Manual/AmiGUS.guide")
+      (set source_folder "Manual")
+      (
+        (askdisk
+          (prompt #insert_manual_disk)
+          (help #insert_manual_disk_help)
+          (dest "AmiGUS-Manual")
+          (assigns)
+        )
+        (set source_folder "AmiGUS-Manual:")
+      )
     )
-    (set source_folder "AmiGUS-Manual:")
     (set manual_target
       (askdir (prompt #which_manual_target)
         (help #which_manual_target_help)

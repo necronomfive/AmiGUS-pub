@@ -140,9 +140,9 @@ IF WARN
   ECHO "3) 68000, DEBUG version, file logging"
   ECHO "4) 68000, DEBUG version, memory logging"
   ECHO "5) 68020, RELEASE version, no logging, use this if on 68020+"
-  ECHO "6) 68020, DEBUG version, serial logging"
-  ECHO "7) 68020, DEBUG version, file logging"
-  ECHO "8) 68020, DEBUG version, memory logging"
+  ECHO "6) 68020, DEBUG version, serial logging, for 68020+"
+  ECHO "7) 68020, DEBUG version, file logging, for 68020+"
+  ECHO "8) 68020, DEBUG version, memory logging, for 68020+"
   ECHO ""
   ECHO "*e[33mDefault: 1*e[31m - please enter 1-8 and push Return:"
   SETENV >NIL: mhi_variant ?
@@ -246,7 +246,9 @@ IF WARN
     SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS"
   ENDIF
 
-  IF EXISTS AmiGUS-13-SRC:ilbm
+  ASSIGN >NIL: AmiGUS-Manual:
+
+  IF EXISTS AmiGUS-13-SRC:Manual
     ; Installing from lha archive
     SETENV >NIL: MANUALPATH "AmiGUS-13-SRC:Manual/"
   ELSE
@@ -258,10 +260,9 @@ IF WARN
   ECHO   >> RAM:AmiGUS_installer1 "  MAKEDIR TOOLSPATH"
   ECHO   >> RAM:AmiGUS_installer1 "ENDIF"
   ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHilbm TOOLSPATH/ilbm"
-  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUSv38.guide TOOLSPATH/AmiGUS.guide"
-  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUSv38.guide.info TOOLSPATH/AmiGUS.guide.info"
-  ; Does not seem to be required - let's see
-  ; ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUSGuideWrapper TOOLSPATH/"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUS.guide TOOLSPATH/AmiGUS.guide"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUS.guide.infoV38 TOOLSPATH/AmiGUS.guide.info"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUSv38.guide TOOLSPATH/AmiGUSv38.guide"
 
   ; Prepare EDIT script to replace MANUALPATH with correct path in installer script
   ECHO   >  RAM:AmiGUS_editscript1 "GE ?MANUALPATH?" NOLINE

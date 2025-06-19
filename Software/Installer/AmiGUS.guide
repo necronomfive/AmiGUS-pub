@@ -1,15 +1,23 @@
+.KEY ""
+.BRA {
+.KET }
+
 STACK 32768
 
-ASSIGN AmiGUS-Manual: ""
+FAILAT 21
+ASSIGN >NIL: AmiGUS-Manual: ""
+FAILAT 10
 
 IF EXISTS Sys:Utilities/MultiView
-  RUN >NIL: Sys:Utilities/MultiView AmiGUS-Manual:AmiGUS.guide WINDOWWIDTH=666
+  RUN >NIL: Sys:Utilities/MultiView AmiGUS-Manual:AmiGUSv39.guide
 ELSE
   IF EXISTS Sys:Utilities/AmigaGuide
-    RUN >NIL: Sys:Utilities/AmigaGuide AmiGUS-Manual:AmiGUSv38.guide WINDOWWIDTH=666
+    RUN >NIL: Sys:Utilities/AmigaGuide AmiGUS-Manual:AmiGUSv38.guide
   ELSE
     ECHO "Please install AmigaGuide from"
     ECHO "*e[33mhttps://aminet.net/text/hyper/aguide34.lha"
     WAIT 10
   ENDIF
+ENDIF
+
 ENDCLI

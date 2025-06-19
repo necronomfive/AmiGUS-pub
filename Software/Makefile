@@ -96,6 +96,7 @@ release: all
 
 	cp Installer/Disk.info                      $(TARGET_DIR)/
 
+	cp Installer/TryManualAssign                $(TARGET_DIR)/
 	cp "Installer/AmiGUS installer"             $(TARGET_DIR)/
 	cp Installer/English.info                   $(TARGET_DIR)/
 	cp Installer/Deutsch.info                   $(TARGET_DIR)/
@@ -113,12 +114,11 @@ release: all
 
 	mkdir -p $(MANUAL_DIR)
 	cp Installer/Disk.info                      $(MANUAL_DIR)/
-	cp ../Documentation/AmiGUS/AmiGUS.guide     $(MANUAL_DIR)
+	cp ../Documentation/AmiGUS/AmiGUS.guide     $(MANUAL_DIR)/AmiGUSv39.guide
 	cp -R ../Documentation/AmiGUS/ilbm          $(MANUAL_DIR)
 	cp Installer/AmiGUS.guide.info              $(MANUAL_DIR)
-	# Does not seem to be neccessary, no clue why
-	# cp Installer/13/AmiGUSGuideWrapper          $(MANUAL_DIR)
-	cp Installer/13/AmiGUSv38.guide.info        $(MANUAL_DIR)
+	cp Installer/AmiGUS.guide                   $(MANUAL_DIR)
+	cp Installer/AmiGUS.guide.infoV38           $(MANUAL_DIR)
 	sed -e "s#MultiView#Sys:Utilities/WDisplay#" \
 	    -e "s#ilbm/#AmiGUS-Manual:ilbm/#"        \
 	    ../Documentation/AmiGUS/AmiGUS.guide  > $(MANUAL_DIR)/AmiGUSv38.guide

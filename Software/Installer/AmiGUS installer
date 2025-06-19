@@ -478,7 +478,7 @@
     (if install_driver_all
       (copyfiles
         (source source_folder)
-        (pattern "#?")
+        (pattern (cat file "#?"))
         (dest target_folder)
       )  
     )
@@ -519,7 +519,7 @@
     (if install_driver_all
       (copyfiles
         (source source_folder)
-        (pattern "#?")
+        (pattern (cat file "#?"))
         (dest target_folder)
       )
     )
@@ -656,19 +656,14 @@
 (if
   (BITAND what %1000000000)
   (
-    (if 
-      (= (exists "Manual") 2)
-      (set source_folder "Manual")
-      (
-        (askdisk
-          (prompt #insert_manual_disk)
-          (help #insert_manual_disk_help)
-          (dest "AmiGUS-Manual")
-          (assigns)
-        )
-        (set source_folder "AmiGUS-Manual:")
-      )
+    (execute TryManualAssign)
+    (askdisk
+      (prompt #insert_manual_disk)
+      (help #insert_manual_disk_help)
+      (dest "AmiGUS-Manual")
+      (assigns)
     )
+    (set source_folder "AmiGUS-Manual:")
     (set manual_target
       (askdir (prompt #which_manual_target)
         (help #which_manual_target_help)

@@ -233,7 +233,7 @@ ECHO ""
 
 ASK "Do you want to install the AmiGUS AmigaGuide manual? (y/N)"
 IF WARN
-  ECHO "The default installation path for the AmiGUS base tools is:"
+  ECHO "The default installation path for the AmiGUS manual is:"
   ECHO "*e[33mSYS:Expansion/AmiGUS*e[31m"
   ECHO "Well, you know the story already most likely..."
   ECHO ""

@@ -237,20 +237,21 @@ ENDIF
 
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
-ECHO "|                         AmigaGuide manual                         |"
+ECHO "|                       AmigaGuide Anleitung                        |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""
 
-ASK "Do you want to install the AmiGUS AmigaGuide manual? (y/N)"
+ASK "Möchten Sie die AmiGUS AmigaGuide Anleitung installieren? (y/N)"
 IF WARN
-  ECHO "The default installation path for the AmiGUS base tools is:"
+  ECHO "Das Standardinstallationsverzeichnis für die AmiGUS Anleitung ist:"
   ECHO "*e[33mSYS:Expansion/AmiGUS*e[31m"
-  ECHO "Well, you know the story already most likely..."
+  ECHO "Nunja, die Geschichte kennen sie wahrscheinlich schon..."
   ECHO ""
-  ASK "Do you want to adapt the path before installing (y/N)?"
-
+  ASK "Möchten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
+ 
   IF WARN
-    ECHO "Enter your desired installation path and push Return:"
+    ECHO "Bitte geben Sie ihr gewünschtes Installationsverzeichnis ein"
+    ECHO "und drücken Sie die Eingabetaste:"
     SETENV >NIL: TOOLSPATH ?
   ELSE
     SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS"

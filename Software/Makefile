@@ -116,8 +116,12 @@ release: all
 	cp ../Documentation/AmiGUS/AmiGUS.guide     $(MANUAL_DIR)
 	cp -R ../Documentation/AmiGUS/ilbm          $(MANUAL_DIR)
 	cp Installer/AmiGUS.guide.info              $(MANUAL_DIR)
-	cp Installer/13/AmiGUS.guide38.info         $(MANUAL_DIR)
-	sed -e "s#MultiView#Sys:Utilities/WDisplay#" ../Documentation/AmiGUS/AmiGUS.guide > $(MANUAL_DIR)/AmiGUS.guide38
+	# Does not seem to be neccessary, no clue why
+	# cp Installer/13/AmiGUSGuideWrapper          $(MANUAL_DIR)
+	cp Installer/13/AmiGUSv38.guide.info        $(MANUAL_DIR)
+	sed -e "s#MultiView#Sys:Utilities/WDisplay#" \
+	    -e "s#ilbm/#AmiGUS-Manual:ilbm/#"        \
+	    ../Documentation/AmiGUS/AmiGUS.guide  > $(MANUAL_DIR)/AmiGUSv38.guide
 
 	###########################################################################
 	# Manual adf

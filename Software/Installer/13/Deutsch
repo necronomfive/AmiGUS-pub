@@ -268,8 +268,11 @@ IF WARN
   ECHO   >> RAM:AmiGUS_installer1 "  MAKEDIR TOOLSPATH"
   ECHO   >> RAM:AmiGUS_installer1 "ENDIF"
   ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHilbm TOOLSPATH/ilbm"
-  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUS.guide38 TOOLSPATH/AmiGUS.guide"
-  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUS.guide38.info TOOLSPATH/AmiGUS.guide.info"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUSv38.guide TOOLSPATH/AmiGUS.guide"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUSv38.guide.info TOOLSPATH/AmiGUS.guide.info"
+  ; Does not seem to be required - let's see
+  ; ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUSGuideWrapper TOOLSPATH/"
+
 
   ; Prepare EDIT script to replace MANUALPATH with correct path in installer script
   ECHO   >  RAM:AmiGUS_editscript1 "GE ?MANUALPATH?" NOLINE

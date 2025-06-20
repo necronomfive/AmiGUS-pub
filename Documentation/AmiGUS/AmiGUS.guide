@@ -1069,21 +1069,41 @@ are slower!
     "setenv AmiGUS-MHI-LOG-FILEPATH SYS:another-Log-MHI.txt" respectively. 
     Please be careful to not overwrite important files and be prepared your 
     drive may want to validate for a long time in case of crashes!
-  - "...-MEM_LOG" debug versions of the drivers allocate a chunk of memory 
-    and leave their messages in there. This is as fast as it can be and as 
-    noisy as it can get, survives crashes well and will be requested in 
-    case of bug reports. 
-    "setenv AmiGUS-AHI-LOG-ADDRESS 1234560" or 
-    "setenv AmiGUS-MHI-LOG-ADDRESS 1234560" sets the log address in case 
-    the automatic methods fail. Beware, the addresses are noted in decimal. 
-    The memory size can be adapted to fit your machine using 
-    "setenv AmiGUS-AHI-LOG-SIZE 512" or 
-    "setenv AmiGUS-MHI-LOG-SIZE 512" with a decimal memory size. 
-    Beware: this is just for allocation and protecting the resulting logs. 
-    The drivers do not stop producing more logs behind the end of that 
+  - "...-MEM_LOG" debug versions of the drivers allocate a chunk of memory
+    and leave their messages in there. This is as fast as it can be and as
+    noisy as it can get, survives crashes well and will be requested in
+    case of bug reports.
+    "setenv AmiGUS-AHI-LOG-ADDRESS 1234560" or
+    "setenv AmiGUS-MHI-LOG-ADDRESS 1234560" sets the log address in case
+    the automatic methods fail. Beware, the addresses are noted in decimal.
+    The memory size can be adapted to fit your machine using
+    "setenv AmiGUS-AHI-LOG-SIZE 512" or
+    "setenv AmiGUS-MHI-LOG-SIZE 512" with a decimal memory size.
+    The actually used memory address is printed to the serial port on driver
+    startup.
+    Beware: this is just for allocation and protecting the resulting logs.
+    The drivers do not stop producing more logs behind the end of that
     memory slab.
-    Even after a crash, the Get#?MemLog tools can retrieve the respective 
-    log files.
+
+The tools explained below are part of the debug tools offered during
+installation.
+  - Even after a crash, the GetAhiMemLog and GetMhiMemLog tools can retrieve
+    the respective memory logs into files.
+    Get#?MemLog accepts optional parameters, try "help" for more information.
+  - MHILibCheck tries loading the AmiGUS MHI driver and calls a method
+    retrieving additional information from it. This is especially useful if
+    the MHI driver is not loaded successfully in OS1.3. If it does not work
+    here, something very wrong.
+  - MHIplay is an OS1.3 compatible command line player for MP3s and similar
+    encoded files. While PlayMP3 directly talks to the hardware, this now
+    tries using the MHI driver. If that does work and another player does
+    not work with the MHI driver correctly, it is likely that other player's
+    fault.
+    MHIplay requires 2 parameters, the driver and the file,
+    e.g. in OS1.3:
+    > mhiplay libs:mhiamigus.library music:nena/99_red_baloons.mp3
+    or OS2.0:
+    > mhiplay libs:mhi/mhiamigus.library music:nena/99_red_baloons.mp3
 
 We hope you will never need this information, 
 please be patient, we did our best!

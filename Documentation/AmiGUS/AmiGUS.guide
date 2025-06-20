@@ -457,13 +457,30 @@ AmigaOS versions. They work well, and while we try our best to make
 the AmiGUS enjoyable on all compatible configurations, we cannot wield
 any magic.
 Thus, there is and there will be no support for AHI below OS2.0, sorry.
+If you use the OS1.3 versions on OS2.0 or above, you will miss out on
+some of the features we could not port back to OS1.3.
 
 @{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
+@ENDNODE
 
-Commodore and its successorts only released the Installer for OS2.0 and
+@NODE sw_inst13 "Installation - OS1.3 Software"
+@TOC contents
+@{" 2     Installation                 " LINK hw_inst}
+@{" 2.1   Card Installation            " LINK hw_inst}
+@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
+@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
+@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
+@{" 2.2.3 Paula loop-through other     " LINK paulaother}
+@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
+@{" 2.3   External Audio Set-Up        " LINK external}
+@{" 2.4   Software Installation        " LINK sw_inst}
+@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
+
+Commodore and its successors only released the Installer for OS2.0 and
 above. Therefore, the AmiGUS OS1.3 disk provides installers in different
 languages as simple shell scripts.
-In all languages, their function is the same: 
+In all languages, their functionality is the same: 
 
 They open a window expecting the user to provide input via keyboard.
 Positive acknowledgements are triggered by pressing the <Y> key,
@@ -544,24 +561,6 @@ in OS1.3.
 @{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 @ENDNODE
 
-@NODE sw_inst13 "Installation - OS1.3 Software"
-@TOC contents
-@{" 2     Installation                 " LINK hw_inst}
-@{" 2.1   Card Installation            " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up        " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM              " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT    " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other     " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion      " LINK expansion}
-@{" 2.3   External Audio Set-Up        " LINK external}
-@{" 2.4   Software Installation        " LINK sw_inst}
-@{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
-
-TODO
-
-@{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
-@ENDNODE
-
 @NODE sw_inst20 "Installation - OS2.0+ Software"
 @TOC contents
 @{" 2     Installation                 " LINK hw_inst}
@@ -576,7 +575,55 @@ TODO
 @{" 2.4.1 OS1.3 Software Installation  " LINK sw_inst13}
 @{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 
-TODO
+On OS2.0 and later, the AmiGUS software installation relies on the
+Amiga Installer being available in path from the underlying OS.
+
+But Commodore only introduced the Installer in OS2.1 and since then,
+it is part of the AmiagaOS installation. So before installing the
+AmiGUS software on OS2.0, you may need to install the Installer from:
+
+https://aminet.net/util/misc/Installer-43_3.lha
+
+We tested the installation with an early Installer from OS2.1 that does
+not even have version information included, but there may be even older
+or worse versions of it out there. In case you experience issues during 
+AmiGUS software installation, Installer 43.3 as per above may serve as a
+common ground.
+
+Similarly, to use any AmigaGuide on AmigaOSs earlier 3.0, 
+namely OS2.0 and OS2.1, you will need to install "AmigaGuide Development"
+version from:
+
+https://aminet.net/text/hyper/aguide34.lha
+
+The AmiGUS AmigaGuide manual does look best on OS3.2 and above, but you
+can at least read it conveniently using older version.
+
+Again, the installation comes in multiple languages and should just work
+the same in all languages. If you would like to see the installation
+procedure and or the manual translated to other languages feel free to
+reach out to us e.g. via our github presence.
+
+"Novice User", "Intermediate User" and "Expert User" level installations
+are available.
+
+"Novice User" installs all recommended parts without further questions
+to the recommended destinations. This should work fine for most users.
+Please note: if you downgrade your CPU after installation and experience
+issues running any AmiGUS software, you may need to reinstall the drivers.
+
+In "Intermediate User" level installations, you may pick and choose a lot
+of options. For the details of those, please refer to the help texts
+embedded into the Installer when pushing the "Help" buttons available
+everywhere. 
+
+In addition to the above, only "Expert User" level installations allow
+for placing all CPU or debug versions of AHI and MHI drivers next to the
+activated ones.
+
+Please keep in mind, using AHI and MHI requires additional software.
+Refer to sections @{" 4 AHI Driver Framework " LINK ahi} and @{"5 MHI Driver Framework" LINK mhi}
+for a detailed description.
 
 @{" 3     Software Tools               " LINK mixer1}
 @ENDNODE

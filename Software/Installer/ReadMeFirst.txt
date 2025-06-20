@@ -56,10 +56,19 @@ How do I install the hardware or software?
 Dependencies:
 -------------
 
+- In case you experience issues with a missing Installer or the installation
+  does not work as expected on the Installer version in your OS2.0 or above,
+  please try the latest Commodore / ESCOM / Amiga Technologies Installer from
+  
+  https://aminet.net/util/misc/Installer-43_3.lha
+
+  Installer 43.3
+  Copyright © 1995-96 Escom AG.
+
 - For file requesters, AmiGUS base tools rely on 
 
   reqtools.library 38.390
-  Copyright Â© 1991-1994 Nico FranÃ§ois
+  Copyright © 1991-1994 Nico François
 
 - To view the AmigaGuide manual on AmigaOSs earlier 3.0, 
   you will need to install "AmigaGuide Development" version from
@@ -67,7 +76,24 @@ Dependencies:
   https://aminet.net/text/hyper/aguide34.lha
   
   AmigaGuide_Dev 34.3
-  Copyright 1992-93 Commodore-Amiga, Inc.
+  Copyright © 1992-1993 Commodore-Amiga, Inc.
+
+- For using AHI, you need 
+
+  https://aminet.net/driver/audio/ahiusr_4.18.lha 
+
+  (RECOMMENDED)
+  AHI 4.18
+  Copyright © 1994-1998 Martin Blom
+
+  - OR -
+
+  https://aminet.net/driver/audio/m68k-amigaos-ahiusr.lha
+
+  AHI 6.0
+  Copyright © 1994-2005 Martin Blom
+
+  installed.
 
 -----------------------------------------------------------------------------
 

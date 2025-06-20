@@ -792,9 +792,9 @@ exclusive software implemented their audio functionality employing AHI to
 allow use of sound cards for playback and recording.
 
 Although there is @{"AHI 6.0 (2)" LINK refs} available for download, @{"AHI 4.18 (1)" LINK refs} is
-assumed to be faster and therefore strongly recommended for use on 68k based
-systems. You need to decide for one of them and install it following their
-respective own manuals.
+assumed to be faster and therefore strongly recommended for use on
+68k based systems. You need to decide for one of them and install it
+following their respective own manuals.
 
 Before configuring AHI for use with AmiGUS, please verify AHI is working
 correctly without. AHI comes with a Paula driver that is sufficient
@@ -1066,11 +1066,11 @@ debug versions for normal operations - they may introduce more crashes and
 are slower!
 
   - "...-SER_LOG" versions of the drivers log to the serial port of the
-    Amiga. You may use Sashimi to redirect the output back into a Workbench
-    window, but the speed of that debug output is limited, therefore the
-    level of detail as well. A real null-modem cable can be used to get
-    the output to another computer. Please find a link to a tested wiring
-    at @{"(7)" LINK refs}.
+    Amiga. You may use Sashimi to redirect the output back into a
+    Workbench window, but the speed of that debug output is limited,
+    therefore the level of detail as well. A real null-modem cable can be
+    used to get the output to another computer. Please find a link to a
+    tested wiring at @{"(7)" LINK refs}.
   - "...-FILE_LOG" versions of the drivers log to a file on the Amiga. By
     default, this is "RAM:AmiGUS-?.log", but can be adapted on AmigaOS 2.0
     and above using

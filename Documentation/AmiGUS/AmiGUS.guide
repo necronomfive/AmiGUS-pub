@@ -609,8 +609,14 @@ are available.
 
 "Novice User" installs all recommended parts without further questions
 to the recommended destinations. This should work fine for most users.
-Please note: if you downgrade your CPU after installation and experience
-issues running any AmiGUS software, you may need to reinstall the drivers.
+Please note: 
+- If you downgrade your CPU after installation and experience issues
+  running any AmiGUS software, you may need to reinstall the drivers.
+- The default installation path of AmiGUS tools and manual is
+  Sys:Expansion/AmiGUS - which may collide with some versions of
+  Commodore's Janus bridgeboard software. If you experience any issues,
+  please delete the AmiGUS software installed to that location, reinstall
+  and select another path.
 
 In "Intermediate User" level installations, you may pick and choose a lot
 of options. For the details of those, please refer to the help texts

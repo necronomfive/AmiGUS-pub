@@ -28,6 +28,8 @@
 (set #which_tools_target_help
 (cat "\nThis section lets you choose in which drawer or on which disk the "
      "AmiGUS base tools should be installed. It can be anywhere you like.\n\n"
+     "Default is Sys:Expansion/AmiGUS - which may cause issues with some "
+     "obscure Commodore extensions (bridgeboards) and their drivers.\n\n"
      @askdir-help
 ))
 
@@ -41,6 +43,8 @@
 (set #which_debug_target_help
 (cat "\nThis section lets you choose in which drawer or on which disk the "
      "AmiGUS debug tools should be installed. It can be anywhere you like.\n\n"
+     "Default is Sys:Expansion/AmiGUS - which may cause issues with some "
+     "obscure Commodore extensions (bridgeboards) and their drivers.\n\n"
      @askdir-help
 ))
 
@@ -92,7 +96,8 @@
 
 (set #all_versions_help
 (cat "\nAll available versions of the %s driver would be copied next to the "
-     "activated one in case you want to switch later."
+     "activated one in case you want to switch later.\n"
+     "This includes all CPU and debug variants."
 ))
 
 (set #yes
@@ -110,7 +115,26 @@
 (set #what_components_help
 (cat "\nThis section lets you choose which parts of the AmiGUS software "
      "package shall be installed. All of them should work independently "
-     "from each other.\n\n"
+     "from each other.\n"
+     "\n"
+     "AHI driver - Installs the AmiGUS drivers for AHI, the retargetable "
+     "audio system for AmigaOS. Recommended as widely used.\n"
+     "MHI driver - Installs the AmiGUS drivers for MHI, a standard for "
+     "hardware accelerated playback of encoded audio files like MP3. "
+     "Recommended, the codec chip would be insulted otherwise.\n"
+     "Mixer - AmiGUS stores the volume and other settings. But these need "
+     "to get there somehow, at least once. Recommended.\n"
+     "FlashGUI - Used to upgrade AmiGUS's firmware when needed or reset "
+     "the embedded settings. Recommended.\n"
+     "PlayWAV - Command line tool to play back WAV or raw PCM files.\n"
+     "PlayMP3 - Command line tool to play back MP3s or other encoded files.\n"
+     "PlayMIDI - Command line tool to play notes from a MIDI keyboard "
+     "connected via serial MIDI cable via AmiGUS's WaveTable engine.\n"
+     "Record - Command line tool to record audio with various settings into "
+     "WAV files.\n"
+     "Debug Tools - Tools to help debug AHI and MHI drivers when needed.\n"
+     "Manual - AmiGUS's AmigaGuide manual. Recommended.\n"
+     "\n"
 ))
 
 (set #component_ahi
@@ -171,6 +195,8 @@
 (cat "\nThe AmiGUS AmigaGuide manual consists of the actual AmigaGuide file "
      "and a folder with the embedded or linked images. You can choose the "
      "location for both here.\n\n"
+     "Default is Sys:Expansion/AmiGUS - which may cause issues with some "
+     "obscure Commodore extensions (bridgeboards) and their drivers.\n\n"
      @askdir-help
 ))
 
@@ -207,6 +233,9 @@
 (cat "\nIn diesem Teil können Sie wählen, auf welche Laufwerk oder "
      "Verzeichnis die AmiGUS Basiswerkzeuge installiert werden sollen. "
      "Der Ort ist dabei absolut beliebig. \n\n"
+     "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
+     "obskuren Commodore Erweiterungen (bridgeboards) und deren Treibern "
+     "verursachen kann.\n\n"
      @askdir-help
 ))
 
@@ -220,6 +249,9 @@
 (cat "\nIn diesem Teil können Sie wählen, auf welche Laufwerk oder "
      "Verzeichnis die AmiGUS Debugwerkzeuge installiert werden sollen. "
      "Der Ort ist dabei absolut beliebig. \n\n"
+     "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
+     "obskuren Commodore Erweiterungen (bridgeboards) und deren Treibern "
+     "verursachen kann.\n\n"
      @askdir-help
 ))
 
@@ -276,7 +308,8 @@
 (set #all_versions_help
 (cat "\nAlle verfügbaren Versionen des %s Treibers würden neben dem Aktiven "
      "abgelegt werden, um einen schnellen und einfachen Wechsel zwischen den "
-     "Treibern zu ermöglichen. "
+     "Treibern zu ermöglichen.\n"
+     "Dies umfasst alle CPU- und Debug-Varianten."
 ))
 
 (set #yes
@@ -294,7 +327,30 @@
 (set #what_components_help
 (cat "\nIn diesem Abschnitt können sie auswählen, welche Teile des AmiGUS "
      "Softwarepakets installiert werden sollen. Alle Teile sollten unabhängig "
-     "voneinander funktionieren.\n\n"
+     "voneinander funktionieren.\n.\n"
+     "\n"
+     "AHI Treiber - Installiert die AmiGUS Treiber für AHI, den AmigaOS "
+     "Audiostandard für diverse Soundkarten. Empfohlen.\n"
+     "MHI Treiber - Installiert die AmiGUS Treiber für MHI, einen Standard "
+     "für hardwarebeschleunigte Wiedergabe von komprimierten Audiodateien "
+     "wie MP3. Empfohlen, der Hardwarecodec wäre sonst beleidigt.\n"
+     "Mixer - Die AmiGUS speichert die Lautstärke und andere Einstellungen "
+     "intern ab. Diese müssen aber dort erstmal hineinkommen. Empfohlen.\n"
+     "FlashGUI - Wird verwendet um die Firmware der AmiGUS upzudaten oder "
+     "die gespeicherten Einstellungen zurückzusetzen. Empfohlen.\n"
+     "PlayWAV - Kommandozeilenwerkzeug, um WAV oder rohe PCM Dateien "
+     "abzuspielen.\n"
+     "PlayMP3 - Kommandozeilenwerkzeug, um MP3s oder andere komprimierte "
+     "Dateien abzuspielen.\n"
+     "PlayMIDI - Kommandozeilenwerkzeug, um Noten von einem per serieller "
+     "Schnittstelle verbundenem MIDI keyboard via AmiGUS's WaveTable "
+     "abzuspielen.\n"
+     "Record - Kommandozeilenwerkzeug, um Audio mit verschiedenen "
+     "Einstellungen als WAV Dateien aufzunehmen.\n"
+     "Debugwerkzeuge - Verschiedene Werkzeuge, um beim debuggen der "
+     "AHI und MHI Treiber zu helfen, wenn nötig.\n"
+     "Anleitung - AmiGUS's AmigaGuide Benutzerhandbuch. Empfohlen.\n"
+     "\n"
 ))
 
 (set #component_ahi
@@ -355,6 +411,9 @@
 (cat "\nDas AmiGUS AmigaGuide Handbuch besteht aus der eigentlichen "
      "AmigaGuide-Datei und einem Verzeichnis mit den eingebetteten oder "
      "verlinkten Bildern. Hier können Sie den Ort für beides auswählen.\n\n"
+     "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
+     "obskuren Commodore Erweiterungen (bridgeboards) und deren Treibern "
+     "verursachen kann.\n\n"
      @askdir-help
 ))
 

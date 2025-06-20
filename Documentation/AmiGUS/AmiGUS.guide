@@ -715,7 +715,6 @@ configuration options.
 
 @ENDNODE
 
-
 @NODE flash1 "Software Tools - FPGA Flash Tool"
 @TOC contents
 @{" 3     Software Tools               " LINK mixer1}

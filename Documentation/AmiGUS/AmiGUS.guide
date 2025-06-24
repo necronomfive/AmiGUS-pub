@@ -296,7 +296,7 @@ re-tighten all screws back according to your Amiga's User Manual.
 
 @ENDNODE
 
-@NODE cdrom "Installation - Internal CD-ROM"
+@NODE cdrom "Installation - Internal Audio Set-Up - Internal CD-ROM"
 @TOC contents
 @{" 2     Installation                 " LINK hw_inst}
 @{" 2.1   Card Installation            " LINK hw_inst}
@@ -318,7 +318,7 @@ AmiGUS CDROM Input via the supplied audio cable of your drive.
 
 @ENDNODE
 
-@NODE paulaaudiot "Installation - Internal AUDIOT"
+@NODE paulaaudiot "Installation - Internal Audio Set-Up - Paula loop-through AUDIOT"
 @TOC contents
 @{" 2     Installation                 " LINK hw_inst}
 @{" 2.1   Card Installation            " LINK hw_inst}
@@ -346,7 +346,7 @@ slot lanes in order to physically fit.
 
 @ENDNODE
 
-@NODE paulaother "Installation - Internal other"
+@NODE paulaother "Installation - Internal Audio Set-Up - Paula loop-through other"
 @TOC contents
 @{" 2     Installation                 " LINK hw_inst}
 @{" 2.1   Card Installation            " LINK hw_inst}
@@ -435,7 +435,7 @@ other analogue sound source which supports line-level audio output.
 
 @ENDNODE
 
-@NODE sw_inst "Installation - Software"
+@NODE sw_inst "Installation - Software Installation"
 @TOC contents
 @{" 2     Installation                 " LINK hw_inst}
 @{" 2.1   Card Installation            " LINK hw_inst}
@@ -468,7 +468,7 @@ some of the features we could not port back to OS1.3.
 @{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 @ENDNODE
 
-@NODE sw_inst13 "Installation - OS1.3 Software"
+@NODE sw_inst13 "Installation - OS1.3 Software Installation"
 @TOC contents
 @{" 2     Installation                 " LINK hw_inst}
 @{" 2.1   Card Installation            " LINK hw_inst}
@@ -507,7 +507,7 @@ and select another path.
 
 The installation procedure starts with the AmiGUS base tools.
 These are the service tools described in sections @{"3.1 Mixer Tool" LINK mixer1}
-and @{"3.1 FPGA Flash Tool" LINK flash1}, and the basic functionality
+and @{"3.2 FPGA Flash Tool" LINK flash1}, and the basic functionality
 tools PlayMidi, PlayMP3, PlayWav and Record.
 Recommendation would be to install them to the default path.
 
@@ -565,7 +565,7 @@ in OS1.3.
 @{" 2.4.2 OS2.0+ Software Installation " LINK sw_inst20}
 @ENDNODE
 
-@NODE sw_inst20 "Installation - OS2.0+ Software"
+@NODE sw_inst20 "Installation - OS2.0+ Software Installation"
 @TOC contents
 @{" 2     Installation                 " LINK hw_inst}
 @{" 2.1   Card Installation            " LINK hw_inst}
@@ -663,7 +663,7 @@ signal, thus lessening the amount of channel separation.
 @ENDNODE
 
 
-@NODE mixer2 "Software Tools - Mixer Panel"
+@NODE mixer2 "Software Tools - Mixer Panel Descriptions"
 @TOC contents
 @{" 3     Software Tools               " LINK mixer1}
 @{" 3.1   Mixer Tool                   " LINK mixer1}
@@ -1121,6 +1121,7 @@ please be patient, we did our best!
 @ENDNODE
 
 @NODE appendix "Appendices"
+@TOC contents
 @{" 6     Driver troubleshooting       " LINK drivers}
 @{" 7     Appendices                   " LINK appendix}
 @{" 7.1   Credits                      " LINK credits}
@@ -1129,6 +1130,7 @@ please be patient, we did our best!
 @ENDNODE
 
 @NODE credits "Appendices - Credits"
+@TOC contents
 @{" 7     Appendices                   " LINK appendix}
 @{" 7.1   Credits                      " LINK credits}
 @{" 7.2   References                   " LINK refs}
@@ -1136,6 +1138,7 @@ please be patient, we did our best!
 @ENDNODE
 
 @NODE refs "Appendices - References"
+@TOC contents
 @{" 7     Appendices                   " LINK appendix}
 @{" 7.1   Credits                      " LINK credits}
 @{" 7.2   References                   " LINK refs}

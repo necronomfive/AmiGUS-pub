@@ -289,6 +289,7 @@ void hagenPlayNote(APTR base, UWORD chNr, UWORD midNote, UWORD midVel)
 	UWORD fVel;
 	WriteReg16(base,HAGEN_VOICE_BNK,chNr);	// Select voice
 	WriteReg16(base,HAGEN_VOICE_CTRL,0x0);	// Stop note	
+	WriteReg16(base,HAGEN_VOICE_ENV_RESET,0x0);	// Reset evelope
 	
 	freq = midiFreq[midNote];				// Convert midi note to frequency value
 	
@@ -308,7 +309,6 @@ void hagenPlayNote(APTR base, UWORD chNr, UWORD midNote, UWORD midVel)
 	}
 	
 	WriteReg32(base,HAGEN_VOICE_PSTRTH,0x0);	// Reset pointer
-	WriteReg32(base,HAGEN_VOICE_ENV_RESET,0x0);	// Reset pointer	
 	WriteReg16(base,HAGEN_VOICE_CTRL,0xc02f);		// Trigger voice
 }
 
@@ -317,7 +317,7 @@ void hagenReleaseNote(APTR base, UWORD chNr)
 	ULONG freq;
 	UWORD fVel;
 	WriteReg16(base,HAGEN_VOICE_BNK,chNr);	// Select voice
-	WriteReg16(base,HAGEN_VOICE_CTRL,0x802f);	// Stop note	
+	WriteReg16(base,HAGEN_VOICE_CTRL,0x802f);	// Release voice key
 }
 
 
@@ -478,7 +478,6 @@ int main(int argc,char **argv)
 		WriteReg16(board_base,HAGEN_VOICE_ENV_SUSTAIN,0x2000);
 		WriteReg16(board_base,HAGEN_VOICE_ENV_RELEASE,0x0400);	
 		WriteReg16(board_base,HAGEN_VOICE_ENV_RESET,0x0);				
-		
 	}
 	// Set master volume
 	WriteReg16(board_base,HAGEN_GLOBAL_VOLUMEL,0xffff);

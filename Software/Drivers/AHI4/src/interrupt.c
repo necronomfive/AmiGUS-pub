@@ -122,8 +122,11 @@ INLINE VOID HandleRecording( VOID ) {
 ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   REG(a1, struct AmiGUS_AHI_BasePrivate * amiGUSBase)
 ) {
-  const UWORD status = ReadReg16( AmiGUS_AHI_Base->agb_CardBase,
-                                  AMIGUS_PCM_INT_CONTROL );
+  APTR card = AmiGUS_AHI_Base->agb_CardBase;
+  const UWORD enable = ReadReg16( card, AMIGUS_PCM_INT_ENABLE );
+  const UWORD control = ReadReg16( card, AMIGUS_PCM_INT_CONTROL );
+  const UWORD status = enable & control;
+
   if ( !( status & ( AMIGUS_PCM_INT_F_PLAY_FIFO_EMPTY
                    | AMIGUS_PCM_INT_F_PLAY_FIFO_WTRMK
                    | AMIGUS_PCM_INT_F_REC_FIFO_FULL

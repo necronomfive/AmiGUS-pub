@@ -74,7 +74,7 @@ LIB_LOG        ?= FILE_LOG
 LIB_NAME        = mhiamigus
 LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
-LIB_REVISION    = 7
+LIB_REVISION    = 8
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =
@@ -316,7 +316,7 @@ get_mem_log:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
 	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
 	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/GetMemMhiLog
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/GetMhiMemLog
 
 mhi_lib_check:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c

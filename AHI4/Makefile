@@ -74,7 +74,7 @@ LIB_LOG        ?= MEM_LOG
 LIB_NAME        = AmiGUS
 LIB_FILE        = $(LIB_NAME).audio
 LIB_VERSION     = 4
-LIB_REVISION    = 18
+LIB_REVISION    = 19
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =
@@ -259,7 +259,7 @@ get_mem_log:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
 	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
 	-cp target/$@ ~/Documents/FS-UAE/Shared/AHI/
-	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/GetMemAhiLog
+	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/GetAhiMemLog
 
 ###############################################################################
 

@@ -74,7 +74,7 @@ LIB_LOG        ?= MEM_LOG
 LIB_NAME        = AmiGUS
 LIB_FILE        = $(LIB_NAME).audio
 LIB_VERSION     = 4
-LIB_REVISION    = 19
+LIB_REVISION    = 20
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =

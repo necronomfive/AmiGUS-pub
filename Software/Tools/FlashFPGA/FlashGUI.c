@@ -336,7 +336,6 @@ void EraseCoreFlash(APTR base)
 		WriteReg16(base, FLASH_CTRL_ADDR, 0x1);
 		
 	} while (sector != 0x00500000);
-	printf(" ");
 }
 
 void wPrintF(int line, char * text, BOOL erase,UWORD topborder,struct TextFont *font,struct Window *mywin)
@@ -415,7 +414,6 @@ void ProgramCoreFlash(APTR base, APTR memory, UWORD topborder, struct Window *my
 		cnt+=4;
 	}
 	while (cnt < length);
-	printf(" ");	
 }
 
 void initCfgMem (APTR cfg_mem)
@@ -433,7 +431,7 @@ void initCfgMem (APTR cfg_mem)
 
 	// ADC Power-Down
 	*((ULONG *)((ULONG)cfg_mem+0x0004)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0008)) = 0x00700022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfg_mem+0x0008)) = 0x00750022;	// MAIN_SPI_WDATA = regval
 	*((ULONG *)((ULONG)cfg_mem+0x000c)) = 0x00000024;	// MAIN_SPI_WTRIG	
 
 	// Enable ADC I2S Master Mode
@@ -514,16 +512,16 @@ void initCfgMem (APTR cfg_mem)
 	
 	// Disable PLL
 	*((ULONG *)((ULONG)cfg_mem+0x00bc)) = 0x00280020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00e0)) = 0x00000022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00e4)) = 0x00000024;	// MAIN_SPI_WTRIG	
+	*((ULONG *)((ULONG)cfg_mem+0x00c0)) = 0x00000022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfg_mem+0x00c4)) = 0x00000024;	// MAIN_SPI_WTRIG	
 
 	// ADC Power-Up
-	*((ULONG *)((ULONG)cfg_mem+0x00e8)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00ec)) = 0x00700022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00f0)) = 0x00000024;	// MAIN_SPI_WTRIG	
+	*((ULONG *)((ULONG)cfg_mem+0x00c8)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfg_mem+0x00cc)) = 0x00700022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfg_mem+0x00d0)) = 0x00000024;	// MAIN_SPI_WTRIG	
 
 /* End of Stream */
-	*((ULONG *)((ULONG)cfg_mem+0x00f4)) = 0xffffffff;
+	*((ULONG *)((ULONG)cfg_mem+0x00d4)) = 0xffffffff;
 }
 
 void errorMessage(STRPTR error)

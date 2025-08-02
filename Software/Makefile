@@ -134,8 +134,9 @@ release: all
 
 	cp Tools/Mixer/Mixer13                      $(TOOL_DIR)
 	cp Tools/Mixer/Mixer13.info                 $(TOOL_DIR)
-	#----- cp Tools/FlashFPGA/FlashGUI13               $(TOOL_DIR)
-	#----- cp Tools/FlashFPGA/FlashGUI13.info          $(TOOL_DIR)
+	cp Tools/FlashFPGA/FlashGUI13               $(TOOL_DIR)
+	cp Tools/FlashFPGA/FlashGUI13.info          $(TOOL_DIR)
+	cp -R dependencies/libs                     $(TARGET_DIR)/Libs
 
 	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)` `basename $(TARGET_DIR)`.info
 
@@ -155,9 +156,17 @@ release: all
 
 	cp Tools/Mixer/Mixer13                      $(ADF_DIR3)/Tools
 	cp Tools/Mixer/Mixer13.info                 $(ADF_DIR3)/Tools
-	#----- cp Tools/FlashFPGA/FlashGUI13               $(ADF_DIR3)/Tools
-	#----- cp Tools/FlashFPGA/FlashGUI13.info          $(ADF_DIR3)/Tools
-
+	cp Tools/FlashFPGA/FlashGUI13               $(ADF_DIR3)/Tools
+	cp Tools/FlashFPGA/FlashGUI13.info          $(ADF_DIR3)/Tools
+	cp Tools/PlayMIDI/PlayMidi                  $(ADF_DIR3)/Tools
+	cp Tools/PlayMIDI/PlayMidi.info             $(ADF_DIR3)/Tools
+	cp Tools/PlayMP3/PlayMP3                    $(ADF_DIR3)/Tools
+	cp Tools/PlayMP3/PlayMP3.info               $(ADF_DIR3)/Tools
+	cp Tools/PlayWAV/PlayWav                    $(ADF_DIR3)/Tools
+	cp Tools/PlayWAV/PlayWav.info               $(ADF_DIR3)/Tools
+	cp Tools/Record/Record                      $(ADF_DIR3)/Tools
+	cp Tools/Record/Record.info                 $(ADF_DIR3)/Tools
+	cp -R dependencies/libs                     $(ADF_DIR3)/Libs
 	cp Drivers/MHI/target/get_mem_log           $(ADF_DIR3)/MHI/GetMhiMemLog
 	cp Installer/program.info                   $(ADF_DIR3)/MHI/GetMhiMemLog.info
 	cp Drivers/MHI/target/mhi_lib_check         $(ADF_DIR3)/MHI/MHILibCheck
@@ -193,12 +202,26 @@ release: all
 
 all: tools drivers support
 
-tools: $(TOOLS/ALL)
+tools: prepare-tools $(TOOLS/ALL)
 
 support: $(DRIVERS/SUPPORT)
 	echo $(DRIVERS/SUPPORT)
 
 drivers: $(DRIVERS/ALL) 
+
+prepare-tools:
+	mkdir -p /tmp/tools-installation
+	wget -P  /tmp/tools-installation https://aminet.net/dev/misc/gt34_1.lha
+	cd       /tmp/tools-installation ; jlha x gt34_1.lha
+	wget -P  /tmp/tools-installation https://aminet.net/util/libs/ReqToolsDev.lha
+	cd       /tmp/tools-installation ; jlha x ReqToolsDev.lha
+	wget -P  /tmp/tools-installation https://aminet.net/util/libs/ReqToolsUsr.lha
+	cd       /tmp/tools-installation ; jlha x ReqToolsUsr.lha
+	mkdir -p dependencies
+	cp -R    /tmp/tools-installation/ReqTools/include                   dependencies/
+	cp -R    /tmp/tools-installation/ReqTools/libs                      dependencies/
+	cp -R    /tmp/tools-installation/GadTools34/gadtools_34.library     dependencies/libs/gadtools.library
+	touch prepare-tools
 
 prepare-ahi:
 	mkdir -p /tmp/ahi4-installation Drivers/AHI4/include
@@ -225,6 +248,7 @@ dist-clean: $(DRIVERS/DIST-CLEAN) clean
 	rm -rf Drivers/*/include
 	rm -rf /tmp/mhi-installation prepare-mhi
 	rm -rf /tmp/ahi4-installation prepare-ahi
+	rm -rf /tmp/gt34-installation prepare-tools
 
 $(DRIVERS/CLEAN) $(DRIVERS/SUPPORT) $(TOOLS/ALL) $(TOOLS/CLEAN):
 	echo -C $(@D) $(@F)

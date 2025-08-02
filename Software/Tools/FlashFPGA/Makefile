@@ -42,20 +42,24 @@ else
   LHA           = lha
 endif
 
-TARGET          = FlashGUI
+TARGET0         = FlashGUI
+TARGET1         = FlashGUI13
 FOLDER          = FlashFPGA
 
 .PHONY: clean release release0 release01
 
-all: $(TARGET)
+all: $(TARGET0) $(TARGET1)
 
 clean:
-	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET) $(RM_SUFFIX)
+	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET0) $(TARGET1) $(RM_SUFFIX)
 
-$(TARGET):
-	$(RUNNER) sc $(TARGET).c incdir=include: cpu=68000 link
+$(TARGET0):
+	$(RUNNER) sc $@.c incdir=include: cpu=68000 link
 
-release: $(TARGET) release0$(LINUX)
+$(TARGET1):
+	$(RUNNER) sc $@.c incdir=include: incdir=gus:../../dependencies/include cpu=68000 link
+
+release: $(TARGET0) $(TARGET1) release0$(LINUX)
 
 # Amiga Version:
 release0:

@@ -4,7 +4,9 @@
 
 # Target files
 FlashFPGA/FlashGUI
+FlashFPGA/FlashGUI13
 Mixer/Mixer
+Mixer/Mixer13
 PlayMIDI/PlayMidi
 PlayMP3/PlayMP3
 PlayWAV/PlayWav

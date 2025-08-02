@@ -54,12 +54,12 @@ clean:
 	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET0) $(TARGET1) $(RM_SUFFIX)
 
 $(TARGET0):
-	$(RUNNER) sc $(TARGET0).c asmroutines.a incdir=include: cpu=68000 MATH=standard link
+	$(RUNNER) sc $@.c asmroutines.a incdir=include: cpu=68000 MATH=standard link
 
 $(TARGET1):
-	$(RUNNER) sc $(TARGET1).c asmroutines.a incdir=include: cpu=68000 MATH=standard link
+	$(RUNNER) sc $@.c asmroutines.a incdir=include: cpu=68000 MATH=standard link
 
-release: $(TARGET0) release0$(LINUX)
+release: $(TARGET0) $(TARGET1) release0$(LINUX)
 
 # Amiga Version:
 release0:

@@ -196,6 +196,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## Credits / Thanks
 * **Oliver Achten** - product idea, concept, PCB design, FPGA logic, docs, base software
 * **Christoph Faßbach** - AHI & MHI driver framework
-* **Torsten Hees** - AmiGUS prototype production coordination & support
+* **Simon Neumann & Torsten Hees** - AmiGUS prototype production coordination & support
 * **Thomas Ziegert** - AmiGUS bracket redesign & production
+* **Henryk Richter** - EaglePlayer support, lots of suggestions ;-)
 * **Kari-Pekka Koljonen** - lots of help for HippoPlayer support
+

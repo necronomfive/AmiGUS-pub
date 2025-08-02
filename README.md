@@ -52,7 +52,7 @@ The above diagram shows all relevant ports and components of the AmiGUS card.
 |**Altera 10M08 FPGA**| Main processing unit, receives and generates digital audio streams in 192kHz |[Register Map](https://github.com/necronomfive/AmiGUS/raw/main/Documentation/AmiGUS/AmiGUS_Register_Map.xlsx)|
 |**32MB SDRAM**| Memory for sample storage, clocked at 122.2MHz  | [Datasheet](https://github.com/necronomfive/AmiGUS/blob/main/Documentation/Datasheets/42_45S83200J_16160J-462626.pdf)  |
 |**VS1063 Decoder**| Decoder chip from VLSI, supports MP3,OGG and FLAC  | [Datasheet](https://github.com/necronomfive/AmiGUS/blob/main/Documentation/Datasheets/vs1063ds.pdf) [HW Guide](https://github.com/necronomfive/AmiGUS/blob/main/Documentation/Datasheets/vs1063hg.pdf) |
-|**PCM1812 ADC**| Analogue to digital coverter, captures audtio from all external inputs @192kHz, 24-bit| [Datasheet](https://github.com/necronomfive/AmiGUS/blob/main/Documentation/Datasheets/pcm1862.pdf) |
+|**PCM1862 ADC**| Analogue to digital coverter, captures audtio from all external inputs @192kHz, 24-bit| [Datasheet](https://github.com/necronomfive/AmiGUS/blob/main/Documentation/Datasheets/pcm1862.pdf) |
 |**PCM1794 DAC**| Digital to analogue converter, outputs final mixing result @192kHz 24-bit  | [Datasheet](https://github.com/necronomfive/AmiGUS/blob/main/Documentation/Datasheets/pcm1794a.pdf) |
 |**ZORRO II Bus**| AmiGUS supports Zorro II, non-DMA I/O accesses.| [Zorro Spec](https://github.com/necronomfive/AmiGUS/blob/main/Documentation/Datasheets/zorro3.pdf) |
 

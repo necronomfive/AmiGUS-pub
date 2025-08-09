@@ -163,7 +163,7 @@ endif
 
 ##################################
 
-.PHONY: all install test support INCLUDES FOLDERS clean dist-clean dist
+.PHONY: all install test support INCLUDES FOLDERS clean dist-clean
 
 all: FOLDERS $(MODE_FILE_DEST) $(LIB_FILE_DEST)
 
@@ -181,14 +181,11 @@ clean-intermediate:
 	-$(RM) $(BDIR) $(RM_SUFFIX)
 
 clean: clean-intermediate
-	-$(RM) $(DDIR) adf $(RM_SUFFIX)
+	-$(RM) $(DDIR) $(RM_SUFFIX)
 	-$(RM) support/$(WILDCARD).o
 
 dist-clean: clean
 	make -f Makefile-Includes clean
-
-dist: all
-	$(LHA) a target/AHI4bin.lha target/$(WILDCARD)
 
 INCLUDES:
 	make -f Makefile-Includes all 
@@ -262,15 +259,3 @@ get_mem_log:
 	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/GetAhiMemLog
 
 ###############################################################################
-
-ADF: all support
-	mkdir -p adf
-	# bzip2 -c -d src/empty.adf.bz2 > target/AmiGUS.adf
-	adf_floppy_create target/AmiGUS.adf dd
-	adf_format -l AmiGUS -t 0 -f target/AmiGUS.adf
-	fuseadf target/AmiGUS.adf adf/
-	cp target/AmiGUS.audio adf/
-	cp target/AMIGUS adf/
-	cp target/get_mem_log adf/
-	umount adf/
-	-cp target/AmiGUS.adf /media/chritoph/HXC/

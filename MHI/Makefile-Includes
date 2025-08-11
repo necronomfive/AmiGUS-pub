@@ -18,7 +18,7 @@
 
 PATH    = include
 
-MHI_INCLUDES    = MHIDevelop:Include
+MHI_INCLUDES    = MHIDevelop:
 
 MKDIR         = makedir
 MKDIR_SUFFIX  = ALL >NIL:

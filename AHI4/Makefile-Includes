@@ -17,9 +17,9 @@
 BASE    = ahi_sub
 PATH    = include
 
-AHI_INCLUDES    = AHI4Develop:include
-AHI_ORIG_CLIB   = $(AHI_INCLUDES)/C/clib/$(BASE)_protos.h
-AHI_ORIG_FD     = $(AHI_INCLUDES)/FD/$(BASE)_lib.fd
+AHI_INCLUDES    = AHI4Develop:
+AHI_ORIG_CLIB   = $(AHI_INCLUDES)C/clib/$(BASE)_protos.h
+AHI_ORIG_FD     = $(AHI_INCLUDES)FD/$(BASE)_lib.fd
 
 PRAGMAPATH = $(PATH)/C/pragma/
 PRAGMANAME = $(PRAGMAPATH)$(BASE)_lib.h

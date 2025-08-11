@@ -20,7 +20,11 @@ PATH    = include
 
 MHI_INCLUDES    = MHIDevelop:Include
 
+MKDIR         = makedir
+MKDIR_SUFFIX  = ALL >NIL:
+
 all: $(LIBRARYNAME)
+	-@$(MKDIR) $(PATH) $(MKDIR_SUFFIX)	
 	copy $(MHI_INCLUDES)/libraries $(PATH)/ASM/libraries   ALL CLONE
 
 clean:

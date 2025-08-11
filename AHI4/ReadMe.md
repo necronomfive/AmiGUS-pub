@@ -1,4 +1,10 @@
-## Usage 
+## License
+
+LGPL 3 - see COPYING + COPYING.LESSER.
+
+Contributions very welcome!
+
+## Usage
 ### Requirements:
 * Software
   * AmigaOS 2.0.4 or higher
@@ -9,7 +15,7 @@
   * Some FastRAM - hard to tell how much, some for AHI, some for OS, some for the audio application you are using, overall at least 4MB maybe?
   * HardDisk - >10MB, do not even think about getting all to work on 880kB floppies!
 ### Installation:
-Some easy manual steps for the time being, an installer for everything AmiGUS may be added later.
+Some easy manual steps for the time being, an installer for everything AmiGUS is in the main repositoy.
 * Download a binary archive from the releases section.
 * Transfer the archive to your Amiga.
 * Extract the archive somewhere somehow. If you have never seen an lha file before please find yourself a manual about it.
@@ -55,6 +61,8 @@ AHI shall be the last resort, prefer MHI or CAMD for God's sake!
 ### Setup:
 * All of the requirements above installed somewhere ...
 * ... and `path ... ADD`ed accordingly to make it callable.
+* ... and finally set `AHIDeveloper:` to AHI/Developer/include folder from AHI DevKit
+* ... and run `make INCLUDES`
 
 ### Steps:
 
@@ -69,6 +77,20 @@ Beware of it!
 * `make clean-intermediate` cleans the build dir only
 * `make dist-clean` prepares the source folder for distribution, drops includes as well.
 * `make ECHO` helps debugging make's internal state
+* `make test` to build / run the automated tests
+* `make support` to build the support applications
+
+Additional switches:
+* `make USEVBCC=1` switches from SAS/C to VBCC
+* `make LIB_CPU=000` switches to creating 68000 code
+  * `.......=020` switches to creating 68020 code
+  * `.......=030` switches to creating 68030 code
+  * `.......=040` switches to creating 68040 code
+  * `.......=060` switches to creating 68060 code (I guess that works with VBCC only, if at all)
+* `make LIB_LOG=NO_LOG` turns log generation completely off, release mode
+  * `.......=SER_LOG` debug logging, via serial port / [Sashimi](https://aminet.net/dev/debug/Sashimi.lha) compatible,
+  * `.......=FILE_LOG` verbose logging, as file somewhere, defaults to RAM:
+  * `.......=MEM_LOG` including interrupt logging, somewhere into RAM at some address. Use the Get[Mhi]MemLog tool to find it.
 
 ### Packaging
 

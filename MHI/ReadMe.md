@@ -4,7 +4,7 @@ LGPL 3 - see COPYING + COPYING.LESSER.
 
 Contributions very welcome!
 
-## Usage 
+## Usage
 ### Requirements:
 * Software
   * AmigaOS 1.3 or higher
@@ -66,7 +66,7 @@ Beware of it!
 * `make test` to build / run the automated tests
 * `make support` to build the support applications
 
-Additional switches: 
+Additional switches:
 * `make USEVBCC=1` switches from SAS/C to VBCC
 * `make LIB_CPU=000` switches to creating 68000 code
   * `.......=020` switches to creating 68020 code
@@ -74,7 +74,7 @@ Additional switches:
   * `.......=040` switches to creating 68040 code
   * `.......=060` switches to creating 68060 code (I guess that works with VBCC only, if at all)
 * `make LIB_LOG=NO_LOG` turns log generation completely off, release mode
-  * `.......=SER_LOG` debug logging, via serial port / [Sashimi](https://aminet.net/dev/debug/Sashimi.lha) compatible, 
+  * `.......=SER_LOG` debug logging, via serial port / [Sashimi](https://aminet.net/dev/debug/Sashimi.lha) compatible,
   * `.......=FILE_LOG` verbose logging, as file somewhere, defaults to RAM:
   * `.......=MEM_LOG` including interrupt logging, somewhere into RAM at some address. Use the Get[Mhi]MemLog tool to find it.
 

@@ -25,7 +25,7 @@ MKDIR_SUFFIX  = ALL >NIL:
 
 all: $(LIBRARYNAME)
 	-@$(MKDIR) $(PATH) $(MKDIR_SUFFIX)	
-	copy $(MHI_INCLUDES)/libraries $(PATH)/libraries   ALL CLONE
+	copy $(MHI_INCLUDES)libraries $(PATH)/libraries   ALL CLONE
 
 clean:
 	-@delete $(PATH) ALL

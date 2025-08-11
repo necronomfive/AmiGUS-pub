@@ -73,10 +73,10 @@ $(CLIBNAME): $(AHI_ORIG_FD)
 all: $(PRAGMANAME) $(AMIGAENAME) $(GCCINLINENAME) $(PROTONAME) \
      $(VBCCINLINENAME) $(LVONAME) $(FDNAME) $(CLIBNAME) \
      $(LIBRARYNAME)
-	copy $(AHI_INCLUDES)/Asm/devices $(PATH)/ASM/devices       ALL CLONE
-	copy $(AHI_INCLUDES)/Asm/libraries $(PATH)/ASM/libraries   ALL CLONE
-	copy $(AHI_INCLUDES)/C/devices $(PATH)/C/devices           ALL CLONE
-	copy $(AHI_INCLUDES)/C/libraries $(PATH)/C/libraries       ALL CLONE	
+	copy $(AHI_INCLUDES)Asm/devices $(PATH)/ASM/devices       ALL CLONE
+	copy $(AHI_INCLUDES)Asm/libraries $(PATH)/ASM/libraries   ALL CLONE
+	copy $(AHI_INCLUDES)C/devices $(PATH)/C/devices           ALL CLONE
+	copy $(AHI_INCLUDES)C/libraries $(PATH)/C/libraries       ALL CLONE	
 
 clean:
 	-@delete $(PATH) ALL

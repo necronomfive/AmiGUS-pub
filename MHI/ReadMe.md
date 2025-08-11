@@ -63,6 +63,8 @@ Beware of it!
 * `make clean-intermediate` cleans the build dir only
 * `make dist-clean` prepares the source folder for distribution, drops includes as well.
 * `make ECHO` helps debugging make's internal state
+* `make test` to build / run the automated tests
+* `make support` to build the support applications
 
 Additional switches: 
 * `make USEVBCC=1` switches from SAS/C to VBCC

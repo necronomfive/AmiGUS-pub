@@ -74,7 +74,7 @@ Additional switches:
 * `make LIB_LOG=NO_LOG` turns log generation completely off, release mode
   * `.......=SER_LOG` debug logging, via serial port / [Sashimi](https://aminet.net/dev/debug/Sashimi.lha) compatible, 
   * `.......=FILE_LOG` verbose logging, as file somewhere, defaults to RAM:
-  * `.......=MEM_LOG` including interrupt logging, somewhere into RAM:
+  * `.......=MEM_LOG` including interrupt logging, somewhere into RAM at some address. Use the Get[Mhi]MemLog tool to find it.
 
 ### Packaging
 

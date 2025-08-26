@@ -77,7 +77,7 @@ LIBRARY_TYPE;
 #define LIBRARY_VERSION   LIB_VERSION
 #define LIBRARY_REVISION  LIB_REVISION
 #define LIBRARY_IDSTRING  STR( LIB_FILE )" "                         \
-                          STR( LIB_VERSION )".00"STR( LIB_REVISION ) \
+                          STR( LIB_VERSION )".0"STR( LIB_REVISION ) \
                           " "LIB_DATE" "STR( LIB_CPU )" "            \
                           STR( LIB_COMPILER )" "STR( LIB_HOST )
 

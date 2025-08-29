@@ -1,0 +1,754 @@
+(complete 0)
+(delopts "oknodelete" "force" "askuser")
+
+;==============================================================================
+; English strings
+
+(set default_lang 4)
+
+(set #which_drivers_target
+(cat "Drivers will need to be installed to the corresponding system folders, "
+     "LIBS:, DEVS:, etc..\n"
+     "In which system disk shall the AmiGUS drivers be installed?\n"
+))
+
+(set #which_drivers_target_help
+(cat "\nThis section lets you choose in which drawer or on which disk the "
+     "AmiGUS driver files should be installed. These should normally go "
+     "in the same location as the current Workbench, as that is where AHI "
+     "and MHI would expect them.\n\n"
+     @askdir-help
+))
+
+(set #which_tools_target
+(cat "The AmiGUS tools can be installed wherever you like them to be - "
+     "so please select your preferred location.\n"
+))
+
+(set #which_tools_target_help
+(cat "\nThis section lets you choose in which drawer or on which disk the "
+     "AmiGUS base tools should be installed. It can be anywhere you like.\n\n"
+     "Default is Sys:Expansion/AmiGUS - which may cause issues with some "
+     "obscure Commodore expansions (bridgeboards) and their drivers.\n\n"
+     @askdir-help
+))
+
+
+(set #which_debug_target
+(cat "Debug tools can be installed wherever you like them to be - "
+     "so please select the your preferred location.\n"
+     "(A folder called \"debug\" will be created there.)\n"
+))
+
+(set #which_debug_target_help
+(cat "\nThis section lets you choose in which drawer or on which disk the "
+     "AmiGUS debug tools should be installed. It can be anywhere you like.\n\n"
+     "Default is Sys:Expansion/AmiGUS - which may cause issues with some "
+     "obscure Commodore expansions (bridgeboards) and their drivers.\n\n"
+     @askdir-help
+))
+
+(set #which_cpu
+(cat "Please select which CPU version of the %s driver shall be installed.\n\n"
+))
+
+(set #which_cpu_help
+(cat "\nThis section lets you choose which CPU-optimized version of the %s "
+     "driver shall be installed. If in doubt, please select 68000, you may "
+     "lose a little performance, but avoid crashes. \n\n"
+))
+
+(set #which_debug_driver
+(cat "Do you want to use a driver with debug output enabled? Please only do "
+     "so if you know what you are doing or were asked to do so.\n"
+     "(WARNING: SLOWER!)\n\n"
+))
+
+(set #which_debug_driver_help
+(cat "\nDebug versions produce log output with different targets, "
+     "the Amiga's serial port, a file, or just into some memory area. "
+     "All of these options are slower than the release version, "
+     "may randomly crash or destroy your hard disk. "
+     "Please do not play around here, if you are unsure.\n\n"
+     "You have been warned!"
+))
+
+(set #release_driver
+(cat "No - release is fine (RECOMMENDED)"
+))
+
+(set #serial_debug_driver
+(cat "Yes - serial debug output"
+))
+
+(set #file_debug_driver
+(cat "Yes - file logging"
+))
+
+(set #memory_debug_driver
+(cat "Yes - memory logging"
+))
+
+(set #all_versions
+(cat "Do you want to copy all %s driver versions next to the active one for "
+     "later potential use?"
+))
+
+(set #all_versions_help
+(cat "\nAll available versions of the %s driver would be copied next to the "
+     "activated one in case you want to switch later.\n"
+     "This includes all CPU and debug variants."
+))
+
+(set #yes
+(cat "Yes"
+))
+
+(set #no
+(cat "No"
+))
+
+(set #what_components
+(cat "Please select what should be installed."
+))
+
+(set #what_components_help
+(cat "\nThis section lets you choose which parts of the AmiGUS software "
+     "package shall be installed. All of them should work independently "
+     "from each other.\n"
+     "\n"
+     "AHI driver - Installs the AmiGUS drivers for AHI, the retargetable "
+     "audio system for AmigaOS. Recommended as widely used.\n"
+     "MHI driver - Installs the AmiGUS drivers for MHI, a standard for "
+     "hardware accelerated playback of encoded audio files like MP3. "
+     "Recommended, as the codec chip would be insulted otherwise.\n"
+     "Mixer - AmiGUS stores the volume and other settings. But these need "
+     "to get there somehow, at least once. Recommended.\n"
+     "FlashGUI - Used to upgrade AmiGUS's firmware when needed or reset "
+     "the embedded settings. Recommended.\n"
+     "PlayWAV - Command line tool to play back WAV or raw PCM files.\n"
+     "PlayMP3 - Command line tool to play back MP3s or other encoded files.\n"
+     "PlayMIDI - Command line tool to play notes from a MIDI keyboard "
+     "connected via serial MIDI cable via AmiGUS's WaveTable engine.\n"
+     "Record - Command line tool to record audio with various settings into "
+     "WAV files.\n"
+     "Debug Tools - Tools to help debug AHI and MHI drivers when needed.\n"
+     "Manual - AmiGUS's AmigaGuide manual. Recommended.\n"
+     "\n"
+))
+
+(set #component_ahi
+(cat "AHI driver"
+))
+
+(set #component_mhi
+(cat "MHI driver"
+))
+
+(set #component_mixer
+(cat "Mixer"
+))
+
+(set #component_flash
+(cat "FlashGUI"
+))
+
+(set #component_wav
+(cat "PlayWAV"
+))
+
+(set #component_mp3
+(cat "PlayMP3"
+))
+
+(set #component_midi
+(cat "PlayMIDI"
+))
+
+(set #component_record
+(cat "Record"
+))
+
+(set #component_debug
+(cat "Debug Tools"
+))
+
+(set #component_manual
+(cat "Manual"
+))
+
+(set #insert_manual_disk
+(cat "Insert disk \"AmiGUS Manual\" in any drive, please."
+))
+
+(set #insert_manual_disk_help
+(cat "\nThe AmiGUS AmigaGuide manual did not fit on the same disk, to install "
+     "it, you will need to insert the corresponding disk containing the "
+     "manual.\n\n"
+))
+
+(set #which_manual_target
+(cat "Where shall the AmiGUS AmigaGuide manual be installed?\n"
+))
+
+(set #which_manual_target_help
+(cat "\nThe AmiGUS AmigaGuide manual consists of the actual AmigaGuide file "
+     "and a folder with the embedded or linked images. You can choose the "
+     "location for both here.\n\n"
+     "Default is Sys:Expansion/AmiGUS - which may cause issues with some "
+     "obscure Commodore expansions (bridgeboards) and their drivers.\n\n"
+     @askdir-help
+))
+
+
+;==============================================================================
+; German strings
+
+(if (= @language "deutsch")
+(
+(set default_lang 2)
+
+(set #which_drivers_target
+(cat "Die Treiber werden in die passenden Systemverzeichnisse installiert, "
+     "LIBS:, DEVS:, etc..\n"
+     "Auf welches Systemlaufwerk sollen die AmiGUS Treiber installiert "
+     "werden?\n"
+))
+
+(set #which_drivers_target_help
+(cat "\nIn diesem Teil k�nnen Sie w�hlen, auf welche Laufwerk oder "
+     "in welches Verzeichnis die AmiGUS Treiber installiert werden sollen. "
+     "Sie sollten normalerweise an dieselbe Stelle installiert werden "
+     "wie die aktuelle Workbench, weil das ist, wo AHI und MHI sie "
+     "erwarten w�rden.\n\n"
+     @askdir-help
+))
+
+(set #which_tools_target
+(cat "Die AmiGUS Basiswerkzeuge k�nnen an einen beliebigen Ort installiert "
+     "werden - suchen Sie bitte ihren bevorzugten Ort aus.\n"
+))
+
+(set #which_tools_target_help
+(cat "\nIn diesem Teil k�nnen Sie w�hlen, auf welche Laufwerk oder "
+     "Verzeichnis die AmiGUS Basiswerkzeuge installiert werden sollen. "
+     "Der Ort ist dabei absolut beliebig. \n\n"
+     "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
+     "obskuren Commodore Erweiterungen (bridgeboards) und deren Treibern "
+     "verursachen kann.\n\n"
+     @askdir-help
+))
+
+(set #which_debug_target
+(cat "Die AmiGUS Debugwerkzeuge k�nnen an einen beliebigen Ort installiert "
+     "werden - suchen Sie bitte ihren bevorzugten Ort aus.\n"
+     "(Ein Verzeichnis \"debug\" wird dort angelegt.)\n"
+))
+
+(set #which_debug_target_help
+(cat "\nIn diesem Teil k�nnen Sie w�hlen, auf welche Laufwerk oder "
+     "Verzeichnis die AmiGUS Debugwerkzeuge installiert werden sollen. "
+     "Der Ort ist dabei absolut beliebig. \n\n"
+     "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
+     "obskuren Commodore Erweiterungen (bridgeboards) und deren Treibern "
+     "verursachen kann.\n\n"
+     @askdir-help
+))
+
+(set #which_cpu
+(cat "Bitte w�hlen Sie aus, welche CPU-optimierte Version des %s Treibers "
+     "installiert werden soll.\n\n"
+))
+
+(set #which_cpu_help
+(cat "\nIn diesem Teil k�nnen Sie w�hlen, f�r welche CPU die optimierte %s "
+     "Treiberversion installiert werden soll. Im Zweifelsfall w�hlen Sie "
+     "bitte 68000. Sie verlieren m�glicherweise etwas Leistung, aber "
+     "vermeiden Abst�rze. \n\n"
+))
+
+(set #which_debug_driver
+(cat "M�chten Sie einen Treiber mit debug-Ausgabe verwenden? "
+     "Bitte w�hlen Sie diese nur, wenn Sie wissen, was sie tun oder darum "
+     "gebeten wurden.\n"
+     "(WARNUNG: LANGSAMER!)\n\n"
+))
+
+(set #which_debug_driver_help
+(cat "\nDebugversionen produzieren log-Ausgaben mit verschiedenen Zielen, "
+     "den seriellen Port des Amiga, eine Datei, oder einfach einen "
+     "Speicherbereich. Alle diese Optionen sind langsamer als die Version "
+     "ohne Logging, k�nnen zuf�llig abst�rzen oder die Festplatte "
+     "besch�digen. Bitte spielen Sie hier nicht herum, wenn sie unsicher "
+     "sind, was das bedeutet.\n\n"
+     "Sie wurden gewarnt!"
+))
+
+(set #release_driver
+(cat "Nein - release ist besser (RECOMMENDED)"
+))
+
+(set #serial_debug_driver
+(cat "Ja - serielle debug-Ausgabe"
+))
+
+(set #file_debug_driver
+(cat "Ja - debug-Ausgabe in eine Datei"
+))
+
+(set #memory_debug_driver
+(cat "Ja - debug-Ausgabe im Speicher"
+))
+
+(set #all_versions
+(cat "M�chten Sie alle %s Treiber Versionen neben dem Aktiven ablegen, falls "
+     "Sie ihn sp�ter mal brauchen?"
+))
+
+(set #all_versions_help
+(cat "\nAlle verf�gbaren Versionen des %s Treibers w�rden neben dem Aktiven "
+     "abgelegt werden, um einen schnellen und einfachen Wechsel zwischen den "
+     "Treibern zu erm�glichen.\n"
+     "Dies umfasst alle CPU- und Debug-Varianten."
+))
+
+(set #yes
+(cat "Ja"
+))
+
+(set #no
+(cat "Nein"
+))
+
+(set #what_components
+(cat "Bitte die zu installierenden Komponenten ausw�hlen."
+))
+
+(set #what_components_help
+(cat "\nIn diesem Abschnitt k�nnen sie ausw�hlen, welche Teile des AmiGUS "
+     "Softwarepakets installiert werden sollen. Alle Teile sollten unabh�ngig "
+     "voneinander funktionieren.\n.\n"
+     "\n"
+     "AHI Treiber - Installiert die AmiGUS Treiber f�r AHI, den AmigaOS "
+     "Audiostandard f�r diverse Soundkarten. Empfohlen.\n"
+     "MHI Treiber - Installiert die AmiGUS Treiber f�r MHI, einen Standard "
+     "f�r hardwarebeschleunigte Wiedergabe von komprimierten Audiodateien "
+     "wie MP3. Empfohlen, der Hardwarecodec w�re sonst beleidigt.\n"
+     "Mixer - Die AmiGUS speichert die Lautst�rke und andere Einstellungen "
+     "intern ab. Diese m�ssen aber dort erstmal hineinkommen. Empfohlen.\n"
+     "FlashGUI - Wird verwendet um die Firmware der AmiGUS upzudaten oder "
+     "die gespeicherten Einstellungen zur�ckzusetzen. Empfohlen.\n"
+     "PlayWAV - Kommandozeilenwerkzeug, um WAV oder rohe PCM Dateien "
+     "abzuspielen.\n"
+     "PlayMP3 - Kommandozeilenwerkzeug, um MP3s oder andere komprimierte "
+     "Dateien abzuspielen.\n"
+     "PlayMIDI - Kommandozeilenwerkzeug, um Noten von einem per serieller "
+     "Schnittstelle verbundenem MIDI keyboard via AmiGUS's WaveTable "
+     "abzuspielen.\n"
+     "Record - Kommandozeilenwerkzeug, um Audio mit verschiedenen "
+     "Einstellungen als WAV Dateien aufzunehmen.\n"
+     "Debugwerkzeuge - Verschiedene Werkzeuge, um beim debuggen der "
+     "AHI und MHI Treiber zu helfen, wenn n�tig.\n"
+     "Anleitung - AmiGUS's AmigaGuide Benutzerhandbuch. Empfohlen.\n"
+     "\n"
+))
+
+(set #component_ahi
+(cat "AHI Treiber"
+))
+
+(set #component_mhi
+(cat "MHI Treiber"
+))
+
+(set #component_mixer
+(cat "Mixer"
+))
+
+(set #component_flash
+(cat "FlashGUI"
+))
+
+(set #component_wav
+(cat "PlayWAV"
+))
+
+(set #component_mp3
+(cat "PlayMP3"
+))
+
+(set #component_midi
+(cat "PlayMIDI"
+))
+
+(set #component_record
+(cat "Record"
+))
+
+(set #component_debug
+(cat "Debugwerkzeuge"
+))
+
+(set #component_manual
+(cat "Anleitung"
+))
+
+(set #insert_manual_disk
+(cat "Bitte die \"AmiGUS Manual\"-Diskette in ein Laufwerk einlegen."
+))
+
+(set #insert_manual_disk_help
+(cat "\nDie AmiGUS AmigaGuide-Anleitung passt nicht auf die Toolsdiskette. "
+     "Um sie zu installieren, m�ssen Sie die entsprechende Diskette einlegen. "
+     "\n\n"
+))
+
+(set #which_manual_target
+(cat "Wo soll das AmiGUS AmigaGuide Handbuch installiert werden?\n"
+))
+
+(set #which_manual_target_help
+(cat "\nDas AmiGUS AmigaGuide Handbuch besteht aus der eigentlichen "
+     "AmigaGuide-Datei und einem Verzeichnis mit den eingebetteten oder "
+     "verlinkten Bildern. Hier k�nnen Sie den Ort f�r beides ausw�hlen.\n\n"
+     "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
+     "obskuren Commodore Erweiterungen (bridgeboards) und deren Treibern "
+     "verursachen kann.\n\n"
+     @askdir-help
+))
+
+))
+
+;=============================================================================
+(set cpu_found (database "cpu"))
+(if (OR (= cpu_found "68000") (= cpu_found "68010"))
+  (set cpu_default 0)
+  (if (OR (= cpu_found "68020") (= cpu_found "68030"))
+      (set cpu_default 1)
+      (set cpu_default 2)
+  )
+)
+
+(procedure install_driver (
+  (set install_driver_cpu cpu_default)
+  (set install_driver_debug 0)
+  (set install_driver_all 0)
+
+  (if
+    (>= @user-level 1)
+    (
+      (set install_driver_cpu 
+        (askchoice
+          (prompt (#which_cpu driver_name))
+          (help (#which_cpu_help driver_name))
+          (choices "68000" "68020" "68040")
+          (default install_driver_cpu)
+        )
+      )
+
+      (set install_driver_debug
+        (askchoice
+          (prompt #which_debug_driver)
+          (help #which_debug_driver_help)
+          (choices
+            #release_driver
+            #serial_debug_driver
+            #file_debug_driver
+            #memory_debug_driver
+          )
+          (default install_driver_debug)
+        )
+      )
+    )
+  )
+
+  (if
+    (>= @user-level 2)
+    (set install_driver_all
+      (askbool
+        (prompt (#all_versions driver_name))
+        (help (#all_versions_help driver_name))
+        (choices #yes #no)
+        (default install_driver_all)
+      )
+    )
+  )
+
+  (set install_driver_cpu (select install_driver_cpu "-000" "-020" "-040"))
+  (set install_driver_debug (select install_driver_debug "-NO_LOG" "-SER_LOG" "-FILE_LOG" "-MEM_LOG"))
+))
+
+;=============================================================================
+; say hi!
+(welcome)
+(set old_level @user-level)
+
+(onerror (TERMINATE))
+
+(set what
+  (askoptions 
+    (prompt #what_components)
+    (help #what_components_help)
+    (choices #component_ahi
+             #component_mhi
+             #component_mixer
+             #component_flash
+             #component_wav
+             #component_mp3
+             #component_midi
+             #component_record 
+             #component_debug
+             #component_manual )
+    (default %1110111111)
+  )
+)
+
+(if
+  (BITAND what %0000000011)
+  (
+    (set drivers_target
+      (askdir
+        (prompt #which_drivers_target)
+        (help #which_drivers_target_help)
+        (default "SYS:")
+      )
+    )
+  )
+)
+
+(if
+  (BITAND what %0000000001)
+  (
+    (set driver_name "AHI")
+    (install_driver)
+
+    (set source_folder "AHI4/AHI")
+    (set file "AmiGUS.audio")
+    (set target_folder (tackon drivers_target "Devs/AHI"))
+    (set source_file (tackon source_folder file))
+
+    (makedir target_folder)
+    (copyfiles
+      (source (cat source_file install_driver_cpu install_driver_debug))
+      (newname file)
+      (dest target_folder)
+    )
+
+    (if install_driver_all
+      (copyfiles
+        (source source_folder)
+        (pattern (cat file "#?"))
+        (dest target_folder)
+      )  
+    )
+
+    (set source_folder "AHI4/AudioModes")
+    (set file "AMIGUS")
+    (set target_folder (tackon drivers_target "Devs/AudioModes"))
+    (set source_file (tackon source_folder file))
+
+    (makedir target_folder)
+    (copyfiles
+      (source source_file)
+      (dest target_folder)
+    )
+  )
+)
+
+(complete 15)
+
+(if
+  (BITAND what %0000000010)
+  (
+    (set driver_name "MHI")
+    (install_driver)
+
+    (set source_folder "MHI")
+    (set file "mhiamigus.library")
+    (set target_folder (tackon drivers_target "Libs/MHI"))
+    (set source_file (tackon source_folder file))
+
+    (makedir target_folder)
+    (copyfiles
+      (source (cat source_file install_driver_cpu install_driver_debug))
+      (newname file)
+      (dest target_folder)
+    )
+    
+    (if install_driver_all
+      (copyfiles
+        (source source_folder)
+        (pattern (cat file "#?"))
+        (dest target_folder)
+      )
+    )
+  )
+)
+
+(complete 30)
+
+(set tools_target "SYS:Expansion/AmiGUS")
+(if
+  (BITAND what %0011111100)
+  (
+    (set tools_target
+      (askdir (prompt #which_tools_target)
+        (help #which_tools_target_help)
+        (default tools_target)
+        (newpath)
+      )
+    )
+    (makedir tools_target (infos))
+    (set source_folder "Tools")
+  )
+)
+
+(complete 35)
+
+(if
+  (BITAND what %0000000100)
+  (copyfiles
+    (source (tackon source_folder "Mixer"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(complete 40)
+
+(if
+  (BITAND what %0000001000)
+  (copyfiles
+    (source (tackon source_folder "FlashGUI"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(complete 45)
+
+(if
+  (BITAND what %0000010000)
+  (copyfiles
+    (source (tackon source_folder "PlayWAV"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(complete 50)
+
+(if
+  (BITAND what %0000100000)
+  (copyfiles
+    (source (tackon source_folder "PlayMP3"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(complete 55)
+
+(if
+  (BITAND what %0001000000)
+  (copyfiles
+    (source (tackon source_folder "PlayMIDI"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(complete 60)
+
+(if
+  (BITAND what %0010000000)
+  (copyfiles
+    (source (tackon source_folder "Record"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(complete 65)
+
+(if
+  (BITAND what %0100000000)
+  (
+    (set debug_target
+      (askdir (prompt #which_debug_target)
+        (help #which_debug_target_help)
+        (default tools_target)
+        (newpath)
+      )
+    )
+    (set debug_target (tackon debug_target "debug"))
+    (makedir debug_target (infos))
+
+    (set source_folder "AHI4")
+    (copyfiles
+      (source (tackon source_folder "GetAhiMemLog"))
+      (dest debug_target)
+      (infos)
+    )
+
+    (set source_folder "MHI")
+    (copyfiles
+      (source (tackon source_folder "GetMhiMemLog"))
+      (dest debug_target)
+      (infos)
+    )
+    (copyfiles
+      (source (tackon source_folder "MHILibCheck"))
+      (dest debug_target)
+      (infos)
+    )
+    (copyfiles
+      (source (tackon source_folder "MHIplay"))
+      (dest debug_target)
+      (infos)
+    )
+  )
+)
+
+(complete 75)
+
+(if
+  (BITAND what %1000000000)
+  (
+    (if
+      (exists "Manual/AmiGUS.guide")
+      (set source_folder "Manual")
+      (
+        (askdisk
+          (prompt #insert_manual_disk)
+          (help #insert_manual_disk_help)
+          (dest "AmiGUS-Manual")
+          (assigns)
+        )
+        (set source_folder "AmiGUS-Manual:")
+      )
+    )
+    (set manual_target
+      (askdir (prompt #which_manual_target)
+        (help #which_manual_target_help)
+        (default tools_target)
+        (newpath)
+      )
+    )
+    (makedir manual_target (infos))
+    (copyfiles
+      (source source_folder)
+      (pattern "#?.guide")
+      (dest manual_target)
+      (infos)
+    )
+    (copyfiles
+      (source (tackon source_folder "ilbm"))
+      (dest (tackon manual_target "ilbm"))
+      (all)
+    )
+  )
+)
+
+(complete 100)
+

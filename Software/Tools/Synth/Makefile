@@ -1,17 +1,17 @@
 #
-# This file is part of the AmiGUS Flash Utility.
+# This file is part of the AmiGUS Synth Utility.
 #
-# AmiGUS Flash Utility is free software: you can redistribute it and/or modify
+# AmiGUS Synth Utility is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License only.
 #
-# AmiGUS Flash Utility is distributed in the hope that it will be useful,
+# AmiGUS Synth Utility is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with AmiGUS Flash Utility.  If not, see <http://www.gnu.org/licenses/>.
+# along with AmiGUS Synth Utility.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 ifeq ($(findstring /home,$(HOME)), /home)
@@ -42,24 +42,20 @@ else
   LHA           = lha
 endif
 
-TARGET0         = FlashGUI
-TARGET1         = FlashGUI13
-FOLDER          = FlashFPGA
+TARGET          = Synth
+FOLDER          = Synth
 
 .PHONY: clean release release0 release01
 
-all: $(TARGET0) $(TARGET1)
+all: $(TARGET)
 
 clean:
-	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET0) $(TARGET1) $(RM_SUFFIX)
+	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET) $(RM_SUFFIX)
 
-$(TARGET0):
-	$(RUNNER) sc $@.c incdir=include: cpu=68000 link
+$(TARGET):
+	$(RUNNER) sc $(TARGET).c asmroutines.a incdir=include: cpu=68000 link
 
-$(TARGET1):
-	$(RUNNER) sc $@.c incdir=include: incdir=gus:../../dependencies/include cpu=68000 link
-
-release: $(TARGET0) $(TARGET1) release0$(LINUX)
+release: $(TARGET) release0$(LINUX)
 
 # Amiga Version:
 release0:

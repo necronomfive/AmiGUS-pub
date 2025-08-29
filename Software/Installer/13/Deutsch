@@ -1,0 +1,316 @@
+.KEY ""
+.BRA {
+.KET }
+
+FAILAT 10
+
+; *e[30m - blue
+; *e[31m - white
+; *e[32m - black
+; *e[33m - orange
+
+RESIDENT C:ECHO
+RESIDENT C:ASK
+RESIDENT C:ASSIGN
+RESIDENT C:IF
+RESIDENT C:ENDIF
+RESIDENT C:EDIT
+
+ASSIGN AmiGUS-13-SRC: ""
+
+ECHO "Wilkommen beim AmiGUS OS 1.3 Installationsskript."
+ECHO ""
+ECHO "Wenn Sie die Installation abbrechen wollen, drücken Sie bitte "
+ECHO "wiederholt CTRL-C. Falls etwas unklar ist, lesen Sie bitte zunächst"
+ECHO "die ReadMeFirst.txt gefolgt von dem Handbuch."
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
+ECHO "|                    Basiswerkzeuginstallation                      |"
+ECHO "+-------------------------------------------------------------------+"
+ECHO ""
+ASK "Möchten Sie die AmiGUS Basiswerkzeuge installieren? (y/N)"
+
+IF WARN
+  ECHO "Das Standardinstallationsverzeichnis der AmiGUS Basiswerkzeuge ist:"
+  ECHO "*e[33mSYS:Expansion/AmiGUS*e[31m"
+  ECHO "Allerdings kann es Probleme mit ... sehr gut ... programmierten"
+  ECHO "Treibern und Software verursachen, dort weitere Dinge zu"
+  ECHO "installieren."
+  ECHO ""
+  ASK "Möchten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
+ 
+  IF WARN
+    ECHO "Bitte geben Sie ihr gewünschtes Installationsverzeichnis ein"
+    ECHO "und drücken Sie die Eingabetaste:"
+    SETENV >NIL: TOOLSPATH ?
+  ELSE
+    SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS"
+  ENDIF
+
+  ECHO   >  RAM:AmiGUS_installer1 "IF NOT EXISTS TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "  MAKEDIR TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "ENDIF"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:Tools/#? TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:Tools.info TOOLSPATH.info"
+
+  ; Prepare EDIT script to replace TOOLSPATH with correct path in installer script
+  ECHO   >  RAM:AmiGUS_editscript1 "GE ?TOOLSPATH?" NOLINE
+  GETENV >> RAM:AmiGUS_editscript1 TOOLSPATH
+  ECHO   >> RAM:AmiGUS_editscript1 "?" NOLINE
+
+  ; Prepare 2nd EDIT script to put 1st EDIT script into single line... *sigh*
+  ECHO   >  RAM:AmiGUS_editscript2 "CL //"
+  
+  ; Run 2nd EDIT script on 1st EDIT script
+  EDIT >NIL: FROM RAM:AmiGUS_editscript1 TO RAM:AmiGUS_editscript3 WITH RAM:AmiGUS_editscript2
+
+  ; Run 1st EDIT script on installer script
+  EDIT >NIL: FROM RAM:AmiGUS_installer1 TO RAM:AmiGUS_installer2 WITH RAM:AmiGUS_editscript3
+
+  ; Run installer script
+  EXECUTE RAM:AmiGUS_installer2
+
+  ; Clean that mess up again...
+  DELETE >NIL: RAM:AmiGUS_editscript#? RAM:AmiGUS_installer#?
+ENDIF
+
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
+ECHO "|                     Debugwerkzeuginstallation                     |"
+ECHO "+-------------------------------------------------------------------+"
+ECHO ""
+ASK "Möchten Sie die AmiGUS Debugwerkzeuge installieren? (y/N)"
+
+IF WARN
+  ECHO "Das Standardinstallationsverzeichnis für die AmiGUS Debugwerkzeuge"
+  ECHO "ist:"
+  ECHO "*e[33mSYS:Expansion/AmiGUS/debug*e[31m"
+  ECHO "Allerdings kann es Probleme mit ... sehr gut ... programmierten"
+  ECHO "Treibern und Software verursachen, dort weitere Dinge zu"
+  ECHO "installieren."
+  ECHO ""
+  ASK "Möchten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
+ 
+  IF WARN
+    ECHO "Bitte geben Sie ihr gewünschtes Installationsverzeichnis ein"
+    ECHO "und drücken Sie die Eingabetaste:"
+    SETENV >NIL: TOOLSPATH ?
+  ELSE
+    SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS/debug"
+  ENDIF
+
+  ECHO   >  RAM:AmiGUS_installer1 "IF NOT EXISTS TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "  MAKEDIR TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "ENDIF"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:MHI/MHIPlay#? TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:MHI/MHILibCheck#? TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:MHI/GetMhiMemLog#? TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:Tools.info TOOLSPATH.info"
+
+  ; Prepare EDIT script to replace TOOLSPATH with correct path in installer script
+  ECHO   >  RAM:AmiGUS_editscript1 "GE ?TOOLSPATH?" NOLINE
+  GETENV >> RAM:AmiGUS_editscript1 TOOLSPATH
+  ECHO   >> RAM:AmiGUS_editscript1 "?" NOLINE
+
+  ; Prepare 2nd EDIT script to put 1st EDIT script into single line... *sigh*
+  ECHO   >  RAM:AmiGUS_editscript2 "CL //"
+  
+  ; Run 2nd EDIT script on 1st EDIT script
+  EDIT >NIL: FROM RAM:AmiGUS_editscript1 TO RAM:AmiGUS_editscript3 WITH RAM:AmiGUS_editscript2
+
+  ; Run 1st EDIT script on installer script
+  EDIT >NIL: FROM RAM:AmiGUS_installer1 TO RAM:AmiGUS_installer2 WITH RAM:AmiGUS_editscript3
+
+  ; Run installer script
+  EXECUTE RAM:AmiGUS_installer2
+
+  ; Clean that mess up again...
+  DELETE >NIL: RAM:AmiGUS_editscript#? RAM:AmiGUS_installer#?
+ENDIF
+
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
+ECHO "|                      MHI-Treiberinstallation                      |"
+ECHO "+-------------------------------------------------------------------+"
+ECHO ""
+ECHO "OS 1.3 ist etwas ... wählerisch ... wenn es um das Laden von"
+ECHO "Bibliotheken geht."
+ECHO "Um MHI zuverlässig zum Funktionieren zu bewegen, sollte der MHI-"
+ECHO "Treiber an den Standardort für Bibliotheken installiert"
+ECHO "werden - LIBS:."
+ECHO ""
+ASK "Möchten Sie mhiamigus.library nach LIBS: installieren? (y/N)"
+
+IF WARN
+  ECHO "Welchen MHI-Treiber möchten Sie installieren?"
+  ECHO ""
+  ECHO "1) 68000, RELEASE-Version, kein Logging, EMPFOHLEN!!!"
+  ECHO "2) 68000, DEBUG-Version, serielles Logging"
+  ECHO "3) 68000, DEBUG-Version, Dateilogging"
+  ECHO "4) 68000, DEBUG-Version, Speicherlogging"
+  ECHO "5) 68020, RELEASE-Version, kein Logging, für 68020+"
+  ECHO "6) 68020, DEBUG-Version, serielles Logging, für 68020+"
+  ECHO "7) 68020, DEBUG-Version, Dateilogging, für 68020+"
+  ECHO "8) 68020, DEBUG-Version, Speicherlogging, für 68020+"
+  ECHO ""
+  ECHO "*e[33mStandard: 1*e[31m - Bitte drücken Sie 1-8 gefolgt von Return:"
+  SETENV >NIL: mhi_variant ?
+
+  IF $mhi_variant EQ 2
+    COPY MHI/mhiamigus.library-000-SER_LOG LIBS:mhiamigus.library CLONE
+    ECHO "Option 2 kopiert..."
+  ELSE
+    IF $mhi_variant EQ 3
+      COPY MHI/mhiamigus.library-000-FILE_LOG LIBS:mhiamigus.library CLONE
+      ECHO "Option 3 kopiert..."
+    ELSE
+      IF $mhi_variant EQ 4
+        COPY MHI/mhiamigus.library-000-MEM_LOG LIBS:mhiamigus.library CLONE
+        ECHO "Option 4 kopiert..."
+      ELSE
+        IF $mhi_variant EQ 5
+          COPY MHI/mhiamigus.library-020-NO_LOG LIBS:mhiamigus.library CLONE
+          ECHO "Option 5 kopiert..."
+        ELSE
+          IF $mhi_variant EQ 6
+            COPY MHI/mhiamigus.library-020-SER_LOG LIBS:mhiamigus.library CLONE
+            ECHO "Option 6 kopiert..."
+          ELSE
+            IF $mhi_variant EQ 7
+              COPY MHI/mhiamigus.library-020-FILE_LOG LIBS:mhiamigus.library CLONE
+              ECHO "Option 7 kopiert..."
+            ELSE
+              IF $mhi_variant EQ 8
+                COPY MHI/mhiamigus.library-020-MEM_LOG LIBS:mhiamigus.library CLONE
+                ECHO "Option 8 kopiert..."
+              ELSE
+                COPY MHI/mhiamigus.library-000-NO_LOG LIBS:mhiamigus.library CLONE
+                ECHO "Option 1 kopiert..."
+              ENDIF
+            ENDIF
+          ENDIF
+        ENDIF
+      ENDIF
+    ENDIF
+  ENDIF
+ENDIF
+
+ECHO ""
+ECHO "Möchten Sie alle Varianten der mhiamigus.library nach LIBS: kopieren,"
+ASK "um sie möglicherweise später umzubennenen und zu verwenden? (y/N)"
+
+IF WARN
+  copy MHI/mhiamigus.library#? LIBS:
+ENDIF
+
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
+ECHO "|                         weitere Libraries                         |"
+ECHO "+-------------------------------------------------------------------+"
+ECHO ""
+ECHO "Die AmiGUS Basiswerkzeuge benötigen OS 1.3 kompatible Versionen"
+ECHO "der reqtools.library 38+."
+ECHO ""
+ECHO "Diese könnten bereits durch andere Softwareinstallationen oder durch"
+ECHO "Sie selbst in Ihrem LIBS: Verzeichnis liegen."
+ECHO ""
+ECHO "Möchten Sie die benötigten Libraries prüfen"
+ASK "und gegebenenfalls installieren? (y/N)"
+
+IF WARN
+  ECHO "Beiliegende Version der reqtools.library:"
+  ECHO "38.390"
+  ECHO "Installierte Version der reqtools.library:"
+  IF EXISTS libs:reqtools.library
+    version libs:reqtools.library
+    ECHO "Möchten Sie diese mit der beiligenden Version überschreiben?"
+  ELSE
+    ECHO "Keine."
+    ECHO "Möchten Sie die beiliegende Version installieren?"
+  ENDIF
+
+  ASK "(y/N)"
+  IF WARN
+    copy Libs/reqtools.library LIBS:
+  ENDIF
+ENDIF
+
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
+ECHO "|                       AmigaGuide Anleitung                        |"
+ECHO "+-------------------------------------------------------------------+"
+ECHO ""
+
+ASK "Möchten Sie die AmiGUS AmigaGuide Anleitung installieren? (y/N)"
+IF WARN
+  ECHO "Das Standardinstallationsverzeichnis für die AmiGUS Anleitung ist:"
+  ECHO "*e[33mSYS:Expansion/AmiGUS*e[31m"
+  ECHO "Nunja, die Geschichte kennen sie wahrscheinlich schon..."
+  ECHO ""
+  ASK "Möchten Sie das Zielverzeichnis vor der Installation anpassen? (y/N)"
+ 
+  IF WARN
+    ECHO "Bitte geben Sie ihr gewünschtes Installationsverzeichnis ein"
+    ECHO "und drücken Sie die Eingabetaste:"
+    SETENV >NIL: TOOLSPATH ?
+  ELSE
+    SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS"
+  ENDIF
+
+  ASSIGN >NIL: AmiGUS-Manual:
+
+  IF EXISTS AmiGUS-13-SRC:Manual
+    ; Installing from lha archive
+    SETENV >NIL: MANUALPATH "AmiGUS-13-SRC:Manual/"
+  ELSE
+    ; Installing from ADF/Disk
+    SETENV >NIL: MANUALPATH "AmiGUS-Manual:"
+  ENDIF
+
+  ECHO   >  RAM:AmiGUS_installer1 "IF NOT EXISTS TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "  MAKEDIR TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "ENDIF"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHilbm TOOLSPATH/ilbm"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUS.guide TOOLSPATH/AmiGUS.guide"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUS.guide.infoV38 TOOLSPATH/AmiGUS.guide.info"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY MANUALPATHAmiGUSv38.guide TOOLSPATH/AmiGUSv38.guide"
+
+  ; Prepare EDIT script to replace MANUALPATH with correct path in installer script
+  ECHO   >  RAM:AmiGUS_editscript1 "GE ?MANUALPATH?" NOLINE
+  GETENV >> RAM:AmiGUS_editscript1 MANUALPATH
+  ECHO   >> RAM:AmiGUS_editscript1 "?" NOLINE
+
+  ; Prepare EDIT script to replace TOOLSPATH with correct path in installer script
+  ECHO   >  RAM:AmiGUS_editscript2 "GE ?TOOLSPATH?" NOLINE
+  GETENV >> RAM:AmiGUS_editscript2 TOOLSPATH
+  ECHO   >> RAM:AmiGUS_editscript2 "?" NOLINE
+
+  ; Prepare 2nd EDIT script to put 1st + 2nd EDIT script into single line... *sigh*
+  ECHO   >  RAM:AmiGUS_editscript3 "CL //"
+  
+  ; Run 2nd EDIT script on 1st EDIT script
+  EDIT >NIL: FROM RAM:AmiGUS_editscript1 TO RAM:AmiGUS_editscript4 WITH RAM:AmiGUS_editscript3
+
+  ; Run 2nd EDIT script on 1st EDIT script
+  EDIT >NIL: FROM RAM:AmiGUS_editscript2 TO RAM:AmiGUS_editscript5 WITH RAM:AmiGUS_editscript3
+
+  ; Run 1st EDIT script on installer script
+  EDIT >NIL: FROM RAM:AmiGUS_installer1 TO RAM:AmiGUS_installer2 WITH RAM:AmiGUS_editscript4
+
+  ; Run 2nd EDIT script on installer script
+  EDIT >NIL: FROM RAM:AmiGUS_installer2 TO RAM:AmiGUS_installer3 WITH RAM:AmiGUS_editscript5
+
+  ; Run installer script
+  EXECUTE RAM:AmiGUS_installer3
+
+  ; Clean that mess up again...
+  DELETE >NIL: RAM:AmiGUS_editscript#? RAM:AmiGUS_installer#?
+
+ENDIF
+
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
+ECHO "|              Alles fertig - einen schönen Tag noch!               |"
+ECHO "+-------------------------------------------------------------------+"
+
+ENDCLI

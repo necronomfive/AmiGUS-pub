@@ -90,8 +90,11 @@ It is recommended that you specify either chamfering or beveling for the slot ed
 Firmware release can be found [here.](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/Releases/)
 
 The [Quartus folder](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/Releases/Quartus) contains .pof files for Altera's Quartus software.
+These are needed for the initial bring-up of self-made AmiGUS cards especially.
 
-The [Amiga files](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/Releases/Quartus) can be flashed using the AmiGUS Flash & Configuration tool.
+The [Amiga .upd files](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/Releases/Quartus) can be flashed using the AmiGUS Flash & Configuration tool.
+
+The AmiGUS Flash tool and the latest .upd file are part of the software release package for your Amiga.
 
 ### _Base Software and Drivers_
 

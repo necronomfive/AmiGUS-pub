@@ -1,4 +1,3 @@
-.KEY ""
 .BRA {
 .KET }
 
@@ -8,6 +7,14 @@ FAILAT 10
 ; *e[31m - white
 ; *e[32m - black
 ; *e[33m - orange
+
+C:VERSION >NIL: exec.library 36
+IF NOT WARN
+  ECHO "Sie verwenden OS2.0 oder neuer."
+  ECHO "Bitte verwenden Sie die OS2.0+ Installationsskripte."
+  ECHO "Dankeschön!"
+  ENDCLI
+ENDIF
 
 RESIDENT C:ECHO
 RESIDENT C:ASK

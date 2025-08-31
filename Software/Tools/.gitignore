@@ -11,6 +11,7 @@ PlayMIDI/PlayMidi
 PlayMP3/PlayMP3
 PlayWAV/PlayWav
 Record/Record
+Synth/Synth
 
 # Codecraft session files
 *.session

@@ -202,4 +202,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 * **Thomas Ziegert** - AmiGUS bracket redesign & production
 * **Henryk Richter** - EaglePlayer support, lots of suggestions ;-)
 * **Kari-Pekka Koljonen** - lots of help for HippoPlayer support
-
+* **Greg Donner** - AmiGUS manual proofreading

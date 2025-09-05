@@ -1800,6 +1800,8 @@ void GadToolsWindow(void)
 
 	/* ================ Configure ADC ================ */
 
+
+	WriteSPI(boardBase, 0x00, 0xfe);	// Enable ADC I2S Master Mode
 	WriteSPI(boardBase, 0x70, 0x75);	// Enable ADC I2S Master Mode
 
 	WriteSPI(boardBase, 0x20, 0x90);	// Enable ADC I2S Master Mode
@@ -1880,7 +1882,7 @@ void GadToolsWindow(void)
 				else
 				{
 					if (NULL == (myWin = OpenWindowTags(NULL,
-							WA_Title,     "AmiGUS Mixer V0.66 - (c)2025 by O. Achten",
+							WA_Title,     "AmiGUS Mixer V0.67 - (c)2025 by O. Achten",
 							WA_Gadgets,   gadList,      WA_AutoAdjust,    TRUE,
 							WA_Width,       528,      WA_MinWidth,        50,
 							WA_InnerHeight, 154,      WA_MinHeight,       50,

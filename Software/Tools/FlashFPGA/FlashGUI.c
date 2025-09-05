@@ -489,7 +489,7 @@ void initCfgMem (APTR cfg_mem)
 
 	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0x00000070;	// MAIN_TOSLINK_CTRL
 
-	// Enable ADC I2S Master Mode
+	// Clock control - disable PLL / automatic clock detection
 	*((ULONG *)((ULONG)cfg_mem+0x008c)) = 0x00200020;	// MAIN_SPI_ADDRESS = regnum
 	*((ULONG *)((ULONG)cfg_mem+0x0090)) = 0x00900022;	// MAIN_SPI_WDATA = regval
 	*((ULONG *)((ULONG)cfg_mem+0x0094)) = 0x00000024;	// MAIN_SPI_WTRIG
@@ -514,18 +514,23 @@ void initCfgMem (APTR cfg_mem)
 	*((ULONG *)((ULONG)cfg_mem+0x00c0)) = 0x00030022;	// MAIN_SPI_WDATA = regval
 	*((ULONG *)((ULONG)cfg_mem+0x00c4)) = 0x00000024;	// MAIN_SPI_WTRIG
 	
-	// Disable PLL
-	*((ULONG *)((ULONG)cfg_mem+0x00c8)) = 0x00280020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00cc)) = 0x00000022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00d0)) = 0x00000024;	// MAIN_SPI_WTRIG	
+	// Set WCLK = BCLK / 64
+	*((ULONG *)((ULONG)cfg_mem+0x00c8)) = 0x00270020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfg_mem+0x00cc)) = 0x003f0022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfg_mem+0x00d0)) = 0x00000024;	// MAIN_SPI_WTRIG
 
-	// ADC Power-Up
-	*((ULONG *)((ULONG)cfg_mem+0x00d4)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00d8)) = 0x00700022;	// MAIN_SPI_WDATA = regval
+	// Disable PLL
+	*((ULONG *)((ULONG)cfg_mem+0x00d4)) = 0x00280020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfg_mem+0x00d8)) = 0x00000022;	// MAIN_SPI_WDATA = regval
 	*((ULONG *)((ULONG)cfg_mem+0x00dc)) = 0x00000024;	// MAIN_SPI_WTRIG	
 
+	// ADC Power-Up
+	*((ULONG *)((ULONG)cfg_mem+0x00e0)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfg_mem+0x00e4)) = 0x00700022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfg_mem+0x00e8)) = 0x00000024;	// MAIN_SPI_WTRIG	
+
 /* End of Stream */
-	*((ULONG *)((ULONG)cfg_mem+0x00e0)) = 0xffffffff;
+	*((ULONG *)((ULONG)cfg_mem+0x00ec)) = 0xffffffff;
 }
 
 void errorMessage(STRPTR error)
@@ -814,7 +819,7 @@ VOID process_window_events(struct Window *mywin,
 
 	myCD = NULL;
 	
-	wPrintF(0,"AmiGUS Flash Tool V0.4", TRUE,topborder,font,mywin);
+	wPrintF(0,"AmiGUS Flash Tool V0.41", TRUE,topborder,font,mywin);
 	wPrintF(1,"(C)2025 by Oliver Achten", FALSE,topborder,font,mywin);
 	
 	/* Find AmiGus Card */

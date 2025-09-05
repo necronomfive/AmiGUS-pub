@@ -216,21 +216,21 @@
 ))
 
 (set #which_drivers_target_help
-(cat "\nIn diesem Teil kï¿½nnen Sie wï¿½hlen, auf welche Laufwerk oder "
+(cat "\nIn diesem Teil können Sie wählen, auf welche Laufwerk oder "
      "in welches Verzeichnis die AmiGUS Treiber installiert werden sollen. "
      "Sie sollten normalerweise an dieselbe Stelle installiert werden "
      "wie die aktuelle Workbench, weil das ist, wo AHI und MHI sie "
-     "erwarten wï¿½rden.\n\n"
+     "erwarten würden.\n\n"
      @askdir-help
 ))
 
 (set #which_tools_target
-(cat "Die AmiGUS Basiswerkzeuge kï¿½nnen an einen beliebigen Ort installiert "
+(cat "Die AmiGUS Basiswerkzeuge können an einen beliebigen Ort installiert "
      "werden - suchen Sie bitte ihren bevorzugten Ort aus.\n"
 ))
 
 (set #which_tools_target_help
-(cat "\nIn diesem Teil kï¿½nnen Sie wï¿½hlen, auf welche Laufwerk oder "
+(cat "\nIn diesem Teil können Sie wählen, auf welche Laufwerk oder "
      "Verzeichnis die AmiGUS Basiswerkzeuge installiert werden sollen. "
      "Der Ort ist dabei absolut beliebig. \n\n"
      "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
@@ -240,13 +240,13 @@
 ))
 
 (set #which_debug_target
-(cat "Die AmiGUS Debugwerkzeuge kï¿½nnen an einen beliebigen Ort installiert "
+(cat "Die AmiGUS Debugwerkzeuge können an einen beliebigen Ort installiert "
      "werden - suchen Sie bitte ihren bevorzugten Ort aus.\n"
      "(Ein Verzeichnis \"debug\" wird dort angelegt.)\n"
 ))
 
 (set #which_debug_target_help
-(cat "\nIn diesem Teil kï¿½nnen Sie wï¿½hlen, auf welche Laufwerk oder "
+(cat "\nIn diesem Teil können Sie wählen, auf welche Laufwerk oder "
      "Verzeichnis die AmiGUS Debugwerkzeuge installiert werden sollen. "
      "Der Ort ist dabei absolut beliebig. \n\n"
      "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
@@ -256,20 +256,20 @@
 ))
 
 (set #which_cpu
-(cat "Bitte wï¿½hlen Sie aus, welche CPU-optimierte Version des %s Treibers "
+(cat "Bitte wählen Sie aus, welche CPU-optimierte Version des %s Treibers "
      "installiert werden soll.\n\n"
 ))
 
 (set #which_cpu_help
-(cat "\nIn diesem Teil kï¿½nnen Sie wï¿½hlen, fï¿½r welche CPU die optimierte %s "
-     "Treiberversion installiert werden soll. Im Zweifelsfall wï¿½hlen Sie "
-     "bitte 68000. Sie verlieren mï¿½glicherweise etwas Leistung, aber "
-     "vermeiden Abstï¿½rze. \n\n"
+(cat "\nIn diesem Teil können Sie wählen, für welche CPU die optimierte %s "
+     "Treiberversion installiert werden soll. Im Zweifelsfall wählen Sie "
+     "bitte 68000. Sie verlieren möglicherweise etwas Leistung, aber "
+     "vermeiden Abstürze. \n\n"
 ))
 
 (set #which_debug_driver
-(cat "Mï¿½chten Sie einen Treiber mit debug-Ausgabe verwenden? "
-     "Bitte wï¿½hlen Sie diese nur, wenn Sie wissen, was sie tun oder darum "
+(cat "Möchten Sie einen Treiber mit debug-Ausgabe verwenden? "
+     "Bitte wählen Sie diese nur, wenn Sie wissen, was sie tun oder darum "
      "gebeten wurden.\n"
      "(WARNUNG: LANGSAMER!)\n\n"
 ))
@@ -278,8 +278,8 @@
 (cat "\nDebugversionen produzieren log-Ausgaben mit verschiedenen Zielen, "
      "den seriellen Port des Amiga, eine Datei, oder einfach einen "
      "Speicherbereich. Alle diese Optionen sind langsamer als die Version "
-     "ohne Logging, kï¿½nnen zufï¿½llig abstï¿½rzen oder die Festplatte "
-     "beschï¿½digen. Bitte spielen Sie hier nicht herum, wenn sie unsicher "
+     "ohne Logging, können zufällig abstürzen oder die Festplatte "
+     "beschädigen. Bitte spielen Sie hier nicht herum, wenn sie unsicher "
      "sind, was das bedeutet.\n\n"
      "Sie wurden gewarnt!"
 ))
@@ -301,14 +301,14 @@
 ))
 
 (set #all_versions
-(cat "Mï¿½chten Sie alle %s Treiber Versionen neben dem Aktiven ablegen, falls "
-     "Sie ihn spï¿½ter mal brauchen?"
+(cat "Möchten Sie alle %s Treiber Versionen neben dem Aktiven ablegen, falls "
+     "Sie ihn später mal brauchen?"
 ))
 
 (set #all_versions_help
-(cat "\nAlle verfï¿½gbaren Versionen des %s Treibers wï¿½rden neben dem Aktiven "
+(cat "\nAlle verfügbaren Versionen des %s Treibers würden neben dem Aktiven "
      "abgelegt werden, um einen schnellen und einfachen Wechsel zwischen den "
-     "Treibern zu ermï¿½glichen.\n"
+     "Treibern zu ermöglichen.\n"
      "Dies umfasst alle CPU- und Debug-Varianten."
 ))
 
@@ -321,23 +321,23 @@
 ))
 
 (set #what_components
-(cat "Bitte die zu installierenden Komponenten auswï¿½hlen."
+(cat "Bitte die zu installierenden Komponenten auswählen."
 ))
 
 (set #what_components_help
-(cat "\nIn diesem Abschnitt kï¿½nnen sie auswï¿½hlen, welche Teile des AmiGUS "
-     "Softwarepakets installiert werden sollen. Alle Teile sollten unabhï¿½ngig "
+(cat "\nIn diesem Abschnitt können sie auswählen, welche Teile des AmiGUS "
+     "Softwarepakets installiert werden sollen. Alle Teile sollten unabhängig "
      "voneinander funktionieren.\n.\n"
      "\n"
-     "AHI Treiber - Installiert die AmiGUS Treiber fï¿½r AHI, den AmigaOS "
-     "Audiostandard fï¿½r diverse Soundkarten. Empfohlen.\n"
-     "MHI Treiber - Installiert die AmiGUS Treiber fï¿½r MHI, einen Standard "
-     "fï¿½r hardwarebeschleunigte Wiedergabe von komprimierten Audiodateien "
-     "wie MP3. Empfohlen, der Hardwarecodec wï¿½re sonst beleidigt.\n"
-     "Mixer - Die AmiGUS speichert die Lautstï¿½rke und andere Einstellungen "
-     "intern ab. Diese mï¿½ssen aber dort erstmal hineinkommen. Empfohlen.\n"
+     "AHI Treiber - Installiert die AmiGUS Treiber für AHI, den AmigaOS "
+     "Audiostandard für diverse Soundkarten. Empfohlen.\n"
+     "MHI Treiber - Installiert die AmiGUS Treiber für MHI, einen Standard "
+     "für hardwarebeschleunigte Wiedergabe von komprimierten Audiodateien "
+     "wie MP3. Empfohlen, der Hardwarecodec wäre sonst beleidigt.\n"
+     "Mixer - Die AmiGUS speichert die Lautstärke und andere Einstellungen "
+     "intern ab. Diese müssen aber dort erstmal hineinkommen. Empfohlen.\n"
      "FlashGUI - Wird verwendet um die Firmware der AmiGUS upzudaten oder "
-     "die gespeicherten Einstellungen zurï¿½ckzusetzen. Empfohlen.\n"
+     "die gespeicherten Einstellungen zurückzusetzen. Empfohlen.\n"
      "PlayWAV - Kommandozeilenwerkzeug, um WAV oder rohe PCM Dateien "
      "abzuspielen.\n"
      "PlayMP3 - Kommandozeilenwerkzeug, um MP3s oder andere komprimierte "
@@ -348,7 +348,7 @@
      "Record - Kommandozeilenwerkzeug, um Audio mit verschiedenen "
      "Einstellungen als WAV Dateien aufzunehmen.\n"
      "Debugwerkzeuge - Verschiedene Werkzeuge, um beim debuggen der "
-     "AHI und MHI Treiber zu helfen, wenn nï¿½tig.\n"
+     "AHI und MHI Treiber zu helfen, wenn nötig.\n"
      "Anleitung - AmiGUS's AmigaGuide Benutzerhandbuch. Empfohlen.\n"
      "\n"
 ))
@@ -399,7 +399,7 @@
 
 (set #insert_manual_disk_help
 (cat "\nDie AmiGUS AmigaGuide-Anleitung passt nicht auf die Toolsdiskette. "
-     "Um sie zu installieren, mï¿½ssen Sie die entsprechende Diskette einlegen. "
+     "Um sie zu installieren, müssen Sie die entsprechende Diskette einlegen. "
      "\n\n"
 ))
 
@@ -410,7 +410,7 @@
 (set #which_manual_target_help
 (cat "\nDas AmiGUS AmigaGuide Handbuch besteht aus der eigentlichen "
      "AmigaGuide-Datei und einem Verzeichnis mit den eingebetteten oder "
-     "verlinkten Bildern. Hier kï¿½nnen Sie den Ort fï¿½r beides auswï¿½hlen.\n\n"
+     "verlinkten Bildern. Hier können Sie den Ort für beides auswählen.\n\n"
      "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
      "obskuren Commodore Erweiterungen (bridgeboards) und deren Treibern "
      "verursachen kann.\n\n"

@@ -424,9 +424,9 @@ void initCfgMem (APTR cfg_mem)
 		*((ULONG *)((ULONG)cfg_mem+cnt)) = 0xffffffff;
 		cnt+=4;
 	} while (cnt != 0x4000);
-		
+	
 	*((ULONG *)((ULONG)cfg_mem+0x0000)) = 0x414d4947;	// Magic Token - Unlock
-
+		
 /* Fix ADC Initialisation */
 
 	// ADC Reset Registers

@@ -441,7 +441,7 @@
         (askchoice
           (prompt (#which_cpu driver_name))
           (help (#which_cpu_help driver_name))
-          (choices "68000" "68020" "68040")
+          (choices "68000" "68020" "68040 / 68060")
           (default install_driver_cpu)
         )
       )

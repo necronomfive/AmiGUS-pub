@@ -387,107 +387,107 @@ void InitCFGMem (APTR cfgMem)
 /* Fix ADC Initialisation */
 
 	// ADC Reset Registers
-	*((ULONG *)((ULONG)cfg_mem+0x0004)) = 0x00000020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0008)) = 0x00fe0022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x000c)) = 0x00000024;	// MAIN_SPI_WTRIG	
+	*((ULONG *)((ULONG)cfgMem+0x0004)) = 0x00000020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x0008)) = 0x00fe0022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x000c)) = 0x00000024;	// MAIN_SPI_WTRIG	
 	
 	// ADC Power-Down
-	*((ULONG *)((ULONG)cfg_mem+0x0010)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0014)) = 0x00750022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0018)) = 0x00000024;	// MAIN_SPI_WTRIG	
+	*((ULONG *)((ULONG)cfgMem+0x0010)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x0014)) = 0x00750022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x0018)) = 0x00000024;	// MAIN_SPI_WTRIG	
 		
 	//  Set Manual Gain Control
 
-	*((ULONG *)((ULONG)cfg_mem+0x001c)) = 0x00190020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0020)) = 0x00ff0022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0024)) = 0x00000024;	// MAIN_SPI_WTRIG
+	*((ULONG *)((ULONG)cfgMem+0x001c)) = 0x00190020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x0020)) = 0x00ff0022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x0024)) = 0x00000024;	// MAIN_SPI_WTRIG
 		
 	// Increase Left Gain
 		
-	*((ULONG *)((ULONG)cfg_mem+0x0028)) = 0x00010020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x002c)) = 0x00200022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0030)) = 0x00000024;	// MAIN_SPI_WTRIG
+	*((ULONG *)((ULONG)cfgMem+0x0028)) = 0x00010020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x002c)) = 0x00200022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x0030)) = 0x00000024;	// MAIN_SPI_WTRIG
 		
 	// Increase Right Gain
 		
-	*((ULONG *)((ULONG)cfg_mem+0x0034)) = 0x00020020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0038)) = 0x00200022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x003c)) = 0x00000024;	// MAIN_SPI_WTRIG
+	*((ULONG *)((ULONG)cfgMem+0x0034)) = 0x00020020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x0038)) = 0x00200022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x003c)) = 0x00000024;	// MAIN_SPI_WTRIG
 		
 	// Enable Left Inputs
 		
-	*((ULONG *)((ULONG)cfg_mem+0x0040)) = 0x00060020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0044)) = 0x00020022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0048)) = 0x00000024;	// MAIN_SPI_WTRIG		
+	*((ULONG *)((ULONG)cfgMem+0x0040)) = 0x00060020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00020022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x0048)) = 0x00000024;	// MAIN_SPI_WTRIG		
 		
 	// Enable Right Inputs
 		
-	*((ULONG *)((ULONG)cfg_mem+0x004c)) = 0x00070020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0050)) = 0x00020022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0054)) = 0x00000024;	// MAIN_SPI_WTRIG			
+	*((ULONG *)((ULONG)cfgMem+0x004c)) = 0x00070020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00020022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x0054)) = 0x00000024;	// MAIN_SPI_WTRIG			
 		
 /* Mixer Settings */
 	
-	*((ULONG *)((ULONG)cfg_mem+0x0058)) = 0x80000030;	// MAIN_ADC_VOLUME_LL
-	*((ULONG *)((ULONG)cfg_mem+0x005c)) = 0x80000032;	// MAIN_ADC_VOLUME_RR
-	*((ULONG *)((ULONG)cfg_mem+0x0060)) = 0x80000034;	// MAIN_MHI_VOLUME_LL
-	*((ULONG *)((ULONG)cfg_mem+0x0064)) = 0x80000036;	// MAIN_MHI_VOLUME_RR	
-	*((ULONG *)((ULONG)cfg_mem+0x0068)) = 0x80000038;	// MAIN_WAV_VOLUME_LL
-	*((ULONG *)((ULONG)cfg_mem+0x006c)) = 0x8000003a;	// MAIN_WAV_VOLUME_RR
-	*((ULONG *)((ULONG)cfg_mem+0x0070)) = 0x8000003c;	// MAIN_AHI_VOLUME_LL
-	*((ULONG *)((ULONG)cfg_mem+0x0074)) = 0x8000003e;	// MAIN_AHI_VOLUME_RR
+	*((ULONG *)((ULONG)cfgMem+0x0058)) = 0x80000030;	// MAIN_ADC_VOLUME_LL
+	*((ULONG *)((ULONG)cfgMem+0x005c)) = 0x80000032;	// MAIN_ADC_VOLUME_RR
+	*((ULONG *)((ULONG)cfgMem+0x0060)) = 0x80000034;	// MAIN_MHI_VOLUME_LL
+	*((ULONG *)((ULONG)cfgMem+0x0064)) = 0x80000036;	// MAIN_MHI_VOLUME_RR	
+	*((ULONG *)((ULONG)cfgMem+0x0068)) = 0x80000038;	// MAIN_WAV_VOLUME_LL
+	*((ULONG *)((ULONG)cfgMem+0x006c)) = 0x8000003a;	// MAIN_WAV_VOLUME_RR
+	*((ULONG *)((ULONG)cfgMem+0x0070)) = 0x8000003c;	// MAIN_AHI_VOLUME_LL
+	*((ULONG *)((ULONG)cfgMem+0x0074)) = 0x8000003e;	// MAIN_AHI_VOLUME_RR
 
-	*((ULONG *)((ULONG)cfg_mem+0x0078)) = 0x00000040;	// MAIN_ADC_MIX_LR
-	*((ULONG *)((ULONG)cfg_mem+0x007c)) = 0x00000042;	// MAIN_MHI_MIX_LR
-	*((ULONG *)((ULONG)cfg_mem+0x0080)) = 0x00000044;	// MAIN_WAV_MIX_LR
-	*((ULONG *)((ULONG)cfg_mem+0x0084)) = 0x00000046;	// MAIN_AHI_MIX_LR
+	*((ULONG *)((ULONG)cfgMem+0x0078)) = 0x00000040;	// MAIN_ADC_MIX_LR
+	*((ULONG *)((ULONG)cfgMem+0x007c)) = 0x00000042;	// MAIN_MHI_MIX_LR
+	*((ULONG *)((ULONG)cfgMem+0x0080)) = 0x00000044;	// MAIN_WAV_MIX_LR
+	*((ULONG *)((ULONG)cfgMem+0x0084)) = 0x00000046;	// MAIN_AHI_MIX_LR
 
 /* TOSLINK Settings */
 
-	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0x00000070;	// MAIN_TOSLINK_CTRL
+	*((ULONG *)((ULONG)cfgMem+0x0088)) = 0x00000070;	// MAIN_TOSLINK_CTRL
 
 	// Clock control - disable PLL / automatic clock detection
-	*((ULONG *)((ULONG)cfg_mem+0x008c)) = 0x00200020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0090)) = 0x00900022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0094)) = 0x00000024;	// MAIN_SPI_WTRIG
+	*((ULONG *)((ULONG)cfgMem+0x008c)) = 0x00200020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x0090)) = 0x00900022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x0094)) = 0x00000024;	// MAIN_SPI_WTRIG
 
 	// Set DSP1 CLOCK
-	*((ULONG *)((ULONG)cfg_mem+0x0098)) = 0x00210020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x009c)) = 0x00000022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00a0)) = 0x00000024;	// MAIN_SPI_WTRIG
+	*((ULONG *)((ULONG)cfgMem+0x0098)) = 0x00210020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x009c)) = 0x00000022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x00a0)) = 0x00000024;	// MAIN_SPI_WTRIG
 	
 	// Set DSP2 CLOCK
-	*((ULONG *)((ULONG)cfg_mem+0x00a4)) = 0x00220020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00a8)) = 0x00000022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00ac)) = 0x00000024;	// MAIN_SPI_WTRIG	
+	*((ULONG *)((ULONG)cfgMem+0x00a4)) = 0x00220020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x00a8)) = 0x00000022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x00ac)) = 0x00000024;	// MAIN_SPI_WTRIG	
 
 	// Set ADC CLOCK
-	*((ULONG *)((ULONG)cfg_mem+0x00b0)) = 0x00230020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00b4)) = 0x00070022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00b8)) = 0x00000024;	// MAIN_SPI_WTRIG
+	*((ULONG *)((ULONG)cfgMem+0x00b0)) = 0x00230020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x00b4)) = 0x00070022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x00b8)) = 0x00000024;	// MAIN_SPI_WTRIG
 
 	// Set BCLK = CLK/4 (192kHz sampling rate)
-	*((ULONG *)((ULONG)cfg_mem+0x00bc)) = 0x00260020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00c0)) = 0x00030022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00c4)) = 0x00000024;	// MAIN_SPI_WTRIG
+	*((ULONG *)((ULONG)cfgMem+0x00bc)) = 0x00260020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x00c0)) = 0x00030022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x00c4)) = 0x00000024;	// MAIN_SPI_WTRIG
 	
 	// Set WCLK = BCLK / 64
-	*((ULONG *)((ULONG)cfg_mem+0x00c8)) = 0x00270020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00cc)) = 0x003f0022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00d0)) = 0x00000024;	// MAIN_SPI_WTRIG
+	*((ULONG *)((ULONG)cfgMem+0x00c8)) = 0x00270020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x00cc)) = 0x003f0022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x00d0)) = 0x00000024;	// MAIN_SPI_WTRIG
 
 	// Disable PLL
-	*((ULONG *)((ULONG)cfg_mem+0x00d4)) = 0x00280020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00d8)) = 0x00000022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00dc)) = 0x00000024;	// MAIN_SPI_WTRIG	
+	*((ULONG *)((ULONG)cfgMem+0x00d4)) = 0x00280020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x00d8)) = 0x00000022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x00dc)) = 0x00000024;	// MAIN_SPI_WTRIG	
 
 	// ADC Power-Up
-	*((ULONG *)((ULONG)cfg_mem+0x00e0)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00e4)) = 0x00700022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00e8)) = 0x00000024;	// MAIN_SPI_WTRIG	
+	*((ULONG *)((ULONG)cfgMem+0x00e0)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
+	*((ULONG *)((ULONG)cfgMem+0x00e4)) = 0x00700022;	// MAIN_SPI_WDATA = regval
+	*((ULONG *)((ULONG)cfgMem+0x00e8)) = 0x00000024;	// MAIN_SPI_WTRIG	
 
 /* End of Stream */
-	*((ULONG *)((ULONG)cfg_mem+0x00ec)) = 0xffffffff;
+	*((ULONG *)((ULONG)cfgMem+0x00ec)) = 0xffffffff;
 }
 
 

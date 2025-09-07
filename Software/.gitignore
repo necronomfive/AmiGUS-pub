@@ -2,3 +2,5 @@ prepare\-ahi
 prepare\-mhi
 prepare\-tools
 dependencies
+build/*
+

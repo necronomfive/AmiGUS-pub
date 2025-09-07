@@ -355,7 +355,7 @@ prepare-mhi:
 	touch prepare-mhi
 
 clean: $(DRIVERS/CLEAN) $(TOOLS/CLEAN)
-	rm -rf $(ADF_IMAGE1) $(ADF_DIR1) $(ADF_IMAGE2) $(ADF_DIR2) $(TARGET_DIR) $(TARGET_LHA)
+	rm -rf $(ADF_IMAGE1) $(ADF_DIR1) $(ADF_IMAGE2) $(ADF_DIR2) $(TARGET_DIR) $(TARGET_LHA) $(BDIR)
 
 dist-clean: $(DRIVERS/DIST-CLEAN) clean
 	rm -rf Drivers/*/include

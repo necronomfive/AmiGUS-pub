@@ -17,7 +17,6 @@ See [documentation](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documen
 
 ## Building and packaging:
 
-## Building
 ### Requirements:
 * make 4.4.1 from https://aminet.net/dev/c/make-4.4.1.lha
 * AmigaOS NDK from https://aminet.net/dev/misc/NDK3.2.lha
@@ -38,8 +37,9 @@ See [documentation](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documen
 * All of the requirements above installed somewhere ...
 * ... and `path ... ADD`ed accordingly to make it callable in vamos.
 
-### Steps:
+### Building:
 
+* `make` same as `make release` - see below
 * `make clean` deletes everything previously built
 * `make dist-clean` as above, but additionally deletes all downloaded dependencies
 * `make prepare-ahi` downloads and installs all dependencies for building the AmiGUS AHI drivers
@@ -47,8 +47,18 @@ See [documentation](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documen
 * `make drivers` combines the two above, and builds all AmiGUS drivers in all variants
 * `make prepare-tools` downloads and installs all dependencies for building the AmiGUS base tools
 * `make tools` as above, and actually builds the AmiGUS base tools
-* `make release` prepares, builds everything and packages it as full release for manual publishing at the moment
-* `make` same as `make release`
+
+### Packaging & releasing:
+
+Releasing and packaging is semi-automated as well.
+This requires a Linux build machine kind of, with vamos, curl, jq, and jlha installed and the correct credentials for api.github.com and uploads.github.com added to `~/.netrc`.
+
+* `make all-variants` prepares, builds everything, iterating over all CPU and logging variants
+* `make package` takes all variants and places them into nice LHA archives and an even nicer ADF files
+* `make release` combines the two above
+* `make RELEASE_TAG='rc-17' release-publish` builds a release, tags it accordingly and publishes it to [github releases page](https://github.com/necronomfive/AmiGUS-pub/releases) as pre-release. Please move over there to edit the release note and whatever else is needed.
+Done.
+* `make RELEASE_TAG='rc-17' release-unpublish` removes the tags and the release in case something was odd. No recovery, handle with care!
 
 ## Bugs?
 

@@ -80,51 +80,24 @@ release-publish: release
 		-H "X-GitHub-Api-Version: 2022-11-28"       \
 		$(RELEASE_API_URL)/tags/$(RELEASE_TAG) | jq -r ".id" > $(BDIR)/TEMP_RELEASE_ID
 	@echo "\n\n\n$(RELEASE_TAG) found as $$(cat $(BDIR)/TEMP_RELEASE_ID)"
-	@echo $(TARGET_LHA)   > $(BDIR)/TEMP_LHA_FILE_NAME
-	@echo $(TARGET_LHA13) > $(BDIR)/TEMP_LHA13_FILE_NAME
-	@echo $(ADF_IMAGE1)   > $(BDIR)/TEMP_IMAGE1_FILE_NAME
-	@echo $(ADF_IMAGE2)   > $(BDIR)/TEMP_IMAGE2_FILE_NAME
-	@echo $(ADF_IMAGE3)   > $(BDIR)/TEMP_IMAGE3_FILE_NAME
-	@echo "Files to release: \n\t\t\t$$(cat $(BDIR)/TEMP_LHA_FILE_NAME)"
-	@echo "\t\t\t$$(cat $(BDIR)/TEMP_LHA13_FILE_NAME)"
-	@echo "\t\t\t$$(cat $(BDIR)/TEMP_IMAGE1_FILE_NAME)"
-	@echo "\t\t\t$$(cat $(BDIR)/TEMP_IMAGE2_FILE_NAME)"
-	@echo "\t\t\t$$(cat $(BDIR)/TEMP_IMAGE3_FILE_NAME)"
-	curl -L --netrc                               \
-		-X POST                                     \
-		-H "Accept: application/vnd.github+json"    \
-		-H "X-GitHub-Api-Version: 2022-11-28"       \
-		-H "Content-Type: application/octet-stream" \
-		"$(UPLOAD_API_URL)/$$(cat $(BDIR)/TEMP_RELEASE_ID)/assets?name=$$(basename $$(cat $(BDIR)/TEMP_LHA_FILE_NAME))" \
-		--data-binary "@$$(cat $(BDIR)/TEMP_LHA_FILE_NAME)"
-	curl -L --netrc                               \
-		-X POST                                     \
-		-H "Accept: application/vnd.github+json"    \
-		-H "X-GitHub-Api-Version: 2022-11-28"       \
-		-H "Content-Type: application/octet-stream" \
-		"$(UPLOAD_API_URL)/$$(cat $(BDIR)/TEMP_RELEASE_ID)/assets?name=$$(basename $$(cat $(BDIR)/TEMP_LHA13_FILE_NAME))" \
-		--data-binary "@$$(cat $(BDIR)/TEMP_LHA13_FILE_NAME)"
-	curl -L --netrc                               \
-		-X POST                                     \
-		-H "Accept: application/vnd.github+json"    \
-		-H "X-GitHub-Api-Version: 2022-11-28"       \
-		-H "Content-Type: application/octet-stream" \
-		"$(UPLOAD_API_URL)/$$(cat $(BDIR)/TEMP_RELEASE_ID)/assets?name=$$(basename $$(cat $(BDIR)/TEMP_IMAGE1_FILE_NAME))" \
-		--data-binary "@$$(cat $(BDIR)/TEMP_IMAGE1_FILE_NAME)"
-	curl -L --netrc                               \
-		-X POST                                     \
-		-H "Accept: application/vnd.github+json"    \
-		-H "X-GitHub-Api-Version: 2022-11-28"       \
-		-H "Content-Type: application/octet-stream" \
-		"$(UPLOAD_API_URL)/$$(cat $(BDIR)/TEMP_RELEASE_ID)/assets?name=$$(basename $$(cat $(BDIR)/TEMP_IMAGE2_FILE_NAME))" \
-		--data-binary "@$$(cat $(BDIR)/TEMP_IMAGE2_FILE_NAME)"
-	curl -L --netrc                               \
-		-X POST                                     \
-		-H "Accept: application/vnd.github+json"    \
-		-H "X-GitHub-Api-Version: 2022-11-28"       \
-		-H "Content-Type: application/octet-stream" \
-		"$(UPLOAD_API_URL)/$$(cat $(BDIR)/TEMP_RELEASE_ID)/assets?name=$$(basename $$(cat $(BDIR)/TEMP_IMAGE3_FILE_NAME))" \
-		--data-binary "@$$(cat $(BDIR)/TEMP_IMAGE3_FILE_NAME)"
+	@echo $(TARGET_LHA)   >  $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(TARGET_LHA13) >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(ADF_IMAGE1)   >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(ADF_IMAGE2)   >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(ADF_IMAGE3)   >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo "Files to release: \n$$(cat $(BDIR)/TEMP_FILE_UPLOADS)\n\n\n"
+	for UPLOAD_PATH in $$(cat $(BDIR)/TEMP_FILE_UPLOADS)            ; \
+	do                                                                \
+		UPLOAD_FILE=$$(basename $$UPLOAD_PATH)                      ; \
+		RELEASE_ID=$$(cat $(BDIR)/TEMP_RELEASE_ID)                  ; \
+		curl -L --netrc                                               \
+		-X POST                                                       \
+		-H "Accept: application/vnd.github+json"                      \
+		-H "X-GitHub-Api-Version: 2022-11-28"                         \
+		-H "Content-Type: application/octet-stream"                   \
+		"$(UPLOAD_API_URL)/$$RELEASE_ID/assets?name=$$UPLOAD_FILE"    \
+		--data-binary "@$$UPLOAD_PATH"                              ; \
+	done
 
 release-unpublish:
 	@if [ -z "$(RELEASE_TAG)" ] ; then echo "Please call \"make RELEASE_TAG='rc-17' release-unpublish\"" ; exit 1 ; fi

@@ -49,6 +49,7 @@ The above diagram shows all relevant ports and components of the AmiGUS card.
 ### _List of Components_
 
 |**AmiGUS User Manual**|
+|-|
 |[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/AmiGUS/AmiGUS_Register_Map.xlsx)|
 
 |Part|Function| Documentation|

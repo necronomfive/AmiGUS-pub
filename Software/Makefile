@@ -1,8 +1,28 @@
-TARGET_DIR         = /tmp/AmiGUS
-TARGET_DIR13       = /tmp/AmiGUS13
-ADF_DIR1           = /tmp/AmiGUS-ADF1
-ADF_DIR2           = /tmp/AmiGUS-ADF2
-ADF_DIR3           = /tmp/AmiGUS-ADF3
+#
+# This file is part of the AmiGUS Software Release.
+#
+# AmiGUS Software Release is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published
+# by the Free Software Foundation, version 3 of the License only.
+#
+# AmiGUS Software Release is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with AmiGUS Software Release.
+#
+# If not, see <http://www.gnu.org/licenses/>.
+#
+
+BDIR               = build
+
+TARGET_DIR         = $(BDIR)/AmiGUS
+TARGET_DIR13       = $(BDIR)/AmiGUS13
+ADF_DIR1           = $(BDIR)/AmiGUS-ADF1
+ADF_DIR2           = $(BDIR)/AmiGUS-ADF2
+ADF_DIR3           = $(BDIR)/AmiGUS-ADF3
 
 TOOL_DIR           = $(TARGET_DIR)/Tools
 AHI_DIR            = $(TARGET_DIR)/AHI4
@@ -12,11 +32,11 @@ MHI_DIR            = $(TARGET_DIR)/MHI
 FW_DIR             = $(TARGET_DIR)/Firmware
 MANUAL_DIR         = $(TARGET_DIR)/Manual
 
-TARGET_LHA         = /tmp/AmiGUS-`date +%Y%m%d`.lha
-TARGET_LHA13       = /tmp/AmiGUS13-`date +%Y%m%d`.lha
-ADF_IMAGE1         = /tmp/AmiGUS-Tools-`date +%Y%m%d`.adf
-ADF_IMAGE2         = /tmp/AmiGUS-Manual-`date +%Y%m%d`.adf
-ADF_IMAGE3         = /tmp/AmiGUS-OS1.3-`date +%Y%m%d`.adf
+TARGET_LHA         = $(BDIR)/AmiGUS-`date +%Y%m%d`.lha
+TARGET_LHA13       = $(BDIR)/AmiGUS13-`date +%Y%m%d`.lha
+ADF_IMAGE1         = $(BDIR)/AmiGUS-Tools-`date +%Y%m%d`.adf
+ADF_IMAGE2         = $(BDIR)/AmiGUS-Manual-`date +%Y%m%d`.adf
+ADF_IMAGE3         = $(BDIR)/AmiGUS-OS1.3-`date +%Y%m%d`.adf
 
 DRIVER_MAKES = $(shell find Drivers -mindepth 1 -maxdepth 2 -type f -name Makefile)
 DRIVERS = $(dir $(DRIVER_MAKES))
@@ -39,7 +59,64 @@ TOOLS/CLEAN = $(foreach TOOL,$(TOOLS),$(TOOL)/clean)
 #echo:
 #	echo $(DRIVERS/SUPPORT)
 
-release: all
+###############################################################################
+
+release: all-variants package
+
+RELEASE_API_URL = https://api.github.com/repos/necronomfive/AmiGUS-pub/releases
+UPLOAD_API_URL = https://uploads.github.com/repos/necronomfive/AmiGUS-pub/releases
+
+release-publish: release
+	@if [ -z "$(RELEASE_TAG)" ] ; then echo "Please call \"make RELEASE_TAG='rc-17' release-publish\"" ; exit 1 ; fi
+	git tag "$(RELEASE_TAG)"
+	git push --tags
+	curl -L --netrc -X POST                       \
+		-H "Accept: application/vnd.github+json"    \
+		-H "X-GitHub-Api-Version: 2022-11-28"       \
+		$(RELEASE_API_URL)                          \
+		-d '{ "tag_name":"$(RELEASE_TAG)", "target_commitish":"main", "name":"$(RELEASE_TAG)", "body":"Description of the release", "draft":false, "prerelease":true, "generate_release_notes":false }'
+	curl -L --netrc                               \
+		-H "Accept: application/vnd.github+json"    \
+		-H "X-GitHub-Api-Version: 2022-11-28"       \
+		$(RELEASE_API_URL)/tags/$(RELEASE_TAG) | jq -r ".id" > $(BDIR)/TEMP_RELEASE_ID
+	@echo "\n\n\n$(RELEASE_TAG) found as $$(cat $(BDIR)/TEMP_RELEASE_ID)"
+	@echo $(TARGET_LHA)   >  $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(TARGET_LHA13) >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(ADF_IMAGE1)   >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(ADF_IMAGE2)   >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(ADF_IMAGE3)   >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo "Files to release: \n$$(cat $(BDIR)/TEMP_FILE_UPLOADS)\n\n\n"
+	for UPLOAD_PATH in $$(cat $(BDIR)/TEMP_FILE_UPLOADS)            ; \
+	do                                                                \
+		UPLOAD_FILE=$$(basename $$UPLOAD_PATH)                      ; \
+		RELEASE_ID=$$(cat $(BDIR)/TEMP_RELEASE_ID)                  ; \
+		curl -L --netrc                                               \
+		-X POST                                                       \
+		-H "Accept: application/vnd.github+json"                      \
+		-H "X-GitHub-Api-Version: 2022-11-28"                         \
+		-H "Content-Type: application/octet-stream"                   \
+		"$(UPLOAD_API_URL)/$$RELEASE_ID/assets?name=$$UPLOAD_FILE"    \
+		--data-binary "@$$UPLOAD_PATH"                              ; \
+	done
+
+release-unpublish:
+	@if [ -z "$(RELEASE_TAG)" ] ; then echo "Please call \"make RELEASE_TAG='rc-17' release-unpublish\"" ; exit 1 ; fi
+	curl -L --netrc                               \
+		-H "Accept: application/vnd.github+json"    \
+		-H "X-GitHub-Api-Version: 2022-11-28"       \
+		$(RELEASE_API_URL)/tags/$(RELEASE_TAG) | jq -r ".id" > $(BDIR)/TEMP_RELEASE_ID
+	echo "$(RELEASE_TAG) found as $$(cat $(BDIR)/TEMP_RELEASE_ID)"
+	curl -L --netrc                               \
+		-X DELETE                                   \
+		-H "Accept: application/vnd.github+json"    \
+		-H "X-GitHub-Api-Version: 2022-11-28"       \
+		$(RELEASE_API_URL)/$$(cat $(BDIR)/TEMP_RELEASE_ID)
+	git tag -d $(RELEASE_TAG)
+	git push origin :$(RELEASE_TAG)
+
+###############################################################################
+
+package:
 	-umount $(ADF_DIR1)
 	-umount $(ADF_DIR2)
 	-umount $(ADF_DIR3)
@@ -204,7 +281,7 @@ release: all
 	rm $(TARGET_DIR)/Disk.info
 	rm $(TARGET_DIR)/Manual/Disk.info
 
-	cd `dirname $(TARGET_DIR)` ; jlha a $(TARGET_LHA) `basename $(TARGET_DIR)` `basename $(TARGET_DIR)`.info
+	cd $$(dirname $(TARGET_LHA)) ; jlha a $$(basename $(TARGET_LHA)) `basename $(TARGET_DIR)` `basename $(TARGET_DIR)`.info
 
 	###########################################################################
 	# LHA 1.3
@@ -219,7 +296,7 @@ release: all
 	rm $(TARGET_DIR13)/Disk.info
 	rm $(TARGET_DIR13)/Manual/Disk.info
 
-	cd `dirname $(TARGET_DIR13)` ; jlha a $(TARGET_LHA13) `basename $(TARGET_DIR13)` `basename $(TARGET_DIR13)`.info
+	cd $$(dirname $(TARGET_LHA13)) ; jlha a $$(basename $(TARGET_LHA13)) `basename $(TARGET_DIR13)` `basename $(TARGET_DIR13)`.info
 
 	###########################################################################
 	# cleanup
@@ -237,7 +314,9 @@ release: all
 	# DONE
 	###########################################################################
 
-all: tools drivers support
+###############################################################################
+
+all-variants: tools drivers support
 
 tools: prepare-tools $(TOOLS/ALL)
 
@@ -276,7 +355,7 @@ prepare-mhi:
 	touch prepare-mhi
 
 clean: $(DRIVERS/CLEAN) $(TOOLS/CLEAN)
-	rm -rf $(ADF_IMAGE1) $(ADF_DIR1) $(ADF_IMAGE2) $(ADF_DIR2) $(TARGET_DIR) $(TARGET_LHA)
+	rm -rf $(ADF_IMAGE1) $(ADF_DIR1) $(ADF_IMAGE2) $(ADF_DIR2) $(TARGET_DIR) $(TARGET_LHA) $(BDIR)
 
 dist-clean: $(DRIVERS/DIST-CLEAN) clean
 	rm -rf Drivers/*/include

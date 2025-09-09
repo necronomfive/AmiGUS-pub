@@ -72,7 +72,7 @@ Here you find all materials to build your own personal AmiGUS card. Most solderi
 ### _PCB Data_
 | File  | Description |
 |-|-|
-|[Download](https://github.com/necronomfive/AmiGUS/blob/main/PCB/Gerbers/Version_13/250909_Amigus_PCB.zip)  Gerber and drill files |
+|[Download](https://github.com/necronomfive/AmiGUS/blob/main/PCB/Gerbers/Version_13/250909_Amigus_PCB.zip)| PCB manufacturing files |
 |x | BOM for all components and Mouser references (if available) |
 |[Download](https://github.com/necronomfive/AmiGUS/blob/main/PCB/Schematics/Z2_Audio_AmiGUS_V13.pdf) | AmiGUS card schematics. |
 

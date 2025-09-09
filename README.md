@@ -50,7 +50,7 @@ The above diagram shows all relevant ports and components of the AmiGUS card.
 
 |**AmiGUS User Manual**|
 |-|
-|[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/AmiGUS/AmiGUS_Register_Map.xlsx)|
+|[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/AmiGUS/AmiGUS_User_Manual.pdf)|
 
 |Part|Function| Documentation|
 |-|-|-|

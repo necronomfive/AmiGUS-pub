@@ -74,7 +74,7 @@ Here you find all materials to build your own personal AmiGUS card. Most solderi
 |-|-|
 |[Download](https://github.com/necronomfive/AmiGUS-pub/raw/main/PCB/Gerbers/Version_13/250909_Amigus_PCB.zip) | PCB manufacturing files |
 |x | BOM for all components and Mouser references (if available) |
-|[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/PCB/Schematics/Z2_Audio_AmiGUS_V13.pdf) | AmiGUS card schematics. |
+|[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/PCB/Schematics/AmiGUS_Schematics_V13.pdf) | AmiGUS card schematics. |
 
 In terms of PCB manufacturing, both PCBWAY and JLPCB were able to produce functional boards during our prototyping phase. 
 It is recommended that you specify either chamfering or beveling for the slot edge connector in order to prevent mechanical damage to the Zorro slots.

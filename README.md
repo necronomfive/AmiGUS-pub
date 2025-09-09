@@ -47,6 +47,10 @@ And since we are at it right now, you can own an **AmiGUS** too, either by buyin
 The above diagram shows all relevant ports and components of the AmiGUS card.
 
 ### _List of Components_
+
+|**AmiGUS User Manual**|
+|[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/AmiGUS/AmiGUS_Register_Map.xlsx)|
+
 |Part|Function| Documentation|
 |-|-|-|
 |**Altera 10M08 FPGA**| Main processing unit, receives and generates digital audio streams in 192kHz |[Register Map](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/AmiGUS/AmiGUS_Register_Map.xlsx)|

@@ -138,10 +138,7 @@ VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle ) {
 
   APTR card = handle->agch_CardBase;
 
-  // Original AmiGUS "stop playback" functionality
-  WriteReg16( card,
-              AMIGUS_CODEC_FIFO_CONTROL,
-              AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
+  // Deactivate interrupts
   WriteReg16( card,
               AMIGUS_CODEC_INT_ENABLE,
               AMIGUS_INT_F_CLEAR
@@ -160,10 +157,16 @@ VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle ) {
               | AMIGUS_CODEC_INT_F_SPI_FINISH
               | AMIGUS_CODEC_INT_F_VS1063_DRQ
               | AMIGUS_CODEC_INT_F_TIMER );
+  // Abort playback by codec
+  CancelVS1063Playback( card );
+  // Original AmiGUS "stop playback" functionality
+  WriteReg16( card,
+              AMIGUS_CODEC_FIFO_CONTROL,
+              AMIGUS_CODEC_FIFO_F_DMA_DISABLE );
+  // Flush card's buffers
   WriteReg16( card,
               AMIGUS_CODEC_FIFO_RESET,
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );
-  CancelVS1063Playback( card );
 }
 
 VOID SleepCodecTicks( APTR amiGUS, ULONG ticks ) {

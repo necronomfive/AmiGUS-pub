@@ -16,6 +16,8 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <proto/exec.h>
+
 #include "amigus_hardware.h"
 #include "debug.h"
 #include "SDI_compiler.h"
@@ -34,7 +36,9 @@ INLINE UWORD ReadSPI(
   UWORD offsetSPItrigger ) {
 
   UWORD status;
+  UWORD result;
 
+  Disable();
   do {
 
     status = ReadReg16( card, offsetSPIstatus );
@@ -47,7 +51,10 @@ INLINE UWORD ReadSPI(
     status = ReadReg16( card, offsetSPIstatus );
 
   } while ( status & blockedSPImask );
-  return ReadReg16( card, offsetSPIread );
+  result = ReadReg16( card, offsetSPIread );
+  Enable();
+
+  return result;
 }
 
 INLINE VOID WriteSPI(
@@ -62,6 +69,7 @@ INLINE VOID WriteSPI(
 
   UWORD status;
 
+  Disable();
   do {
 
     status = ReadReg16( card, offsetSPIstatus );
@@ -70,6 +78,7 @@ INLINE VOID WriteSPI(
   WriteReg16( card, offsetSPIaddress, SPIregister );
   WriteReg16( card, offsetSPIwrite, SPIvalue );
   WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
+  Enable();
 }
 
 /******************************************************************************

@@ -223,23 +223,30 @@ VOID CancelVS1063Playback( APTR amiGUS ) {
   UWORD sciMode;
   ULONG i;
   ULONG j;
+  UWORD format;
+  ULONG blockCount;
+  const ULONG blockSize = 768;
+  ULONG endFill;
 
   // Need to know what is playing - page 50.
   // For FLAC, according to page 50 SCI_HDAT1 = 0x664C,
   // send 12288 end fill bytes according to page 57,
   // for all others, send >= 2052 end fill bytes.
-  // Will use 3072 BYTEs = 768 LONGs, 
+  // Will use 3072 BYTEs = 768 LONGs (hence blockSize), 
   // 'cause 3072 * 4 = 12288
-  const UWORD format = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 );
-  const ULONG blockCount = ( 0x664C == format) ? 4: 1;
-  const ULONG blockSize = 768;
+  LOG_V(( "V: End of file step 1.\n" ));
+  format = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_HDAT1 );
+  blockCount = ( 0x664C == format) ? 4: 1;
+  LOG_V(( "V: End of file step 1.%08lx.\n", format ));
 
   // Now we need to tell the VS1063 to cleanly (!) stop
   // so...
   // Trigger end of 11.5.1 Playing a Whole File - page 57
 
   // step 2
-  ULONG endFill = GetVS1063EndFill( amiGUS );
+  LOG_V(( "V: End of file step 2.\n" ));
+  endFill = GetVS1063EndFill( amiGUS );
+  LOG_V(( "V: End of file step 2.%08lx.\n", endFill ));
 
   // Re-Enable DMA so we can feed end fill bytes
   WriteReg16( amiGUS,

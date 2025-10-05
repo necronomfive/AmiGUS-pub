@@ -367,8 +367,64 @@ Following is a list of boards which supply PAULA audio output:
 | Multifix AGA     | The card provides the Amiga audio and               |
 | Flickerfixer     | ground signals on JP1 and JP3.                      |
 +------------------+-----------------------------------------------------+
+| PicassoIV        | The graphics card provides the Amiga audio signal   |
+|                  | on two unnamed headers near the graphics slot.      |
++------------------+-----------------------------------------------------+
 | ZZ9000 GFX Board | The card provides the Amiga audio signal on J6.     |
 +------------------+-----------------------------------------------------+
+
+@{b}2.2.3.1 Multifix AGA Flickerfixer@{ub}
+
+Please use seperatable jumper wires to connect
+- JP1 LEFT and RIGHT with the outer pins of AmiGUS's Paula-In connector,
+- and JP3 AGND with one of the middle pins respectively.
+
+@{b}Take care to NEVER connect JP3 5V TO AmiGUS's Paula-In connector.@{ub}
+
+This would destroy your hardware!
+Check again, are you sure?
+Great!
+Check once more!
+You have been warned!
+
+@{"Multifix AGA Flickerfixer connectors" system "MultiView ilbm/mflifi1.iff"}@{IMG ilbm/mflifi1.iff}
+@{"AmiGUS connector" system "MultiView ilbm/mflifi2.iff"}@{IMG ilbm/mflifi2.iff}
+
+@{b}2.2.3.2 PicassoIV@{ub}
+
+You can use a spare 4 pin CDROM audio cable here.
+
+@{"PicassoIV connectors" system "MultiView ilbm/piv1.iff"}@{IMG ilbm/piv1.iff}
+
+@{b}WARNING: This is based on assumptions and has never been tested!@{ub}
+
+Please verify and let us know by creating an issue on
+the @{"AmiGUS github repository (8)" LINK refs}:
+
+- PicassoIV's pins marked "L" are connected with
+  (a) each other and 
+  (b) to the graphics slot, 
+      either pin 3 of the front part for Amiga's filtered Paula audio,
+      or pin 33 of the rear part for unfiltered Paula audio.
+
+- PicassoIV's pins marked "R" are connected with
+  (c) each other and 
+  (d) to the graphics slot, 
+      either pin 4 of the front part for Amiga's filtered Paula audio,
+      or pin 35 of the rear part for unfiltered Paula audio.
+
+- PicassoIV's middle pins of the same header are connected with
+  (e) each other and 
+  (f) to the graphics slot, 
+      either pin 12 of the front part for Amiga ground,
+      or pin 34 and 36 of the rear part for audio ground.
+
+@{b}2.2.3.3 ZZ9000 GFX Board@{ub}
+
+@{"ZZ9000 audio connection" system "MultiView ilbm/zz1.iff"}@{IMG ilbm/zz1.iff}
+
+See @{"ZZ9000 (9)" LINK refs} manual description of J6 and the right image in
+the third row of @{"ZZ9000AX (10)" LINK refs} manuals for reference.
 
 @{" 2.2.4 Digital Audio Expansion       " LINK expansion}
 @{" 2.3   External Audio Set-Up         " LINK external}
@@ -1154,19 +1210,25 @@ Oliver Eschbach
 @{" 7.1   Credits                       " LINK credits}
 @{" 7.2   References                    " LINK refs}
 
-(1) @{"https://aminet.net/driver/audio/ahiusr_4.18.lha" system "openurl https://aminet.net/driver/audio/ahiusr_4.18.lha"}
+( 1) @{"https://aminet.net/driver/audio/ahiusr_4.18.lha" system "openurl https://aminet.net/driver/audio/ahiusr_4.18.lha"}
 
-(2) @{"https://aminet.net/driver/audio/m68k-amigaos-ahiusr.lha"  system "openurl https://aminet.net/driver/audio/m68k-amigaos-ahiusr.lha"}
+( 2) @{"https://aminet.net/driver/audio/m68k-amigaos-ahiusr.lha" system "openurl https://aminet.net/driver/audio/m68k-amigaos-ahiusr.lha"}
 
-(3) @{"https://aminet.net/util/libs/mui38usr.lha"  system "openurl https://aminet.net/util/libs/mui38usr.lha"}
+( 3) @{"https://aminet.net/util/libs/mui38usr.lha" system "openurl https://aminet.net/util/libs/mui38usr.lha"}
 
-(4) @{"http://www.amigaamp.de/Binaries/AmigaAMP3-68k.lha"  system "openurl http://www.amigaamp.de/Binaries/AmigaAMP3-68k.lha"}
+( 4) @{"http://www.amigaamp.de/Binaries/AmigaAMP3-68k.lha" system "openurl http://www.amigaamp.de/Binaries/AmigaAMP3-68k.lha"}
 
-(5) @{"https://aminet.net/mus/play/hippoplayer.lha" system "openurl https://aminet.net/mus/play/hippoplayer.lha"}
+( 5) @{"https://aminet.net/mus/play/hippoplayer.lha" system "openurl https://aminet.net/mus/play/hippoplayer.lha"}
 
-(6) @{"https://aminet.net/mus/play/hippoplayerupdate.lha"  system "openurl https://aminet.net/mus/play/hippoplayerupdate.lha"}
+( 6) @{"https://aminet.net/mus/play/hippoplayerupdate.lha" system "openurl https://aminet.net/mus/play/hippoplayerupdate.lha"}
 
-(7) @{"https://www.amigaforever.com/kb/13-105"  system "openurl https://www.amigaforever.com/kb/13-105"}
+( 7) @{"https://www.amigaforever.com/kb/13-105" system "openurl https://www.amigaforever.com/kb/13-105"}
+
+( 8) @{"https://github.com/necronomfive/AmiGUS-pub/issues" system  "openurl https://github.com/necronomfive/AmiGUS-pub/issues"}
+
+( 9) @{"https://mntre.com/media/ZZ9000_info_md/zz9000-manual.pdf" system "openurl https://web.archive.org/web/20250306223537/https://mntre.com/media/ZZ9000_info_md/zz9000-manual.pdf"}
+
+(10) @{"https://mntre.com/media/ZZ9000_info_md/zz9000ax-manual-r1.pdf" system "openurl https://web.archive.org/web/20250108190251/https://mntre.com/media/ZZ9000_info_md/zz9000ax-manual-r1.pdf"}
 
 @ENDNODE
 

@@ -34,14 +34,40 @@
  */
 VOID ResetVS1063( APTR amiGUS ) {
 
-  LOG_D(( "D: Resetting VS1063 codec...\n"));
+  ULONG circle = 0;
+
+  LOG_D(( "D: Resetting VS1063 codec from mode 0x%04lx...\n",
+          ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_MODE )));
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_INT_CONTROL,
+              AMIGUS_CODEC_INT_F_VS1063_DRQ |
+              AMIGUS_INT_F_CLEAR );
   WriteCodecSPI( amiGUS,
                  VS1063_CODEC_SCI_MODE,
+                 VS1063_CODEC_F_SM_CLK_RANGE |
+                 VS1063_CODEC_F_SM_SDINEW |
                  VS1063_CODEC_F_SM_RESET );
   // page 56 - 11.3 Software Reset
   SleepCodecTicks( amiGUS, VS1063_CODEC_RESET_DELAY_TICKS );
+  // and wait for DREQ
+  for ( ; ; ) {
+    UWORD status = ReadReg16( amiGUS, AMIGUS_CODEC_INT_CONTROL );
+    ++circle;
+    if ( status & AMIGUS_CODEC_INT_F_VS1063_DRQ ) {
 
-  LOG_D(( "D: ... done.\n"));
+      LOG_D(( "D: ... done, %ld circles.\n", circle ));
+      return;
+    }
+    if ( circle & 0x00000400 ) {
+
+      LOG_W(( "W: Status flag is 0x%04lx after %ld circles.\n", status, circle ));
+    }
+    if ( circle > 1000000 ) {
+
+      LOG_E(( "E: Giving up - this is bad!\n" ));
+      return;
+    }
+  }
 }
 
 /******************************************************************************

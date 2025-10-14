@@ -275,7 +275,7 @@ VOID CancelVS1063Playback( APTR amiGUS ) {
       WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, endFill );
     }
     // step 6
-    sciMode = ReadVS1063Mem( amiGUS, VS1063_CODEC_SCI_MODE );
+    sciMode = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_MODE );
     if ( !( sciMode & VS1063_CODEC_F_SM_CANCEL )) {
 
       LOG_V(( "V: End of file step 6\n" ));

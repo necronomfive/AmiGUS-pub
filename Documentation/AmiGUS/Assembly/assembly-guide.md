@@ -10,14 +10,14 @@
 ## Step 1: Order PCBs
 
 Use these Gerber files for ordering:
-[https://github.com/necronomfive/AmiGUS-pub/tree/main/PCB/Gerbers/Version_13]() and
-[https://github.com/necronomfive/AmiGUS-pub/tree/main/PCB/Gerbers/Audiot]()
+[/PCB/Gerbers/Version_13](https://github.com/necronomfive/AmiGUS-pub/tree/main/PCB/Gerbers/Version_13) and
+[/PCB/Gerbers/Audiot](https://github.com/necronomfive/AmiGUS-pub/tree/main/PCB/Gerbers/Audiot)
 
 Not intended as advertising, but here are my JLCPCB settings...
 
-![settings JLCPCB](assets/images/AmiGUS-JLPCB-1.png)
+![settings JLCPCB 1](assets/images/AmiGUS-JLPCB-1.png)
 
-![settings II](assets/images/AmiGUS-JLPCB-2.png)
+![settings JLCPCB 2](assets/images/AmiGUS-JLPCB-2.png)
 
 Could you do it differently?
 Sure, but this method worked perfectly for me.
@@ -37,9 +37,9 @@ Timeline from my experience:
 
 Example shopping carts for Reichelt and Mouser can be found here:
 
-[https://github.com/necronomfive/AmiGUS-pub/tree/main/PCB/BOM/AmiGUS_Rev13-example]()
+[/PCB/BOM/AmiGUS_Rev13-example](https://github.com/necronomfive/AmiGUS-pub/tree/main/PCB/BOM/AmiGUS_Rev13-example)
 
-Alinea offers the slot bracket separately for a very reasonable €10 - [https://www.amiga-shop.net/Amiga-Ha.../Slotblende-fuer-AmiGUS-Soundkarte::1437.html]()
+Alinea offers the slot bracket separately for a very reasonable €10 - [here](https://www.amiga-shop.net/Amiga-Ha.../Slotblende-fuer-AmiGUS-Soundkarte::1437.html)
 
 If you're buying the bracket from Alinea, remove the Keystone bracket from your Mouser cart. If you're making your own... grab your Dremel and drill, and good luck!
 
@@ -47,35 +47,35 @@ If you're buying the bracket from Alinea, remove the Keystone bracket from your 
 
 Fresh from the manufacturer, your PCBs will look like this:
 
-![settings JLCPCB](assets/images/AmiGUS-PCBs.jpg)
+![AmiGUS PCB](assets/images/AmiGUS-PCBs.jpg)
 
 The AUDIOT requires some preparation work:
 
-![settings JLCPCB](assets/images/Audiot-PCB.jpg)
+![AUDIOT PCB](assets/images/Audiot-PCB.jpg)
 
 You'll need to break off the upper section.
 I secured the PCB in a vise like this:
 
-![settings JLCPCB](assets/images/Audiot-Sanding.jpg)
+![AUDIOT prep 1](assets/images/Audiot-Sanding.jpg)
 
 Note: This version wasn't optimal - I've since refined the process. If you encounter issues, please let me know.
 
 For best results, clamp it flush (using the card as a guide) and apply pressure. Then file the edge:
 
-![settings JLCPCB](assets/images/Audiot-Sanding-II.jpg)
+![AUDIOT prep 2](assets/images/Audiot-Sanding-II.jpg)
 
 Clean up the edges:
 
-![settings JLCPCB](assets/images/Audiot-Sanding-III.jpg)
+![AUDIOT prep 3](assets/images/Audiot-Sanding-III.jpg)
 
 Work on both sides:
 
-![settings JLCPCB](assets/images/Audiot-Sanding-IV.jpg)
+![AUDIOT prep 4](assets/images/Audiot-Sanding-IV.jpg)
 
 Final result:
 
-![settings JLCPCB](assets/images/Audiot-Front.jpg)
-![settings JLCPCB](assets/images/Audiot-Back.jpg)
+![AUDIOT prep 5](assets/images/Audiot-Front.jpg)
+![AUDIOT prep 6](assets/images/Audiot-Back.jpg)
 
 General Notes
 
@@ -83,7 +83,7 @@ During assembly, use the [interactive BOM](https://htmlpreview.github.io/?https:
 
 My workbench setup includes:
 
-![settings JLCPCB](assets/images/Solder-Workshop.jpg)
+![equipment](assets/images/Solder-Workshop.jpg)
 
 * ELV LF-8800 soldering station with 1.6mm chisel tip, matching desoldering iron and soldering tweezers
 * Stereo microscope
@@ -115,37 +115,37 @@ I worked right to left, starting with:
 
 The operational amplifiers (OPAs):
 
-![settings JLCPCB](assets/images/OPA.jpg)
+![Soldering 1](assets/images/OPA.jpg)
 
 Skip U16 (DAC) for now, proceed to U13 (ADC):
 
-![settings JLCPCB](assets/images/U13.jpg)
+![Soldering 2](assets/images/U13.jpg)
 
 Next, U10 (codec):
 
-![settings JLCPCB](assets/images/U10.jpg)
+![Soldering 3](assets/images/U10.jpg)
 
 Install U11 (RAM) before U24 due to tight spacing and U11's finer pitch:
 
-![settings JLCPCB](assets/images/U11.jpg)
+![Soldering 4](assets/images/U11.jpg)
 
 Then U24 (logic gate):
 
-![settings JLCPCB](assets/images/U24.jpg)
+![Soldering 5](assets/images/U24.jpg)
 
 U14 follows naturally:
 
-![settings JLCPCB](assets/images/U14.jpg)
+![Soldering 6](assets/images/U14.jpg)
 
 Notice the Kapton tape here - protect those gold surfaces or you'll regret it. No tape = no sympathy! :P
 
 Next comes U7 (FPGA):
 
-![settings JLCPCB](assets/images/FPGA.jpg)
+![Soldering 7](assets/images/FPGA.jpg)
 
 Install bus drivers right to left:
 
-![settings JLCPCB](assets/images/Bus-Driver.jpg)
+![Soldering 8](assets/images/Bus-Driver.jpg)
 
 Clean thoroughly at this stage.
 
@@ -153,21 +153,21 @@ Clean thoroughly at this stage.
 
 Before:
 
-![settings JLCPCB](assets/images/before.jpg)
+![Soldering 9](assets/images/before.jpg)
 
 After:
 
-![settings JLCPCB](assets/images/after.jpg)
+![Soldering 10](assets/images/after.jpg)
 
 ### 3. U16
 
 Technique: Tack one pin, apply flux, then...
 
-![settings JLCPCB](assets/images/U16.jpg)
+![Soldering 11](assets/images/U16.jpg)
 
 ...complete the remaining pins:
 
-![settings JLCPCB](assets/images/rest.jpg)
+![Solderingc12](assets/images/rest.jpg)
 
 Now you can see why we installed the electrolytics first - protecting the ADC in this tight space is crucial.
 
@@ -175,31 +175,31 @@ Now you can see why we installed the electrolytics first - protecting the ADC in
 
 Space is tight here - electrolytics on one side, small components on the other:
 
-![settings JLCPCB](assets/images/C40.jpg)
+![Soldering 13](assets/images/C40.jpg)
 
 ### 5. C97
 
 Similar situation, with small components on the right:
 
-![settings JLCPCB](assets/images/C97.jpg)
+![Soldering 14](assets/images/C97.jpg)
 
 ### 6. Crystal
 
 Interesting component! First, tin the pads...
 
-![settings JLCPCB](assets/images/crystal.jpg)
+![Soldering 15](assets/images/crystal.jpg)
 
 ...position with desoldering tweezers...
 
-![settings JLCPCB](assets/images/crystal-II.jpg)
+![Soldering 16](assets/images/crystal-II.jpg)
 
 ...align carefully...
 
-![settings JLCPCB](assets/images/crystal-III.jpg)
+![Soldering 17](assets/images/crystal-III.jpg)
 
 ...done!
 
-![settings JLCPCB](assets/images/crystal-IV.jpg)
+![Soldering 18](assets/images/crystal-IV.jpg)
 
 I use this method because the pads are quite small. The tweezers let me heat all four points simultaneously for perfect placement.
 
@@ -209,19 +209,19 @@ The tedious but essential part... My method: Tack one pad per position, place co
 
 75x 100nF capacitors, mid-process:
 
-![settings JLCPCB](assets/images/birdseeds.jpg)
+![Soldering 19](assets/images/birdseeds.jpg)
 
 After cleaning:
 
-![settings JLCPCB](assets/images/cleaned.jpg)
+![Soldering 20](assets/images/cleaned.jpg)
 
 Work through the interactive BOM systematically, checking off each component. Taking time here prevents errors.
 
-![settings JLCPCB](assets/images/birdseeds-II.jpg)
+![Soldering 21](assets/images/birdseeds-II.jpg)
 
 Large ground planes can be challenging even at 390°C with the 1.6mm tip. Persistence required...
 
-![settings JLCPCB](assets/images/birdseeds-III.jpg)
+![Soldering 22](assets/images/birdseeds-III.jpg)
 
 Clean frequently - flux residue spreads everywhere. Small components are particularly troublesome; even minimal flux application leaves residue.
 
@@ -230,22 +230,22 @@ Clean frequently - flux residue spreads everywhere. Small components are particu
 These SMD voltage regulators could have been installed earlier with the ICs.
 Warning: Large copper areas require higher temperatures and possibly larger tips.
 
-![settings JLCPCB](assets/images/U3.jpg)
-![settings JLCPCB](assets/images/U3-II.jpg)
-![settings JLCPCB](assets/images/U3-III.jpg)
+![Soldering 23](assets/images/U3.jpg)
+![Soldering 24](assets/images/U3-II.jpg)
+![Soldering 25](assets/images/U3-III.jpg)
 
 ### 9. Remaining Electrolytic Capacitors
 
-![settings JLCPCB](assets/images/capacitors.jpg)
+![Soldering 26](assets/images/capacitors.jpg)
 
 This illustrates my concerns about SMD electrolytics. Even with the smallest suitable polymer capacitors, soldering tip access is tight.
 The large copper areas increase the risk of cold joints.
 
-![settings JLCPCB](assets/images/capacitors-II.jpg)
+![Soldering 27](assets/images/capacitors-II.jpg)
 
 Other locations are easier, though still with substantial copper areas. C98 and C99 (top right) are particularly close - through-hole would have been easier here.
 
-![settings JLCPCB](assets/images/capacitors-III.jpg)
+![Soldering 28](assets/images/capacitors-III.jpg)
 
 ## 10. Through-hole Voltage Regulators U20, U21, U22
 
@@ -255,33 +255,33 @@ Pro tip: Mount with nylon screws first - never use metal screws as traces run un
 
 Important: If using a Reichelt 7909, verify you received the correct part. We've seen about 30% wrong regulators (7806/+6V instead). While no cards have been damaged yet, it's still problematic.
 
-![settings JLCPCB](assets/images/U20.jpg)
+![Soldering 29](assets/images/U20.jpg)
 
 High heat needed here. Shortened leads help. I use the desoldering iron for better heat transfer.
 
 ### 11. All Connectors
 
-![settings JLCPCB](assets/images/jacks.jpg)
+![Soldering 30](assets/images/jacks.jpg)
 
 ### 12. Pin Headers
 
 Same approach: High heat, desoldering iron.
 
-![settings JLCPCB](assets/images/pinheader.jpg)
+![Soldering 31](assets/images/pinheader.jpg)
 
 AUDIOT follows the same process.
 
-![settings JLCPCB](assets/images/pinheader-II.jpg)
+![Soldering 32](assets/images/pinheader-II.jpg)
 
 Pin 1 at top right (notch up).
 Be careful not to dislodge pins.
 
-![settings JLCPCB](assets/images/pinheader-III.jpg)
+![Soldering 33](assets/images/pinheader-III.jpg)
 
 Electrical assembly complete!
 
-![settings JLCPCB](assets/images/ready.jpg)
-![settings JLCPCB](assets/images/ready-II.jpg)
+![Soldering 34](assets/images/ready.jpg)
+![Soldering 35](assets/images/ready-II.jpg)
 
 ### 13. Slot Bracket Preparation
 
@@ -298,7 +298,7 @@ Self-explanatory - you've got this!
 Protecting vintage hardware is crucial.
 Let's check for short circuits.
 
-![settings JLCPCB](assets/images/regulators.png)
+![Checking 1](assets/images/regulators.png)
 
 Linear regulators (top right of AmiGUS).
 
@@ -337,7 +337,7 @@ Expected readings:
 Verify +/-12V at regulators, GND continuity,
 +5V reaches TLV1117-33/TLV1117-18 (right pin).
 
-![settings JLCPCB](assets/images/regulators-ii.png)
+![Checking 2](assets/images/regulators-II.png)
 
 Additional checks:
 Verify TLV1117 outputs against GND (left to center pin).
@@ -366,52 +366,52 @@ Altera Quartus software required. @botfixer tested current Quartus Prime Lite; I
 
 Initial screen:
 
-![settings JLCPCB](assets/images/quartus.png)
+![Firmware 1](assets/images/quartus.png)
 
 Process:
 1. File -> Open: Select XyZ_AmiGUS_FPGA.pof from [https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/Releases/Quartus]()
 2. Set Program/Configure options
 3. Click Start
 
-![settings JLCPCB](assets/images/quartus-II.png)
+![Firmware 2](assets/images/quartus-II.png)
 
 Note: Quartus ignores Verify settings.
 Warning: A "100% Successful" message doesn't guarantee proper programming (I got this even with a failed cable).
 
-![settings JLCPCB](assets/images/quartus-III.png)
+![Firmware 3](assets/images/quartus-III.png)
 
 Watch for system freeze (floppy drive stops clicking).
 Solution: Cold restart ("Have you tried turning it off and on again?")
 
 Hold both mouse buttons for Expansion Board Diagnostics...
 
-![settings JLCPCB](assets/images/boot.jpg)
+![Board ID 1](assets/images/boot.jpg)
 
 AmiGUS shows as devices 5, 6, 7:
 
-![settings JLCPCB](assets/images/showconfig.png)
+![Board ID 2](assets/images/showconfig.png)
 
 ### 4. Software Setup
 
-Download release_250907-rc2 from [https://github.com/necronomfive/AmiGUS-pub/releases]()
+Download the latest [release](https://github.com/necronomfive/AmiGUS-pub/releases).
 Note: Some users report LHA archive issues. Works with lha 2.15.
 ADFs available as alternative.
 For detailed installation options: [RTFM](https://github.com/necronomfive/AmiGUS-pub/blob/main/Documentation/AmiGUS/AmiGUS_User_Manual.pdf)
 
 Start FlashFPGA, click "Info"...
 
-![settings JLCPCB](assets/images/flash.png)
+![Firmware 4](assets/images/flash.png)
 
 Expected warning - click "Init"...
 
-![settings JLCPCB](assets/images/flash-II.png)
+![Firmware 5](assets/images/flash-II.png)
 
 Blue progress bar appears. Non-functioning "Quit" button indicates issues.
 Quick reset readies the card.
 
 Testing with mixer:
 
-![settings JLCPCB](assets/images/mixer.png)
+![Test 1](assets/images/mixer.png)
 
 "Levels" shows DAC/TOSLINK output.
 Verify Paula connection: Check audio and level indicators
@@ -431,15 +431,15 @@ HippoPlayer usage:
 Settings in Prefs ("Pr"):
 MHI tab:
 
-![settings JLCPCB](assets/images/prefs.png)
+![Test 2](assets/images/prefs.png)
 
 AmiGUS tab:
 
-![settings JLCPCB](assets/images/prefs-II.png)
+![Test 3](assets/images/prefs-II.png)
 
 AHI tab:
 
-![settings JLCPCB](assets/images/prefs-III.png)
+![Test 4](assets/images/prefs-III.png)
 
 Configuration rules:
 * AmiGUS active = AHI/Paula inactive
@@ -454,15 +454,15 @@ Usage guide:
 Operating modes:
 MHI playback:
 
-![settings JLCPCB](assets/images/MHI.png)
+![Test 5](assets/images/MHI.png)
 
 AGUS output:
 
-![settings JLCPCB](assets/images/AGUS.png)
+![Test 6](assets/images/AGUS.png)
 
 AHI output:
 
-![settings JLCPCB](assets/images/AHI.png)
+![Test 7](assets/images/AHI.png)
 
 All modes functional?
 Paula and LineIn working?

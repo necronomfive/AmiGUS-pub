@@ -253,6 +253,7 @@
 #define VS1063_CODEC_F_SM_CANCEL        0x0008 // page 44
 #define VS1063_CODEC_F_SM_SDINEW        0x0800 // page 44
 #define VS1063_CODEC_F_SM_ENCODE        0x1000 // page 44
+#define VS1063_CODEC_F_SM_CLK_RANGE     0x4000 // page 44
 
 #define VS1063_CODEC_F_SC_MULT_5_0X     0xE000 // page 48
 

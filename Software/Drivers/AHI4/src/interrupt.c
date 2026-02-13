@@ -82,9 +82,11 @@ INLINE VOID HandleRecording( VOID ) {
 
   ULONG *current = &( recording->agpr_CurrentBuffer );
   BOOL canSwap = TRUE;
-  LONG copied = 0;        /* Sum of BYTEs actually filled into FIFO this run */
-  LONG target =                 /* Read-back remaining FIFO samples in BYTES */
-    ReadReg16( AmiGUS_AHI_Base->agb_CardBase, AMIGUS_PCM_REC_FIFO_USAGE ) << 1;
+  LONG copied = 0;        /* Sum of BYTEs actually read from FIFO this run   */
+  LONG target = ReadReg16( AmiGUS_AHI_Base->agb_CardBase, /* Read remaining  */
+                           AMIGUS_PCM_REC_FIFO_USAGE );   /* FIFO WORDs      */
+  target <<= 1;                                    /* convert WORDs to BYTEs */
+  target -= recording->agpr_CopyInputSize;  /* and prevent buffer underflows */
 
   while ( copied < target ) {
 
@@ -110,8 +112,9 @@ INLINE VOID HandleRecording( VOID ) {
   }
 
   LOG_INT((
-    "INT: Recording t %4ld c %4ld wm %4ld wr %ld b%ld-i %ld\n",
+    "INT: Recording t %4ld+%ld c %4ld wm %4ld wr %ld b%ld-i%ld\n",
     target,
+    recording->agpr_CopyInputSize,
     copied,
     ReadReg16( AmiGUS_AHI_Base->agb_CardBase, AMIGUS_PCM_REC_FIFO_WATERMARK ),
     AmiGUS_AHI_Base->agb_WorkerReady,

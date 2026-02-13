@@ -128,7 +128,7 @@ ASM(LONG) PlaybackCopy32to24(
  * @param[in, out] bufferIndex Index applied onto the buffer already,
  *                             increased by 4 as counting LONGs here.
  *
- * @return Number of bytes written, i.e. 4.
+ * @return Number of bytes read, i.e. 4.
  */
 ASM( LONG ) RecordingCopy8Mto16S(
   REG( d0, ULONG *bufferBase ),
@@ -142,7 +142,7 @@ ASM( LONG ) RecordingCopy8Mto16S(
  * @param[in, out] bufferIndex Index applied onto the buffer already,
  *                             increased by 4 as counting LONGs here.
  *
- * @return Number of bytes written, i.e. 4.
+ * @return Number of bytes read, i.e. 4.
  */
 ASM( LONG ) RecordingCopy8Sto16S(
   REG( d0, ULONG *bufferBase ),
@@ -156,7 +156,7 @@ ASM( LONG ) RecordingCopy8Sto16S(
  * @param[in, out] bufferIndex Index applied onto the buffer already,
  *                             increased by 4 as counting LONGs here.
  *
- * @return Number of bytes written, i.e. 4.
+ * @return Number of bytes read, i.e. 4.
  */
 ASM( LONG ) RecordingCopy16Mto16S(
   REG( d0, ULONG *bufferBase ),
@@ -170,7 +170,7 @@ ASM( LONG ) RecordingCopy16Mto16S(
  * @param[in, out] bufferIndex Index applied onto the buffer already,
  *                             increased by 4 as counting LONGs here.
  *
- * @return Number of bytes written, i.e. 4.
+ * @return Number of bytes read, i.e. 4.
  */
 ASM( LONG ) RecordingCopy16Sto16S(
   REG( d0, ULONG *bufferBase ),
@@ -184,7 +184,7 @@ ASM( LONG ) RecordingCopy16Sto16S(
  * @param[in, out] bufferIndex Index applied onto the buffer already,
  *                             increased by 8 as counting LONGs here.
  *
- * @return Number of bytes written, i.e. 32.
+ * @return Number of bytes read, i.e. 6.
  */
 ASM( LONG ) RecordingCopy24Mto32S(
   REG( d0, ULONG *bufferBase ),
@@ -198,7 +198,7 @@ ASM( LONG ) RecordingCopy24Mto32S(
  * @param[in, out] bufferIndex Index applied onto the buffer already,
  *                             increased by 8 as counting LONGs here.
  *
- * @return Number of bytes written, i.e. 32.
+ * @return Number of bytes read, i.e. 12.
  */
 ASM( LONG ) RecordingCopy24Sto32S(
   REG( d0, ULONG *bufferBase ),

@@ -93,6 +93,7 @@ struct AmiGUSPcmRecording {
   ULONG                         agpr_CurrentBuffer;  /* Current recording b. */
 
   CopyFunctionType              agpr_CopyFunction;   /* Magic AmiGUS<->AHI.. */
+  ULONG                         agpr_CopyInputSize;  /* Function input BYTEs */
 
   struct AHIRecordMessage       agpr_RecordingMessage;
 

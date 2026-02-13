@@ -145,7 +145,7 @@ ASM( LONG ) RecordingCopy8Mto16S(
   *( ULONG * ) addressOut = outD;
 
   ( *bufferIndex ) += 4;
-  return 16;
+  return 4;
 }
 
 ASM( LONG ) RecordingCopy8Sto16S(
@@ -165,7 +165,7 @@ ASM( LONG ) RecordingCopy8Sto16S(
   *( ULONG * ) addressOut = outB;
 
   ( *bufferIndex ) += 2;
-  return 8;
+  return 4;
 }
 
 ASM( LONG ) RecordingCopy16Mto16S(
@@ -185,7 +185,7 @@ ASM( LONG ) RecordingCopy16Mto16S(
   *( ULONG * ) addressOut = outB;
   
   ( *bufferIndex ) += 2;
-  return 8;
+  return 4;
 }
 
 ASM( LONG ) RecordingCopy16Sto16S(
@@ -235,7 +235,7 @@ ASM( LONG ) RecordingCopy24Mto32S(
   *( ULONG * ) addressOut = outC;
   
   ( *bufferIndex ) += 6;
-  return 24;
+  return 6;
 }
 
 ASM( LONG ) RecordingCopy24Sto32S(
@@ -274,5 +274,5 @@ ASM( LONG ) RecordingCopy24Sto32S(
   *( ULONG * ) addressOut = outF;
   
   ( *bufferIndex ) += 6;
-  return 24;
+  return 12;
 }

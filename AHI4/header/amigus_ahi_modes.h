@@ -72,6 +72,10 @@ struct RecordingProperties {
      *  only LONGs from AmiGUS. The recording buffers' BYTE size needs to be *
      *  multiples of these.                                                  */
     ULONG               rp_AhiBufferMultiples;
+    /** Number of BYTEs input per single copy function call,                 *
+     *  only depends on the CopyFunction - but that is defined by the        *
+     *  requirements of hardware and AHI in the end.                         */
+    ULONG               rp_CopyFunctionInputSize;
 };
 
 /**

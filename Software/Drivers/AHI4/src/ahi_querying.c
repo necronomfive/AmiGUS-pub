@@ -48,7 +48,8 @@ ASM(LONG) SAVEDS AHIsub_GetAttr(
     }
     case AHIDB_MaxChannels: {
 
-      result = 1;
+      // 1 channel would be just correct, i.e. result = 1;
+      // but if Tocatta goes with default... ´\_O_/`
       break;
     }
     case AHIDB_Frequencies: {

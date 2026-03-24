@@ -34,14 +34,43 @@
  */
 VOID ResetVS1063( APTR amiGUS ) {
 
-  LOG_D(( "D: Resetting VS1063 codec...\n"));
+  ULONG loop = 0;
+  UWORD status = AMIGUS_CODEC_SPI_F_DREQ;
+
+  LOG_D(( "D: Resetting VS1063 codec from mode 0x%04lx...\n",
+          ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_MODE )));
+  WriteReg16( amiGUS,
+              AMIGUS_CODEC_INT_CONTROL,
+              AMIGUS_CODEC_INT_F_VS1063_DRQ |
+              AMIGUS_INT_F_CLEAR );
   WriteCodecSPI( amiGUS,
                  VS1063_CODEC_SCI_MODE,
+                 VS1063_CODEC_F_SM_CLK_RANGE |
+                 VS1063_CODEC_F_SM_SDINEW |
                  VS1063_CODEC_F_SM_RESET );
+
   // page 56 - 11.3 Software Reset
   SleepCodecTicks( amiGUS, VS1063_CODEC_RESET_DELAY_TICKS );
 
-  LOG_D(( "D: ... done.\n"));
+  // ... and wait for DREQ to become go high, which is negated in bit 14
+  // of AMIGUS_CODEC_SPI_STATUS, so we wait for it to become 0.
+  while ( status ) {
+
+    ++loop;
+    status = ReadReg16( amiGUS, AMIGUS_CODEC_SPI_STATUS );
+    // Below, you find a poor man's modulo 1024, as no modulo on 68000
+    if ( !( loop & 0x000003ff )) {
+
+      LOG_W(( "W: Status flag is 0x%04lx after %ld loops.\n", status, loop ));
+    }
+    status &= AMIGUS_CODEC_SPI_F_DREQ;
+    if ( loop > 1000000 ) {
+
+      LOG_E(( "E: Giving up - this is bad!\n" ));
+      status = 0;
+    }
+  }
+  LOG_D(( "D: ... done, %ld loops.\n", loop ));
 }
 
 /******************************************************************************
@@ -275,7 +304,7 @@ VOID CancelVS1063Playback( APTR amiGUS ) {
       WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, endFill );
     }
     // step 6
-    sciMode = ReadVS1063Mem( amiGUS, VS1063_CODEC_SCI_MODE );
+    sciMode = ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_MODE );
     if ( !( sciMode & VS1063_CODEC_F_SM_CANCEL )) {
 
       LOG_V(( "V: End of file step 6\n" ));

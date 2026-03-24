@@ -92,48 +92,48 @@ struct PlaybackProperties PlaybackPropertiesById[] = {
 
 struct RecordingProperties RecordingPropertiesById[] = {
   /* 8bit mono */
-  { &RecordingCopy8Mto16S,  AMIGUS_PCM_S_REC_MONO_8BIT,    AHIST_S16S, 2,  8 },
+  { &RecordingCopy8Mto16S,  AMIGUS_PCM_S_REC_MONO_8BIT,    AHIST_S16S, 2, 16,  4 },
   /* 8bit stereo */
-  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  8,  4 },
   /* 8bit stereo++ */
-  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  8,  4 },
   /* 16bit mono */
-  { &RecordingCopy16Mto16S, AMIGUS_PCM_S_REC_MONO_16BIT,   AHIST_S16S, 2,  8 },
+  { &RecordingCopy16Mto16S, AMIGUS_PCM_S_REC_MONO_16BIT,   AHIST_S16S, 2,  8,  4 },
   /* 16bit stereo */
-  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4,  4 },
   /* 16bit stereo++ */
-  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4,  4 },
   /* Fast 8 bit mono */
-  { &RecordingCopy8Mto16S,  AMIGUS_PCM_S_REC_MONO_8BIT,    AHIST_S16S, 2,  8 },
+  { &RecordingCopy8Mto16S,  AMIGUS_PCM_S_REC_MONO_8BIT,    AHIST_S16S, 2, 16,  4 },
   /* Fast 8 bit stereo */
-  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  8,  4 },
   /* Fast 8 bit stereo++ */
-  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  8,  4 },
   /* Fast 16 bit mono */
-  { &RecordingCopy16Mto16S, AMIGUS_PCM_S_REC_MONO_16BIT,   AHIST_S16S, 2,  8 },
+  { &RecordingCopy16Mto16S, AMIGUS_PCM_S_REC_MONO_16BIT,   AHIST_S16S, 2,  8,  4 },
   /* Fast 16 bit stereo */
-  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4,  4 },
   /* Fast 16 bit stereo++ */
-  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4,  4 },
   /* HiFi 8 bit mono */
-  { &RecordingCopy8Mto16S,  AMIGUS_PCM_S_REC_MONO_8BIT,    AHIST_S16S, 2,  8 },
+  { &RecordingCopy8Mto16S,  AMIGUS_PCM_S_REC_MONO_8BIT,    AHIST_S16S, 2, 16,  4 },
   /* HiFi 8 bit stereo */
-  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  8,  4 },
   /* HiFi 8 bit stereo++ */
-  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  4 },
+  { &RecordingCopy8Sto16S,  AMIGUS_PCM_S_REC_STEREO_8BIT,  AHIST_S16S, 2,  8,  4 },
   /* HiFi 16 bit mono */
-  { &RecordingCopy16Mto16S, AMIGUS_PCM_S_REC_MONO_16BIT,   AHIST_S16S, 2,  8 },
+  { &RecordingCopy16Mto16S, AMIGUS_PCM_S_REC_MONO_16BIT,   AHIST_S16S, 2,  8,  4 },
   /* HiFi 16 bit stereo */
-  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4,  4 },
   /* HiFi 16 bit stereo++ */
-  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4 },
+  { &RecordingCopy16Sto16S, AMIGUS_PCM_S_REC_STEREO_16BIT, AHIST_S16S, 2,  4,  4 },
   /* HiFi 24 bit mono */
-  { &RecordingCopy24Mto32S, AMIGUS_PCM_S_REC_MONO_24BIT,   AHIST_S32S, 3, 32 },
+  { &RecordingCopy24Mto32S, AMIGUS_PCM_S_REC_MONO_24BIT,   AHIST_S32S, 3, 24,  6 },
   /* HiFi 24 bit stereo */
-  { &RecordingCopy24Sto32S, AMIGUS_PCM_S_REC_STEREO_24BIT, AHIST_S32S, 3, 16 },
+  { &RecordingCopy24Sto32S, AMIGUS_PCM_S_REC_STEREO_24BIT, AHIST_S32S, 3, 24, 12 },
   /* HiFi 24 bit stereo++ */
-  { &RecordingCopy24Sto32S, AMIGUS_PCM_S_REC_STEREO_24BIT, AHIST_S32S, 3, 16 }
-/*  ^1                      ^2                             ^3          ^4 ^5
+  { &RecordingCopy24Sto32S, AMIGUS_PCM_S_REC_STEREO_24BIT, AHIST_S32S, 3, 24, 12 }
+/*  ^1                      ^2                             ^3          ^4 ^5  ^6
  *
  * Note ^1:
  *   Recording copy function to copy AmiGUS PCM FiFo to AHI buffer.
@@ -151,5 +151,8 @@ struct RecordingProperties RecordingPropertiesById[] = {
  *   AmiGUS hardware sample format and mainly of the requirement to read only
  *   LONGs from AmiGUS.The recording buffers' BYTE size needs to be 
  *   multiples of these.
+ * Note ^6:
+ *   Number of BYTEs ingested per single copy function call, depends on the
+ *   CopyFunction - which depends on the AHI and hardware properties.
  */
 };

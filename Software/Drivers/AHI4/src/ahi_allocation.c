@@ -191,6 +191,7 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
 
   recording->agpr_AhiSampleShift = recProps->rp_AhiSampleShift;
   recording->agpr_CopyFunction = recProps->rp_CopyFunction;
+  recording->agpr_CopyInputSize = recProps->rp_CopyFunctionInputSize;
   recording->agpr_RecordingMessage.ahirm_Type = recProps->rp_AhiFormatId;
 
   /*

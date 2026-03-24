@@ -230,7 +230,7 @@ INLINE VOID HandleRecording( VOID ) {
     StartAmiGusPcmRecording();
   }
 
-  LOG_INT(( "WORKER: Recording i0 %5ld m0 %5ld i1 %5ld m1 %5ld\n",
+  LOG_INT(( "WORKER: Recording b0-i%ld-m%ld b1-i%ld-m%ld\n",
             recording->agpr_BufferIndex[ 0 ],
             recording->agpr_BufferMax[ 0 ],
             recording->agpr_BufferIndex[ 1 ],

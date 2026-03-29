@@ -1,27 +1,28 @@
 /*
- * This file is part of the mhiamigus.library.
+ * This file is part of the amigus.library.
  *
- * mhiamigus.library is free software: you can redistribute it and/or modify
+ * amigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiamigus.library is distributed in the hope that it will be useful,
+ * amigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiamigus.library.
+ * along with amigus.library.
  *
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <intuition/intuitionbase.h>
 #include <libraries/expansionbase.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 
-#include "amigus_mhi.h"
+#include "amigus_pcmcia.h"
+#include "amigus_private.h"
+#include "amigus_zorro2.h"
 #include "debug.h"
 #include "errors.h"
 #include "library.h"
@@ -29,13 +30,13 @@
 
 #ifdef BASE_GLOBAL
 
-// As declared in amigus_mhi.h
+// As declared in amigus_private.h
 struct ExecBase          * SysBase           = 0;
 struct DosLibrary        * DOSBase           = 0;
-struct IntuitionBase     * IntuitionBase     = 0;
 struct Library           * UtilityBase       = 0;
-struct Library           * AmiGUS_Base       = 0;
-struct AmiGUS_MHI        * AmiGUS_MHI_Base   = 0;
+struct Library           * ExpansionBase     = 0;
+struct Library           * CardResource      = 0;
+struct AmiGUS_Base       * AmiGUS_Base       = 0;
 
 #endif
 
@@ -83,27 +84,27 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 
     return EOpenDosBase;
   }
-  base->agb_IntuitionBase =
-    ( struct IntuitionBase * ) OpenLibrary( "intuition.library", 34 );
-  if ( !( base->agb_IntuitionBase )) {
+  base->agb_ExpansionBase =
+    ( struct Library * ) OpenLibrary( "expansion.library", 34 );
+  if ( !( base->agb_ExpansionBase )) {
 
-    return EOpenIntuitionBase;
+    return EOpenExpansionBase;
   }
-  base->agb_AmiGUS_Base =
-    ( struct Library * ) OpenLibrary( "amigus.library", 1 );
-  if ( !( base->agb_AmiGUS_Base )) {
-
-    return EOpenAmiGusBase;
-  }
+  base->agb_CardResource = 
+    ( struct Library * ) OpenResource( "card.resource" );
 
 #ifdef BASE_GLOBAL
+  CardResource    = base->agb_CardResource;
   DOSBase         = base->agb_DOSBase;
-  IntuitionBase   = base->agb_IntuitionBase;
-  AmiGUS_Base     = base->agb_AmiGUS_Base;
-  AmiGUS_MHI_Base = base;
+  ExpansionBase   = base->agb_ExpansionBase;
+  AmiGUS_Base     = base;
 #endif
 
-  LOG_D(("D: AmiGUS base ready @ 0x%08lx\n", base));
+  NEW_LIST( &( base->agb_Cards ));
+  AmiGusPcmcia_AddAll( &( base->agb_Cards ));
+  AmiGusZorro2_AddAll( &( base->agb_Cards ));
+
+  LOG_D(( "D: AmiGUS base ready @ 0x%08lx\n", base ));
   return ENoError;
 }
 
@@ -112,6 +113,17 @@ VOID CustomLibClose( LIBRARY_TYPE * base ) {
 #ifndef BASE_GLOBAL
   struct ExecBase *SysBase = base->agb_SysBase;
 #endif
+
+  APTR card;
+
+  AmiGusPcmcia_RemoveAll( &( base->agb_Cards ));
+  AmiGusZorro2_RemoveAll( &( base->agb_Cards ));
+  while ( card = RemTail( &( base->agb_Cards ))) {
+
+    FreeMem( card, sizeof( struct AmiGUS_Private ));
+  }
+
+  LOG_D(( "D: AmiGUS base @ 0x%08lx leaving the building\n", base ));
 
   if ( base->agb_LogFile ) {
 
@@ -125,16 +137,12 @@ VOID CustomLibClose( LIBRARY_TYPE * base ) {
     FreeMem( base->agb_LogMem, ... );
   }    
   */
-  if ( base->agb_AmiGUS_Base ) {
-
-    CloseLibrary(( struct Library * ) base->agb_AmiGUS_Base );
-  }
-  if ( base->agb_IntuitionBase ) {
-
-    CloseLibrary(( struct Library * ) base->agb_IntuitionBase );
-  }
   if ( base->agb_DOSBase ) {
 
     CloseLibrary(( struct Library *) base->agb_DOSBase );
+  }
+  if ( base->agb_ExpansionBase ) {
+
+    CloseLibrary(( struct Library * ) base->agb_ExpansionBase );
   }
 }

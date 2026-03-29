@@ -19,8 +19,6 @@
 #ifndef AMIGUS_PCM_H
 #define AMIGUS_PCM_H
 
-LONG FindAmiGusPcm( struct AmiGUS_AHI_Base *amiGUS );
-
 VOID StartAmiGusPcmPlayback( VOID );
 VOID StopAmiGusPcmPlayback( VOID );
 

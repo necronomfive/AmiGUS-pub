@@ -30,22 +30,6 @@ struct AmiGUS_MHI_Handle;
  *****************************************************************************/
 
 /**
- * Finds an available, matching AmiGUS codec device and 
- * fills its properties into the provided device.
- *
- * Does not prevent any conflicts due to concurrency,
- * but works fine in Permit()/Forbid().
- *
- * @param[out] device "struct ConfigDev *" provided by expansion.library
- *                    if a suitable AmiGUS codec device is available,
- *                    NULL otherwise.
- *
- * @return ENoError if an AmiGUS codec device was found,
- *         error value describing the reason otherwise.
- */
-LONG FindAmiGusCodec( struct ConfigDev ** device );
-
-/**
  * Starts playback of the AmiGUS codec as "owned" by the handle
  * provided from / to the player software.
  *

@@ -27,17 +27,16 @@
  *****************************************************************************/
 
 /**
- * Creates the interupt handler for the MHI driver library.
+ * Interrupt handler function,
+ * checking the status of the relevant AmiGUS card, and
+ * and filling their buffers accordingly.
  *
- * @return ENoError = 0 if successful,
- *         error code otherwise.
+ * @param data Pointer to the handle address.
+ *
+ * @return 1 if the handle's card's interrupt was pending and handled,
+ *         0 otherwise.
  */
-LONG CreateInterruptHandler( VOID );
-
-/**
- * Destroys the interupt handler of the MHI driver library.
- */
-VOID DestroyInterruptHandler( VOID );
+ASM( LONG ) HandleInterruptNew( REG( d1, APTR data ));
 
 /**
  * Fills the codec's playback buffer with however many more encoded data

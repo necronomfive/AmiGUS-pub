@@ -19,6 +19,7 @@
 #include <exec/types.h>
 #include <libraries/mhi.h>
 #include <libraries/configvars.h>
+#include <proto/amigus.h>
 #include <proto/exec.h>
 
 #include "SDI_mhi_protos.h"
@@ -57,7 +58,7 @@ VOID InitHandle( struct AmiGUS_MHI_Handle * handle ) {
 
   ULONG i;
 
-  handle->agch_CardBase = handle->agch_ConfigDevice->cd_BoardAddr;
+  handle->agch_CardBase = handle->agch_AmiGUS->agus_CodecBase;
 
   NEW_LIST( &( handle->agch_Buffers ));
   handle->agch_CurrentBuffer = NULL;
@@ -116,11 +117,27 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   if ( !error ) {
 
     Forbid();
-    error = FindAmiGusCodec( &( handle->agch_ConfigDevice ));
-    if ( !error ) {
+    do {
 
-      handle->agch_ConfigDevice->cd_Driver = handle;
-    }
+      handle->agch_AmiGUS = AmiGUS_FindCard( handle->agch_AmiGUS );
+      if ( !( handle->agch_AmiGUS )) {
+
+        if ( !( error )) {
+          error = EAmiGUSNotFound;
+        }
+        continue;
+      }
+      if ( AMIGUS_MHI_FIRMWARE_MINIMUM >
+        handle->agch_AmiGUS->agus_FirmwareRev ) {
+
+        error = EAmiGUSFirmwareOutdated;
+        continue;
+      }
+      error = AmiGUS_ReserveCard( handle->agch_AmiGUS,
+                                  AMIGUS_FLAG_CODEC,
+                                  handle );
+
+    } while (( handle->agch_AmiGUS ) && ( error ));
     Permit();
   }
   if ( !error ) {
@@ -139,7 +156,11 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     UpdateVS1063VolumePanning( handle->agch_CardBase,
                                handle->agch_MHI_Volume,
                                handle->agch_MHI_Panning );
-    error = CreateInterruptHandler();
+    error = AmiGUS_InstallInterrupt( handle->agch_AmiGUS,
+                                     AMIGUS_FLAG_CODEC,
+                                     handle,
+                                     &( HandleInterruptNew ),
+                                     handle );
 
   }
   if ( error ) {
@@ -153,15 +174,11 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     // Takes care of the log entry, too. :)
     DisplayError( error );
 
-  } else {
-
-    Forbid();
-    AddTail(( struct List * ) &( AmiGUS_MHI_Base->agb_Clients ),
-            ( struct Node * ) handle );
-    Permit();
   }
 
-  LOG_D(( "D: MHIAllocDecoder done, returning handle 0x%08lx\n", handle ));
+  LOG_D(( "D: MHIAllocDecoder done, using "
+          "handle 0x%08lx, card 0x%08lx and part 0x%04lx\n",
+          handle, handle->agch_AmiGUS, AMIGUS_FLAG_CODEC ));
   return handle;
 }
 
@@ -170,23 +187,12 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   REG( a6, struct AmiGUS_MHI * base )
 ) {
 
-  struct MinList * clients = &( AmiGUS_MHI_Base->agb_Clients );
-  struct AmiGUS_MHI_Handle * currentHandle;
   struct Task * task = handle->agch_Task;
   LONG signal = handle->agch_Signal;
-  ULONG error = EHandleUnknown;
-
+  ULONG error = ENoError;
 
   LOG_D(( "D: MHIFreeDecoder start for task 0x%08lx\n", task ));
-  FOR_LIST ( clients, currentHandle, struct AmiGUS_MHI_Handle * ) {
-    
-    if ( handle == currentHandle ) {
-
-      error = ENoError;
-      break;
-    }
-  }
-  if (( error ) || ( !task )) {
+  if ( !( task )) {
 
     LOG_W(( "W: AmiGUS MHI does not know task 0x%08lx and signal 0x%08lx"
             " - hence not free'd.\n",
@@ -196,11 +202,15 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   }
 
   Forbid();
-  if (( handle->agch_ConfigDevice->cd_Driver == handle )) {
+  if (( handle->agch_AmiGUS )) {
 
     handle->agch_Task = NULL;
     handle->agch_Signal = 0;
-    handle->agch_ConfigDevice->cd_Driver = NULL;
+
+    AmiGUS_RemoveInterrupt( handle->agch_AmiGUS, AMIGUS_FLAG_CODEC, handle );
+    AmiGUS_FreeCard( handle->agch_AmiGUS, AMIGUS_FLAG_CODEC, handle );
+
+    handle->agch_AmiGUS = NULL;
 
     Remove(( struct Node * ) handle );
     FreeMem( handle, sizeof( struct AmiGUS_MHI_Handle ));
@@ -220,10 +230,6 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
 
     LOG_D(( "D: AmiGUS MHI free'd up task 0x%08lx and signal 0x%08lx.\n",
             task, signal ));
-    if ( !( AmiGUS_MHI_Base->agb_Clients.mlh_Tail )) {
-
-      DestroyInterruptHandler();
-    }
   }
   LOG_D(( "D: MHIFreeDecoder done\n" ));
   return;

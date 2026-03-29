@@ -1,17 +1,17 @@
 /*
- * This file is part of the mhiamigus.library.
+ * This file is part of the amigus.library.
  *
- * mhiamigus.library is free software: you can redistribute it and/or modify
+ * amigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiamigus.library is distributed in the hope that it will be useful,
+ * amigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiamigus.library.
+ * along with amigus.library.
  *
  * If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,13 +31,14 @@ enum ErrorCodes
   ELibraryBaseInconsistency,
   EOpenDosBase,
   EOpenIntuitionBase,
-  EOpenAmiGusBase,
+  EOpenExpansionBase,
   EOpenLogFile,
   EAllocateLogMem,
   EHandleUnknown,
   EAllocateInterrupt,
   EAllocateHandle,
   EAllocateBuffer,
+  EDriverInUse,
   EDriverNotInUse,
 
   /* Missing implementation 100-199*/
@@ -45,6 +46,7 @@ enum ErrorCodes
 
   /* Hardware errors 200-300 */
   EAmiGUSNotFound = 200,
+  EAmiGUSDetectError,
   EAmiGUSFirmwareOutdated,
 
   /* Insert errors above. */

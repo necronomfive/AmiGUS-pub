@@ -22,7 +22,20 @@
 #include "exec/types.h"
 #include "SDI_compiler.h"
 
-BOOL CreateInterruptHandler( VOID );
-VOID DestroyInterruptHandler( VOID );
+/******************************************************************************
+ * Interrupt functions.
+ *****************************************************************************/
+
+/**
+ * Interrupt handler function,
+ * checking the status of the relevant AmiGUS card, and
+ * and relay further for playback and recording.
+ *
+ * @param data Pointer to the handle address.
+ *
+ * @return 1 if the handle's card's interrupt was pending and handled,
+ *         0 otherwise.
+ */
+ASM( LONG ) HandleInterruptNew( REG( d1, APTR data ));
 
 #endif /* INTERRUPT_H */

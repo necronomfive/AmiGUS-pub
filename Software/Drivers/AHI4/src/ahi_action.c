@@ -17,6 +17,7 @@
  */
 
 #include <exec/libraries.h>
+#include <proto/amigus.h>
 #include <proto/exec.h>
 #include <proto/utility.h>
 
@@ -131,7 +132,11 @@ ASM(ULONG) SAVEDS AHIsub_Start(
     LOG_D(( "D: No worker, failed.\n" ));
     return AHIE_UNKNOWN;
   }
-  if ( CreateInterruptHandler() ) {
+  if ( AmiGUS_InstallInterrupt( AmiGUS_AHI_Base->agb_AmiGUS,
+                                AMIGUS_FLAG_PCM,
+                                AmiGUS_AHI_Base,
+                                &( HandleInterruptNew ),
+                                AmiGUS_AHI_Base ) ) {
   
     LOG_D(( "D: No INT handler, failed.\n" ));
     return AHIE_UNKNOWN;
@@ -261,7 +266,9 @@ ASM(VOID) SAVEDS AHIsub_Stop(
 
     LOG_D(( "D: No playback or recording, "
             "ending interrupt handler and worker task.\n" ));
-    DestroyInterruptHandler();
+    AmiGUS_RemoveInterrupt( AmiGUS_AHI_Base->agb_AmiGUS,
+                            AMIGUS_FLAG_PCM,
+                            AmiGUS_AHI_Base );
     DestroyWorkerProcess();
 
   } else {

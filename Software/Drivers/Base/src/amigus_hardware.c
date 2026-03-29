@@ -1,25 +1,22 @@
 /*
- * This file is part of the mhiamigus.library.
+ * This file is part of the amigus.library.
  *
- * mhiamigus.library is free software: you can redistribute it and/or modify
+ * amigus.library is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, version 3 of the License only.
  *
- * mhiamigus.library is distributed in the hope that it will be useful,
+ * amigus.library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with mhiamigus.library.
+ * along with amigus.library.
  *
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <proto/exec.h>
-
 #include "amigus_hardware.h"
-#include "amigus_mhi.h"
 #include "debug.h"
 #include "SDI_compiler.h"
 
@@ -37,9 +34,7 @@ INLINE UWORD ReadSPI(
   UWORD offsetSPItrigger ) {
 
   UWORD status;
-  UWORD result;
 
-  Disable();
   do {
 
     status = ReadReg16( card, offsetSPIstatus );
@@ -52,10 +47,7 @@ INLINE UWORD ReadSPI(
     status = ReadReg16( card, offsetSPIstatus );
 
   } while ( status & blockedSPImask );
-  result = ReadReg16( card, offsetSPIread );
-  Enable();
-
-  return result;
+  return ReadReg16( card, offsetSPIread );
 }
 
 INLINE VOID WriteSPI(
@@ -70,7 +62,6 @@ INLINE VOID WriteSPI(
 
   UWORD status;
 
-  Disable();
   do {
 
     status = ReadReg16( card, offsetSPIstatus );
@@ -79,7 +70,6 @@ INLINE VOID WriteSPI(
   WriteReg16( card, offsetSPIaddress, SPIregister );
   WriteReg16( card, offsetSPIwrite, SPIvalue );
   WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
-  Enable();
 }
 
 /******************************************************************************

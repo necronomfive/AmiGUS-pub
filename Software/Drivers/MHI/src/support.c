@@ -69,10 +69,9 @@ struct ErrorMessage errors[] = {
   { EAllocateLogMem, "Can not allocate memory blob for extra-dirty logging.", "Meh." },
   { EAllocateHandle, "No more handles - out of memory!", "Shit!" },
   { EAllocateBuffer, "No more buffers - out of memory!", "Shit!" },
-  { EDriverInUse, "AmiGUS codec part is in use by another driver.", "Oops." },
+  { AmiGUS_CodecInUse, "AmiGUS codec part is in use by another driver.", "Oops." },
 
   { EAmiGUSNotFound, "AmiGUS card not found.", "Read?" },
-  { EAmiGUSDetectError, "AmiGUS card detection mess.", "Damn!" },
   { EAmiGUSFirmwareOutdated, "AmiGUS card firmware outdated.", "Will update, promised!" },
 
   /* Insert errors above. */

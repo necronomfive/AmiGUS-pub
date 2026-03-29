@@ -177,6 +177,10 @@
 (cat "Manual"
 ))
 
+(set #component_firmware
+(cat "Firmware"
+))
+
 (set #insert_manual_disk
 (cat "Insert disk \"AmiGUS Manual\" in any drive, please."
 ))
@@ -200,6 +204,29 @@
      @askdir-help
 ))
 
+(set #insert_firmware_disk
+(cat "Insert disk \"AmiGUS Firmware\" in any drive, please."
+))
+
+(set #insert_firmware_disk_help
+(cat "\nThe AmiGUS firmware did not fit on the same disk, to install "
+     "it, you will need to insert the corresponding disk containing the "
+     "manual.\n\n"
+))
+
+(set #which_firmware_target
+(cat "Where shall the AmiGUS firmware be installed?\n"
+))
+
+(set #which_firmware_target_help
+(cat "\nThe AmiGUS firmware is flashed into the programmable logic circuit "
+     "(FPGA) of the AmiGUS and does not need to be installed therefore. "
+     "For later reference, it can be copied as well. You can choose the "
+     "location here.\n\n"
+     "Default is Sys:Expansion/AmiGUS - which may cause issues with some "
+     "obscure Commodore expansions (bridgeboards) and their drivers.\n\n"
+     @askdir-help
+))
 
 ;==============================================================================
 ; German strings
@@ -393,6 +420,10 @@
 (cat "Anleitung"
 ))
 
+(set #component_firmware
+(cat "Firmware"
+))
+
 (set #insert_manual_disk
 (cat "Bitte die \"AmiGUS Manual\"-Diskette in ein Laufwerk einlegen."
 ))
@@ -411,6 +442,31 @@
 (cat "\nDas AmiGUS AmigaGuide Handbuch besteht aus der eigentlichen "
      "AmigaGuide-Datei und einem Verzeichnis mit den eingebetteten oder "
      "verlinkten Bildern. Hier können Sie den Ort für beides auswählen.\n\n"
+     "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
+     "obskuren Commodore Erweiterungen (bridgeboards) und deren Treibern "
+     "verursachen kann.\n\n"
+     @askdir-help
+))
+
+(set #insert_firmware_disk
+(cat "Bitte die \"AmiGUS Firmware\"-Diskette in ein Laufwerk einlegen."
+))
+
+(set #insert_firmware_disk_help
+(cat "\nDie AmiGUS Firmware passt nicht auf die Toolsdiskette. "
+     "Um sie zu installieren, müssen Sie die entsprechende Diskette einlegen. "
+     "\n\n"
+))
+
+(set #which_firmware_target
+(cat "Wo soll die AmiGUS Firmware installiert werden?\n"
+))
+
+(set #which_firmware_target_help
+(cat "\nDie AmiGUS Firmware ist fest im programmierbaren Logikbaustein (FPGA) "
+     "der AmiGUS verbaut und muss daher nicht installiert werden. Um später "
+     "leichter darauf zugreifen zu können, kann sie jedoch mit kopiert "
+     "werden. Hier können Sie den Ort für beides auswählen.\n\n"
      "Voreinstellung ist Sys:Expansion/AmiGUS - was Probleme mit einigen "
      "obskuren Commodore Erweiterungen (bridgeboards) und deren Treibern "
      "verursachen kann.\n\n"
@@ -441,7 +497,7 @@
         (askchoice
           (prompt (#which_cpu driver_name))
           (help (#which_cpu_help driver_name))
-          (choices "68000" "68020" "68040 / 68060")
+          (choices "68000" "68020 / 68030" "68040 / 68060")
           (default install_driver_cpu)
         )
       )
@@ -498,13 +554,14 @@
              #component_midi
              #component_record 
              #component_debug
-             #component_manual )
-    (default %1110111111)
+             #component_manual
+             #component_firmware )
+    (default %01110111111)
   )
 )
 
 (if
-  (BITAND what %0000000011)
+  (BITAND what %00000000011)
   (
     (set drivers_target
       (askdir
@@ -513,11 +570,34 @@
         (default "SYS:")
       )
     )
+
+    (set driver_name "Base")
+    (install_driver)
+
+    (set source_folder "Base")
+    (set file "amigus.library")
+    (set target_folder (tackon drivers_target "Libs"))
+    (set source_file (tackon source_folder file))
+
+    (makedir target_folder)
+    (copyfiles
+      (source (cat source_file install_driver_cpu install_driver_debug))
+      (newname file)
+      (dest target_folder)
+    )
+
+    (if install_driver_all
+      (copyfiles
+        (source source_folder)
+        (pattern (cat file "#?"))
+        (dest target_folder)
+      )  
+    )
   )
 )
 
 (if
-  (BITAND what %0000000001)
+  (BITAND what %00000000001)
   (
     (set driver_name "AHI")
     (install_driver)
@@ -555,10 +635,10 @@
   )
 )
 
-(complete 15)
+(complete 10)
 
 (if
-  (BITAND what %0000000010)
+  (BITAND what %00000000010)
   (
     (set driver_name "MHI")
     (install_driver)
@@ -585,11 +665,11 @@
   )
 )
 
-(complete 30)
+(complete 20)
 
 (set tools_target "SYS:Expansion/AmiGUS")
 (if
-  (BITAND what %0011111100)
+  (BITAND what %00011111100)
   (
     (set tools_target
       (askdir (prompt #which_tools_target)
@@ -603,12 +683,34 @@
   )
 )
 
+(complete 25)
+
+(if
+  (BITAND what %00000000100)
+  (copyfiles
+    (source (tackon source_folder "Mixer"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(complete 30)
+
+(if
+  (BITAND what %00000001000)
+  (copyfiles
+    (source (tackon source_folder "FlashGUI"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
 (complete 35)
 
 (if
-  (BITAND what %0000000100)
+  (BITAND what %00000010000)
   (copyfiles
-    (source (tackon source_folder "Mixer"))
+    (source (tackon source_folder "PlayWAV"))
     (dest tools_target)
     (infos)
   )
@@ -617,9 +719,9 @@
 (complete 40)
 
 (if
-  (BITAND what %0000001000)
+  (BITAND what %00000100000)
   (copyfiles
-    (source (tackon source_folder "FlashGUI"))
+    (source (tackon source_folder "PlayMP3"))
     (dest tools_target)
     (infos)
   )
@@ -628,9 +730,9 @@
 (complete 45)
 
 (if
-  (BITAND what %0000010000)
+  (BITAND what %00001000000)
   (copyfiles
-    (source (tackon source_folder "PlayWAV"))
+    (source (tackon source_folder "PlayMIDI"))
     (dest tools_target)
     (infos)
   )
@@ -639,9 +741,9 @@
 (complete 50)
 
 (if
-  (BITAND what %0000100000)
+  (BITAND what %00010000000)
   (copyfiles
-    (source (tackon source_folder "PlayMP3"))
+    (source (tackon source_folder "Record"))
     (dest tools_target)
     (infos)
   )
@@ -650,29 +752,7 @@
 (complete 55)
 
 (if
-  (BITAND what %0001000000)
-  (copyfiles
-    (source (tackon source_folder "PlayMIDI"))
-    (dest tools_target)
-    (infos)
-  )
-)
-
-(complete 60)
-
-(if
-  (BITAND what %0010000000)
-  (copyfiles
-    (source (tackon source_folder "Record"))
-    (dest tools_target)
-    (infos)
-  )
-)
-
-(complete 65)
-
-(if
-  (BITAND what %0100000000)
+  (BITAND what %00100000000)
   (
     (set debug_target
       (askdir (prompt #which_debug_target)
@@ -683,6 +763,18 @@
     )
     (set debug_target (tackon debug_target "debug"))
     (makedir debug_target (infos))
+
+    (set source_folder "Base")
+    (copyfiles
+      (source (tackon source_folder "GetAmiGUSMemLog"))
+      (dest debug_target)
+      (infos)
+    )
+    (copyfiles
+      (source (tackon source_folder "AmiGUSLibCheck"))
+      (dest debug_target)
+      (infos)
+    )
 
     (set source_folder "AHI4")
     (copyfiles
@@ -710,10 +802,10 @@
   )
 )
 
-(complete 75)
+(complete 60)
 
 (if
-  (BITAND what %1000000000)
+  (BITAND what %01000000000)
   (
     (if
       (exists "Manual/AmiGUS.guide")
@@ -746,6 +838,41 @@
       (source (tackon source_folder "ilbm"))
       (dest (tackon manual_target "ilbm"))
       (all)
+    )
+  )
+)
+
+(complete 80)
+
+(if
+  (BITAND what %10000000000)
+  (
+    (if
+      (= 2 (exists "Firmware"))
+      (set source_folder "Firmware")
+      (
+        (askdisk
+          (prompt #insert_firmware_disk)
+          (help #insert_firmware_disk_help)
+          (dest "AmiGUS-Firmware")
+          (assigns)
+        )
+        (set source_folder "AmiGUS-Firmware:")
+      )
+    )
+    (set firmware_target
+      (askdir (prompt #which_firmware_target)
+        (help #which_firmware_target_help)
+        (default tools_target)
+        (newpath)
+      )
+    )
+    (makedir firmware_target (infos))
+    (copyfiles
+      (source source_folder)
+      (pattern "#?.upd")
+      (dest firmware_target)
+      (infos)
     )
   )
 )

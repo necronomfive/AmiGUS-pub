@@ -109,6 +109,8 @@ IF WARN
   ECHO   >  RAM:AmiGUS_installer1 "IF NOT EXISTS TOOLSPATH"
   ECHO   >> RAM:AmiGUS_installer1 "  MAKEDIR TOOLSPATH"
   ECHO   >> RAM:AmiGUS_installer1 "ENDIF"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:Base/AmiGUSLibCheck#? TOOLSPATH"
+  ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:Base/GetAmiGUSMemLog#? TOOLSPATH"
   ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:MHI/MHIPlay#? TOOLSPATH"
   ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:MHI/MHILibCheck#? TOOLSPATH"
   ECHO   >> RAM:AmiGUS_installer1 "COPY AmiGUS-13-SRC:MHI/GetMhiMemLog#? TOOLSPATH"

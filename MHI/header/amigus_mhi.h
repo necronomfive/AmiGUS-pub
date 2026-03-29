@@ -41,6 +41,8 @@
 #endif
 #endif
 
+#include "amigus/amigus.h"
+
 #include "library.h"
 
 /*
@@ -114,10 +116,8 @@ struct AmiGUS_MHI_Buffer {
  */
 struct AmiGUS_MHI_Handle {
 
-  struct MinNode                agch_Node;          // Another list node
-
   APTR                          agch_CardBase;      // Codec base address
-  struct ConfigDev            * agch_ConfigDevice;  // Expansion device address
+  struct AmiGUS               * agch_AmiGUS;        // AmiGUS card handle
 
   struct Task                 * agch_Task;          // Client task and ...
   LONG                          agch_Signal;        // ... signal to notify
@@ -149,13 +149,7 @@ struct AmiGUS_MHI {
   struct ExecBase             * agb_SysBase;       // Exec, allocations etc.
   struct DosLibrary           * agb_DOSBase;       // DOS, logs and so on
   struct IntuitionBase        * agb_IntuitionBase; // For error messages
-  struct Library              * agb_ExpansionBase; // Finding devices
-
-  /* AmiGUS specific member variables */
-  struct Interrupt            * agb_Interrupt;     // Shared interrupt handler
-
-  /* Client info */
-  struct MinList                agb_Clients;       // AmiGUS_MHI_Handle list
+  struct Library              * agb_AmiGUS_Base;   // Finding & handling AmiGUS
 
   BPTR                          agb_LogFile;       // Debug log file handle
   APTR                          agb_LogMem;        // Debug log memory blob
@@ -168,13 +162,13 @@ struct AmiGUS_MHI {
 #if defined(BASE_GLOBAL)
   extern struct AmiGUS_MHI        * AmiGUS_MHI_Base;
   extern struct DosLibrary        * DOSBase;
-  extern struct Library           * ExpansionBase;
+  extern struct Library           * AmiGUS_Base;
   extern struct IntuitionBase     * IntuitionBase;
   extern struct ExecBase          * SysBase;
 #elif defined(BASE_REDEFINE)
   #define AmiGUS_MHI_Base           (base)
   #define DOSBase                   base->agb_DOSBase
-  #define ExpansionBase             base->agb_ExpansionBase
+  #define AmiGUS_Base               base->agb_AmiGUS_Base
   #define IntuitionBase             base->agb_IntuitionBase
   #define SysBase                   base->agb_SysBase
 #endif

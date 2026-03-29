@@ -37,7 +37,8 @@ ifeq ($(findstring /home,$(HOME)), /home)
   # ~/.netrc format:
   # machine <ip> login username password pass
   # Could do --user username:pass instead - but not cool in repo ;)
-  INSTALL1      = curl --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.4/cf0/Libs/MHI/$(LIB_NAME).library
+  INSTALL1      = curl --connect-timeout 2 --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.12/sda4/Libs/MHI/$(LIB_NAME).library
+  INSTALL1      = curl --connect-timeout 2 --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.4/cf0/Libs/MHI/$(LIB_NAME).library
   INSTALL0      = cp $(LIB_FILE_DEST) ~/Documents/FS-UAE/Shared/MHI/$(LIB_NAME).library
 else
   AMIGAOS       = 1
@@ -66,7 +67,7 @@ SDIR   = src/
 HDIR   = header/
 
 LIB_CPU        ?= 000
-LIB_LOG        ?= FILE_LOG
+LIB_LOG        ?= NO_LOG
 # NO_LOG
 # SER_LOG
 # FILE_LOG
@@ -74,7 +75,7 @@ LIB_LOG        ?= FILE_LOG
 LIB_NAME        = mhiamigus
 LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
-LIB_REVISION    = 11
+LIB_REVISION    = 12
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =
@@ -316,19 +317,22 @@ get_mem_log:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
 	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
 	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/GetMhiMemLog
+	-curl --connect-timeout 2 --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/GetMhiMemLog
+  -curl --connect-timeout 2 --netrc --upload-file target/$@       ftp://192.168.0.12/sda4/Expansion/AmiGUS/GetMhiMemLog
 
 mhi_lib_check:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
 	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
 	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+	-curl --connect-timeout 2 --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+  -curl --connect-timeout 2 --netrc --upload-file target/$@       ftp://192.168.0.12/sda4/Expansion/AmiGUS/
 
 MHIplay:
 	$(CC) $(CFLAGS) support/$@.o support/$@.c
 	$(LD) $(LFLAGS) target/$@ $(LFLAGS1) $(LFLAGST1) support/$@.o $(LFLAGST2)
 	-cp target/$@ ~/Documents/FS-UAE/Shared/MHI/
-	-curl --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+	-curl --connect-timeout 2 --netrc --upload-file target/$@       ftp://192.168.0.4/cf0/Expansion/AmiGUS/
+  -curl --connect-timeout 2 --netrc --upload-file target/$@       ftp://192.168.0.12/sda4/Expansion/AmiGUS/
 
 ###############################################################################
 

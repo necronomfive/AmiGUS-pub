@@ -1,0 +1,144 @@
+#
+# This file is part of the amigus.library.
+#
+# amigus.library is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, version 3 of the License only.
+#
+# amigus.library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with amigus.library.
+#
+# If not, see <http://www.gnu.org/licenses/>.
+#
+
+ifeq ($(findstring /home,$(HOME)), /home)
+  LINUX         = 1
+
+  WILDCARD      = *
+  
+  FD2PRAGMA     = vamos -c ../.vamosrc fd2pragma
+  MKDIR         = mkdir -p
+  MKDIR_SUFFIX  =
+  RM            = rm -rf
+  RM_SUFFIX     =
+  CP            = cp -r
+  CP_SUFFIX     =
+else
+  AMIGAOS       = 1
+
+  WILDCARD      = \#?
+
+  FD2PRAGMA     = fd2pragma
+  MKDIR         = makedir
+  MKDIR_SUFFIX  = ALL >NIL:
+  RM            = delete
+  RM_SUFFIX     = ALL >NIL:
+  CP            = copy
+  CP_SUFFIX     = ALL CLONE >NIL:
+endif
+
+BASE_NAME  	    = amigus
+TARGET_PATH     = include
+AMIGUS_INCLUDES = include-src
+
+#CAMD_ORIG_CLIB   = $(CAMD_INCLUDES)/include/clib/$(BASE_NAME)_protos.h
+#CAMD_ORIG_FD     = $(CAMD_INCLUDES)/fd/$(BASE_NAME)_lib.fd
+
+#AMIGUS_SFD    = RAM:$(BASE_NAME)_lib.fd
+
+AMIGUS_SFD        = $(AMIGUS_INCLUDES)/sfd/$(BASE_NAME)_lib.sfd
+
+default: all
+
+INCLUDES: all
+
+#$(AMIGUS_SFD): $(CAMD_ORIG_FD)
+#	edit FROM $< TO $@ WITH fd_patch
+
+#SFDPATH = $(TARGET_PATH)/sfd/
+#SFDNAME = $(SFDPATH)$(BASE_NAME).sfd
+#$(SFDNAME): $(AMIGUS_SFD)
+#	-@$(MKDIR) $(SFDPATH) $(MKDIR_SUFFIX)
+#	$(FD2PRAGMA) SPECIAL 112 INFILE $(AMIGUS_SFD) TO $(SFDPATH)
+
+PRAGMAPATH = $(TARGET_PATH)/C/pragma/
+PRAGMANAME = $(PRAGMAPATH)$(BASE_NAME)_lib.h
+$(PRAGMANAME): $(AMIGUS_SFD)
+	-@$(MKDIR) $(PRAGMAPATH) $(MKDIR_SUFFIX)
+	$(FD2PRAGMA) SPECIAL   6 INFILE $(AMIGUS_SFD) TO $(PRAGMAPATH)
+
+AMIGAEPATH = $(TARGET_PATH)/AmigaE/
+AMIGAENAME = $(AMIGAEPATH)$(BASE_NAME).m
+$(AMIGAENAME): $(AMIGUS_SFD)
+	-@$(MKDIR) $(AMIGAEPATH) $(MKDIR_SUFFIX)
+	$(FD2PRAGMA) SPECIAL  18 INFILE $(AMIGUS_SFD) TO $(AMIGAEPATH)
+
+GCCINLINEPATH = $(TARGET_PATH)/C/inline/
+GCCINLINENAME = $(GCCINLINEPATH)$(BASE_NAME).h
+$(GCCINLINENAME): $(AMIGUS_SFD)
+	-@$(MKDIR) $(GCCINLINEPATH) $(MKDIR_SUFFIX)
+	$(FD2PRAGMA) SPECIAL  40 INFILE $(AMIGUS_SFD) TO $(GCCINLINEPATH)
+
+PROTOPATH = $(TARGET_PATH)/C/proto/
+PROTONAME = $(PROTOPATH)$(BASE_NAME).h
+$(PROTONAME): $(AMIGUS_SFD)
+	-@$(MKDIR) $(PROTOPATH) $(MKDIR_SUFFIX)
+	$(FD2PRAGMA) SPECIAL  38 INFILE $(AMIGUS_SFD) TO $(PROTOPATH)
+
+VBCCINLINEPATH = $(TARGET_PATH)/C/inline/
+VBCCINLINENAME = $(VBCCINLINEPATH)$(BASE_NAME)_protos.h
+$(VBCCINLINENAME): $(AMIGUS_SFD)
+	-@$(MKDIR) $(VBCCINLINEPATH) $(MKDIR_SUFFIX)
+	$(FD2PRAGMA) SPECIAL  70 INFILE $(AMIGUS_SFD) TO $(VBCCINLINEPATH)
+
+LVOPATH = $(TARGET_PATH)/ASM/lvo/
+LVONAME = $(LVOPATH)$(BASE_NAME)_lib.i
+$(LVONAME): $(AMIGUS_SFD)
+	-@$(MKDIR) $(LVOPATH) $(MKDIR_SUFFIX)
+	$(FD2PRAGMA) SPECIAL  23 INFILE $(AMIGUS_SFD) TO $(LVOPATH)
+
+FDPATH = $(TARGET_PATH)/FD/
+FDNAME = $(FDPATH)$(BASE_NAME)_lib.fd
+$(FDNAME): $(AMIGUS_SFD)
+	-@$(MKDIR) $(FDPATH) $(MKDIR_SUFFIX)
+	$(FD2PRAGMA) SPECIAL 110 INFILE $(AMIGUS_SFD) TO $(FDPATH) COMMENT
+
+CLIBPATH = $(TARGET_PATH)/C/clib/
+CLIBNAME = $(CLIBPATH)$(BASE_NAME)_protos.h
+$(CLIBNAME): $(AMIGUS_SFD)
+	-@$(MKDIR) $(CLIBPATH) $(MKDIR_SUFFIX)
+	$(FD2PRAGMA) SPECIAL 111 INFILE $(AMIGUS_SFD) TO $(CLIBPATH) COMMENT
+# breaks it sometimes... COPYRIGHT $(AUTHOR)
+
+all: $(PRAGMANAME) $(AMIGAENAME) $(GCCINLINENAME) $(PROTONAME) \
+     $(VBCCINLINENAME) $(LVONAME) $(FDNAME) $(CLIBNAME) \
+     $(LIBRARYNAME) $(SFDNAME) $(AMIGUS_INCLUDES)/amigus/$(WILDCARD).*
+	-@$(MKDIR) $(TARGET_PATH)/C/amigus $(MKDIR_SUFFIX)
+	$(CP) $(AMIGUS_INCLUDES)/amigus/$(WILDCARD).h $(TARGET_PATH)/C/amigus/ $(CP_SUFFIX)
+#	-@$(MKDIR) $(TARGET_PATH)/ASM/amigus $(MKDIR_SUFFIX)
+#	$(CP) $(AMIGUS_INCLUDES)/amigus/$(WILDCARD).i $(TARGET_PATH)/C/amigus/ $(CP_SUFFIX)
+
+install: all
+	$(MKDIR) ../AHI4/include/C $(MKDIR_SUFFIX)
+	$(MKDIR) ../CAMD/include $(MKDIR_SUFFIX)
+	$(MKDIR) ../MHI/include  $(MKDIR_SUFFIX)
+	$(CP) $(TARGET_PATH)/C/$(WILDCARD) ../AHI4/include/C $(CP_SUFFIX)
+	$(CP) $(TARGET_PATH)/C/$(WILDCARD) ../CAMD/include/  $(CP_SUFFIX)
+	$(CP) $(TARGET_PATH)/C/$(WILDCARD) ../MHI/include/  $(CP_SUFFIX)
+
+clean:
+	-@$(RM) $(TARGET_PATH) $(RM_SUFFIX)
+
+# Prepare doing:
+# cp Makefile-Includes ~/Documents/FS-UAE/Shared/Projekte/AmiGUS/
+# cp -R  include-src ~/Documents/FS-UAE/Shared/Projekte/AmiGUS/
+# cp fd2pragma.types ~/Documents/FS-UAE/Shared/Projekte/AmiGUS
+#
+# Use result:
+# cp -R ~/Dokumente/FS-UAE/Shared/Projekte/AmiGUS/include .
+# for UAEM in `find include | grep \.uaem` ; do rm $UAEM ; done

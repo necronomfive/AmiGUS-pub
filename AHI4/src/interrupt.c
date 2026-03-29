@@ -122,9 +122,8 @@ INLINE VOID HandleRecording( VOID ) {
     recording->agpr_BufferIndex[ *current ] ));
 }
 
-ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
-  REG(a1, struct AmiGUS_AHI_BasePrivate * amiGUSBase)
-) {
+ASM( LONG ) HandleInterruptNew( REG( d1, APTR data )) {
+
   APTR card = AmiGUS_AHI_Base->agb_CardBase;
   const UWORD enable = ReadReg16( card, AMIGUS_PCM_INT_ENABLE );
   const UWORD control = ReadReg16( card, AMIGUS_PCM_INT_CONTROL );
@@ -187,62 +186,4 @@ ASM(LONG) /* __entry for vbcc ? */ SAVEDS INTERRUPT handleInterrupt (
   }
 
   return 1;
-}
-
-// TRUE = failure
-BOOL CreateInterruptHandler( VOID ) {
-
-  if (AmiGUS_AHI_Base->agb_Interrupt) {
-
-    LOG_D(("D: INT server in use!\n"));
-    return FALSE;
-  }
-
-  LOG_D(("D: Creating INT server\n"));
-  Disable();
-
-  AmiGUS_AHI_Base->agb_Interrupt = (struct Interrupt *)
-      AllocMem(
-          sizeof(struct Interrupt),
-          MEMF_CLEAR | MEMF_PUBLIC
-      );
-  if ( AmiGUS_AHI_Base->agb_Interrupt ) {
-
-    AmiGUS_AHI_Base->agb_Interrupt->is_Node.ln_Pri = 100;
-    AmiGUS_AHI_Base->agb_Interrupt->is_Node.ln_Name = "AMIGUS_AHI_INT";
-    AmiGUS_AHI_Base->agb_Interrupt->is_Data = AmiGUS_AHI_Base;
-    AmiGUS_AHI_Base->agb_Interrupt->is_Code = (void (* )())handleInterrupt;
-
-    AddIntServer(INTB_PORTS, AmiGUS_AHI_Base->agb_Interrupt);
-
-    Enable();
-
-    LOG_D(("D: Created INT server\n"));
-    return FALSE;
-  }
-
-  Enable();
-  LOG_D(("D: Failed creating INT server\n"));
-  // TODO: Display error?
-  return TRUE;
-}
-
-VOID DestroyInterruptHandler( VOID ) {
-
-  if ( !AmiGUS_AHI_Base->agb_Interrupt ) {
-
-    LOG_D(("D: No INT server to destroy!\n"));
-    return;
-  }
-  
-  LOG_D(("D: Destroying INT server\n"));
-
-  Disable();
-  RemIntServer( INTB_PORTS, AmiGUS_AHI_Base->agb_Interrupt );
-  Enable();
-
-  FreeMem( AmiGUS_AHI_Base->agb_Interrupt, sizeof(struct Interrupt) );
-  AmiGUS_AHI_Base->agb_Interrupt = NULL;
-
-  LOG_D(("D: Destroyed INT server\n"));
 }

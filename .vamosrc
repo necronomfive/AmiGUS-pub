@@ -15,7 +15,7 @@ gus=~/Documents/dev/AmiGUS/mine
 
 [path]
 auto_assign=sys:
-path=sys:C,sc:c,vbcc:bin,developer:Make-4.4.1
+path=sys:C,sys:fd2pragma,sc:c,vbcc:bin,developer:Make-4.4.1
 
 [assigns]
 developer=sys:

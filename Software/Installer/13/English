@@ -130,6 +130,75 @@ ENDIF
 
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
+ECHO "|                    AmiGUS driver installation                     |"
+ECHO "+-------------------------------------------------------------------+"
+ECHO ""
+ASK "Do you want to install amigus.library to LIBS:? (y/N)"
+
+IF WARN
+  ECHO "Which AmiGUS driver do you want to install?"
+  ECHO ""
+  ECHO "1) 68000, RELEASE version, no logging, RECOMMENDED!!!"
+  ECHO "2) 68000, DEBUG version, serial logging"
+  ECHO "3) 68000, DEBUG version, file logging"
+  ECHO "4) 68000, DEBUG version, memory logging"
+  ECHO "5) 68020, RELEASE version, no logging, use this if on 68020+"
+  ECHO "6) 68020, DEBUG version, serial logging, for 68020+"
+  ECHO "7) 68020, DEBUG version, file logging, for 68020+"
+  ECHO "8) 68020, DEBUG version, memory logging, for 68020+"
+  ECHO ""
+  ECHO "*e[33mDefault: 1*e[31m - please enter 1-8 and push Return:"
+  SETENV >NIL: amigus_variant ?
+
+  IF $amigus_variant EQ 2
+    COPY Base/amigus.library-000-SER_LOG LIBS:amigus.library CLONE
+    ECHO "Option 2 copied..."
+  ELSE
+    IF $amigus_variant EQ 3
+      COPY Base/amigus.library-000-FILE_LOG LIBS:amigus.library CLONE
+      ECHO "Option 3 copied..."
+    ELSE
+      IF $amigus_variant EQ 4
+        COPY Base/amigus.library-000-MEM_LOG LIBS:amigus.library CLONE
+        ECHO "Option 4 copied..."
+      ELSE
+        IF $amigus_variant EQ 5
+          COPY Base/amigus.library-020-NO_LOG LIBS:amigus.library CLONE
+          ECHO "Option 5 copied..."
+        ELSE
+          IF $amigus_variant EQ 6
+            COPY Base/amigus.library-020-SER_LOG LIBS:amigus.library CLONE
+            ECHO "Option 6 copied..."
+          ELSE
+            IF $amigus_variant EQ 7
+              COPY Base/amigus.library-020-FILE_LOG LIBS:amigus.library CLONE
+              ECHO "Option 7 copied..."
+            ELSE
+              IF $amigus_variant EQ 8
+                COPY Base/amigus.library-020-MEM_LOG LIBS:amigus.library CLONE
+                ECHO "Option 8 copied..."
+              ELSE
+                COPY Base/amigus.library-000-NO_LOG LIBS:amigus.library CLONE
+                ECHO "Option 1 copied..."
+              ENDIF
+            ENDIF
+          ENDIF
+        ENDIF
+      ENDIF
+    ENDIF
+  ENDIF
+ENDIF
+
+ECHO ""
+ECHO "Do you want to copy all variants of amigus.library to LIBS: for"
+ASK "potential later use after renaming? (y/N)"
+
+IF WARN
+  copy Base/amigus.library#? LIBS:
+ENDIF
+
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
 ECHO "|                      MHI driver installation                      |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""

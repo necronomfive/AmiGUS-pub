@@ -137,6 +137,75 @@ ENDIF
 
 ECHO ""
 ECHO "+-------------------------------------------------------------------+"
+ECHO "|                    AmiGUS Treiber-Installation                    |"
+ECHO "+-------------------------------------------------------------------+"
+ECHO ""
+ASK "Möchten Sie amigus.library nach LIBS: installieren? (y/N)"
+
+IF WARN
+  ECHO "Welchen MHI-Treiber möchten Sie installieren?"
+  ECHO ""
+  ECHO "1) 68000, RELEASE-Version, kein Logging, EMPFOHLEN!!!"
+  ECHO "2) 68000, DEBUG-Version, serielles Logging"
+  ECHO "3) 68000, DEBUG-Version, Dateilogging"
+  ECHO "4) 68000, DEBUG-Version, Speicherlogging"
+  ECHO "5) 68020, RELEASE-Version, kein Logging, für 68020+"
+  ECHO "6) 68020, DEBUG-Version, serielles Logging, für 68020+"
+  ECHO "7) 68020, DEBUG-Version, Dateilogging, für 68020+"
+  ECHO "8) 68020, DEBUG-Version, Speicherlogging, für 68020+"
+  ECHO ""
+  ECHO "*e[33mStandard: 1*e[31m - Bitte drücken Sie 1-8 gefolgt von Return:"
+  SETENV >NIL: amigus_variant ?
+
+  IF $amigus_variant EQ 2
+    COPY Base/amigus.library-000-SER_LOG LIBS:amigus.library CLONE
+    ECHO "Option 2 kopiert..."
+  ELSE
+    IF $amigus_variant EQ 3
+      COPY Base/amigus.library-000-FILE_LOG LIBS:amigus.library CLONE
+      ECHO "Option 3 kopiert..."
+    ELSE
+      IF $amigus_variant EQ 4
+        COPY Base/amigus.library-000-MEM_LOG LIBS:amigus.library CLONE
+        ECHO "Option 4 kopiert..."
+      ELSE
+        IF $amigus_variant EQ 5
+          COPY Base/amigus.library-020-NO_LOG LIBS:amigus.library CLONE
+          ECHO "Option 5 kopiert..."
+        ELSE
+          IF $amigus_variant EQ 6
+            COPY Base/amigus.library-020-SER_LOG LIBS:amigus.library CLONE
+            ECHO "Option 6 kopiert..."
+          ELSE
+            IF $amigus_variant EQ 7
+              COPY Base/amigus.library-020-FILE_LOG LIBS:amigus.library CLONE
+              ECHO "Option 7 kopiert..."
+            ELSE
+              IF $amigus_variant EQ 8
+                COPY Base/amigus.library-020-MEM_LOG LIBS:amigus.library CLONE
+                ECHO "Option 8 kopiert..."
+              ELSE
+                COPY Base/amigus.library-000-NO_LOG LIBS:amigus.library CLONE
+                ECHO "Option 1 kopiert..."
+              ENDIF
+            ENDIF
+          ENDIF
+        ENDIF
+      ENDIF
+    ENDIF
+  ENDIF
+ENDIF
+
+ECHO ""
+ECHO "Möchten Sie alle Varianten der amigus.library nach LIBS: kopieren,"
+ASK "um sie möglicherweise später umzubennenen und zu verwenden? (y/N)"
+
+IF WARN
+  copy Base/amigus.library#? LIBS:
+ENDIF
+
+ECHO ""
+ECHO "+-------------------------------------------------------------------+"
 ECHO "|                      MHI-Treiberinstallation                      |"
 ECHO "+-------------------------------------------------------------------+"
 ECHO ""

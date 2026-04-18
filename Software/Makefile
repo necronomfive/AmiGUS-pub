@@ -391,6 +391,8 @@ prepare-mhi:
 
 prepare-base:
 	make -C Drivers/Base -f Makefile-Includes INCLUDES install
+	mkdir -p Tools/include
+	cp -R Drivers/Base/include/C/* Tools/include
 	touch prepare-base
 
 clean: $(DRIVERS/CLEAN) $(TOOLS/CLEAN)

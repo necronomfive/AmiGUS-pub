@@ -25,17 +25,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <exec/execbase.h>
 #include <exec/types.h>
 #include <exec/memory.h>
-#include <exec/interrupts.h>
 
 #include <libraries/dos.h>
 #include <libraries/configvars.h>
 
+#include <proto/amigus.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
-#include <proto/expansion.h>
 
 #include <clib/exec_protos.h>
-#include <clib/expansion_protos.h>
 
 #include <hardware/intbits.h>
 
@@ -165,34 +163,20 @@ void shutdownAmiGUS(APTR board_base)
 int main(int argc,char **argv)
 {
  	struct Library	*SysBase = NULL;
-	struct Library	*ExpansionBase = NULL;
+	struct Library	*AmiGUS_Base = NULL;
 	struct Library	*DOSBase = NULL; 
 
-	struct Interrupt *fifoint;
- 
-	struct ConfigDev *myCD;
+	struct AmiGUS *myAmiGUS;
     struct FileInfoBlock* fib;
 	
 	struct IntData *intdata;
 		
-	UBYTE	board_product_id;
-	UWORD	board_manufacturer_id;
-	ULONG	board_serial_id;
-	
-	UWORD	fpga_date_minute;
-	UWORD	fpga_date_hour;
-	UWORD	fpga_date_day;
-	UWORD	fpga_date_month;
-	UWORD	fpga_date_year;
-	
 	APTR	board_base,memory,read_ptr;
 	BPTR 	filehandle;
-	BPTR 	file;
 	BYTE	signr;
 	
     long 	filesize,read_data;
 	
-	BOOL	board_found = FALSE;
 	BOOL	first_read = TRUE;
 
 	ULONG 	Temp;
@@ -214,13 +198,13 @@ int main(int argc,char **argv)
 
 	if((SysBase=OpenLibrary("exec.library",0L))==NULL)
 	{
-		printf("ERROR: can't open 'expansion.library'\n\n");
+		printf("ERROR: can't open 'exec.library'\n\n");
 		return 0;
 	}
 	
-	if((ExpansionBase=OpenLibrary("expansion.library",0L))==NULL)
+	if((AmiGUS_Base=OpenLibrary("amigus.library",0L))==NULL)
 	{
-        printf("ERROR: can't open 'expansion.library'\n\n");
+        printf("ERROR: can't open 'amigus.library'\n\n");
         return 0;
 	}
 	
@@ -233,32 +217,24 @@ int main(int argc,char **argv)
 	
 	/* ================ Find AmiGUS card ================ */
 	
-	myCD = NULL;
-    while(myCD=FindConfigDev(myCD,-1L,-1L)) /* search for all ConfigDevs */	
+	myAmiGUS = AmiGUS_FindCard(NULL);
+	if (myAmiGUS)
 	{
-		board_manufacturer_id = myCD->cd_Rom.er_Manufacturer;
-		board_product_id = myCD->cd_Rom.er_Product;
-		board_serial_id = myCD->cd_Rom.er_SerialNumber;
-		board_base = myCD->cd_BoardAddr;
-		if (board_manufacturer_id == AMIGUS_MANUFACTURER_ID && board_product_id == AMIGUS_MP3_PRODUCT_ID)
-		{
-			board_found = TRUE;
-			
-			fpga_date_minute = (UWORD)(board_serial_id & (ULONG)0x3f);
-			fpga_date_hour = (UWORD)((board_serial_id & (ULONG)0x7c0)>>6);
-			fpga_date_day = (UWORD)((board_serial_id & (ULONG)0xf800)>>11);
-			fpga_date_month = (UWORD)((board_serial_id & (ULONG)0xf0000)>>16);
-			fpga_date_year = (UWORD)((board_serial_id & (ULONG)0xfff00000)>>20);
-			break;
+		Temp = AmiGUS_ReserveCard(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
+		printf("Reserve was %lx\n", Temp);
+		if (AmiGUS_NoError == Temp) {
+			board_base = myAmiGUS->agus_CodecBase;
+			printf("AmiGUS (MHI) found at $%lx\n",board_base);
+			printf("FPGA Date: %4d-%02d-%02d, %02d:%02d\n\n",
+				   myAmiGUS->agus_Year,
+				   myAmiGUS->agus_Month,
+				   myAmiGUS->agus_Day,
+				   myAmiGUS->agus_Hour,
+				   myAmiGUS->agus_Minute);
+		} else {
+			printf("ERROR: AmiGUS board in use!\n");	
+			return 0;
 		}
-	}
-	
-	CloseLibrary(ExpansionBase);
-	
-	if (board_found == TRUE)
-	{
-		printf("AmiGUS (MHI) found at $%lx\n",board_base);
-		printf("FPGA Date: %4d-%02d-%02d, %02d:%02d\n\n",fpga_date_year,fpga_date_month,fpga_date_day,fpga_date_hour,fpga_date_minute);		
 	}
 	else
 	{
@@ -266,7 +242,7 @@ int main(int argc,char **argv)
 		return 0;
 	}
 	
-	 initVS1063(board_base);
+	initVS1063(board_base);
 	
 	/* ================ Install Interrupt Server ================ */
 	
@@ -293,20 +269,12 @@ int main(int argc,char **argv)
         printf("ERROR: can't allocate memory for interrupt node\n");
         return 0;		
 	}
-                                                
-    if (fifoint = AllocMem(sizeof(struct Interrupt), 
-                         MEMF_PUBLIC|MEMF_CLEAR))
-    {
-		fifoint->is_Node.ln_Type = NT_INTERRUPT;
-        fifoint->is_Node.ln_Pri = 100;
-        fifoint->is_Node.ln_Name = "AmiGUS-Main-Int";
-        fifoint->is_Data = (APTR)intdata;
-        fifoint->is_Code = intServer;
-		
-		AddIntServer(INTB_PORTS, fifoint);
 
-	}
-	else 
+	if (AmiGUS_InstallInterrupt(myAmiGUS,
+								AMIGUS_FLAG_CODEC,
+								myAmiGUS,
+								( AmiGUS_Interrupt ) intServer,
+								intdata))
 	{
         printf("ERROR: can't allocate memory for interrupt node\n");
 		FreeMem(intdata,sizeof(struct IntData));
@@ -325,7 +293,6 @@ int main(int argc,char **argv)
         printf("ERROR: couldn't allocate buffer memory\n");
 		CloseLibrary(DOSBase);
 		FreeMem(intdata,sizeof(struct IntData));
-		FreeMem(fifoint, sizeof(struct Interrupt));			
         return 0;
     }
 	
@@ -344,9 +311,9 @@ int main(int argc,char **argv)
 			{			
 				printf("ERROR: access file/n");
 				CloseLibrary(DOSBase);
-				RemIntServer(INTB_PORTS, fifoint);		
+				AmiGUS_RemoveInterrupt(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
+				AmiGUS_FreeCard(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
 				FreeMem(intdata,sizeof(struct IntData));
-				FreeMem(fifoint, sizeof(struct Interrupt));			
 				FreeMem(memory,MEM_SIZE);
 				return 0;
 			}
@@ -357,9 +324,9 @@ int main(int argc,char **argv)
 	{
 		printf("ERROR: access file/n");
 		CloseLibrary(DOSBase);
-		RemIntServer(INTB_PORTS, fifoint);		
+		AmiGUS_RemoveInterrupt(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
+		AmiGUS_FreeCard(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
 		FreeMem(intdata,sizeof(struct IntData));
-		FreeMem(fifoint, sizeof(struct Interrupt));			
 		FreeMem(memory,MEM_SIZE);
 		return 0;		
 	}
@@ -389,10 +356,10 @@ int main(int argc,char **argv)
 						Close(filehandle);
 						CloseLibrary(DOSBase);
 						shutdownAmiGUS(board_base);
-						RemIntServer(INTB_PORTS, fifoint);							
+						AmiGUS_RemoveInterrupt(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
+						AmiGUS_FreeCard(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
 						FreeMem(memory,MEM_SIZE);
 						FreeMem(intdata,sizeof(struct IntData));
-						FreeMem(fifoint, sizeof(struct Interrupt));	
 						
 						return 0;
 					}
@@ -419,10 +386,10 @@ int main(int argc,char **argv)
 						Close(filehandle);
 						CloseLibrary(DOSBase);
 						shutdownAmiGUS(board_base);
-						RemIntServer(INTB_PORTS, fifoint);							
+						AmiGUS_RemoveInterrupt(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
+						AmiGUS_FreeCard(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
 						FreeMem(memory,MEM_SIZE);
 						FreeMem(intdata,sizeof(struct IntData));
-						FreeMem(fifoint, sizeof(struct Interrupt));		
 						FreeSignal(signr);
 							
 						return 0;
@@ -447,10 +414,10 @@ int main(int argc,char **argv)
 							Close(filehandle);
 							CloseLibrary(DOSBase);
 							shutdownAmiGUS(board_base);
-							RemIntServer(INTB_PORTS, fifoint);							
+							AmiGUS_RemoveInterrupt(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
+							AmiGUS_FreeCard(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
 							FreeMem(memory,MEM_SIZE);
 							FreeMem(intdata,sizeof(struct IntData));
-							FreeMem(fifoint, sizeof(struct Interrupt));		
 							FreeSignal(signr);
 								
 							return 0;
@@ -481,10 +448,11 @@ int main(int argc,char **argv)
 
 	
 	shutdownAmiGUS(board_base);
-	RemIntServer(INTB_PORTS, fifoint);							
+	AmiGUS_RemoveInterrupt(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
+	AmiGUS_FreeCard(myAmiGUS, AMIGUS_FLAG_CODEC, myAmiGUS);
 	FreeMem(memory,MEM_SIZE);
 	FreeMem(intdata,sizeof(struct IntData));
-	FreeMem(fifoint, sizeof(struct Interrupt));		
+	CloseLibrary(AmiGUS_Base);
 
 	return 0;  
    }

@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <clib/asl_protos.h>
 #include <clib/expansion_protos.h>
 
-#include <proto/expansion.h>
+#include <proto/amigus.h>
 #include <proto/dos.h>
 
 #ifdef LATTICE
@@ -112,10 +112,10 @@ int chkabort(void) { return(0); }  /* really */
 
 
 struct Library      *IntuitionBase;
-struct Library      *ExpansionBase;
 struct Library      *GfxBase;
 struct Library      *AslBase;
 struct Library      *GadToolsBase;
+struct Library      *AmiGUS_Base;
 
 struct TextAttr Topaz80 = { "topaz.font", 8, 0, 0, };
 
@@ -759,12 +759,9 @@ VOID process_window_events(struct Window *mywin,
 	BOOL terminated = FALSE;
 	UWORD command;
 
-	struct ConfigDev *myCD;
+	struct AmiGUS *myAmiGUS;
 	struct FileInfoBlock* fib;
 	
-	UBYTE	board_product_id;
-	UWORD	board_manufacturer_id;
-	ULONG	board_serial_id;
 	APTR	board_base;
 	
 	char	filename[1024];
@@ -773,12 +770,12 @@ VOID process_window_events(struct Window *mywin,
 	BPTR 	filehandle;
     long 	filesize;
 	
-#ifndef DEBUG
-	BOOL	board_found = FALSE;
+#ifdef DEBUG
+	BOOL	requireBoard = FALSE;
 #else
-	BOOL	board_found = TRUE;
+	BOOL	requireBoard = TRUE;
 #endif
-	
+
 	UWORD	fpga_date_minute;
 	UWORD	fpga_date_hour;
 	UWORD	fpga_date_day;
@@ -792,37 +789,27 @@ VOID process_window_events(struct Window *mywin,
 	APTR	core_mem;
 	
 
-	myCD = NULL;
-	
-	wPrintF(0,"AmiGUS Flash Tool V0.43", TRUE,topborder,font,mywin);
+	wPrintF(0,"AmiGUS Flash Tool V0.44", TRUE,topborder,font,mywin);
 	wPrintF(1,"(C)2025 by Oliver Achten", FALSE,topborder,font,mywin);
 	
 	/* Find AmiGus Card */
 	
-    while(myCD=FindConfigDev(myCD,-1L,-1L)) /* search for all ConfigDevs */	
+	myAmiGUS = AmiGUS_FindCard(NULL);
+	if ((myAmiGUS) || (!requireBoard))
 	{
-		board_manufacturer_id = myCD->cd_Rom.er_Manufacturer;
-		board_product_id = myCD->cd_Rom.er_Product;
-		board_serial_id = myCD->cd_Rom.er_SerialNumber;
-		board_base = myCD->cd_BoardAddr;
-		if (board_manufacturer_id == AMIGUS_MANUFACTURER_ID && board_product_id == AMIGUS_MAIN_PRODUCT_ID)
-		{
-			board_found = TRUE;
+		board_base = myAmiGUS->agus_PcmBase;
 
-			fpga_date_minute = (UWORD)(board_serial_id & (ULONG)0x3f);
-			fpga_date_hour = (UWORD)((board_serial_id & (ULONG)0x7c0)>>6);
-			fpga_date_day = (UWORD)((board_serial_id & (ULONG)0xf800)>>11);
-			fpga_date_month = (UWORD)((board_serial_id & (ULONG)0xf0000)>>16);
-			fpga_date_year = (UWORD)((board_serial_id & (ULONG)0xfff00000)>>20);
+		fpga_date_minute = myAmiGUS->agus_Minute;
+		fpga_date_hour = myAmiGUS->agus_Hour;
+		fpga_date_day = myAmiGUS->agus_Day;
+		fpga_date_month = myAmiGUS->agus_Month;
+		fpga_date_year = myAmiGUS->agus_Year;
 			
-			fpga_id_high = ReadReg32(board_base,FPGA_ID_HIGH);
-			fpga_id_low = ReadReg32(board_base,FPGA_ID_LOW);			
-			break;
-		}
-	}
+		fpga_id_high = myAmiGUS->agus_FpgaId.idLongs[ 0 ];
+		fpga_id_low = myAmiGUS->agus_FpgaId.idLongs[ 1 ];
 
-	if (board_found == TRUE)
 		wPrintF(3,"AmiGUS card found!", FALSE,topborder,font,mywin);
+	}
 	else
 	{
 		wPrintF(3,"AmiGUS card not found!", FALSE,topborder,font,mywin);
@@ -1235,8 +1222,8 @@ if (NULL == (IntuitionBase = OpenLibrary("intuition.library", 37)))
     errorMessage( "Requires V37 intuition.library");
 else
 	{
-	if (NULL == (ExpansionBase = OpenLibrary("expansion.library", 37)))
-		errorMessage( "Requires V37 expansion.library");
+	if (NULL == (AmiGUS_Base = OpenLibrary("amigus.library", 1)))
+		errorMessage( "Requires V1 amigus.library");
 	else	
 		{
 		if (NULL == (GfxBase = OpenLibrary("graphics.library", 37)))
@@ -1259,7 +1246,7 @@ else
 				}
 			CloseLibrary(AslBase);
 			}
-		CloseLibrary(ExpansionBase);
+		CloseLibrary(AmiGUS_Base);
 		}
 	CloseLibrary(IntuitionBase);	
 	}

@@ -54,10 +54,10 @@ clean:
 	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET0) $(TARGET1) $(RM_SUFFIX)
 
 $(TARGET0):
-	$(RUNNER) sc $@.c incdir=include: cpu=68000 link
+	$(RUNNER) sc $@.c incdir=include: incdir=/include cpu=68000 link
 
 $(TARGET1):
-	$(RUNNER) sc $@.c incdir=include: incdir=gus:../../dependencies/include cpu=68000 link
+	$(RUNNER) sc $@.c incdir=include: incdir=/include incdir=gus:../dependencies/include incdir=/include cpu=68000 link
 
 release: $(TARGET0) $(TARGET1) release0$(LINUX)
 

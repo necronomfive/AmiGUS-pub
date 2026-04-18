@@ -12,6 +12,7 @@ PlayMP3/PlayMP3
 PlayWAV/PlayWav
 Record/Record
 Synth/Synth
+include/*
 
 # Codecraft session files
 *.session

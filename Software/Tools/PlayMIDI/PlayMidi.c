@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <stdlib.h>
 
+#include <amigus/amigus.h>
 #include <exec/execbase.h>
 #include <exec/types.h>
 #include <exec/memory.h>
@@ -33,9 +34,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <libraries/dos.h>
 #include <libraries/configvars.h>
 
+#include <proto/amigus.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
-#include <proto/expansion.h>
 
 #include <clib/exec_protos.h>
 #include <clib/expansion_protos.h>
@@ -308,23 +309,12 @@ void hagenPlayNote(APTR base, UWORD chNr, UWORD midNote, UWORD midVel, UWORD ctr
 int main(int argc,char **argv)
 {
  	struct Library	*SysBase = NULL;
-	struct Library	*ExpansionBase = NULL;
+	struct Library	*AmiGUS_Base = NULL;
 	struct Library	*DOSBase = NULL; 
 
-	struct ConfigDev *myCD;
+	struct AmiGUS *amigus;
     struct FileInfoBlock* fib;
 
-		
-	UBYTE	board_product_id;
-	UWORD	board_manufacturer_id;
-	ULONG	board_serial_id;
-	
-	UWORD	fpga_date_minute;
-	UWORD	fpga_date_hour;
-	UWORD	fpga_date_day;
-	UWORD	fpga_date_month;
-	UWORD	fpga_date_year;	
-	
 	UWORD	control_word;
 	APTR	board_base,memory;
 	BPTR 	filehandle;
@@ -350,6 +340,7 @@ int main(int argc,char **argv)
 	BPTR lock;
 	
 	BOOL	board_found = FALSE;
+	struct Task * task = FindTask( NULL );
 	
     printf("\n=========================\n AmiGUS MIDI Player V0.4 \n(C) 2025 by Oliver Achten\n=========================\n\n");
 
@@ -376,9 +367,9 @@ int main(int argc,char **argv)
 		return 0;
 	}
 	
-	if((ExpansionBase=OpenLibrary("expansion.library",0L))==NULL)
+	if((AmiGUS_Base=OpenLibrary("amigus.library",0L))==NULL)
 	{
-        printf("ERROR: can't open 'expansion.library'\n");
+        printf("ERROR: can't open 'amigus.library'\n");
         return 0;
 	}
 	
@@ -391,32 +382,19 @@ int main(int argc,char **argv)
 	
 	/* ================ Find AmiGUS card ================ */
 	
-	myCD = NULL;
-    while(myCD=FindConfigDev(myCD,-1L,-1L)) /* search for all ConfigDevs */	
+	amigus = AmiGUS_FindCard( NULL );
+	if ( amigus )
 	{
-		board_manufacturer_id = myCD->cd_Rom.er_Manufacturer;
-		board_product_id = myCD->cd_Rom.er_Product;
-		board_serial_id = myCD->cd_Rom.er_SerialNumber;
-		board_base = myCD->cd_BoardAddr;
-		if (board_manufacturer_id == AMIGUS_MANUFACTURER_ID && board_product_id == AMIGUS_HAGEN_PRODUCT_ID)
-		{
-			board_found = TRUE;
-			
-			fpga_date_minute = (UWORD)(board_serial_id & (ULONG)0x3f);
-			fpga_date_hour = (UWORD)((board_serial_id & (ULONG)0x7c0)>>6);
-			fpga_date_day = (UWORD)((board_serial_id & (ULONG)0xf800)>>11);
-			fpga_date_month = (UWORD)((board_serial_id & (ULONG)0xf0000)>>16);
-			fpga_date_year = (UWORD)((board_serial_id & (ULONG)0xfff00000)>>20);
-			break;
-		}
-	}
-	
-	CloseLibrary(ExpansionBase);
-	
-	if (board_found == TRUE)
-	{
+
+		AmiGUS_ReserveCard( amigus, AMIGUS_FLAG_WAVETABLE, task ); // TODO error handling
+		board_base = amigus->agus_WavetableBase;
 		printf("AmiGUS (Wave) found at $%lx\n",board_base);
-		printf("FPGA Date: %4d-%02d-%02d, %02d:%02d\n\n",fpga_date_year,fpga_date_month,fpga_date_day,fpga_date_hour,fpga_date_minute);		
+		printf("FPGA Date: %4d-%02d-%02d, %02d:%02d\n\n",
+			amigus->agus_Year,
+			amigus->agus_Month,
+			amigus->agus_Day,
+			amigus->agus_Hour,
+			amigus->agus_Minute );		
 	}
 	else
 	{
@@ -621,7 +599,7 @@ int main(int argc,char **argv)
 		printf("Error: Could not create message port\n");
 	
 	
-	
+	CloseLibrary(AmiGUS_Base);
 	CloseLibrary(SysBase);	
 
 	return 0;  

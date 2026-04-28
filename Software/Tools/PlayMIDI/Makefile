@@ -53,7 +53,7 @@ clean:
 	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET) $(RM_SUFFIX)
 
 $(TARGET):
-	$(RUNNER) sc $(TARGET).c asmroutines.a incdir=include: cpu=68000 link
+	$(RUNNER) sc $(TARGET).c asmroutines.a incdir=include: incdir=/include cpu=68000 link
 
 release: $(TARGET) release0$(LINUX)
 

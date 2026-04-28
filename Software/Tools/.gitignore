@@ -10,6 +10,7 @@ Mixer/Mixer13
 PlayMIDI/PlayMidi
 PlayMP3/PlayMP3
 PlayWAV/PlayWav
+PlayWAVetable/PlayWAVetable
 Record/Record
 Synth/Synth
 include/*

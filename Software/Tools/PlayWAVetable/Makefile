@@ -75,3 +75,5 @@ install: all
 	-cp $(TARGET) ~/Documents/FS-UAE/Shared/Projekte/AmiGUS/$(TARGET)
 	-curl --connect-timeout 2 --netrc --upload-file $(TARGET)       ftp://192.168.0.12/sda4/Expansion/AmiGUS/$(TARGET)
 	-curl --connect-timeout 2 --netrc --upload-file $(TARGET)       ftp://192.168.0.4/cf0/Expansion/AmiGUS/$(TARGET)
+	-curl --connect-timeout 2 --netrc --upload-file $(TARGET)       ftp://192.168.0.100/cf3/Expansion/AmiGUS/$(TARGET)
+

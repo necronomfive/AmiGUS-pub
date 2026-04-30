@@ -677,6 +677,7 @@ struct Gadget *createAllGadgets(struct Gadget **glistptr, void *vi,
 	ng.ng_TextAttr   = &Topaz80;
 	ng.ng_GadgetID   = BUTTON_FLASH;
 	ng.ng_Flags      = 0;
+	ng.ng_VisualInfo = vi;
 	my_gads[BUTTON_FLASH] = gad = CreateGadget(BUTTON_KIND, gad, &ng,
 						GT_Underscore, '_',
 						TAG_END);

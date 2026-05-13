@@ -260,6 +260,8 @@ package:
 	cp Tools/PlayMP3/PlayMP3.info               $(ADF_DIR3)/Tools
 	cp Tools/PlayWAV/PlayWav                    $(ADF_DIR3)/Tools
 	cp Tools/PlayWAV/PlayWav.info               $(ADF_DIR3)/Tools
+	cp Tools/PlayWAVetable/PlayWavetable        $(ADF_DIR3)/Tools
+	cp Tools/PlayWAVetable/PlayWavetable.info   $(ADF_DIR3)/Tools
 	cp Tools/Record/Record                      $(ADF_DIR3)/Tools
 	cp Tools/Record/Record.info                 $(ADF_DIR3)/Tools
 	cp -R dependencies/libs                     $(ADF_DIR3)/Libs
@@ -353,12 +355,12 @@ package:
 
 all-variants: tools drivers support
 
-tools: prepare-tools $(TOOLS/ALL)
+tools: prepare-base prepare-tools $(TOOLS/ALL)
 
 support: $(DRIVERS/SUPPORT)
 	echo $(DRIVERS/SUPPORT)
 
-drivers: $(DRIVERS/ALL) 
+drivers: prepare-base prepare-ahi prepare-mhi $(DRIVERS/ALL) 
 
 prepare-tools:
 	mkdir -p /tmp/tools-installation

@@ -126,7 +126,10 @@
      "to get there somehow, at least once. Recommended.\n"
      "FlashGUI - Used to upgrade AmiGUS's firmware when needed or reset "
      "the embedded settings. Recommended.\n"
-     "PlayWAV - Command line tool to play back WAV or raw PCM files.\n"
+     "PlayWAV - Command line tool to play back WAV or raw PCM files via "
+     "AmiGUS PCM part.\n"
+     "PlayWAVetable - Command line tool to play back WAV files via "
+     "AmiGUS WaveTable part.\n"
      "PlayMP3 - Command line tool to play back MP3s or other encoded files.\n"
      "PlayMIDI - Command line tool to play notes from a MIDI keyboard "
      "connected via serial MIDI cable via AmiGUS's WaveTable engine.\n"
@@ -155,6 +158,10 @@
 
 (set #component_wav
 (cat "PlayWAV"
+))
+
+(set #component_wavetable
+(cat "PlayWAVetable"
 ))
 
 (set #component_mp3
@@ -366,7 +373,9 @@
      "FlashGUI - Wird verwendet um die Firmware der AmiGUS upzudaten oder "
      "die gespeicherten Einstellungen zurückzusetzen. Empfohlen.\n"
      "PlayWAV - Kommandozeilenwerkzeug, um WAV oder rohe PCM Dateien "
-     "abzuspielen.\n"
+     "via AmiGUS PCM Teil abzuspielen.\n"
+     "PlayWAVetable - Kommandozeilenwerkzeug, um WAV Dateien "
+     "via AmiGUS WaveTable Teil abzuspielen.\n"
      "PlayMP3 - Kommandozeilenwerkzeug, um MP3s oder andere komprimierte "
      "Dateien abzuspielen.\n"
      "PlayMIDI - Kommandozeilenwerkzeug, um Noten von einem per serieller "
@@ -398,6 +407,10 @@
 
 (set #component_wav
 (cat "PlayWAV"
+))
+
+(set #component_wavetable
+(cat "PlayWAVetable"
 ))
 
 (set #component_mp3
@@ -550,18 +563,19 @@
              #component_mixer
              #component_flash
              #component_wav
+             #component_wavetable
              #component_mp3
              #component_midi
              #component_record 
              #component_debug
              #component_manual
              #component_firmware )
-    (default %01110111111)
+    (default %011101111111)
   )
 )
 
 (if
-  (BITAND what %00000000011)
+  (BITAND what %000010101111)
   (
     (set drivers_target
       (askdir
@@ -597,7 +611,7 @@
 )
 
 (if
-  (BITAND what %00000000001)
+  (BITAND what %000000000001)
   (
     (set driver_name "AHI")
     (install_driver)
@@ -638,7 +652,7 @@
 (complete 10)
 
 (if
-  (BITAND what %00000000010)
+  (BITAND what %000000000010)
   (
     (set driver_name "MHI")
     (install_driver)
@@ -669,7 +683,7 @@
 
 (set tools_target "SYS:Expansion/AmiGUS")
 (if
-  (BITAND what %00011111100)
+  (BITAND what %000111111100)
   (
     (set tools_target
       (askdir (prompt #which_tools_target)
@@ -686,7 +700,7 @@
 (complete 25)
 
 (if
-  (BITAND what %00000000100)
+  (BITAND what %000000000100)
   (copyfiles
     (source (tackon source_folder "Mixer"))
     (dest tools_target)
@@ -697,7 +711,7 @@
 (complete 30)
 
 (if
-  (BITAND what %00000001000)
+  (BITAND what %000000001000)
   (copyfiles
     (source (tackon source_folder "FlashGUI"))
     (dest tools_target)
@@ -708,9 +722,18 @@
 (complete 35)
 
 (if
-  (BITAND what %00000010000)
+  (BITAND what %000000010000)
   (copyfiles
     (source (tackon source_folder "PlayWAV"))
+    (dest tools_target)
+    (infos)
+  )
+)
+
+(if
+  (BITAND what %000000100000)
+  (copyfiles
+    (source (tackon source_folder "PlayWAVetable"))
     (dest tools_target)
     (infos)
   )
@@ -719,7 +742,7 @@
 (complete 40)
 
 (if
-  (BITAND what %00000100000)
+  (BITAND what %000001000000)
   (copyfiles
     (source (tackon source_folder "PlayMP3"))
     (dest tools_target)
@@ -730,7 +753,7 @@
 (complete 45)
 
 (if
-  (BITAND what %00001000000)
+  (BITAND what %000010000000)
   (copyfiles
     (source (tackon source_folder "PlayMIDI"))
     (dest tools_target)
@@ -741,7 +764,7 @@
 (complete 50)
 
 (if
-  (BITAND what %00010000000)
+  (BITAND what %000100000000)
   (copyfiles
     (source (tackon source_folder "Record"))
     (dest tools_target)
@@ -752,7 +775,7 @@
 (complete 55)
 
 (if
-  (BITAND what %00100000000)
+  (BITAND what %001000000000)
   (
     (set debug_target
       (askdir (prompt #which_debug_target)
@@ -805,7 +828,7 @@
 (complete 60)
 
 (if
-  (BITAND what %01000000000)
+  (BITAND what %010000000000)
   (
     (if
       (exists "Manual/AmiGUS.guide")
@@ -845,7 +868,7 @@
 (complete 80)
 
 (if
-  (BITAND what %10000000000)
+  (BITAND what %100000000000)
   (
     (if
       (= 2 (exists "Firmware"))

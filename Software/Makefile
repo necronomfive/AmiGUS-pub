@@ -50,7 +50,7 @@ DRIVERS/SUPPORT = $(foreach DRIVER,$(DRIVERS),$(DRIVER)support)
 CPUS = 000 020 040
 LOGGINGS = NO_LOG SER_LOG FILE_LOG MEM_LOG
 
-TOOLS = $(shell find Tools -mindepth 1 -maxdepth 1 -type d)
+TOOLS = $(shell find Tools -mindepth 1 -maxdepth 1 -type d -not -path Tools/include)
 TOOLS/ALL = $(foreach TOOL,$(TOOLS),$(TOOL)/all)
 TOOLS/CLEAN = $(foreach TOOL,$(TOOLS),$(TOOL)/clean)
 
@@ -400,6 +400,7 @@ clean: $(DRIVERS/CLEAN) $(TOOLS/CLEAN)
 
 dist-clean: $(DRIVERS/DIST-CLEAN) clean
 	rm -rf Drivers/*/include
+	rm -rf Tools/include
 	rm -rf /tmp/mhi-installation prepare-mhi
 	rm -rf /tmp/ahi4-installation prepare-ahi
 	rm -rf /tmp/gt34-installation prepare-tools

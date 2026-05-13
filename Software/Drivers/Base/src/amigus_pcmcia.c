@@ -311,7 +311,7 @@ VOID AmiGusPcmcia_AddAll( struct List * cards ) {
   status = ReadCardStatus();
   if ( !( CARD_STATUSF_CCDET & status )) {
 
-    LOG_I(( "I: No card inserted.\n" ));
+    LOG_I(( "I: No PCMCIA card inserted.\n" ));
     return;
   }
 
@@ -326,15 +326,15 @@ VOID AmiGusPcmcia_AddAll( struct List * cards ) {
   own = OwnCard( base->agb_CardHandle );
   if ( NULL != own ) {
 
-    LOG_E(( "E: Failed owning card!\n" ));
+    LOG_E(( "E: Failed owning PCMCIA card!\n" ));
     return;
   }
-  LOG_D(( "D: Success, owning card!\n" ));
+  LOG_D(( "D: Success, owning PCMCIA card!\n" ));
 
   reset = CardResetCard( base->agb_CardHandle );
   if ( !( reset )) {
 
-    LOG_E(( "E: Card reset failed!\n" ));
+    LOG_E(( "E: PCMCIA card reset failed!\n" ));
     ReleaseCard( base->agb_CardHandle, 0 );
     return;
   }
@@ -359,7 +359,7 @@ VOID AmiGusPcmcia_AddAll( struct List * cards ) {
   id.idLong[ 1 ] = ReadReg32( cardMap->cmm_AttributeMemory, 
                               AMIGUS_MINI_ID_HIGH_OFFSET );
   id.idString[ 8 ] = 0;
-  LOG_I(( "I: Found card %s.\n", id.idString ));
+  LOG_I(( "I: Found PCMCIA card %s.\n", id.idString ));
   if (( AMIGUS_MINI_CARD_ID_LOW  != id.idLong[ 0 ] ) ||
       ( AMIGUS_MINI_CARD_ID_HIGH != id.idLong[ 1 ] )) {
 

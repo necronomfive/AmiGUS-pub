@@ -401,8 +401,9 @@ clean: $(DRIVERS/CLEAN) $(TOOLS/CLEAN)
 dist-clean: $(DRIVERS/DIST-CLEAN) clean
 	rm -rf Drivers/*/include
 	rm -rf Tools/include
-	rm -rf /tmp/mhi-installation prepare-mhi
 	rm -rf /tmp/ahi4-installation prepare-ahi
+	rm -rf /tmp/ahi4-installation prepare-base
+	rm -rf /tmp/mhi-installation prepare-mhi
 	rm -rf /tmp/gt34-installation prepare-tools
 
 $(DRIVERS/CLEAN) $(DRIVERS/SUPPORT) $(TOOLS/ALL) $(TOOLS/CLEAN):

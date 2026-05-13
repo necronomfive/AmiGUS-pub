@@ -260,8 +260,8 @@ package:
 	cp Tools/PlayMP3/PlayMP3.info               $(ADF_DIR3)/Tools
 	cp Tools/PlayWAV/PlayWav                    $(ADF_DIR3)/Tools
 	cp Tools/PlayWAV/PlayWav.info               $(ADF_DIR3)/Tools
-	cp Tools/PlayWAVetable/PlayWavetable        $(ADF_DIR3)/Tools
-	cp Tools/PlayWAVetable/PlayWavetable.info   $(ADF_DIR3)/Tools
+	cp Tools/PlayWAVetable/PlayWAVetable        $(ADF_DIR3)/Tools
+	cp Tools/PlayWAVetable/PlayWAVetable.info   $(ADF_DIR3)/Tools
 	cp Tools/Record/Record                      $(ADF_DIR3)/Tools
 	cp Tools/Record/Record.info                 $(ADF_DIR3)/Tools
 	cp -R dependencies/libs                     $(ADF_DIR3)/Libs

@@ -15,7 +15,7 @@
 
 _initFIFO:
 	movem.l d1-d7/a0-a6,-(sp)	; Save registers
-	
+
 	lea 	$a(a6),a1
 	moveq	#0,d0
 	
@@ -25,7 +25,7 @@ initFIFOLoop:
 	
 	movem.l (sp)+,d1-d7/a0-a6	; Restore registers
 	rts
-	
+
 *******************************************************************************
 
        STRUCTURE INTDATA,0
@@ -35,8 +35,8 @@ initFIFOLoop:
 		ULONG 	buf_count	
 		ULONG	buf_segments	
 		ULONG	buf_half_segments			
-        APTR   	rd_task
-        ULONG  	rd_signal
+		APTR   	rd_task
+		ULONG  	rd_signal
 		ULONG	tmp_buffer	
         LABEL RBFDATA_SIZEOF
 
@@ -47,7 +47,7 @@ initFIFOLoop:
 *
 
 _intServer:
-    move.l  d1,a1
+	move.l  d1,a1
 	move.l 	board_base(a1),a6	; get AmiGUS hardware register base
 	move.w	$00(a6),d0			; read interrupt status
 	and.w   #$4,d0				; did FIFO watermark irq occur?
@@ -69,7 +69,7 @@ intFIFOLoop:
 
 	move.w  #$4,d1				; clear FIFO watermark irq
 	move.w  d1,$00(a6)
-	
+
 	move.l	a0,tmp_buffer(a1)	; store buffer pointer
 
 	addq	#1,d0				; increment buffer count
@@ -77,9 +77,11 @@ intFIFOLoop:
 	bne		noBufOverflow		; no
 	moveq	#0,d0				; yes: reset buffer number to 0
 	move.l	d0,buf_count(a1)	; store it
+
 	bra		intSendSignal		; buffer#0 reached: send signal
 noBufOverflow:
 	move.l	d0,buf_count(a1)	; store incremented buffer count
+
 	cmp.l	buf_half_segments(a1),d0 ; did we reach half of buffer?
 	bne		intNoSendSignal		; no: send no signal. yes: send signal
 	
@@ -89,6 +91,8 @@ intSendSignal:
 	move.l 	$4,a6				; Get Exec pointer
 	JSRLIB	Signal				; send signal to main() in order to wake-up
 intNoSendSignal
+	moveq	#1,d0
+	rts
 
 ;---	
 noFIFOInt:

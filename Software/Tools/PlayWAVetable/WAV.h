@@ -22,15 +22,15 @@
 #include <dos/dos.h>
 #include <exec/types.h>
 
-struct WAV {
+struct wav {
 
-  BPTR  WAV_file;
-  APTR  WAV_buffer;
-  UWORD WAV_Channels;
-  ULONG WAV_SampleRate;
-  ULONG WAV_SampleBits;
-  ULONG WAV_DataSize;
-  LONG  WAV_DataOffset;
+  BPTR  wav_File;
+  APTR  wav_Buffer;
+  UWORD wav_Channels;
+  ULONG wav_SampleRate;
+  ULONG wav_SampleBits;
+  ULONG wav_DataSize;
+  LONG  wav_DataOffset;
 };
 
 /*****************************************************
@@ -46,14 +46,14 @@ struct WAV {
  * Returns NoError = 0 on success,
  * or an error code on failure.
  */
-LONG OpenWav( struct WAV * wav, STRPTR filename );
+LONG OpenWav( struct wav * wav, STRPTR filename );
 
 /**
  * Closes the WAV file and frees any allocated resources.
  *
  * @param wav Pointer to the WAV struct to be cleaned up.
  */
-VOID CloseWav( struct WAV * wav );
+VOID CloseWav( struct wav * wav );
 
 /**
  * Reads the next chunk of sample data in little endian format
@@ -63,7 +63,7 @@ VOID CloseWav( struct WAV * wav );
  *
  * @return Number of bytes read.
  */
-LONG ReadChunkLE( struct WAV * wav );
+LONG ReadChunkLE( struct wav * wav );
 
 /**
  * Reads the next chunk of sample data in big endian format
@@ -73,6 +73,6 @@ LONG ReadChunkLE( struct WAV * wav );
  *
  * @return Number of bytes read.
  */
-LONG ReadChunkBE( struct WAV * wav );
+LONG ReadChunkBE( struct wav * wav );
 
 #endif /* WAV_H */

@@ -191,7 +191,7 @@ int main( int argc, char **argv ) {
   struct Library * AmiGUS_Base = NULL;
   struct AmiGUS * amigus = NULL;
   struct Task * mainTask = FindTask( NULL );
-  struct WAV wavData;
+  struct wav wav;
   ULONG positionA = 0;
   ULONG positionB = 1 << 24;
   LONG available;
@@ -253,27 +253,27 @@ int main( int argc, char **argv ) {
    * Reading and parsing WAV files... Kudos to wikipedia ;-)
    ****************************************************************************/
 
-  result = OpenWav( &wavData, argv[ 1 ]);
+  result = OpenWav( &wav, argv[ 1 ]);
   if ( result ) {
 
     Printf( "Cannot read file.\n" );
     result = 34;
     goto cleanup;
   }
-  if (( 1 << 25 ) < wavData.WAV_DataSize ) {
+  if (( 1 << 25 ) < wav.wav_DataSize ) {
 
     Printf( "File too big, max %ld but is %ld bytes.\n",
             ( 1 << 25 ),
-            wavData.WAV_DataSize );
+            wav.wav_DataSize );
     result = 35;
     goto cleanup;
   }
 
   Printf( "Found %ldbit, %ldHz, %ld channels, %ld total bytes.\n",
-          wavData.WAV_SampleBits,
-          wavData.WAV_SampleRate,
-          wavData.WAV_Channels,
-          wavData.WAV_DataSize );
+          wav.wav_SampleBits,
+          wav.wav_SampleRate,
+          wav.wav_Channels,
+          wav.wav_DataSize );
 
   Printf( "Playing on card 0x%08lx (eb0000)\n", card );
 
@@ -287,15 +287,15 @@ int main( int argc, char **argv ) {
    *   WAV 8bit is unsigned, 16 bit is signed.
    ****************************************************************************/
 
-  while ( available = ReadChunkLE( &wavData )) {
+  while ( available = ReadChunkLE( &wav )) {
 
     LONG i;
 
-    if ( 8 == wavData.WAV_SampleBits ) {
+    if ( 8 == wav.wav_SampleBits ) {
 
       // unsigned -> signed conversion for the next block of data!
 
-      UBYTE * buffer = wavData.WAV_buffer;
+      UBYTE * buffer = wav.wav_Buffer;
 
       for ( i = 0; i < available; ++i ) {
         // Fix up signed vs unsigned for 8bit only
@@ -304,11 +304,11 @@ int main( int argc, char **argv ) {
       }
     }
 
-    if ( 1 == wavData.WAV_Channels ) {
+    if ( 1 == wav.wav_Channels ) {
 
       // 8bit or 16bit MONO - No need to fiddle around, can just be coppied
 
-      ULONG * buffer = wavData.WAV_buffer;
+      ULONG * buffer = wav.wav_Buffer;
 
       WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionA );
       for ( i = 0; i < ( available >> 2 ); ++i ) {
@@ -319,11 +319,11 @@ int main( int argc, char **argv ) {
       // Could also rely on auto-increment as it is only one channel,
       // but we love symmetric code, don't we?
 
-    } else if ( 8 == wavData.WAV_SampleBits ) {
+    } else if ( 8 == wav.wav_SampleBits ) {
 
       // 8bit STEREO - resort bytes from block into channels
 
-      UBYTE * buffer = wavData.WAV_buffer; // 1 Sample = 1 UBYTE
+      UBYTE * buffer = wav.wav_Buffer; // 1 Sample = 1 UBYTE
       ULONG data;
 
       // Channel A
@@ -363,7 +363,7 @@ int main( int argc, char **argv ) {
     } else {
 
       // 16bit STEREO
-      UWORD * buffer = wavData.WAV_buffer; // 1 Sample = 1 UWORD
+      UWORD * buffer = wav.wav_Buffer; // 1 Sample = 1 UWORD
       ULONG data;
 
       // Channel A
@@ -407,14 +407,14 @@ int main( int argc, char **argv ) {
    ****************************************************************************/
 
   StartAmiGusWavetablePlayback( card,
-                                wavData.WAV_Channels,
-                                wavData.WAV_SampleRate,
-                                wavData.WAV_SampleBits,
+                                wav.wav_Channels,
+                                wav.wav_SampleRate,
+                                wav.wav_SampleBits,
                                 positionA - 4 );
 
   Printf( "Did you know? AmiGUS can play alone...\n" );
 
-  CloseWav( &wavData );
+  CloseWav( &wav );
   /*****************************************************************************
    * Sorry for the ... hack.
    ****************************************************************************/

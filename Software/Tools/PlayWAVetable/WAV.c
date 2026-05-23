@@ -65,32 +65,32 @@ ULONG Swap32( ULONG value ) {
  * WAV file loading and parsing functions below.
  *****************************************************/
 
-LONG OpenWav( struct WAV * wav, STRPTR filename ) {
+LONG OpenWav( struct wav * wav, STRPTR filename ) {
 
   LONG result;
   LONG position = 0;
 
   BYTE header[ HEADER_SIZE ];
 
-  wav->WAV_file = NULL;
-  wav->WAV_buffer = NULL;
+  wav->wav_File = NULL;
+  wav->wav_Buffer = NULL;
 
-  wav->WAV_file = Open( filename, MODE_OLDFILE );
-  if ( !( wav->WAV_file )) {
+  wav->wav_File = Open( filename, MODE_OLDFILE );
+  if ( !( wav->wav_File )) {
 
     CloseWav( wav );
     return 1; // Could not open file.
   }
 
-  result = Read( wav->WAV_file, header, HEADER_SIZE );
+  result = Read( wav->wav_File, header, HEADER_SIZE );
   if ( HEADER_SIZE != result ) {
 
     CloseWav( wav );
     return 2; // Could not read header.
   }
 
-  wav->WAV_buffer = AllocMem( BUFFER_SIZE, MEMF_ANY );
-  if ( !wav->WAV_buffer ) {
+  wav->wav_Buffer = AllocMem( BUFFER_SIZE, MEMF_ANY );
+  if ( !wav->wav_Buffer ) {
 
     CloseWav( wav );
     return 3; // Could not alloc memory.
@@ -126,19 +126,19 @@ LONG OpenWav( struct WAV * wav, STRPTR filename ) {
   }
   position += 2;
 
-  wav->WAV_Channels = Swap16( * (( WORD * )( &( header[ position ] ))));
-  if (( 1 > wav->WAV_Channels ) || ( 2 < wav->WAV_Channels )) {
+  wav->wav_Channels = Swap16( * (( WORD * )( &( header[ position ] ))));
+  if (( 1 > wav->wav_Channels ) || ( 2 < wav->wav_Channels )) {
 
     CloseWav( wav );
     return 7; // Invalid channels
   }
   position += 2;
 
-  wav->WAV_SampleRate = Swap32( * (( ULONG * )( &( header[ position ] ))));
+  wav->wav_SampleRate = Swap32( * (( ULONG * )( &( header[ position ] ))));
   position += 10;
   // BytePerSec and BytePerBloc - ignored
 
-  wav->WAV_SampleBits = Swap16( * (( WORD * )( &( header[ position ] ))));
+  wav->wav_SampleBits = Swap16( * (( WORD * )( &( header[ position ] ))));
   position += 2;
 
   if ( DATA_ID != ( * (( LONG * )( &( header[ position ] ))))) {
@@ -148,46 +148,46 @@ LONG OpenWav( struct WAV * wav, STRPTR filename ) {
   }
   position += 4;
 
-  wav->WAV_DataSize = Swap32( * (( ULONG * )( &( header[ position ] ))));
+  wav->wav_DataSize = Swap32( * (( ULONG * )( &( header[ position ] ))));
   position += 4;
 
-  wav->WAV_DataOffset = position;
+  wav->wav_DataOffset = position;
 
   return 0; // success!
 }
 
-VOID CloseWav( struct WAV * wav ) {
+VOID CloseWav( struct wav * wav ) {
 
-  if ( wav->WAV_buffer ) {
+  if ( wav->wav_Buffer ) {
 
-    FreeMem( wav->WAV_buffer, BUFFER_SIZE );
-    wav->WAV_buffer = NULL;
+    FreeMem( wav->wav_Buffer, BUFFER_SIZE );
+    wav->wav_Buffer = NULL;
   }
-  if ( wav->WAV_file ) {
+  if ( wav->wav_File ) {
 
-    Close( wav->WAV_file );
-    wav->WAV_file = NULL;
+    Close( wav->wav_File );
+    wav->wav_File = NULL;
   }
 }
 
-LONG ReadChunkLE( struct WAV * wav ) {
+LONG ReadChunkLE( struct wav * wav ) {
 
-  LONG result = Read( wav->WAV_file, wav->WAV_buffer, BUFFER_SIZE );
+  LONG result = Read( wav->wav_File, wav->wav_Buffer, BUFFER_SIZE );
   return result;
 }
 
-LONG ReadChunkBE( struct WAV * wav ) {
+LONG ReadChunkBE( struct wav * wav ) {
 
   LONG i;
   LONG result = ReadChunkLE( wav );
-  if (( !( result )) || ( 8 == wav->WAV_SampleBits )) {
+  if (( !( result )) || ( 8 == wav->wav_SampleBits )) {
 
     return result;
   }
 
   for ( i = 0; i < ( BUFFER_SIZE >> 1 ); ++i ) {
 
-    WORD * buffer = ( WORD * ) wav->WAV_buffer;
+    WORD * buffer = ( WORD * ) wav->wav_Buffer;
     buffer[ i ] = Swap16( buffer[i] );
   }
 

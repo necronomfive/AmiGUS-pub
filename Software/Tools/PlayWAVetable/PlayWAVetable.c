@@ -23,34 +23,7 @@
 #include <proto/dos.h>
 #include <proto/exec.h>
 
-/******************************************************************************
- * WAV format definitions below.
- *****************************************************************************/
-
-#define CHAR_TO_ULONG( a, b, c, d ) ((( a ) << 24 ) | (( b ) << 16 ) | (( c ) << 8 ) | ( d ))
-
-#define RIFF_ID   CHAR_TO_ULONG( 'R', 'I', 'F', 'F' )
-#define WAVE_ID   CHAR_TO_ULONG( 'W', 'A', 'V', 'E' )
-#define FMT_ID    CHAR_TO_ULONG( 'f', 'm', 't', ' ' )
-#define DATA_ID   CHAR_TO_ULONG( 'd', 'a', 't', 'a' )
-
-/******************************************************************************
- * WAV is a x86 format, welcome to endianess-hell and the helper functions.
- *****************************************************************************/
-
-UWORD Swap16( UWORD value ) {
-
-  return ( UWORD )((( value & 0xFF00 ) >> 8 ) |
-                   (( value & 0x00FF ) << 8 ));
-}
-
-ULONG Swap32( ULONG value ) {
-
-  return ((( value & 0xFF000000 ) >> 24 ) |
-          (( value & 0x00FF0000 ) >>  8 ) |
-          (( value & 0x0000FF00 ) <<  8 ) |
-          (( value & 0x000000FF ) << 24 ));
-}
+#include "WAV.h"
 
 /******************************************************************************
  * AmiGUS Wavetable hardware definitions below
@@ -147,12 +120,6 @@ VOID InitAmiGus( APTR card ) {
   Printf( "Wavetable @ 0x%08lx init'ed\n", card );
 }
 
-VOID LoadAmiGusWavetableSample( APTR card, ULONG target, ULONG data ) {
-
-  WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, target );
-  WriteReg32( card, AMIGUS_WT_DATA_32BIT, data );
-}
-
 VOID StartAmiGusWavetablePlayback( APTR card,
                                    UWORD channels,
                                    ULONG sampleRate,
@@ -160,7 +127,7 @@ VOID StartAmiGusWavetablePlayback( APTR card,
                                    ULONG count ) {
 
   ULONG middle = 1 << 24;
-  ULONG end = 1 << 25;
+  // ULONG end = 1 << 25;
   double maxFreq = 0x40000000;
 	double maxRate = 192000;
 	ULONG frequency = (( double ) sampleRate ) * maxFreq / maxRate;
@@ -223,24 +190,16 @@ int main( int argc, char **argv ) {
 
   struct Library * AmiGUS_Base = NULL;
   struct AmiGUS * amigus = NULL;
-  BPTR file = NULL;
-  UBYTE * buffer = NULL;
   struct Task * mainTask = FindTask( NULL );
-  ULONG samplerate;
-  UWORD channels;
-  UWORD resolution;
-  ULONG datasize;
-  ULONG posA = 0;
-  ULONG posB = 1 << 24;
-  ULONG tempL;
+  struct WAV wavData;
+  ULONG positionA = 0;
+  ULONG positionB = 1 << 24;
   LONG available;
-  UWORD tempW;
-  int result = 0;
-  LONG copyIncrement;
+  LONG result;
   APTR card;
 
   Printf( "\n============================="
-          "\n  AmiGUS PlayWAVetable V0.1  "
+          "\n  AmiGUS PlayWAVetable V0.2  "
           "\n============================="
           "\n"
           "\nUsage: PlayWAVetable some.wav"
@@ -274,8 +233,8 @@ int main( int argc, char **argv ) {
     goto cleanup;
   }
 
-  tempL = AmiGUS_ReserveCard( amigus, AMIGUS_FLAG_WAVETABLE, mainTask );
-  if ( tempL ) {
+  result = AmiGUS_ReserveCard( amigus, AMIGUS_FLAG_WAVETABLE, mainTask );
+  if ( result ) {
 
     Printf( "Could not reserve AmiGUS at 0x%08lx.\n",
             amigus->agus_WavetableBase );
@@ -294,95 +253,27 @@ int main( int argc, char **argv ) {
    * Reading and parsing WAV files... Kudos to wikipedia ;-)
    ****************************************************************************/
 
-  file = Open( argv[ 1 ], MODE_OLDFILE );
-  if ( !file ) {
+  result = OpenWav( &wavData, argv[ 1 ]);
+  if ( result ) {
 
-    Printf( "Could not open file '%s'.\n", argv[ 1 ]);
+    Printf( "Cannot read file.\n" );
     result = 34;
     goto cleanup;
   }
+  if (( 1 << 25 ) < wavData.WAV_DataSize ) {
 
-  buffer = AllocMem( 4096, MEMF_ANY );
-
-  if ( !buffer ) {
-
-    Printf( "Could not allocate buffer.\n" );
+    Printf( "File too big, max %ld but is %ld bytes.\n",
+            ( 1 << 25 ),
+            wavData.WAV_DataSize );
     result = 35;
     goto cleanup;
   }
 
-  Read( file, &tempL, 4 );
-  if ( RIFF_ID != tempL ) {
-
-    Printf( "Invalid file format.\n" );
-    result = 36;
-    goto cleanup;
-  }
-
-  Seek( file, 4, OFFSET_CURRENT ); // FileSize - ignored
-
-  Read( file, &tempL, 4 );
-  if ( WAVE_ID != tempL ) {
-
-    Printf( "Invalid file format.\n" );
-    result = 38;
-    goto cleanup;
-  }
-
-  Read( file, &tempL, 4 );
-  if ( FMT_ID != tempL ) {
-
-    Printf( "Invalid file format.\n" );
-    result = 39;
-    goto cleanup;
-  }
-
-  Seek( file, 4, OFFSET_CURRENT ); // BlocSize - ignored
-
-  Read( file, &tempW, 2 );
-  if ( 1 != Swap16( tempW )) {
-
-    Printf( "Invalid file format 0x%08lx - need PCM.\n", tempW );
-    result = 40;
-    goto cleanup;
-  }
-
-  Read( file, &tempW, 2 );
-  channels = Swap16( tempW );
-  if (( 1 > channels ) || ( 2 < channels )) {
-
-    Printf( "Can only do 2 channels yet, got %ld.\n", channels );
-    result = 41;
-    goto cleanup;
-  }
-
-  Read( file, &tempL, 4 );
-  samplerate = Swap32( tempL );
-
-  Seek( file, 6, OFFSET_CURRENT ); // BytePerSec and BytePerBloc - ignored
-
-  Read( file, &tempW, 2 );
-  resolution = Swap16( tempW );
-
-  Read( file, &tempL, 4 );
-  if ( DATA_ID != tempL ) {
-
-    Printf( "Invalid file format, expected 'data'.\n" );
-    result = 42;
-    goto cleanup;
-  }
-
-  Read( file, &tempL, 4 );
-  datasize = Swap32( tempL );
-  if (( 1 << 25 ) < datasize ) {
-
-    Printf( "File too big.\n" );
-    result = 37;
-    goto cleanup;
-  }
-
   Printf( "Found %ldbit, %ldHz, %ld channels, %ld total bytes.\n",
-          resolution, samplerate, channels, datasize );
+          wavData.WAV_SampleBits,
+          wavData.WAV_SampleRate,
+          wavData.WAV_Channels,
+          wavData.WAV_DataSize );
 
   Printf( "Playing on card 0x%08lx (eb0000)\n", card );
 
@@ -396,90 +287,140 @@ int main( int argc, char **argv ) {
    *   WAV 8bit is unsigned, 16 bit is signed.
    ****************************************************************************/
 
-  if ( 1 == channels ) {
+  while ( available = ReadChunkLE( &wavData )) {
 
-    // Mono can go w/o re-sorting samples...
-    copyIncrement = 4;
-
-  } else {
-
-    // Stereo cannot, need the bytes per sample:
-    copyIncrement = resolution >> 3;
-  }
-
-  do {
     LONG i;
-    ULONG valueA = 0;
-    ULONG valueB = 0;
-    BYTE countA = 0;
-    BYTE countB = 0;
 
-    available = Read( file, buffer, 4096 );
-    for ( i = 0; i < available; ++i ) {
+    if ( 8 == wavData.WAV_SampleBits ) {
 
-      //Printf( "Next byte 0x%02lx\n", buffer[ i ] );
-      // Fix up signed vs unsigned for 8bit only
-      if ( 8 == resolution ) {
+      // unsigned -> signed conversion for the next block of data!
+
+      UBYTE * buffer = wavData.WAV_buffer;
+
+      for ( i = 0; i < available; ++i ) {
+        // Fix up signed vs unsigned for 8bit only
 
         buffer[ i ] -= 128;
       }
-      // Sort 32bit of samples together, no matter how many these are
-      if (( 2 == channels ) && ( i & copyIncrement )) {
-
-        valueB = ( valueB  << 8 ) | buffer[ i ];
-        ++countB;
-
-      } else {
-
-        valueA = ( valueA  << 8 ) | buffer[ i ];
-        ++countA;
-      }
-      // And copy them to WaveTable memory.
-      // AmiGUS needs always 32bit per go...
-      if ( 4 == countA ) {
-
-        //Printf( "Writing A=0x%08lx\n", valueA );
-        LoadAmiGusWavetableSample( card, posA, valueA );
-        countA = 0;
-        valueA = 0;
-        posA += 4;
-      }
-      if ( 4 == countB ) {
-
-        //Printf( "Writing B=0x%08lx\n", valueB );
-        LoadAmiGusWavetableSample( card, posB, valueB );
-        countB = 0;
-        valueB = 0;
-        posB += 4;
-      }
     }
-  } while( 0 < available );
+
+    if ( 1 == wavData.WAV_Channels ) {
+
+      // 8bit or 16bit MONO - No need to fiddle around, can just be coppied
+
+      ULONG * buffer = wavData.WAV_buffer;
+
+      WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionA );
+      for ( i = 0; i < ( available >> 2 ); ++i ) {
+
+        WriteReg32( card, AMIGUS_WT_DATA_32BIT, buffer[ i ]);
+      }
+      positionA += available;
+      // Could also rely on auto-increment as it is only one channel,
+      // but we love symmetric code, don't we?
+
+    } else if ( 8 == wavData.WAV_SampleBits ) {
+
+      // 8bit STEREO - resort bytes from block into channels
+
+      UBYTE * buffer = wavData.WAV_buffer; // 1 Sample = 1 UBYTE
+      ULONG data;
+
+      // Channel A
+      WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionA );
+      data = 0;
+      for ( i = 0; i < available; i += 2 ) {
+
+        data = ( data << 8 );
+        data |= buffer[ i ];
+        // since buffer is UBYTE *, i is addressing BYTEs, too
+        if (( i & 6 ) == 6 ) {
+
+          // Triggered every 4 bytes with the i += 2 above!
+          WriteReg32( card, AMIGUS_WT_DATA_32BIT, data );
+          data = 0;
+        }
+      }
+      positionA += ( available >> 1 );
+
+      // Channel B
+      WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionB );
+      data = 0;
+      for ( i = 1; i < available; i += 2 ) {
+
+        data = ( data << 8 );
+        data |= buffer[ i ];
+        // since buffer is UBYTE *, i is addressing BYTEs, too
+        if (( i & 6 ) == 6 ) {
+
+          // Triggered every 4 bytes with the i += 2 above!
+          WriteReg32( card, AMIGUS_WT_DATA_32BIT, data );
+          data = 0;
+        }
+      }
+      positionB += ( available >> 1 );
+
+    } else {
+
+      // 16bit STEREO
+      UWORD * buffer = wavData.WAV_buffer; // 1 Sample = 1 UWORD
+      ULONG data;
+
+      // Channel A
+      WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionA );
+      data = 0;
+      for ( i = 0; i < ( available >> 1 ); i += 2 ) {
+
+        data = ( data << 16 );
+        data |= buffer[ i ];
+        // since buffer is UWORD *, i is addressing WORDs, too
+        if ( i & 2 ) {
+
+          // Triggered every 4 bytes with the i += 2 above!
+          WriteReg32( card, AMIGUS_WT_DATA_32BIT, data );
+          data = 0;
+        }
+      }
+      positionA += ( available >> 1 );
+
+      // Channel B
+      WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionB );
+      data = 0;
+      for ( i = 1; i < ( available >> 1 ); i += 2 ) {
+
+        data = ( data << 16 );
+        data |= buffer[ i ];
+        // since buffer is UWORD *, i is addressing WORDs, too
+        if ( i & 2 ) {
+
+          // Triggered every 4 bytes with the i += 2 above!
+          WriteReg32( card, AMIGUS_WT_DATA_32BIT, data );
+          data = 0;
+        }
+      }
+      positionB += ( available >> 1 );
+    }
+  }
 
   /*****************************************************************************
    * Starting playback finally... Easy, eh?
    ****************************************************************************/
 
   StartAmiGusWavetablePlayback( card,
-                                channels,
-                                samplerate,
-                                resolution,
-                                posA - 4 );
+                                wavData.WAV_Channels,
+                                wavData.WAV_SampleRate,
+                                wavData.WAV_SampleBits,
+                                positionA - 4 );
 
   Printf( "Did you know? AmiGUS can play alone...\n" );
 
+  CloseWav( &wavData );
   /*****************************************************************************
    * Sorry for the ... hack.
    ****************************************************************************/
 // Yes, this is awful, but keeps this demo code readable...
 cleanup:
-  if ( buffer ) {
 
-    FreeMem( buffer, 4096 );
-  }
-  if ( file ) {
-
-    Close( file );
-  }
   if ( amigus ) {
 
     AmiGUS_FreeCard( amigus, AMIGUS_FLAG_WAVETABLE, mainTask );

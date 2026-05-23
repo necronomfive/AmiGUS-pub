@@ -54,8 +54,8 @@ all: $(TARGET)
 clean:
 	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET) $(RM_SUFFIX)
 
-$(TARGET): $(TARGET).c
-	$(RUNNER) sc $(TARGET).c incdir=include: incdir=/include math=IEEE cpu=68000 link
+$(TARGET): $(TARGET).c WAV.c WAV.h
+	$(RUNNER) sc $(TARGET).c WAV.c incdir=include: incdir=/include math=IEEE cpu=68000 link
 
 release: $(TARGET) release0$(LINUX)
 

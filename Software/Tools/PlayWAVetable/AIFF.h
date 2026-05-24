@@ -16,63 +16,63 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WAV_H
-#define WAV_H
+#ifndef AIFF_H
+#define AIFF_H
 
 #include <dos/dos.h>
 #include <exec/types.h>
 
-struct wav {
+struct aiff {
 
-  BPTR  wav_File;
-  APTR  wav_Buffer;
-  UWORD wav_Channels;
-  ULONG wav_SampleRate;
-  ULONG wav_SampleBits;
-  ULONG wav_DataSize;
-  LONG  wav_DataOffset;
+  BPTR  aiff_File;
+  APTR  aiff_Buffer;
+  UWORD aiff_Channels;
+  ULONG aiff_SampleRate;
+  ULONG aiff_SampleBits;
+  ULONG aiff_DataSize;
+  LONG  aiff_DataOffset;
 };
 
 /*****************************************************
- * WAV file loading and parsing functions below.
+ * AIFF file loading and parsing functions below.
  *****************************************************/
 
 /**
- * Opens the WAV file and parses the header, filling the provided WAV struct.
+ * Opens the AIFF file and parses the header, filling the provided AIFF struct.
  *
- * @param wav Pointer to the WAV struct to be filled.
- * @param filename Path to the WAV file to be opened.
+ * @param aiff Pointer to the AIFF struct to be filled.
+ * @param filename Path to the AIFF file to be opened.
  *
  * Returns NoError = 0 on success,
  * or an error code on failure.
  */
-LONG OpenWav( struct wav * wav, STRPTR filename );
+LONG OpenAiff( struct aiff * aiff, STRPTR filename );
 
 /**
- * Closes the WAV file and frees any allocated resources.
+ * Closes the AIFF file and frees any allocated resources.
  *
- * @param wav Pointer to the WAV struct to be cleaned up.
+ * @param aiff Pointer to the AIFF struct to be cleaned up.
  */
-VOID CloseWav( struct wav * wav );
+VOID CloseAiff( struct aiff * aiff );
 
 /**
  * Reads the next chunk of sample data in little endian format
- * into the WAV's internal buffer.
+ * into the AIFF's internal buffer.
  *
- * @param wav Pointer to the WAV struct to be used.
+ * @param aiff Pointer to the AIFF struct to be used.
  *
  * @return Number of bytes read.
  */
-LONG ReadWavChunkLE( struct wav * wav );
+LONG ReadAiffChunkLE( struct aiff * aiff );
 
 /**
  * Reads the next chunk of sample data in big endian format
- * into the WAV's internal buffer.
+ * into the AIFF's internal buffer.
  *
- * @param wav Pointer to the WAV struct to be used.
+ * @param aiff Pointer to the AIFF struct to be used.
  *
  * @return Number of bytes read.
  */
-LONG ReadWavChunkBE( struct wav * wav );
+LONG ReadAiffChunkBE( struct aiff * aiff );
 
-#endif /* WAV_H */
+#endif /* AIFF_H */

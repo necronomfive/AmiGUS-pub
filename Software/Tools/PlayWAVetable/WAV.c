@@ -41,19 +41,25 @@
  * Implementation specific definitions below.
  *****************************************************************************/
 
-#define BUFFER_SIZE                 4096
+// BUFFER_SIZE is approximately 8k and nicely devisable by 
+// 1 for 8bit Mono
+// 2 for 8bit Stereo and 16bit Mono
+// 3 for 24bit Mono
+// 4 for 16bit Stereo and
+// 6 for 24bit Stereo
+#define BUFFER_SIZE                 8184
 
 /******************************************************************************
  * WAV is a x86 format, welcome to endianess-hell and the helper functions.
- ******************************************************extrem***********************/
+ *****************************************************************************/
 
-UWORD Swap16( UWORD value ) {
+static UWORD Swap16( UWORD value ) {
 
   return ( UWORD )((( value & 0xFF00 ) >> 8 ) |
                    (( value & 0x00FF ) << 8 ));
 }
 
-ULONG Swap32( ULONG value ) {
+static ULONG Swap32( ULONG value ) {
 
   return ((( value & 0xFF000000 ) >> 24 ) |
           (( value & 0x00FF0000 ) >>  8 ) |
@@ -170,16 +176,16 @@ VOID CloseWav( struct wav * wav ) {
   }
 }
 
-LONG ReadChunkLE( struct wav * wav ) {
+LONG ReadWavChunkLE( struct wav * wav ) {
 
   LONG result = Read( wav->wav_File, wav->wav_Buffer, BUFFER_SIZE );
   return result;
 }
 
-LONG ReadChunkBE( struct wav * wav ) {
+LONG ReadWavChunkBE( struct wav * wav ) {
 
   LONG i;
-  LONG result = ReadChunkLE( wav );
+  LONG result = ReadWavChunkLE( wav );
   if (( !( result )) || ( 8 == wav->wav_SampleBits )) {
 
     return result;

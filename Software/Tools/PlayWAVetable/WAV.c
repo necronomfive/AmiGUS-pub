@@ -105,7 +105,7 @@ LONG OpenWav( struct wav * wav, STRPTR filename ) {
   if ( RIFF_ID != ( * (( LONG * )( &( header[ position ] ))))) {
 
     CloseWav( wav );
-    return 3; // Invalid file format 1
+    return 4; // Invalid file format 1
   }
   // FileSize - ignored
   position += 8;
@@ -113,14 +113,14 @@ LONG OpenWav( struct wav * wav, STRPTR filename ) {
   if ( WAVE_ID != ( * (( LONG * )( &( header[ position ] ))))) {
 
     CloseWav( wav );
-    return 4; // Invalid file format 2
+    return 5; // Invalid file format 2
   }
   position += 4;
 
   if ( FMT_ID != ( * (( LONG * )( &( header[ position ] ))))) {
 
     CloseWav( wav );
-    return 5; // Invalid file format 3
+    return 6; // Invalid file format 3
   }
   // BlocSize - ignored
   position += 8;
@@ -128,7 +128,7 @@ LONG OpenWav( struct wav * wav, STRPTR filename ) {
   if ( 1 != Swap16( * (( WORD * )( &( header[ position ] ))))) {
 
     CloseWav( wav );
-    return 6; // Not a PCM WAV file
+    return 7; // Not a PCM WAV file
   }
   position += 2;
 
@@ -136,11 +136,16 @@ LONG OpenWav( struct wav * wav, STRPTR filename ) {
   if (( 1 > wav->wav_Channels ) || ( 2 < wav->wav_Channels )) {
 
     CloseWav( wav );
-    return 7; // Invalid channels
+    return 8; // Invalid channels
   }
   position += 2;
 
   wav->wav_SampleRate = Swap32( * (( ULONG * )( &( header[ position ] ))));
+  if (( 0 >= wav->wav_SampleRate ) || ( 192000 < wav->wav_SampleRate )) {
+
+    CloseWav( wav );
+    return 9;
+  }
   position += 10;
   // BytePerSec and BytePerBloc - ignored
 
@@ -150,7 +155,7 @@ LONG OpenWav( struct wav * wav, STRPTR filename ) {
   if ( DATA_ID != ( * (( LONG * )( &( header[ position ] ))))) {
 
     CloseWav( wav );
-    return 8; // Cannot read data size
+    return 10; // Invalid file format 4
   }
   position += 4;
 

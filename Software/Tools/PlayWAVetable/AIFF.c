@@ -123,7 +123,7 @@ LONG OpenAiff( struct aiff * aiff, STRPTR filename ) {
   if ( FORM_ID != ( * (( LONG * )( &( header[ position ] ))))) {
 
     CloseAiff( aiff );
-    return 3; // Invalid file format 1
+    return 4; // Invalid file format 1
   }
   // FileSize - ignored
   position += 8;
@@ -131,14 +131,14 @@ LONG OpenAiff( struct aiff * aiff, STRPTR filename ) {
   if ( AIFF_ID != ( * (( LONG * )( &( header[ position ] ))))) {
 
     CloseAiff( aiff );
-    return 4; // Invalid file format 2
+    return 5; // Invalid file format 2
   }
   position += 4;
 
   if ( COMM_ID != ( * (( LONG * )( &( header[ position ] ))))) {
 
     CloseAiff( aiff );
-    return 5; // Invalid file format 3
+    return 6; // Invalid file format 3
   }
   // ChunkSize - ignored
   position += 8;
@@ -147,7 +147,7 @@ LONG OpenAiff( struct aiff * aiff, STRPTR filename ) {
   if (( 1 > aiff->aiff_Channels ) || ( 2 < aiff->aiff_Channels )) {
 
     CloseAiff( aiff );
-    return 7; // Invalid channels
+    return 8; // Invalid channels
   }
   // SamplesPerChannel - ignored
   position += 6;

@@ -317,6 +317,7 @@ LONG LoadAiff( struct aiff * aiff, STRPTR filename ) {
     Printf( "Cannot read AIFF file, reason %ld.\n", result );
     return result;
   }
+  Printf( "Read AIFF file successfully.\n" );
   if (( 1 << 25 ) < aiff->aiff_DataSize ) {
 
     Printf( "File too big, max %ld but is %ld bytes.\n",
@@ -342,6 +343,7 @@ LONG LoadWav( struct wav * wav, STRPTR filename ) {
     Printf( "Cannot read WAV file, reason %ld.\n", result );
     return result;
   }
+  Printf( "Read WAV file successfully.\n" );
   if (( 1 << 25 ) < wav->wav_DataSize ) {
 
     Printf( "File too big, max %ld but is %ld bytes.\n",

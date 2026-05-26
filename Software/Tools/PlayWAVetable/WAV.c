@@ -16,8 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <exec/memory.h>
-
 #include <proto/dos.h>
 #include <proto/exec.h>
 

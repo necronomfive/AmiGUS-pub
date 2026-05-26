@@ -38,18 +38,6 @@
 #define HEADER_SIZE                 44
 
 /******************************************************************************
- * Implementation specific definitions below.
- *****************************************************************************/
-
-// BUFFER_SIZE is approximately 8k and nicely devisable by 
-// 1 for 8bit Mono
-// 2 for 8bit Stereo and 16bit Mono
-// 3 for 24bit Mono
-// 4 for 16bit Stereo and
-// 6 for 24bit Stereo
-#define BUFFER_SIZE                 8184
-
-/******************************************************************************
  * WAV is a x86 format, welcome to endianess-hell and the helper functions.
  *****************************************************************************/
 
@@ -79,7 +67,6 @@ LONG OpenWav( struct wav * wav, STRPTR filename ) {
   BYTE header[ HEADER_SIZE ];
 
   wav->wav_File = NULL;
-  wav->wav_Buffer = NULL;
 
   wav->wav_File = Open( filename, MODE_OLDFILE );
   if ( !( wav->wav_File )) {
@@ -93,13 +80,6 @@ LONG OpenWav( struct wav * wav, STRPTR filename ) {
 
     CloseWav( wav );
     return 2; // Could not read header.
-  }
-
-  wav->wav_Buffer = AllocMem( BUFFER_SIZE, MEMF_ANY );
-  if ( !wav->wav_Buffer ) {
-
-    CloseWav( wav );
-    return 3; // Could not alloc memory.
   }
 
   if ( RIFF_ID != ( * (( LONG * )( &( header[ position ] ))))) {
@@ -169,11 +149,6 @@ LONG OpenWav( struct wav * wav, STRPTR filename ) {
 
 VOID CloseWav( struct wav * wav ) {
 
-  if ( wav->wav_Buffer ) {
-
-    FreeMem( wav->wav_Buffer, BUFFER_SIZE );
-    wav->wav_Buffer = NULL;
-  }
   if ( wav->wav_File ) {
 
     Close( wav->wav_File );
@@ -181,24 +156,24 @@ VOID CloseWav( struct wav * wav ) {
   }
 }
 
-LONG ReadWavChunkLE( struct wav * wav ) {
+LONG ReadWavChunkLE( struct wav * wav, APTR data, LONG size ) {
 
-  LONG result = Read( wav->wav_File, wav->wav_Buffer, BUFFER_SIZE );
+  LONG result = Read( wav->wav_File, data, size );
   return result;
 }
 
-LONG ReadWavChunkBE( struct wav * wav ) {
+LONG ReadWavChunkBE( struct wav * wav, APTR data, LONG size ) {
 
   LONG i;
-  LONG result = ReadWavChunkLE( wav );
+  LONG result = ReadWavChunkLE( wav, data, size );
   if (( !( result )) || ( 8 == wav->wav_SampleBits )) {
 
     return result;
   }
 
-  for ( i = 0; i < ( BUFFER_SIZE >> 1 ); ++i ) {
+  for ( i = 0; i < ( size >> 1 ); ++i ) {
 
-    WORD * buffer = ( WORD * ) wav->wav_Buffer;
+    WORD * buffer = ( WORD * ) data;
     buffer[ i ] = Swap16( buffer[i] );
   }
 

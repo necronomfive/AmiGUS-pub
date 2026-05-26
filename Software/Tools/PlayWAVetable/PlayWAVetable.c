@@ -191,14 +191,14 @@ VOID StartAmiGusWavetablePlayback( APTR card,
  *
  * @param card Base address of the AmiGUS Wavetable part.
  * @param data Source address of the sample data blob.
- * @param length Number of BYTEs in the sample data blob.
+ * @param size Number of BYTEs in the sample data blob.
  * @param channels 1 for MONO, 2 for STEREO.
  * @param bits Bits per sample, 8 or 16.
  */
 VOID ShuffleCopySampleData(
   APTR card,
   APTR data,
-  LONG length,
+  LONG size,
   UWORD channels,
   UWORD bits ) {
 
@@ -215,11 +215,11 @@ VOID ShuffleCopySampleData(
     ULONG * buffer = data;
 
     WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionA );
-    for ( i = 0; i < ( length >> 2 ); ++i ) {
+    for ( i = 0; i < ( size >> 2 ); ++i ) {
 
       WriteReg32( card, AMIGUS_WT_DATA_32BIT, buffer[ i ]);
     }
-    positionA += length;
+    positionA += size;
     // Could also rely on auto-increment as it is only one channel,
     // but we love symmetric code, don't we?
 
@@ -234,7 +234,7 @@ VOID ShuffleCopySampleData(
     // Channel A
     WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionA );
     temp = 0;
-    for ( i = 0; i < length; i += 2 ) {
+    for ( i = 0; i < size; i += 2 ) {
 
       temp = ( temp << 8 );
       temp |= buffer[ i ];
@@ -246,12 +246,12 @@ VOID ShuffleCopySampleData(
         temp = 0;
       }
     }
-    positionA += ( length >> 1 );
+    positionA += ( size >> 1 );
 
     // Channel B
     WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionB );
     temp = 0;
-    for ( i = 1; i < length; i += 2 ) {
+    for ( i = 1; i < size; i += 2 ) {
 
       temp = ( temp << 8 );
       temp |= buffer[ i ];
@@ -263,7 +263,7 @@ VOID ShuffleCopySampleData(
         temp = 0;
       }
     }
-    positionB += ( length >> 1 );
+    positionB += ( size >> 1 );
 
   } else if ( 16 == bits ) {
 
@@ -276,7 +276,7 @@ VOID ShuffleCopySampleData(
     // Channel A
     WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionA );
     temp = 0;
-    for ( i = 0; i < ( length >> 1 ); i += 2 ) {
+    for ( i = 0; i < ( size >> 1 ); i += 2 ) {
 
       temp = ( temp << 16 );
       temp |= buffer[ i ];
@@ -288,12 +288,12 @@ VOID ShuffleCopySampleData(
         temp = 0;
       }
     }
-    positionA += ( length >> 1 );
+    positionA += ( size >> 1 );
 
     // Channel B
     WriteReg32( card, AMIGUS_WT_ADDRESS_32BIT, positionB );
     temp = 0;
-    for ( i = 1; i < ( length >> 1 ); i += 2 ) {
+    for ( i = 1; i < ( size >> 1 ); i += 2 ) {
 
       temp = ( temp << 16 );
       temp |= buffer[ i ];
@@ -305,7 +305,7 @@ VOID ShuffleCopySampleData(
         temp = 0;
       }
     }
-    positionB += ( length >> 1 );
+    positionB += ( size >> 1 );
   }
 }
 
@@ -361,17 +361,17 @@ LONG LoadWav( struct wav * wav, STRPTR filename ) {
   return result;
 }
 
-VOID PlayAiff( APTR card, struct aiff * aiff ) {
+VOID PlayAiff( APTR card, struct aiff * aiff, APTR data ) {
 
   LONG available;
   UWORD flags;
 
-  while ( available = ReadAiffChunkBE( aiff )) {
+  while ( available = ReadAiffChunkBE( aiff, data, AIFF_BUFFER_SIZE )) {
 
     // No unsigned -> signed conversion for 8bit in AIFF - ;)
     
     ShuffleCopySampleData( card,
-                           aiff->aiff_Buffer,
+                           data,
                            available,
                            aiff->aiff_Channels,
                            aiff->aiff_SampleBits );
@@ -393,12 +393,12 @@ VOID PlayAiff( APTR card, struct aiff * aiff ) {
                                 aiff->aiff_DataSize );
 }
 
-VOID PlayWav( APTR card, struct wav * wav ) {
+VOID PlayWav( APTR card, struct wav * wav, APTR data ) {
 
   LONG available;
   UWORD flags;
 
-  while ( available = ReadWavChunkLE( wav )) {
+  while ( available = ReadWavChunkLE( wav, data, WAV_BUFFER_SIZE )) {
 
     if ( 8 == wav->wav_SampleBits ) {
 
@@ -408,7 +408,7 @@ VOID PlayWav( APTR card, struct wav * wav ) {
        *   WAV 8bit is unsigned, 16 bit is signed.
        */
 
-      UBYTE * buffer = wav->wav_Buffer;
+      UBYTE * buffer = data;
       LONG i;
 
       for ( i = 0; i < available; ++i ) {
@@ -419,7 +419,7 @@ VOID PlayWav( APTR card, struct wav * wav ) {
     }
 
     ShuffleCopySampleData( card,
-                           wav->wav_Buffer,
+                           data,
                            available,
                            wav->wav_Channels,
                            wav->wav_SampleBits );
@@ -452,6 +452,9 @@ int main( int argc, char **argv ) {
   struct Task * mainTask = FindTask( NULL );
   struct aiff aiff;
   struct wav wav;
+
+  APTR data = NULL;
+  LONG size = 0;
 
   LONG result;
 
@@ -515,7 +518,9 @@ int main( int argc, char **argv ) {
 
     Printf( "Playing WAV on card 0x%08lx (eb0000)\n",
             amigus->agus_WavetableBase );
-    PlayWav( amigus->agus_WavetableBase, &wav );
+    size = WAV_BUFFER_SIZE;
+    data = AllocMem( size, MEMF_ANY );
+    PlayWav( amigus->agus_WavetableBase, &wav, data );
     CloseWav( &wav );
 
   } else {
@@ -525,7 +530,9 @@ int main( int argc, char **argv ) {
 
       Printf( "Playing AIFF on card 0x%08lx (eb0000)\n",
               amigus->agus_WavetableBase );
-      PlayAiff( amigus->agus_WavetableBase, &aiff );
+      size = AIFF_BUFFER_SIZE;
+      data = AllocMem( size, MEMF_ANY );
+      PlayAiff( amigus->agus_WavetableBase, &aiff, data );
       CloseAiff( &aiff );
 
     } else{
@@ -542,6 +549,9 @@ int main( int argc, char **argv ) {
 // Yes, this is awful, but keeps this demo code readable...
 cleanup:
 
+  if ( data ) {
+    FreeMem( data, size );
+  }
   if ( amigus ) {
 
     AmiGUS_FreeCard( amigus, AMIGUS_FLAG_WAVETABLE, mainTask );

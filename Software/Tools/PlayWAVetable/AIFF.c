@@ -38,18 +38,6 @@
 #define HEADER_SIZE                 54
 
 /******************************************************************************
- * Implementation specific definitions below.
- *****************************************************************************/
-
-// BUFFER_SIZE is approximately 8k and nicely devisable by 
-// 1 for 8bit Mono
-// 2 for 8bit Stereo and 16bit Mono
-// 3 for 24bit Mono
-// 4 for 16bit Stereo and
-// 6 for 24bit Stereo
-#define BUFFER_SIZE                 8184
-
-/******************************************************************************
  * AIFF is a m68 format, nice big endian and all cool.
  * But maybe we need little endian every now and then?
  *****************************************************************************/
@@ -96,9 +84,6 @@ LONG OpenAiff( struct aiff * aiff, STRPTR filename ) {
 
   BYTE header[ HEADER_SIZE ];
 
-  aiff->aiff_File = NULL;
-  aiff->aiff_Buffer = NULL;
-
   aiff->aiff_File = Open( filename, MODE_OLDFILE );
   if ( !( aiff->aiff_File )) {
 
@@ -111,13 +96,6 @@ LONG OpenAiff( struct aiff * aiff, STRPTR filename ) {
 
     CloseAiff( aiff );
     return 2; // Could not read header.
-  }
-
-  aiff->aiff_Buffer = AllocMem( BUFFER_SIZE, MEMF_ANY );
-  if ( !aiff->aiff_Buffer ) {
-
-    CloseAiff( aiff );
-    return 3; // Could not alloc memory.
   }
 
   if ( FORM_ID != ( * (( LONG * )( &( header[ position ] ))))) {
@@ -195,11 +173,6 @@ LONG OpenAiff( struct aiff * aiff, STRPTR filename ) {
 
 VOID CloseAiff( struct aiff * aiff ) {
 
-  if ( aiff->aiff_Buffer ) {
-
-    FreeMem( aiff->aiff_Buffer, BUFFER_SIZE );
-    aiff->aiff_Buffer = NULL;
-  }
   if ( aiff->aiff_File ) {
 
     Close( aiff->aiff_File );
@@ -207,26 +180,26 @@ VOID CloseAiff( struct aiff * aiff ) {
   }
 }
 
-LONG ReadAiffChunkLE( struct aiff * aiff ) {
+LONG ReadAiffChunkLE( struct aiff * aiff, APTR data, LONG size ) {
 
   LONG i;
-  LONG result = ReadAiffChunkBE( aiff );
+  LONG result = ReadAiffChunkBE( aiff, data, size );
   if (( !( result )) || ( 8 == aiff->aiff_SampleBits )) {
 
     return result;
   }
 
-  for ( i = 0; i < ( BUFFER_SIZE >> 1 ); ++i ) {
+  for ( i = 0; i < ( size >> 1 ); ++i ) {
 
-    WORD * buffer = ( WORD * ) aiff->aiff_Buffer;
+    WORD * buffer = ( WORD * ) data;
     buffer[ i ] = Swap16( buffer[i] );
   }
 
   return result;
 }
 
-LONG ReadAiffChunkBE( struct aiff * aiff ) {
+LONG ReadAiffChunkBE( struct aiff * aiff, APTR data, LONG size ) {
 
-  LONG result = Read( aiff->aiff_File, aiff->aiff_Buffer, BUFFER_SIZE );
+  LONG result = Read( aiff->aiff_File, data, size );
   return result;
 }

@@ -22,10 +22,21 @@
 #include <dos/dos.h>
 #include <exec/types.h>
 
+/**
+ * AIFF_BUFFER_SIZE is approximately 8k and nicely devisable by 
+ * 1 for 8bit Mono
+ * 2 for 8bit Stereo and 16bit Mono
+ * 3 for 24bit Mono
+ * 4 for 16bit Stereo and
+ * 6 for 24bit Stereo
+ * 
+ * ... and therefore, a nice default.
+ */
+#define AIFF_BUFFER_SIZE            8184
+
 struct aiff {
 
   BPTR  aiff_File;
-  APTR  aiff_Buffer;
   UWORD aiff_Channels;
   ULONG aiff_SampleRate;
   ULONG aiff_SampleBits;
@@ -60,19 +71,23 @@ VOID CloseAiff( struct aiff * aiff );
  * into the AIFF's internal buffer.
  *
  * @param aiff Pointer to the AIFF struct to be used.
+ * @param data Pointer to where the data chunk should be stored.
+ * @param size Size of the data chunk
  *
  * @return Number of bytes read.
  */
-LONG ReadAiffChunkLE( struct aiff * aiff );
+LONG ReadAiffChunkLE( struct aiff * aiff, APTR data, LONG size );
 
 /**
  * Reads the next chunk of sample data in big endian format
  * into the AIFF's internal buffer.
  *
  * @param aiff Pointer to the AIFF struct to be used.
+ * @param data Pointer to where the data chunk should be stored.
+ * @param size Size of the data chunk
  *
  * @return Number of bytes read.
  */
-LONG ReadAiffChunkBE( struct aiff * aiff );
+LONG ReadAiffChunkBE( struct aiff * aiff, APTR data, LONG size );
 
 #endif /* AIFF_H */

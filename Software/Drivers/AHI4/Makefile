@@ -37,7 +37,9 @@ ifeq ($(findstring /home,$(HOME)), /home)
   # machine <ip> login username password pass
   # Could do --user username:pass instead - but not cool in repo ;)
   INSTALL0       = curl --netrc --upload-file $(MODE_FILE_DEST) ftp://192.168.0.4/cf0/Devs/AudioModes/
+  INSTALL0       = curl --netrc --upload-file $(MODE_FILE_DEST) ftp://192.168.0.12/sda4/Devs/AudioModes/
   INSTALL1       = curl --netrc --upload-file $(LIB_FILE_DEST)  ftp://192.168.0.4/cf0/Devs/AHI/$(LIB_NAME).audio
+  INSTALL1       = curl --netrc --upload-file $(LIB_FILE_DEST)  ftp://192.168.0.12/sda4/Devs/AHI/$(LIB_NAME).audio
   INSTALL2       =
 else
   AMIGAOS       = 1
@@ -66,7 +68,7 @@ SDIR   = src/
 HDIR   = header/
 
 LIB_CPU        ?= 000
-LIB_LOG        ?= MEM_LOG
+LIB_LOG        ?= NO_LOG
 # NO_LOG
 # SER_LOG
 # FILE_LOG
@@ -74,7 +76,7 @@ LIB_LOG        ?= MEM_LOG
 LIB_NAME        = AmiGUS
 LIB_FILE        = $(LIB_NAME).audio
 LIB_VERSION     = 4
-LIB_REVISION    = 21
+LIB_REVISION    = 22
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =

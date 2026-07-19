@@ -53,11 +53,11 @@ all: $(TARGET0) $(TARGET1)
 clean:
 	-$(RM) $(WILDCARD).o $(WILDCARD).lnk $(TARGET0) $(TARGET1) $(RM_SUFFIX)
 
-$(TARGET0):
-	$(RUNNER) sc $@.c incdir=include: cpu=68000 link
+$(TARGET0): $(TARGET0).c
+	$(RUNNER) sc $@.c incdir=include: incdir=/include cpu=68000 link
 
-$(TARGET1):
-	$(RUNNER) sc $@.c incdir=include: incdir=gus:../../dependencies/include cpu=68000 link
+$(TARGET1): $(TARGET1).c
+	$(RUNNER) sc $@.c incdir=include: incdir=/include incdir=gus:../dependencies/include incdir=/include cpu=68000 link
 
 release: $(TARGET0) $(TARGET1) release0$(LINUX)
 
@@ -72,3 +72,9 @@ release01:
 	$(LHA) a \
 		$(FOLDER)/Release/$(TARGET)_`date +%y%m%d`.lha \
 		$$FILES
+
+install: all
+	-cp $(TARGET0) ~/Documents/FS-UAE/Shared/Projekte/AmiGUS/$(TARGET0)
+	-curl --connect-timeout 2 --netrc --upload-file $(TARGET0)       ftp://192.168.0.12/sda4/Expansion/AmiGUS/$(TARGET0)
+	-curl --connect-timeout 2 --netrc --upload-file $(TARGET0)       ftp://192.168.0.4/cf0/Expansion/AmiGUS/$(TARGET0)
+	-curl --connect-timeout 2 --netrc --upload-file $(TARGET0)       ftp://192.168.0.100/cf3/Expansion/AmiGUS/$(TARGET0)

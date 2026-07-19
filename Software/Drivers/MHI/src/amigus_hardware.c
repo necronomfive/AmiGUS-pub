@@ -19,6 +19,7 @@
 #include <proto/exec.h>
 
 #include "amigus_hardware.h"
+#include "amigus_mhi.h"
 #include "debug.h"
 #include "SDI_compiler.h"
 

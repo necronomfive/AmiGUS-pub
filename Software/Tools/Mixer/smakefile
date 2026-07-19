@@ -5,7 +5,7 @@ LINKER=slink
 LIBER=oml
 CPU=68060
 MATH=standard
-
+INCDIR=/include
 
 
 # List of C object files to include

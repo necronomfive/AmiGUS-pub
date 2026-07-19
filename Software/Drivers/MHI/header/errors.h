@@ -31,14 +31,13 @@ enum ErrorCodes
   ELibraryBaseInconsistency,
   EOpenDosBase,
   EOpenIntuitionBase,
-  EOpenExpansionBase,
+  EOpenAmiGusBase,
   EOpenLogFile,
   EAllocateLogMem,
   EHandleUnknown,
   EAllocateInterrupt,
   EAllocateHandle,
   EAllocateBuffer,
-  EDriverInUse,
   EDriverNotInUse,
 
   /* Missing implementation 100-199*/
@@ -46,7 +45,6 @@ enum ErrorCodes
 
   /* Hardware errors 200-300 */
   EAmiGUSNotFound = 200,
-  EAmiGUSDetectError,
   EAmiGUSFirmwareOutdated,
 
   /* Insert errors above. */

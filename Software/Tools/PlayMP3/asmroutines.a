@@ -41,12 +41,13 @@ initFIFOLoop:
         LABEL RBFDATA_SIZEOF
 
 * Entered with:       A0 == scratch (execpt for highest pri vertb server)
-*  D0 == scratch      A1 == is_Data
-*  D1 == scratch      A5 == vector to interrupt code (scratch)
+*  D0 == scratch      A1 == scratch
+*  D1 == is_Data      A5 == vector to interrupt code (scratch)
 *                     A6 == scratch
 *
 
 _intServer:
+    move.l  d1,a1
 	move.l 	board_base(a1),a6	; get AmiGUS hardware register base
 	move.w	$00(a6),d0			; read interrupt status
 	and.w   #$4,d0				; did FIFO watermark irq occur?

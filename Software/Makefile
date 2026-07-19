@@ -23,6 +23,7 @@ TARGET_DIR13       = $(BDIR)/AmiGUS13
 ADF_DIR1           = $(BDIR)/AmiGUS-ADF1
 ADF_DIR2           = $(BDIR)/AmiGUS-ADF2
 ADF_DIR3           = $(BDIR)/AmiGUS-ADF3
+ADF_DIR4           = $(BDIR)/AmiGUS-ADF4
 
 TOOL_DIR           = $(TARGET_DIR)/Tools
 AHI_DIR            = $(TARGET_DIR)/AHI4
@@ -37,6 +38,7 @@ TARGET_LHA13       = $(BDIR)/AmiGUS13-`date +%Y%m%d`.lha
 ADF_IMAGE1         = $(BDIR)/AmiGUS-Tools-`date +%Y%m%d`.adf
 ADF_IMAGE2         = $(BDIR)/AmiGUS-Manual-`date +%Y%m%d`.adf
 ADF_IMAGE3         = $(BDIR)/AmiGUS-OS1.3-`date +%Y%m%d`.adf
+ADF_IMAGE4         = $(BDIR)/AmiGUS-Firmware-`date +%Y%m%d`.adf
 
 DRIVER_MAKES = $(shell find Drivers -mindepth 1 -maxdepth 2 -type f -name Makefile)
 DRIVERS = $(dir $(DRIVER_MAKES))
@@ -48,7 +50,7 @@ DRIVERS/SUPPORT = $(foreach DRIVER,$(DRIVERS),$(DRIVER)support)
 CPUS = 000 020 040
 LOGGINGS = NO_LOG SER_LOG FILE_LOG MEM_LOG
 
-TOOLS = $(shell find Tools -mindepth 1 -maxdepth 1 -type d)
+TOOLS = $(shell find Tools -mindepth 1 -maxdepth 1 -type d -not -path Tools/include)
 TOOLS/ALL = $(foreach TOOL,$(TOOLS),$(TOOL)/all)
 TOOLS/CLEAN = $(foreach TOOL,$(TOOLS),$(TOOL)/clean)
 
@@ -120,12 +122,14 @@ package:
 	-umount $(ADF_DIR1)
 	-umount $(ADF_DIR2)
 	-umount $(ADF_DIR3)
+	-umount $(ADF_DIR4)
 	rm -rf $(TARGET_DIR) $(TARGET_LHA) \
 	       $(TARGET_DIR13) $(TARGET_LHA13) \
 	       $(ADF_DIR1) $(ADF_IMAGE1) \
 	       $(ADF_DIR2) $(ADF_IMAGE2) \
-	       $(ADF_DIR3) $(ADF_IMAGE3)
-	mkdir -p $(ADF_DIR1) $(ADF_DIR2) $(ADF_DIR3) \
+	       $(ADF_DIR3) $(ADF_IMAGE3) \
+	       $(ADF_DIR4) $(ADF_IMAGE4)
+	mkdir -p $(ADF_DIR1) $(ADF_DIR2) $(ADF_DIR3) $(ADF_DIR4) \
 	         $(TARGET_DIR) $(TARGET_DIR13)
 
 	###########################################################################
@@ -137,11 +141,11 @@ package:
 	fuseadf $(ADF_IMAGE1) $(ADF_DIR1)/
 
 	mkdir -p $(ADF_DIR1)/Tools           \
+	         $(ADF_DIR1)/Base            \
 	         $(ADF_DIR1)/AHI4            \
 	         $(ADF_DIR1)/AHI4/AHI        \
 			 $(ADF_DIR1)/AHI4/AudioModes \
-			 $(ADF_DIR1)/MHI             \
-			 $(ADF_DIR1)/Firmware 
+			 $(ADF_DIR1)/MHI
 
 	cp Installer/Tools.info                     $(ADF_DIR1)/
 	cp Installer/AHI4.info                      $(ADF_DIR1)/
@@ -160,10 +164,19 @@ package:
 	cp Tools/PlayWAV/PlayWav.info               $(ADF_DIR1)/Tools
 	cp Tools/Record/Record                      $(ADF_DIR1)/Tools
 	cp Tools/Record/Record.info                 $(ADF_DIR1)/Tools
+	
+	cp Drivers/Base/target/get_mem_log          $(ADF_DIR1)/Base/GetAmiGUSMemLog
+	cp Installer/program.info                   $(ADF_DIR1)/Base/GetAmiGUSMemLog.info
+	cp Drivers/Base/target/amigus_lib_check     $(ADF_DIR1)/Base/AmiGUSLibCheck
+	cp Installer/program.info                   $(ADF_DIR1)/Base/AmiGUSLibCheck.info
+	cp Drivers/Base/target/amigus-dev.lha       $(ADF_DIR1)/Base
+	cp Drivers/Base/target/*.library*           $(ADF_DIR1)/Base
+
 	cp Drivers/AHI4/target/get_mem_log          $(ADF_DIR1)/AHI4/GetAhiMemLog
 	cp Installer/program.info                   $(ADF_DIR1)/AHI4/GetAhiMemLog.info
 	cp Drivers/AHI4/target/*.audio*             $(ADF_DIR1)/AHI4/AHI
 	cp Drivers/AHI4/target/AMIGUS               $(ADF_DIR1)/AHI4/AudioModes
+
 	cp Drivers/MHI/target/get_mem_log           $(ADF_DIR1)/MHI/GetMhiMemLog
 	cp Installer/program.info                   $(ADF_DIR1)/MHI/GetMhiMemLog.info
 	cp Drivers/MHI/target/mhi_lib_check         $(ADF_DIR1)/MHI/MHILibCheck
@@ -187,10 +200,22 @@ package:
 	cp Installer/English.info                   $(ADF_DIR1)/
 	cp Installer/Deutsch.info                   $(ADF_DIR1)/
 
+	###########################################################################
+	# Firmware adf
+	###########################################################################
+
+	adf_floppy_create $(ADF_IMAGE4) dd
+	adf_format -l AmiGUS-Firmware -t 0 -f $(ADF_IMAGE4)
+	fuseadf $(ADF_IMAGE4) $(ADF_DIR4)/
+
+	mkdir -p $(ADF_DIR4)/Firmware
+
+	cp Installer/Disk.info                      $(ADF_DIR4)/
+
 	LATEST_FW=`find ../FPGA/Releases/Amiga/ | grep "\.upd" | sort | tail -n 1` ;\
 	BASENAME_FW=`basename $$LATEST_FW`                          ;\
-	cp $$LATEST_FW                              $(ADF_DIR1)/Firmware       ;\
-	cp Installer/fw.info                        $(ADF_DIR1)/Firmware/$$BASENAME_FW.info
+	cp $$LATEST_FW                              $(ADF_DIR4)/Firmware       ;\
+	cp Installer/fw.info                        $(ADF_DIR4)/Firmware/$$BASENAME_FW.info
 
 	###########################################################################
 	# Manual adf
@@ -218,7 +243,7 @@ package:
 	adf_format -l AmiGUS-OS1.3 -t 0 -f $(ADF_IMAGE3)
 	fuseadf $(ADF_IMAGE3) $(ADF_DIR3)/
 
-	mkdir -p $(ADF_DIR3)/Tools $(ADF_DIR3)/Firmware $(ADF_DIR3)/MHI
+	mkdir -p $(ADF_DIR3)/Tools $(ADF_DIR3)/Firmware $(ADF_DIR3)/Base $(ADF_DIR3)/MHI
 
 	cp Installer/13/Tools.info                  $(ADF_DIR3)/Tools.info
 	cp Installer/13/MHI.info                    $(ADF_DIR3)/MHI.info
@@ -235,9 +260,18 @@ package:
 	cp Tools/PlayMP3/PlayMP3.info               $(ADF_DIR3)/Tools
 	cp Tools/PlayWAV/PlayWav                    $(ADF_DIR3)/Tools
 	cp Tools/PlayWAV/PlayWav.info               $(ADF_DIR3)/Tools
+	cp Tools/PlayWAVetable/PlayWAVetable        $(ADF_DIR3)/Tools
+	cp Tools/PlayWAVetable/PlayWAVetable.info   $(ADF_DIR3)/Tools
 	cp Tools/Record/Record                      $(ADF_DIR3)/Tools
 	cp Tools/Record/Record.info                 $(ADF_DIR3)/Tools
 	cp -R dependencies/libs                     $(ADF_DIR3)/Libs
+
+	cp Drivers/Base/target/get_mem_log          $(ADF_DIR3)/Base/GetAmiGUSMemLog
+	cp Installer/program.info                   $(ADF_DIR3)/Base/GetAmiGUSMemLog.info
+	cp Drivers/Base/target/amigus_lib_check     $(ADF_DIR3)/Base/AmiGUSLibCheck
+	cp Installer/program.info                   $(ADF_DIR3)/Base/AmiGUSLibCheck.info
+	cp Drivers/Base/target/*.library*           $(ADF_DIR3)/Base
+
 	cp Drivers/MHI/target/get_mem_log           $(ADF_DIR3)/MHI/GetMhiMemLog
 	cp Installer/program.info                   $(ADF_DIR3)/MHI/GetMhiMemLog.info
 	cp Drivers/MHI/target/mhi_lib_check         $(ADF_DIR3)/MHI/MHILibCheck
@@ -277,6 +311,7 @@ package:
 
 	cp -R $(ADF_DIR1)/*                         $(TARGET_DIR)
 	cp -R $(ADF_DIR2)/*                         $(TARGET_DIR)/Manual
+	cp -R $(ADF_DIR4)/*                         $(TARGET_DIR)
 
 	rm $(TARGET_DIR)/Disk.info
 	rm $(TARGET_DIR)/Manual/Disk.info
@@ -305,10 +340,12 @@ package:
 	umount $(ADF_DIR1)/
 	umount $(ADF_DIR2)/
 	umount $(ADF_DIR3)/
+	umount $(ADF_DIR4)/
 
 	-cp $(ADF_IMAGE1) /media/chritoph/HXC/
 	-cp $(ADF_IMAGE2) /media/chritoph/HXC/
 	-cp $(ADF_IMAGE3) /media/chritoph/HXC/
+	-cp $(ADF_IMAGE4) /media/chritoph/HXC/
 
 	###########################################################################
 	# DONE
@@ -318,12 +355,12 @@ package:
 
 all-variants: tools drivers support
 
-tools: prepare-tools $(TOOLS/ALL)
+tools: prepare-base prepare-tools $(TOOLS/ALL)
 
 support: $(DRIVERS/SUPPORT)
 	echo $(DRIVERS/SUPPORT)
 
-drivers: $(DRIVERS/ALL) 
+drivers: prepare-base prepare-ahi prepare-mhi $(DRIVERS/ALL) 
 
 prepare-tools:
 	mkdir -p /tmp/tools-installation
@@ -354,20 +391,28 @@ prepare-mhi:
 	cp -R    /tmp/mhi-installation/Include/clib                 Drivers/MHI/include
 	touch prepare-mhi
 
+prepare-base:
+	make -C Drivers/Base -f Makefile-Includes INCLUDES install
+	mkdir -p Tools/include
+	cp -R Drivers/Base/include/C/* Tools/include
+	touch prepare-base
+
 clean: $(DRIVERS/CLEAN) $(TOOLS/CLEAN)
-	rm -rf $(ADF_IMAGE1) $(ADF_DIR1) $(ADF_IMAGE2) $(ADF_DIR2) $(TARGET_DIR) $(TARGET_LHA) $(BDIR)
+	rm -rf $(ADF_IMAGE1) $(ADF_DIR1) $(ADF_IMAGE2) $(ADF_DIR2) $(ADF_IMAGE3) $(ADF_DIR3) $(ADF_IMAGE4) $(ADF_DIR4) $(TARGET_DIR) $(TARGET_LHA) $(BDIR)
 
 dist-clean: $(DRIVERS/DIST-CLEAN) clean
 	rm -rf Drivers/*/include
-	rm -rf /tmp/mhi-installation prepare-mhi
+	rm -rf Tools/include
 	rm -rf /tmp/ahi4-installation prepare-ahi
+	rm -rf /tmp/ahi4-installation prepare-base
+	rm -rf /tmp/mhi-installation prepare-mhi
 	rm -rf /tmp/gt34-installation prepare-tools
 
 $(DRIVERS/CLEAN) $(DRIVERS/SUPPORT) $(TOOLS/ALL) $(TOOLS/CLEAN):
 	echo -C $(@D) $(@F)
 	$(MAKE) -C $(@D) $(@F)
 
-$(DRIVERS/ALL): prepare-ahi prepare-mhi
+$(DRIVERS/ALL): prepare-base prepare-ahi prepare-mhi
 	for CPU in $(CPUS)                                              ;\
 	do                                                               \
 		for LOGGING in $(LOGGINGS)                                  ;\

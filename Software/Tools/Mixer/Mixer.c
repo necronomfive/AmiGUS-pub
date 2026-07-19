@@ -36,11 +36,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <clib/graphics_protos.h>
 #include <clib/intuition_protos.h>
 #include <clib/gadtools_protos.h>
-#include <clib/expansion_protos.h>
 #include <hardware/intbits.h>
-#include <proto/expansion.h>
 
 #include <stdio.h>
+
+#include <proto/amigus.h>
 
 #ifdef LATTICE
 int CXBRK(void)    { return(0); }  /* Disable Lattice CTRL/C handling */
@@ -155,9 +155,9 @@ extern void intServer();
 struct TextAttr Topaz80 = { "topaz.font", 8, 0, 0, };
 
 struct Library      *IntuitionBase;
-struct Library      *ExpansionBase;
 struct Library      *GfxBase;
 struct Library      *GadToolsBase;
+struct Library      *AmiGUS_Base;
 
 short myBorderData[] =
 {
@@ -1690,15 +1690,13 @@ void GadToolsWindow(void)
 	struct Window   	*myWin;
 	struct Gadget   	*gadList, *myGads[24];
 	struct mixData		*mixDat;
-	struct ConfigDev 	*myCD;
+	struct AmiGUS 	    *myAmiGUS;
 	
 	struct Interrupt 	*mixerInt;
 	struct intData 		*intData;		
 	
 	void            	*vi;
 
-	UBYTE	boardProdId;
-	UWORD	boardManufacId;
 	APTR	boardBase;
 	
 	UWORD	topBorder;
@@ -1706,29 +1704,19 @@ void GadToolsWindow(void)
 	ULONG	waitMask;
 	BYTE	sigNr;
 	
-#ifndef DEBUG
-	BOOL	boardFound = FALSE;
+#ifdef DEBUG
+	BOOL	requireBoard = FALSE;
 #else
-	BOOL	boardFound = TRUE;
+	BOOL	requireBoard = TRUE;
 #endif
 
 	/* ================ Find AmiGUS card ================ */
-	
-	myCD = NULL;
-    while(myCD=FindConfigDev(myCD,-1L,-1L)) /* search for all ConfigDevs */	
+
+	myAmiGUS = AmiGUS_FindCard(NULL);
+
+	if ((myAmiGUS) || (!requireBoard))
 	{
-		boardManufacId = myCD->cd_Rom.er_Manufacturer;
-		boardProdId = myCD->cd_Rom.er_Product;
-		boardBase = myCD->cd_BoardAddr;
-		if (boardManufacId == AMIGUS_MANUFACTURER_ID && boardProdId == AMIGUS_MAIN_PRODUCT_ID)
-		{
-			boardFound = TRUE;
-			break;
-		}
-	}
-	
-	if (boardFound == TRUE)
-	{
+		boardBase = myAmiGUS->agus_PcmBase;
 		//printf("AmiGUS found at $%lx\n",boardBase);
 	}
 	else
@@ -1860,7 +1848,7 @@ void GadToolsWindow(void)
 				else
 				{
 					if (NULL == (myWin = OpenWindowTags(NULL,
-							WA_Title,     "AmiGUS Mixer V0.67 - (c)2025 by O. Achten",
+							WA_Title,     "AmiGUS Mixer V0.68 - (c)2025 by O. Achten",
 							WA_Gadgets,   gadList,      WA_AutoAdjust,    TRUE,
 							WA_Width,       528,      WA_MinWidth,        50,
 							WA_InnerHeight, 154,      WA_MinHeight,       50,
@@ -1907,8 +1895,8 @@ void main(void)
 		printf( "Requires V37 intuition.library\n");
 	else
 	{
-		if (NULL == (ExpansionBase = OpenLibrary("expansion.library", 34)))
-			printf("Requires V37 expansion.library\n");
+		if (NULL == (AmiGUS_Base = OpenLibrary("amigus.library", 1)))
+			printf("Requires V1 amigus.library\n");
 		else	
 		{
 			if (NULL == (GfxBase = OpenLibrary("graphics.library", 34)))
@@ -1925,7 +1913,7 @@ void main(void)
 				}
 				CloseLibrary(GfxBase);
 			}
-			CloseLibrary(ExpansionBase);
+			CloseLibrary(AmiGUS_Base);
 		}
 		CloseLibrary(IntuitionBase);	
 	}

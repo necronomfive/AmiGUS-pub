@@ -18,12 +18,12 @@
 
 #include <intuition/intuitionbase.h>
 #include <libraries/expansionbase.h>
+#include <proto/amigus.h>
 #include <proto/dos.h>
 #include <proto/exec.h>
 #include <proto/utility.h>
 
 #include "amigus_ahi_sub.h"
-#include "amigus_pcm.h"
 #include "debug.h"
 #include "errors.h"
 #include "library.h"
@@ -36,8 +36,9 @@ struct DosLibrary        * DOSBase           = 0;
 struct IntuitionBase     * IntuitionBase     = 0;
 struct Library           * UtilityBase       = 0;
 struct Library           * ExpansionBase     = 0;
+struct Library           * AmiGUS_Base       = 0;
 struct Device            * TimerBase         = 0;
-struct AmiGUS_AHI_Base        * AmiGUS_AHI_Base        = 0;
+struct AmiGUS_AHI_Base   * AmiGUS_AHI_Base   = 0;
 
 #endif
 
@@ -106,6 +107,12 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
 
     return EOpenExpansionBase;
   }
+  base->agb_AmiGUS_Base =
+    ( struct Library * ) OpenLibrary( "amigus.library", 1 );
+  if ( !( base->agb_AmiGUS_Base )) {
+
+    return EOpenAmiGusBase;
+  }
   amiGUSBase->agb_TimerRequest = AllocMem( sizeof(struct IORequest),
                                            MEMF_ANY | MEMF_CLEAR );
   if( !(amiGUSBase->agb_TimerRequest) ) {
@@ -120,19 +127,40 @@ LONG CustomLibInit( LIBRARY_TYPE * base, struct ExecBase * sysBase ) {
   amiGUSBase->agb_TimerBase = amiGUSBase->agb_TimerRequest->io_Device;
 
 #ifdef BASE_GLOBAL
-  DOSBase       = amiGUSBase->agb_DOSBase;
-  IntuitionBase = amiGUSBase->agb_IntuitionBase;
-  UtilityBase   = amiGUSBase->agb_UtilityBase;
-  ExpansionBase = amiGUSBase->agb_ExpansionBase;
-  TimerBase     = amiGUSBase->agb_TimerBase;
-  AmiGUS_AHI_Base    = amiGUSBase;
+  DOSBase         = amiGUSBase->agb_DOSBase;
+  IntuitionBase   = amiGUSBase->agb_IntuitionBase;
+  UtilityBase     = amiGUSBase->agb_UtilityBase;
+  ExpansionBase   = amiGUSBase->agb_ExpansionBase;
+  AmiGUS_Base     = base->agb_AmiGUS_Base;
+  TimerBase       = amiGUSBase->agb_TimerBase;
+  AmiGUS_AHI_Base = amiGUSBase;
 #endif
 
   LOG_D(( "D: AmiGUS base ready @ 0x%08lx\n", amiGUSBase ));
-  error = FindAmiGusPcm( amiGUSBase );
+  amiGUSBase->agb_AmiGUS = AmiGUS_FindCard( amiGUSBase->agb_AmiGUS );
+  if ( !( amiGUSBase->agb_AmiGUS )) {
+
+    error = EAmiGUSNotFound;
+
+  } else if ( AMIGUS_AHI_FIRMWARE_MINIMUM 
+    > amiGUSBase->agb_AmiGUS->agus_FirmwareRev ) {
+
+    error = EAmiGUSFirmwareOutdated;
+
+  } else {
+
+    error = AmiGUS_ReserveCard( amiGUSBase->agb_AmiGUS,
+                                AMIGUS_FLAG_PCM,
+                                amiGUSBase );
+  }
   if ( error ) {
 
     DisplayError( error );
+
+  } else {
+
+    amiGUSBase->agb_CardBase = amiGUSBase->agb_AmiGUS->agus_PcmBase;
+    amiGUSBase->agb_UsageCounter = 0;
   }
   LOG_I(( "I: %s\n", LIBRARY_IDSTRING ));
   return ENoError;
@@ -142,6 +170,9 @@ VOID CustomLibClose( LIBRARY_TYPE * base ) {
 
   struct AmiGUS_AHI_Base * amiGUSBase = (struct AmiGUS_AHI_Base *)base;
 
+  AmiGUS_FreeCard( amiGUSBase->agb_AmiGUS,
+                   AMIGUS_FLAG_PCM,
+                   amiGUSBase );
 #ifndef BASE_GLOBAL
   struct ExecBase *SysBase = AmiGUS_AHI_Base->agb_SysBase;
 #endif
@@ -166,21 +197,24 @@ VOID CustomLibClose( LIBRARY_TYPE * base ) {
     FreeMem( amiGUSBase->agb_LogMem, ... );
   }    
   */
+  if ( base->agb_AmiGUS_Base ) {
 
-  if( amiGUSBase->agb_DOSBase ) {
-
-    CloseLibrary( (struct Library *) amiGUSBase->agb_DOSBase );
+    CloseLibrary(( struct Library * ) base->agb_AmiGUS_Base );
   }
-  if( amiGUSBase->agb_IntuitionBase ) {
+  if( amiGUSBase->agb_ExpansionBase ) {
 
-    CloseLibrary( (struct Library *) amiGUSBase->agb_IntuitionBase );
+    CloseLibrary( (struct Library *) amiGUSBase->agb_ExpansionBase );
   }
   if( amiGUSBase->agb_UtilityBase ) {
 
     CloseLibrary( (struct Library *) amiGUSBase->agb_UtilityBase );
   }
-  if( amiGUSBase->agb_ExpansionBase ) {
+  if( amiGUSBase->agb_IntuitionBase ) {
 
-    CloseLibrary( (struct Library *) amiGUSBase->agb_ExpansionBase );
+    CloseLibrary( (struct Library *) amiGUSBase->agb_IntuitionBase );
+  }
+  if( amiGUSBase->agb_DOSBase ) {
+
+    CloseLibrary( (struct Library *) amiGUSBase->agb_DOSBase );
   }
 }

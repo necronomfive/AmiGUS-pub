@@ -47,7 +47,8 @@ VOID ResetVS1063( APTR amiGUS ) {
                  VS1063_CODEC_SCI_MODE,
                  VS1063_CODEC_F_SM_CLK_RANGE |
                  VS1063_CODEC_F_SM_SDINEW |
-                 VS1063_CODEC_F_SM_RESET );
+                 VS1063_CODEC_F_SM_RESET |
+                 VS1063_CODEC_F_SM_LAYER12 );
 
   // page 56 - 11.3 Software Reset
   SleepCodecTicks( amiGUS, VS1063_CODEC_RESET_DELAY_TICKS );
@@ -79,6 +80,11 @@ VOID ResetVS1063( APTR amiGUS ) {
 
 VOID InitVS1063Codec( APTR amiGUS ) {
 
+  WriteCodecSPI( amiGUS,
+                 VS1063_CODEC_SCI_MODE,
+                 VS1063_CODEC_F_SM_CLK_RANGE |
+                 VS1063_CODEC_F_SM_SDINEW |
+                 VS1063_CODEC_F_SM_LAYER12 );
   // Set SC_MULT to XTALI x 5.0 in SC_CLOCKF,
   // see VS1063a Datasheet, Version: 1.32, 2024-01-31, page 48
   WriteCodecSPI( amiGUS,

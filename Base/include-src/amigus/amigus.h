@@ -106,6 +106,6 @@ struct AmiGUS {
  *   0 if the interrupt was not handled,
  *   1 if the interrupt was handled.
  */
-typedef ASM( LONG ) ( * AmiGUS_Interrupt )( REG( d1, APTR data ));
+typedef ASM( LONG ) ( * AmiGUS_Interrupt )( REG( a0, APTR data ));
 
 #endif /* AMIGUS_H */

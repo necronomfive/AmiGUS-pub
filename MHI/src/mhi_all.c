@@ -159,7 +159,7 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
     error = AmiGUS_InstallInterrupt( handle->agch_AmiGUS,
                                      AMIGUS_FLAG_CODEC,
                                      handle,
-                                     &( HandleInterruptNew ),
+                                     &( HandleInterrupt ),
                                      handle );
 
   }

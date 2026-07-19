@@ -35,7 +35,7 @@
  * Interrupt functions - public function definitions.
  *****************************************************************************/
 
-ASM( LONG ) HandleInterruptNew( REG( d1, APTR data )) {
+ASM( LONG ) HandleInterrupt( REG( a0, APTR data )) {
 
   LONG result = 0;
 

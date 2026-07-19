@@ -135,7 +135,7 @@ ASM(ULONG) SAVEDS AHIsub_Start(
   if ( AmiGUS_InstallInterrupt( AmiGUS_AHI_Base->agb_AmiGUS,
                                 AMIGUS_FLAG_PCM,
                                 AmiGUS_AHI_Base,
-                                &( HandleInterruptNew ),
+                                &( HandleInterrupt ),
                                 AmiGUS_AHI_Base ) ) {
   
     LOG_D(( "D: No INT handler, failed.\n" ));

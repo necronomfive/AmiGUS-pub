@@ -36,7 +36,7 @@
  * @return 1 if the handle's card's interrupt was pending and handled,
  *         0 otherwise.
  */
-ASM( LONG ) HandleInterruptNew( REG( d1, APTR data ));
+ASM( LONG ) HandleInterrupt( REG( a0, APTR data ));
 
 /**
  * Fills the codec's playback buffer with however many more encoded data

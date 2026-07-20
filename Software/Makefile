@@ -119,10 +119,6 @@ release-unpublish:
 ###############################################################################
 
 package:
-	-umount $(ADF_DIR1)
-	-umount $(ADF_DIR2)
-	-umount $(ADF_DIR3)
-	-umount $(ADF_DIR4)
 	rm -rf $(TARGET_DIR) $(TARGET_LHA) \
 	       $(TARGET_DIR13) $(TARGET_LHA13) \
 	       $(ADF_DIR1) $(ADF_IMAGE1) \
@@ -135,10 +131,6 @@ package:
 	###########################################################################
 	# Tools adf
 	###########################################################################
-
-	adf_floppy_create $(ADF_IMAGE1) dd
-	adf_format -l AmiGUS-Tools -t 1 -f $(ADF_IMAGE1)
-	fuseadf $(ADF_IMAGE1) $(ADF_DIR1)/
 
 	mkdir -p $(ADF_DIR1)/Tools           \
 	         $(ADF_DIR1)/Base            \
@@ -200,13 +192,22 @@ package:
 	cp Installer/English.info                   $(ADF_DIR1)/
 	cp Installer/Deutsch.info                   $(ADF_DIR1)/
 
+	# uses python's amitools - https://github.com/cnvogelg/amitools
+	@echo ""
+	xdftool $(ADF_IMAGE1) format AmiGUS-Tools ffs
+
+	@echo ""
+	@IFS='§' ;                                        \
+	for ITEM in $(ADF_DIR1)/* ;                       \
+	  do                                              \
+	    xdftool $(ADF_IMAGE1) write $${ITEM};         \
+	    echo "xdftool $(ADF_IMAGE1) write $${ITEM}" ; \
+	  done
+	@echo ""
+
 	###########################################################################
 	# Firmware adf
 	###########################################################################
-
-	adf_floppy_create $(ADF_IMAGE4) dd
-	adf_format -l AmiGUS-Firmware -t 0 -f $(ADF_IMAGE4)
-	fuseadf $(ADF_IMAGE4) $(ADF_DIR4)/
 
 	mkdir -p $(ADF_DIR4)/Firmware
 
@@ -217,13 +218,22 @@ package:
 	cp $$LATEST_FW                              $(ADF_DIR4)/Firmware       ;\
 	cp Installer/fw.info                        $(ADF_DIR4)/Firmware/$$BASENAME_FW.info
 
+	# uses python's amitools - https://github.com/cnvogelg/amitools
+	@echo ""
+	xdftool $(ADF_IMAGE4) format AmiGUS-Firmware ofs
+
+	@echo ""
+	@IFS='§' ;                                        \
+	for ITEM in $(ADF_DIR4)/* ;                       \
+	  do                                              \
+	    xdftool $(ADF_IMAGE4) write $${ITEM};         \
+	    echo "xdftool $(ADF_IMAGE4) write $${ITEM}" ; \
+	  done
+	@echo ""
+
 	###########################################################################
 	# Manual adf
 	###########################################################################
-
-	adf_floppy_create $(ADF_IMAGE2) dd
-	adf_format -l AmiGUS-Manual -t 0 -f $(ADF_IMAGE2)
-	fuseadf $(ADF_IMAGE2) $(ADF_DIR2)/
 
 	cp Installer/Disk.info                      $(ADF_DIR2)/
 	cp ../Documentation/AmiGUS/AmiGUS.guide     $(ADF_DIR2)/AmiGUSv39.guide
@@ -235,13 +245,22 @@ package:
 	cp Installer/AmiGUS.guide.info              $(ADF_DIR2)
 	cp Installer/AmiGUS.guide.infoV38           $(ADF_DIR2)
 
+	# uses python's amitools - https://github.com/cnvogelg/amitools
+	@echo ""
+	xdftool $(ADF_IMAGE2) format AmiGUS-Manual ofs
+
+	@echo ""
+	@IFS='§' ;                                        \
+	for ITEM in $(ADF_DIR2)/* ;                       \
+	  do                                              \
+	    xdftool $(ADF_IMAGE2) write $${ITEM};         \
+	    echo "xdftool $(ADF_IMAGE2) write $${ITEM}" ; \
+	  done
+	@echo ""
+
 	###########################################################################
 	# OS1.3 adf
 	###########################################################################
-
-	adf_floppy_create $(ADF_IMAGE3) dd
-	adf_format -l AmiGUS-OS1.3 -t 0 -f $(ADF_IMAGE3)
-	fuseadf $(ADF_IMAGE3) $(ADF_DIR3)/
 
 	mkdir -p $(ADF_DIR3)/Tools $(ADF_DIR3)/Firmware $(ADF_DIR3)/Base $(ADF_DIR3)/MHI
 
@@ -297,10 +316,18 @@ package:
 	cp Installer/13/Deutsch                     $(ADF_DIR3)/
 	cp Installer/13/Deutsch.info                $(ADF_DIR3)/
 
-	LATEST_FW=`find ../FPGA/Releases/Amiga/ | grep "\.upd" | sort | tail -n 1` ;\
-	BASENAME_FW=`basename $$LATEST_FW`                          ;\
-	cp $$LATEST_FW                              $(ADF_DIR3)/Firmware       ;\
-	cp Installer/fw.info                        $(ADF_DIR3)/Firmware/$$BASENAME_FW.info
+	# uses python's amitools - https://github.com/cnvogelg/amitools
+	@echo ""
+	xdftool $(ADF_IMAGE3) format AmiGUS-OS13 ofs
+
+	@echo ""
+	@IFS='§' ;                                        \
+	for ITEM in $(ADF_DIR3)/* ;                       \
+	  do                                              \
+	    xdftool $(ADF_IMAGE3) write $${ITEM};         \
+	    echo "xdftool $(ADF_IMAGE3) write $${ITEM}" ; \
+	  done
+	@echo ""
 
 	###########################################################################
 	# LHA
@@ -336,11 +363,6 @@ package:
 	###########################################################################
 	# cleanup
 	###########################################################################
-
-	umount $(ADF_DIR1)/
-	umount $(ADF_DIR2)/
-	umount $(ADF_DIR3)/
-	umount $(ADF_DIR4)/
 
 	-cp $(ADF_IMAGE1) /media/chritoph/HXC/
 	-cp $(ADF_IMAGE2) /media/chritoph/HXC/

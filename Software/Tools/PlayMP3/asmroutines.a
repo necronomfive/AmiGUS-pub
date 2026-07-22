@@ -41,7 +41,7 @@ initFIFOLoop:
         LABEL RBFDATA_SIZEOF
 
 * Entered with:
-*  D0 == scratch      A0 == is_Data (execpt for highest pri vertb server)
+*  D0 == return value      A0 == is_Data
 
 _intServer:
 	movem.l d1-d7/a0-a6,-(sp)	; Save registers

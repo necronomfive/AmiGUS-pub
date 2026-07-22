@@ -48,6 +48,18 @@ VOID StartAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
 VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle );
 
 /**
+ * Pauses playback of the AmiGUS codec as "owned" by the handle
+ * provided from / to the player software.
+ *
+ * @param handle AmiGUS MHI handle as provided to the player by the driver
+ *               and used to identify the player's MHI context.
+ * @param pause TRUE to pause playback,
++ *             FALSE to resume it.
+ */
+VOID PauseAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle,
+                               BOOL pause );
+
+/**
  * Busy waiting "sleep" method using the AmiGUS codec's high resolution timer.
  * Fine to use for less than a second, waste of CPU time otherwise.
  *

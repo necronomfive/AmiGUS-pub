@@ -368,7 +368,7 @@ int main(int argc,char **argv)
 	
 	if (intdata = AllocMem(sizeof(struct IntData), MEMF_PUBLIC|MEMF_CLEAR))
     {
-		intdata->buf_size = (BUF_SIZE>>5)-1;			/* Size of data transferred per buffer (in DWORDs) */
+		intdata->buf_size = (BUF_SIZE>>2)-1;			/* Size of data transferred per buffer (in DWORDs) */
 		intdata->buf_count = 0;							/* Current buffer number (reset to 0) */
 		intdata->buf_segments = BUF_NUM;				/* Number of buffer segments */
 		intdata->buf_half_segments = (BUF_NUM >> 1);	/* 1/2 nuber of buffer segments */

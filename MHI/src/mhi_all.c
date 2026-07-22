@@ -370,10 +370,12 @@ ASM( VOID ) SAVEDS MHIPause(
 
   if ( handle->agch_Status == MHIF_PAUSED ) {
 
+    PauseAmiGusCodecPlayback( handle, FALSE );
     handle->agch_Status = MHIF_PLAYING;
 
   } else if( handle->agch_Status == MHIF_PLAYING ) {
 
+    PauseAmiGusCodecPlayback( handle, TRUE );
     handle->agch_Status = MHIF_PAUSED;
   }
   LOG_D(( "D: MHIPause done\n" ));

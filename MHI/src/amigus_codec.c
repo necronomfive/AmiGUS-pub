@@ -111,6 +111,17 @@ VOID StopAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle ) {
               AMIGUS_CODEC_FIFO_F_RESET_STROBE );
 }
 
+VOID PauseAmiGusCodecPlayback( struct AmiGUS_MHI_Handle * handle,
+                               BOOL pause ) {
+
+  APTR card = handle->agch_CardBase;
+  UWORD dma = ( pause )
+            ? ( AMIGUS_CODEC_FIFO_F_DMA_DISABLE )
+            : ( AMIGUS_CODEC_FIFO_F_DMA_ENABLE );
+
+  WriteReg16( card, AMIGUS_CODEC_FIFO_CONTROL, dma );
+}
+
 VOID SleepCodecTicks( APTR amiGUS, ULONG ticks ) {
 
   LONG rounds = 0;

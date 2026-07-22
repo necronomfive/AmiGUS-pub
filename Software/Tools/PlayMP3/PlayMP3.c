@@ -186,7 +186,7 @@ int main(int argc,char **argv)
 	
 	SetTaskPri(FindTask(NULL),60);
 	
-    printf("\n========================\n AmiGUS MP3 Player V0.4 \n(C)2025 by Oliver Achten\n========================\n\n");
+    printf("\n========================\n AmiGUS MP3 Player V0.5 \n(C)2025 by Oliver Achten\n========================\n\n");
 
 	if (argc != 2)
 	{

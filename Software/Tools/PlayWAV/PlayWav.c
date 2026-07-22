@@ -188,7 +188,7 @@ int main(int argc,char **argv)
 	
 	SetTaskPri(FindTask(NULL),60);
 	
-    printf("\n==========================\n  AmiGUS WAV Player V0.6 \n (C)2025 by Oliver Achten \n==========================\n\n");
+    printf("\n==========================\n  AmiGUS WAV Player V0.7 \n (C)2025 by Oliver Achten \n==========================\n\n");
 	
 	sample_fmt = SMPL_FMT_LITTLE_ENDIAN|SMPL_FMT_STEREO_16BIT;
 	sample_rate = SMPL_RATE_44100;
@@ -482,7 +482,9 @@ int main(int argc,char **argv)
 					intdata->buffer = memory;
 					
 					initFIFO(memory, board_base, (8184>>2)-1); // Arm FIFO (with zeroes) to kick-off interrupt
-							
+
+					printf("Using AmiGUS format = 0x%04lx rate = 0x%04lx\n",
+					       sample_fmt, sample_rate);
 					WriteReg16(board_base,MAIN_SMPL_FMT,sample_fmt);		// Set sample rate		
 					WriteReg16(board_base,MAIN_SMPL_RATE,sample_rate|0xc000);							// Start playback
 				

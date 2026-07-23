@@ -874,26 +874,26 @@ in the "Base" folder. It includes ASM, C, E, and fd files.
 
 The process using amigus.library is pretty straight forward.
 
-1) ---> AmiGUS_FindCard
-        - Enumerates AmiGUS cards for you, providing information and
-          base addresses for the RBI (Register Banging Interface).
-2) +--> AmiGUS_ReserveCard
-   |    - Reserves an AmiGUS card of your choice for you -
-   |      or tells you if it is in use already.
-   |      Do not use an AmiGUS you did not reserve successfully!
-3) |+-> AmiGUS_InstallInterrupt
-   ||   - Installs an interrupt handling routine for you.
-4) ||+> Calls your "LONG HandleInterrupt( APTR __regA0 data)" function
-   ||   - Remember, the interrupt handler is called by C code, so you
-   ||     wanna save/restore registers to/from stack at the
-   ||     beginning/end if writing ASM.
-5) |+-> AmiGUS_RemoveInterrupt
-   |    - Removes your interrupt handler again
-6) +--> AmiGUS_FreeCard
-        - Gives up your AmiGUS reservation again.
-          Do it - otherwise you will block other applications/drivers
-          from using the AmiGUS
-          (okay, maybe the users can "avail flush", but... com'on!)
+1) ----> AmiGUS_FindCard
+         - Enumerates AmiGUS cards for you, providing information and
+           base addresses for the RBI (Register Banging Interface).
+2) +---> AmiGUS_ReserveCard
+   |     - Reserves an AmiGUS card of your choice for you -
+   |       or tells you if it is in use already.
+   |       Do not use an AmiGUS you did not reserve successfully!
+3) |+--> AmiGUS_InstallInterrupt
+   ||    - Installs an interrupt handling routine for you.
+4) ||+-> Calls your "LONG HandleInterrupt( APTR __regA0 data)" function
+   ||    - Remember, the interrupt handler is called by C code, so you
+   ||      wanna save/restore registers to/from stack at the
+   ||      beginning/end if writing ASM.
+5) |+--> AmiGUS_RemoveInterrupt
+   |     - Removes your interrupt handler again
+6) +---> AmiGUS_FreeCard
+         - Gives up your AmiGUS reservation again.
+           Do it - otherwise you will block other applications/drivers
+           from using the AmiGUS
+           (okay, maybe the users can "avail flush", but... com'on!)
 
 That's it. Additional information on the library functions can be
 found in the @{"AmiGUS github repository (9)" LINK refs}.

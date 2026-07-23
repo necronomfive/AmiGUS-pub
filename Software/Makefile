@@ -291,6 +291,7 @@ package:
 	cp Installer/program.info                   $(ADF_DIR3)/Base/GetAmiGUSMemLog.info
 	cp Drivers/Base/target/amigus_lib_check     $(ADF_DIR3)/Base/AmiGUSLibCheck
 	cp Installer/program.info                   $(ADF_DIR3)/Base/AmiGUSLibCheck.info
+	cp Drivers/Base/target/amigus-dev.lha       $(ADF_DIR3)/Base
 	cp Drivers/Base/target/*.library*           $(ADF_DIR3)/Base
 
 	cp Drivers/MHI/target/get_mem_log           $(ADF_DIR3)/MHI/GetMhiMemLog

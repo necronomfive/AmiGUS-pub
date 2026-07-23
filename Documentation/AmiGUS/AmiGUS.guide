@@ -41,21 +41,24 @@
 @{" 3.2   FPGA Flash Tool               " LINK flash1}
 @{" 3.2.1 Available Options             " LINK flash2}
 
-@{" 4     AHI Driver Framework          " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS         " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI        " LINK ahi_config}
-@{" 4.3.1 Available Options             " LINK ahi_options}
+@{" 4     amigus.library                " LINK aguslib}
+@{" 4.1   amigus.library dev kit        " LINK aguslib_dev}
 
-@{" 5     MHI Driver Framework          " LINK mhi}
-@{" 5.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
-@{" 5.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
+@{" 5     AHI Driver Framework          " LINK ahi}
+@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
+@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3.1 Available Options             " LINK ahi_options}
 
-@{" 6     Driver troubleshooting        " LINK drivers}
+@{" 6     MHI Driver Framework          " LINK mhi}
+@{" 6.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
+@{" 6.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
 
-@{" 7     Appendices                    " LINK credits}
-@{" 7.1   Credits                       " LINK credits}
-@{" 7.2   References                    " LINK refs}
+@{" 7     Driver troubleshooting        " LINK drivers}
+
+@{" 8     Appendices                    " LINK credits}
+@{" 8.1   Credits                       " LINK credits}
+@{" 8.2   References                    " LINK refs}
 
 @ENDNODE
 
@@ -423,8 +426,8 @@ the @{"AmiGUS github repository (8)" LINK refs}:
 
 @{"ZZ9000 audio connection" system "MultiView ilbm/zz1.iff"}@{IMG ilbm/zz1.iff}
 
-See @{"ZZ9000 (9)" LINK refs} manual description of J6 and the right image in
-the third row of @{"ZZ9000AX (10)" LINK refs} manuals for reference.
+See @{"ZZ9000 (11)" LINK refs} manual description of J6 and the right image in
+the third row of @{"ZZ9000AX (12)" LINK refs} manuals for reference.
 
 @{" 2.2.4 Digital Audio Expansion       " LINK expansion}
 @{" 2.3   External Audio Set-Up         " LINK external}
@@ -577,8 +580,15 @@ For OS 1.3, these are only available for the MHI driver so far.
 The recommendation is to skip installing them.
 If you experience trouble, you can still install them later.
 
-The third installation category tackles the MHI driver, described in
-section @{"5 MHI Driver Framework" LINK mhi}.
+The third installation category tackles the basic amigus.library.
+None of the base tools or drivers will work without it. It only adds
+a tiny abstraction layer between Zorro or PCMCIA based AmiGUS cards
+enabling developers transparently writing software for AmiGUS and
+AmiGUS mini at the same point in time without thinking further about
+the underlying interface to the card.
+
+The fourth section ot the installation tackles the MHI driver, described
+in section @{"5 MHI Driver Framework" LINK mhi}.
 Recommendation would be to install it - it would only reliably work from
 the default path, so there is no option to change the path.
 But you can choose which version of the MHI driver you want to install.
@@ -689,7 +699,7 @@ for placement of all CPU or debug versions of AHI and MHI drivers next
 to the activated ones.
 
 Please keep in mind that using AHI and MHI requires additional software.
-Refer to sections @{" 4 AHI Driver Framework " LINK ahi} and @{"5 MHI Driver Framework" LINK mhi}
+Refer to sections @{" 5 AHI Driver Framework " LINK ahi} and @{"5 MHI Driver Framework" LINK mhi}
 for a detailed description.
 
 @{" 3     Software Tools                " LINK mixer1}
@@ -831,13 +841,75 @@ This includes updating the firmware, displaying the card's hardware status
 |                  | can be re-flashed by using the Load option.         |
 +------------------+-----------------------------------------------------+
 
-@{" 4     AHI Driver Framework          " LINK ahi}
+@{" 4     amigus.library                " LINK aguslib}
+@ENDNODE
+
+@NODE aguslib "amigus.library"
+@{" 3     Software Tools                " LINK mixer1}
+@{" 4     amigus.library                " LINK aguslib}
+
+amigus.library is the basis of the tools or drivers will work without it.
+It only adds a tiny abstraction layer on top of the AmiGUS cards enabling
+developers transparently writing software for AmiGUS and AmiGUS mini at
+the same point in time without thinking further about the underlying
+Zorro or PCMCIA interfaces to the cards. 
+
+Therefore, it provides detection, reservation, and interrupt handling for
+all variants of the AmiGUS cards. Instead of using card.resource,
+expansion.library, or banging Gary directly, using the amigus.library
+shall abstract the hardware so developers can use the AmiGUS chip's
+RBI (Register Banging Interface) without taking further care of the
+AmiGUS's variant.
+
+@{" 4.1   amigus.library dev kit        " LINK aguslib_dev}
+@ENDNODE
+
+@NODE aguslib_dev "AmiGUS development RBI"
+@{" 4     amigus.library                " LINK aguslib}
+@{" 4.1   amigus.library dev kit        " LINK aguslib_dev}
+
+The AmiGUS developers' kit is not automatically installed, but it can be
+found as amigus-dev.lha on 1.3 or 2.0+ AmiGUS-Tools disk (or .lha file)
+in the "Base" folder. It includes ASM, C, E, and fd files. 
+
+The process using amigus.library is pretty straight forward.
+
+1) ---> AmiGUS_FindCard
+        - Enumerates AmiGUS cards for you, providing information and
+          base addresses for the RBI (Register Banging Interface).
+2) +--> AmiGUS_ReserveCard
+   |    - Reserves an AmiGUS card of your choice for you -
+   |      or tells you if it is in use already.
+   |      Do not use an AmiGUS you did not reserve successfully!
+3) |+-> AmiGUS_InstallInterrupt
+   ||   - Installs an interrupt handling routine for you.
+4) ||+> Calls your "LONG HandleInterrupt( APTR __regA0 data)" function
+   ||   - Remember, the interrupt handler is called by C code, so you
+   ||     wanna save/restore registers to/from stack at the
+   ||     beginning/end if writing ASM.
+5) |+-> AmiGUS_RemoveInterrupt
+   |    - Removes your interrupt handler again
+6) +--> AmiGUS_FreeCard
+        - Gives up your AmiGUS reservation again.
+          Do it - otherwise you will block other applications/drivers
+          from using the AmiGUS
+          (okay, maybe the users can "avail flush", but... com'on!)
+
+That's it. Additional information on the library functions can be
+found in the @{"AmiGUS github repository (9)" LINK refs}.
+
+If you want the AmiGUS to do something, you need to use the
+RBI (Register Banging Interface) additionally. For help, check out the
+base tools, the driver implementations, and for a detailed
+AmiGUS register map, please refer to the @{"AmiGUS github repository (10)" LINK refs}.
+
+@{" 5     AHI Driver Framework          " LINK ahi}
 @ENDNODE
 
 @NODE ahi "AHI Driver Framework"
 @TOC contents
-@{" 3     Software Tools                " LINK mixer1}
-@{" 4     AHI Driver Framework          " LINK ahi}
+@{" 4     amigus.library                " LINK aguslib}
+@{" 5     AHI Driver Framework          " LINK ahi}
 
 AHI is a retargetable audio subsystem for Amiga-like operating systems,
 originally developed by Martin Bloom.
@@ -863,16 +935,16 @@ Please note:
   - Due to limitations of the AHI framework, AmiGUS's AHI driver is
     limited to a 64000 Hz mixing rate.
 
-@{" 4.1   Using AHI with AmiGUS         " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI        " LINK ahi_config}
-@{" 4.3.1 Available Options             " LINK ahi_options}
+@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
+@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3.1 Available Options             " LINK ahi_options}
 @ENDNODE
 
 @NODE ahi_amigus "AHI Driver Framework - Using AHI with AmiGUS"
 @TOC contents
-@{" 4     AHI Driver Framework          " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5     AHI Driver Framework          " LINK ahi}
+@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
 
 AHI should be your last resort for making software use your AmiGUS.
   - For playback of encoded music like MP3, FLAC, or OGG, please use MHI
@@ -882,16 +954,16 @@ AHI should be your last resort for making software use your AmiGUS.
   - None of that works for your application? Here comes AHI.
     And only here.
 
-@{" 4.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI        " LINK ahi_config}
-@{" 4.3.1 Available Options             " LINK ahi_options}
+@{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
+@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3.1 Available Options             " LINK ahi_options}
 @ENDNODE
 
 @NODE ahi_modes "AHI Driver Framework - Selecting AHI Modes"
 @TOC contents
-@{" 4     AHI Driver Framework          " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS         " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes           " LINK ahi_modes}
+@{" 5     AHI Driver Framework          " LINK ahi}
+@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
 
 AHI modes need to be selected to fit the purpose.
 
@@ -930,16 +1002,16 @@ Here are some guidelines:
     Avoid them for games, if you are short on CPU time. Recommended for
     enjoying music as good as possible!
 
-@{" 4.3   Configuring AmiGUS AHI        " LINK ahi_config}
-@{" 4.3.1 Available Options             " LINK ahi_options}
+@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3.1 Available Options             " LINK ahi_options}
 @ENDNODE
 
 @NODE ahi_config "AHI Driver Framework - Configuring AmiGUS AHI"
 @TOC contents
-@{" 4     AHI Driver Framework          " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS         " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5     AHI Driver Framework          " LINK ahi}
+@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
+@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
 
 After all that theoretical foundation you are ready to select AmiGUS modes
 using the AHI preferences editor usually installed to Sys:Prefs/AHI.
@@ -953,16 +1025,16 @@ Recommendations:
 
 @{"AHI Prefs" system "MultiView ilbm/ahi0.iff"}@{IMG ilbm/ahi0.iff}
 
-@{" 4.3.1 Available Options             " LINK ahi_options}
+@{" 5.3.1 Available Options             " LINK ahi_options}
 @ENDNODE
 
 @NODE ahi_options "AHI Driver Framework - Available Options"
 @TOC contents
-@{" 4     AHI Driver Framework          " LINK ahi}
-@{" 4.1   Using AHI with AmiGUS         " LINK ahi_amigus}
-@{" 4.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 4.3   Configuring AmiGUS AHI        " LINK ahi_config}
-@{" 4.3.1 Available Options             " LINK ahi_options}
+@{" 5     AHI Driver Framework          " LINK ahi}
+@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
+@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3.1 Available Options             " LINK ahi_options}
 
 +------------------+-----------------------------------------------------+
 | Panel            | Description                                         |
@@ -1015,13 +1087,13 @@ Recommendations:
 |                  | AHI preferences editor.                             |
 +------------------+-----------------------------------------------------+
 
-@{" 5     MHI Driver Framework          " LINK mhi}
+@{" 6     MHI Driver Framework          " LINK mhi}
 @ENDNODE
 
 @NODE mhi "MHI Driver Framework"
 @TOC contents
-@{" 4     AHI Driver Framework          " LINK ahi}
-@{" 5     MHI Driver Framework          " LINK mhi}
+@{" 5     AHI Driver Framework          " LINK ahi}
+@{" 6     MHI Driver Framework          " LINK mhi}
 
 MHI is a standard for retargetable encoded audio for classic Amigas.
 AmiGUS comes with the VLSI VS1063a audio codec chip supporting
@@ -1041,14 +1113,14 @@ On AmigaOS 1.3, there are problems loading libraries from other locations
 than Libs:, hence it will be installed to Libs:mhiamigus.library to
 ensure hassle-free usage.
 
-@{" 5.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
-@{" 5.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
+@{" 6.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
+@{" 6.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
 @ENDNODE
 
 @NODE mhi_amigaamp "MHI Driver Framework - AmigaAmp"
 @TOC contents
-@{" 5     MHI Driver Framework          " LINK mhi}
-@{" 5.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
+@{" 6     MHI Driver Framework          " LINK mhi}
+@{" 6.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
 
 As Thomas Wenzel not only created @{"AmigaAMP (4)" LINK refs} but has 
 also been co-authoring MHI, integration of both works almost perfectly,
@@ -1075,14 +1147,14 @@ Confirm with the "OK" button, close and confirm the preferences dialog
 with the "Save" button. You may need to restart AmigaAMP immediately.
 Add a few MP3 files to your playlist and enjoy!
 
-@{" 5.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
+@{" 6.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
 @ENDNODE
 
 @NODE mhi_hippoplayer "MHI Driver Framework - HippoPlayer"
 @TOC contents
-@{" 5     MHI Driver Framework          " LINK mhi}
-@{" 5.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
-@{" 5.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
+@{" 6     MHI Driver Framework          " LINK mhi}
+@{" 6.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
+@{" 6.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
 
 @{"HippoPlayer (5, 6)" LINK refs} by K-P Koljonen not only works from AmigaOS 1.2
 and later but has also been successfully tested with MHI on AmigaOS 1.3
@@ -1108,13 +1180,13 @@ Select it, push the "OK" button, and save the preferences using the
 Add a few MP3 files to your playlist and enjoy!
 
 
-@{" 6     Driver troubleshooting        " LINK drivers}
+@{" 7     Driver troubleshooting        " LINK drivers}
 @ENDNODE
 
 @NODE drivers "Driver troubleshooting"
 @TOC contents
-@{" 5     MHI Driver Framework          " LINK mhi}
-@{" 6     Driver troubleshooting        " LINK drivers}
+@{" 6     MHI Driver Framework          " LINK mhi}
+@{" 7     Driver troubleshooting        " LINK drivers}
 
 AHI and MHI drivers come with release and debug versions. Never use the
 debug versions for normal operations - they may introduce more crashes and
@@ -1174,13 +1246,13 @@ installation.
 We hope you will never need this information;
 please be patient, we did our best!
 
-@{" 7     Appendices                    " LINK credits}
+@{" 8     Appendices                    " LINK credits}
 @ENDNODE
 
 @NODE credits "Appendices - Credits"
 @TOC contents
-@{" 7     Appendices                    " LINK credits}
-@{" 7.1   Credits                       " LINK credits}
+@{" 8     Appendices                    " LINK credits}
+@{" 8.1   Credits                       " LINK credits}
 
 AmiGUS concept & hardware design
 --------------------------------
@@ -1201,15 +1273,15 @@ Greg Donner
 Oliver Eschbach
 Ingo Schmitz
 
-@{" 7.2   References                    " LINK refs}
+@{" 8.2   References                    " LINK refs}
 
 @ENDNODE
 
 @NODE refs "Appendices - References"
 @TOC contents
-@{" 7     Appendices                    " LINK credits}
-@{" 7.1   Credits                       " LINK credits}
-@{" 7.2   References                    " LINK refs}
+@{" 8     Appendices                    " LINK credits}
+@{" 8.1   Credits                       " LINK credits}
+@{" 8.2   References                    " LINK refs}
 
 ( 1) @{"https://aminet.net/driver/audio/ahiusr_4.18.lha" system "openurl https://aminet.net/driver/audio/ahiusr_4.18.lha"}
 
@@ -1227,9 +1299,13 @@ Ingo Schmitz
 
 ( 8) @{"https://github.com/necronomfive/AmiGUS-pub/issues" system  "openurl https://github.com/necronomfive/AmiGUS-pub/issues"}
 
-( 9) @{"https://mntre.com/media/ZZ9000_info_md/zz9000-manual.pdf" system "openurl https://web.archive.org/web/20250306223537/https://mntre.com/media/ZZ9000_info_md/zz9000-manual.pdf"}
+( 9) @{"https://github.com/necronomfive/AmiGUS-pub/blob/main/Software/Drivers/Base/header/SDI_amigus_protos.h" system  "openurl https://github.com/necronomfive/AmiGUS-pub/blob/main/Software/Drivers/Base/header/SDI_amigus_protos.h"}
 
-(10) @{"https://mntre.com/media/ZZ9000_info_md/zz9000ax-manual-r1.pdf" system "openurl https://web.archive.org/web/20250108190251/https://mntre.com/media/ZZ9000_info_md/zz9000ax-manual-r1.pdf"}
+(10) @{"https://github.com/necronomfive/AmiGUS-pub/blob/main/Documentation/AmiGUS/AmiGUS_Register_Map.xlsx" system  "openurl https://github.com/necronomfive/AmiGUS-pub/blob/main/Documentation/AmiGUS/AmiGUS_Register_Map.xlsx"}
+
+(11) @{"https://mntre.com/media/ZZ9000_info_md/zz9000-manual.pdf" system "openurl https://web.archive.org/web/20250306223537/https://mntre.com/media/ZZ9000_info_md/zz9000-manual.pdf"}
+
+(12) @{"https://mntre.com/media/ZZ9000_info_md/zz9000ax-manual-r1.pdf" system "openurl https://web.archive.org/web/20250108190251/https://mntre.com/media/ZZ9000_info_md/zz9000ax-manual-r1.pdf"}
 
 @ENDNODE
 

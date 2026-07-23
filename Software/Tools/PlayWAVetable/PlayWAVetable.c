@@ -118,7 +118,7 @@ VOID InitAmiGus( APTR card ) {
   // Set master volume
   WriteReg16( card, AMIGUS_WT_MASTER_VOLUME_LEFT, 0xffff );
   WriteReg16( card, AMIGUS_WT_MASTER_VOLUME_RIGHT, 0xffff );
-  Printf( "Wavetable @ 0x%08lx init'ed\n", card );
+  printf( "Wavetable @ 0x%08lx init'ed\n", card );
 }
 
 VOID StartAmiGusWavetablePlayback( APTR card,
@@ -134,7 +134,7 @@ VOID StartAmiGusWavetablePlayback( APTR card,
 	ULONG frequency = (( double ) sampleRate ) * maxFreq / maxRate;
   UWORD channel0VolumeRight = ( 2 == channels ) ? 0 : 0xFFFF;
 
-  Printf( "Calculated frequency is 0x%08lx for %ldHz.\n",
+  printf( "Calculated frequency is 0x%08lx for %ldHz.\n",
           frequency,
           sampleRate );
 
@@ -314,19 +314,19 @@ LONG LoadAiff( struct aiff * aiff, STRPTR filename ) {
   LONG result = OpenAiff( aiff, filename);
   if ( result ) {
 
-    Printf( "Cannot read AIFF file, reason %ld.\n", result );
+    printf( "Cannot read AIFF file, reason %ld.\n", result );
     return result;
   }
-  Printf( "Read AIFF file successfully.\n" );
+  printf( "Read AIFF file successfully.\n" );
   if (( 1 << 25 ) < aiff->aiff_DataSize ) {
 
-    Printf( "File too big, max %ld but is %ld bytes.\n",
+    printf( "File too big, max %ld but is %ld bytes.\n",
             ( 1 << 25 ),
             aiff->aiff_DataSize );
     return 35;
   }
 
-  Printf( "Found AIFF with %ldbit, %ldHz, %ld channels, %ld total bytes.\n",
+  printf( "Found AIFF with %ldbit, %ldHz, %ld channels, %ld total bytes.\n",
           aiff->aiff_SampleBits,
           aiff->aiff_SampleRate,
           aiff->aiff_Channels,
@@ -340,19 +340,19 @@ LONG LoadWav( struct wav * wav, STRPTR filename ) {
   LONG result = OpenWav( wav, filename);
   if ( result ) {
 
-    Printf( "Cannot read WAV file, reason %ld.\n", result );
+    printf( "Cannot read WAV file, reason %ld.\n", result );
     return result;
   }
-  Printf( "Read WAV file successfully.\n" );
+  printf( "Read WAV file successfully.\n" );
   if (( 1 << 25 ) < wav->wav_DataSize ) {
 
-    Printf( "File too big, max %ld but is %ld bytes.\n",
+    printf( "File too big, max %ld but is %ld bytes.\n",
             ( 1 << 25 ),
             wav->wav_DataSize );
     return 35;
   }
 
-  Printf( "Found WAV with %ldbit, %ldHz, %ld channels, %ld total bytes.\n",
+  printf( "Found WAV with %ldbit, %ldHz, %ld channels, %ld total bytes.\n",
           wav->wav_SampleBits,
           wav->wav_SampleRate,
           wav->wav_Channels,
@@ -458,7 +458,7 @@ int main( int argc, char **argv ) {
 
   LONG result;
 
-  Printf( "\n============================="
+  printf( "\n============================="
           "\n  AmiGUS PlayWAVetable V0.2  "
           "\n============================="
           "\n"
@@ -470,14 +470,14 @@ int main( int argc, char **argv ) {
 
   if ( argc < 2 ) {
 
-    Printf( "No AIFF/WAV file name provided.\n" );
+    printf( "No AIFF/WAV file name provided.\n" );
     result = 30;
     goto cleanup;
   }
   AmiGUS_Base = OpenLibrary( "amigus.library", 1 );
   if ( !AmiGUS_Base ) {
 
-    Printf( "Could not open amigus.library.\n" );
+    printf( "Could not open amigus.library.\n" );
     result = 31;
     goto cleanup;
   }
@@ -489,7 +489,7 @@ int main( int argc, char **argv ) {
   amigus = AmiGUS_FindCard( NULL );
   if ( !amigus ) {
 
-    Printf( "No AmiGUS found.\n" );
+    printf( "No AmiGUS found.\n" );
     result = 32;
     goto cleanup;
   }
@@ -497,7 +497,7 @@ int main( int argc, char **argv ) {
   result = AmiGUS_ReserveCard( amigus, AMIGUS_FLAG_WAVETABLE, mainTask );
   if ( result ) {
 
-    Printf( "Could not reserve AmiGUS at 0x%08lx.\n",
+    printf( "Could not reserve AmiGUS at 0x%08lx.\n",
             amigus->agus_WavetableBase );
     result = 33;
     goto cleanup;
@@ -516,7 +516,7 @@ int main( int argc, char **argv ) {
   result = LoadWav( &wav, argv[ 1 ]);
   if ( !result ) {
 
-    Printf( "Playing WAV on card 0x%08lx (eb0000)\n",
+    printf( "Playing WAV on card 0x%08lx (eb0000)\n",
             amigus->agus_WavetableBase );
     size = WAV_BUFFER_SIZE;
     data = AllocMem( size, MEMF_ANY );
@@ -528,7 +528,7 @@ int main( int argc, char **argv ) {
     result = LoadAiff( &aiff, argv[ 1 ]);
     if ( !result ) {
 
-      Printf( "Playing AIFF on card 0x%08lx (eb0000)\n",
+      printf( "Playing AIFF on card 0x%08lx (eb0000)\n",
               amigus->agus_WavetableBase );
       size = AIFF_BUFFER_SIZE;
       data = AllocMem( size, MEMF_ANY );
@@ -541,7 +541,7 @@ int main( int argc, char **argv ) {
     }
   }
 
-  Printf( "Did you know? AmiGUS can play alone...\n" );
+  printf( "Did you know? AmiGUS can play alone...\n" );
 
   /*****************************************************************************
    * Sorry for the ... hack.

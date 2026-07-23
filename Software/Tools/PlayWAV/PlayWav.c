@@ -389,7 +389,7 @@ int main(int argc,char **argv)
 								( AmiGUS_Interrupt ) intServer,
 								intdata))
 	{
-        printf("ERROR: can't allocate memory for interrupt node\n");
+        printf("ERROR: can't install interrupt\n");
 		FreeMem(intdata,sizeof(struct IntData));
         return 0;		
 	}
@@ -536,6 +536,8 @@ int main(int argc,char **argv)
 							FreeMem(memory,MEM_SIZE);
 							FreeMem(intdata,sizeof(struct IntData));
 							FreeSignal(signr);
+
+							CloseLibrary(AmiGUS_Base);
 								
 							return 0;
 						}

@@ -1,7 +1,7 @@
 /*
 ======================================================================
 AmiGUS Mixer Utility
-Copyright (C) 2025 by Oliver Achten
+Copyright (C) 2026 by Oliver Achten
 ======================================================================
 
 This program is free software: you can redistribute it and/or modify
@@ -110,6 +110,8 @@ int chkabort(void) { return(0); }  /* really */
 
 #define	MAIN_TOSLINK_CTRL		0x70
 
+#define MAIN_LED_VALUE			0xd0
+#define MAIN_LED_CTRL			0xd4
 
 #define MYGAD_SLIDER_AHI_L    	(0)
 #define MYGAD_SLIDER_AHI_R    	(1)
@@ -142,6 +144,7 @@ int chkabort(void) { return(0); }  /* really */
 
 #define MYGAD_CYCLE_LEVELS		(22)
 #define MYGAD_CYCLE_TOSLINK		(23)
+#define MYGAD_CYCLE_VURANGE		(24)
 
 /* Range for the slider: */
 #define SLIDER_MIN  (0)
@@ -205,6 +208,7 @@ struct mixData {
 	UWORD	ahi_mix_lr;
 	
 	UWORD	toslink_srate;
+	UWORD	vu_mode;
 
 	UBYTE	adc_enable;
 	
@@ -282,8 +286,10 @@ UWORD ReadSPI(APTR base, UWORD regNum)
 }
 
 
-void SetMixer(APTR base,struct mixData *mixDat)
+void SetMixer(APTR base,struct mixData *mixDat,UWORD typeAmiGUS)
 {
+	UWORD	regVal;
+	
 	WriteReg16(base,MAIN_ADC_VOLUME_LL,mixDat->adc_vol_ll);
 	WriteReg16(base,MAIN_ADC_VOLUME_RR,mixDat->adc_vol_rr);
 	WriteReg16(base,MAIN_MHI_VOLUME_LL,mixDat->mhi_vol_ll);
@@ -300,8 +306,23 @@ void SetMixer(APTR base,struct mixData *mixDat)
 
 	WriteReg16(base,MAIN_TOSLINK_CTRL,mixDat->toslink_srate);
 	
-	WriteSPI(base, 0x06, (UWORD)mixDat->adc_enable);	// Enable PAULA Left
-	WriteSPI(base, 0x07, (UWORD)mixDat->adc_enable);	// Enable PAULA Right
+	if (typeAmiGUS == AmiGUS_Zorro2)
+	{
+		WriteSPI(base, 0x06, (UWORD)mixDat->adc_enable);	// Enable PAULA Left
+		WriteSPI(base, 0x07, (UWORD)mixDat->adc_enable);	// Enable PAULA Right
+	}
+
+	if (typeAmiGUS == AmiGUS_mini)
+	{
+		if (mixDat->vu_mode == 0)
+			regVal = 0;
+		else
+		{
+			regVal = (UWORD)(((((UWORD)mixDat->vu_mode-1)<<2)&0x0c)|0x2);
+			
+		}		
+		WriteReg16(base,MAIN_LED_CTRL,regVal);		
+	}	
 }
 
 
@@ -365,7 +386,7 @@ void ProgramFlash(APTR base, APTR memory)
 	while (cnt < length);
 }
 
-void DrawBorders(struct RastPort *rp,UWORD topBorder,struct TextFont *font)
+void DrawBorders(struct RastPort *rp,UWORD topBorder,struct TextFont *font,UWORD typeAmiGUS)
 {
 	struct Border	shineBorder;
 	struct Border	shadowBorder;
@@ -455,69 +476,38 @@ void DrawBorders(struct RastPort *rp,UWORD topBorder,struct TextFont *font)
 	startX +=146;
 	myIText.IText       = "Levels";
 	PrintIText(rp,&myIText,startX,topBorder+4);
+		
 	startX+=8;
 	myIText.IText       = "L  R";
 	PrintIText(rp,&myIText,startX,topBorder+20);
 	startX-=82;
+	
 	myIText.IText       = "Inputs";
-	PrintIText(rp,&myIText,startX,topBorder+20);
+	
+	if (typeAmiGUS == AmiGUS_Zorro2)		
+		PrintIText(rp,&myIText,startX,topBorder+20);
+	else
+	{
+		myIText.IText       = "VU Mode";
+		PrintIText(rp,&myIText,startX,topBorder+40);
+	}
 	startX-=4;
 	myIText.IText       = "TOSLINK";
 	PrintIText(rp,&myIText,startX,topBorder+84);
 }
 
-void InitCFGMem (APTR cfgMem)
+void InitCFGMem (APTR cfgMem,UWORD typeAmiGUS)
 {
 	ULONG cnt = 0;
 		
+/* Prepare configuration memory */
+
 	do {
 		*((ULONG *)((ULONG)cfgMem+cnt)) = 0xffffffff;
 		cnt+=4;
 	} while (cnt != 0x4000);
 		
 	*((ULONG *)((ULONG)cfgMem+0x0000)) = 0x414d4947;	// Magic Token - Unlock
-
-/* Fix ADC Initialisation */
-
-	// ADC Reset Registers
-	*((ULONG *)((ULONG)cfgMem+0x0004)) = 0x00000020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x0008)) = 0x00fe0022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x000c)) = 0x00000024;	// MAIN_SPI_WTRIG	
-	
-	// ADC Power-Down
-	*((ULONG *)((ULONG)cfgMem+0x0010)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x0014)) = 0x00750022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x0018)) = 0x00000024;	// MAIN_SPI_WTRIG	
-		
-	//  Set Manual Gain Control
-
-	*((ULONG *)((ULONG)cfgMem+0x001c)) = 0x00190020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x0020)) = 0x00ff0022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x0024)) = 0x00000024;	// MAIN_SPI_WTRIG
-		
-	// Increase Left Gain
-		
-	*((ULONG *)((ULONG)cfgMem+0x0028)) = 0x00010020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x002c)) = 0x00200022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x0030)) = 0x00000024;	// MAIN_SPI_WTRIG
-		
-	// Increase Right Gain
-		
-	*((ULONG *)((ULONG)cfgMem+0x0034)) = 0x00020020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x0038)) = 0x00200022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x003c)) = 0x00000024;	// MAIN_SPI_WTRIG
-		
-	// Enable Left Inputs
-		
-	*((ULONG *)((ULONG)cfgMem+0x0040)) = 0x00060020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00020022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x0048)) = 0x00000024;	// MAIN_SPI_WTRIG		
-		
-	// Enable Right Inputs
-		
-	*((ULONG *)((ULONG)cfgMem+0x004c)) = 0x00070020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00020022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x0054)) = 0x00000024;	// MAIN_SPI_WTRIG			
 		
 /* Mixer Settings */
 	
@@ -538,24 +528,101 @@ void InitCFGMem (APTR cfgMem)
 /* TOSLINK Settings */
 
 	*((ULONG *)((ULONG)cfgMem+0x0088)) = 0x00000070;	// MAIN_TOSLINK_CTRL
-
-	// Clock control - automatic clock detection
-	*((ULONG *)((ULONG)cfgMem+0x008c)) = 0x00200020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x0090)) = 0x001f0022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x0094)) = 0x00000024;	// MAIN_SPI_WTRIG
-
-	// Set BCLK = CLK/4 (192kHz sampling rate)
-	*((ULONG *)((ULONG)cfgMem+0x0098)) = 0x00260020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x009c)) = 0x00030022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x00a0)) = 0x00000024;	// MAIN_SPI_WTRIG
 	
-	// ADC Power-Up
-	*((ULONG *)((ULONG)cfgMem+0x00a4)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfgMem+0x00a8)) = 0x00700022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfgMem+0x00ac)) = 0x00000024;	// MAIN_SPI_WTRIG		
+/* Card Specific Settings */	
+	
+    switch (typeAmiGUS) {
+
+      case AmiGUS_Zorro2:
+
+		/* PCM1864 ADC Settings */
+
+			// ADC Reset Registers
+			*((ULONG *)((ULONG)cfgMem+0x0004)) = 0x00000020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x0008)) = 0x00fe0022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x000c)) = 0x00000024;	// MAIN_SPI_WTRIG	
+			
+			// ADC Power-Down
+			*((ULONG *)((ULONG)cfgMem+0x0010)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x0014)) = 0x00750022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x0018)) = 0x00000024;	// MAIN_SPI_WTRIG	
+				
+			//  Set Manual Gain Control
+
+			*((ULONG *)((ULONG)cfgMem+0x001c)) = 0x00190020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x0020)) = 0x00ff0022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x0024)) = 0x00000024;	// MAIN_SPI_WTRIG
+				
+			// Increase Left Gain
+				
+			*((ULONG *)((ULONG)cfgMem+0x0028)) = 0x00010020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x002c)) = 0x00200022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x0030)) = 0x00000024;	// MAIN_SPI_WTRIG
+				
+			// Increase Right Gain
+				
+			*((ULONG *)((ULONG)cfgMem+0x0034)) = 0x00020020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x0038)) = 0x00200022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x003c)) = 0x00000024;	// MAIN_SPI_WTRIG
+				
+			// Enable Left Inputs
+				
+			*((ULONG *)((ULONG)cfgMem+0x0040)) = 0x00060020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00020022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x0048)) = 0x00000024;	// MAIN_SPI_WTRIG		
+				
+			// Enable Right Inputs
+				
+			*((ULONG *)((ULONG)cfgMem+0x004c)) = 0x00070020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00020022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x0054)) = 0x00000024;	// MAIN_SPI_WTRIG	
+
+			// Clock control - automatic clock detection
+			*((ULONG *)((ULONG)cfgMem+0x008c)) = 0x00200020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x0090)) = 0x001f0022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x0094)) = 0x00000024;	// MAIN_SPI_WTRIG
+
+			// Set BCLK = CLK/4 (192kHz sampling rate)
+			*((ULONG *)((ULONG)cfgMem+0x0098)) = 0x00260020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x009c)) = 0x00030022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x00a0)) = 0x00000024;	// MAIN_SPI_WTRIG
+			
+			// ADC Power-Up
+			*((ULONG *)((ULONG)cfgMem+0x00a4)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
+			*((ULONG *)((ULONG)cfgMem+0x00a8)) = 0x00700022;	// MAIN_SPI_WDATA = regval
+			*((ULONG *)((ULONG)cfgMem+0x00ac)) = 0x00000024;	// MAIN_SPI_WTRIG		
+        break;
+      case AmiGUS_mini:
+
+		*((ULONG *)((ULONG)cfgMem+0x0004)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0008)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x000c)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0010)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0014)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0018)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x001c)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0020)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0024)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0028)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x002c)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0030)) = 0x000000fe;	// NIL			
+		*((ULONG *)((ULONG)cfgMem+0x0034)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0038)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x003c)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0040)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0048)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x004c)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x000000fe;	// NIL
+		*((ULONG *)((ULONG)cfgMem+0x0054)) = 0x000000fe;	// NIL
+	  
+		/* LED VU Meter */
+		*((ULONG *)((ULONG)cfgMem+0x008c)) = 0x000600d4;	// MAIN_LED_CTRL
+        break;
+	  }
 
 /* End of Stream */
-	*((ULONG *)((ULONG)cfgMem+0x00b0)) = 0xffffffff;
+
 }
 
 
@@ -624,7 +691,7 @@ void UpdateSliders(struct Window *win, struct Gadget *myGads[], struct mixData *
 							TAG_END);
 }
 
-void InitGadgets(struct Window *win, struct Gadget *myGads[], struct mixData *mixDat, APTR base, APTR cfgMem)
+void InitGadgets(struct Window *win, struct Gadget *myGads[], struct mixData *mixDat, APTR base, APTR cfgMem, UWORD typeAmiGUS)
 {
 	UWORD regVal;
 
@@ -681,53 +748,17 @@ void InitGadgets(struct Window *win, struct Gadget *myGads[], struct mixData *mi
 	/* Initialise sliders from config structure */
 	
 	UpdateSliders(win,myGads,mixDat);
+
+	/* Initialise Cycle Gadget from TOSLINK settings */
 	
-	/* Initialise checkboxes from ADC settings */
-							
-	regVal = (ReadSPI(base,0x06)&0xe);
-	mixDat->adc_enable = (UBYTE)regVal;
-	*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)regVal << 16);
-	*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)regVal << 16);
+	regVal = ReadReg16(base,MAIN_TOSLINK_CTRL);
+	mixDat->toslink_srate = regVal;
+	*((ULONG *)((ULONG)cfgMem+0x0088)) = 0x00000070 | (ULONG)((ULONG)regVal << 16);	// MAIN_TOSLINK_CTRL
 	
-	if ((regVal & 0x2) == 0x02)
-	{	
-		GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_PAULA], win, NULL,
-								GTCB_Checked, 1,
-								TAG_END);
-	}
-	else
-	{
-		GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_PAULA], win, NULL,
-								GTCB_Checked, 0,
-								TAG_END);
-	}
-	
-	if ((regVal & 0x4) == 0x04)
-	{	
-		GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_CDROM], win, NULL,
-								GTCB_Checked, 1,
-								TAG_END);
-	}
-	else
-	{
-		GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_CDROM], win, NULL,
-								GTCB_Checked, 0,
-								TAG_END);
-	}
-	
-	if ((regVal & 0x8) == 0x08)
-	{
-		GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_LINE], win, NULL,
-								GTCB_Checked, 1,
-								TAG_END);
-	}
-	else
-	{
-		GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_LINE], win, NULL,
-								GTCB_Checked, 0,
-								TAG_END);
-	}
-	
+	GT_SetGadgetAttrs(myGads[MYGAD_CYCLE_TOSLINK], win, NULL,
+				GTCY_Active, mixDat->toslink_srate,
+				TAG_END);
+				
 	if (mixDat->ahi_vol_ll == mixDat->ahi_vol_rr)
 	{
 		GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_AHI], win, NULL,
@@ -774,22 +805,85 @@ void InitGadgets(struct Window *win, struct Gadget *myGads[], struct mixData *mi
 	else
 	{
 		mixDat->adc_locked = FALSE;
-	}	
+	}				
+				
+	/* Card specific initialization */
 
-	/* Initialise Cycle Gadget from TOSLINK settings */
+    switch (typeAmiGUS) {
+		case AmiGUS_Zorro2:
 	
-	regVal = ReadReg16(base,MAIN_TOSLINK_CTRL);
-	mixDat->toslink_srate = regVal;
-	*((ULONG *)((ULONG)cfgMem+0x0088)) = 0x00000070 | (ULONG)((ULONG)regVal << 16);	// MAIN_TOSLINK_CTRL
-	
-	GT_SetGadgetAttrs(myGads[MYGAD_CYCLE_TOSLINK], win, NULL,
-				GTCY_Active, mixDat->toslink_srate,
-				TAG_END);	
+			/* Initialise checkboxes from ADC settings */
+									
+			regVal = (ReadSPI(base,0x06)&0xe);
+			mixDat->adc_enable = (UBYTE)regVal;
+			*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)regVal << 16);
+			*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)regVal << 16);
+			
+			if ((regVal & 0x2) == 0x02)
+			{	
+				GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_PAULA], win, NULL,
+										GTCB_Checked, 1,
+										TAG_END);
+			}
+			else
+			{
+				GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_PAULA], win, NULL,
+										GTCB_Checked, 0,
+										TAG_END);
+			}
+			
+			if ((regVal & 0x4) == 0x04)
+			{	
+				GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_CDROM], win, NULL,
+										GTCB_Checked, 1,
+										TAG_END);
+			}
+			else
+			{
+				GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_CDROM], win, NULL,
+										GTCB_Checked, 0,
+										TAG_END);
+			}
+			
+			if ((regVal & 0x8) == 0x08)
+			{
+				GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_LINE], win, NULL,
+										GTCB_Checked, 1,
+										TAG_END);
+			}
+			else
+			{
+				GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_LINE], win, NULL,
+										GTCB_Checked, 0,
+										TAG_END);
+			}
+			break;
+		case AmiGUS_mini:
+			regVal = ReadReg16(base,MAIN_LED_CTRL);
+			if ((regVal & 0x2) == 0x2)
+			{
+				mixDat->vu_mode = ((regVal & 0xc) >> 2)+1;
+			}
+			else
+			{
+				mixDat->vu_mode = 0;
+			}
+			
+			*((ULONG *)((ULONG)cfgMem+0x008C)) = 0x000000d4 | (ULONG)((ULONG)regVal<<16);	
+			
+			GT_SetGadgetAttrs(myGads[MYGAD_CYCLE_VURANGE], win, NULL,
+				GTCY_Active, mixDat->vu_mode,
+				TAG_END);
+			break;		
+	}
 }
 
 void HandleGadgetEvent(struct Window *win, struct Gadget *gad, UWORD code,
-		struct Gadget *myGads[], BOOL *terminated,struct mixData *mixDat,APTR boardBase,APTR cfgMem,struct intData *intData)
+		struct Gadget *myGads[], BOOL *terminated,struct mixData *mixDat,APTR boardBase,APTR cfgMem,struct intData *intData,UWORD typeAmiGUS)
 {
+
+UWORD	regVal;	
+	
 switch (gad->GadgetID)
     {
     case MYGAD_SLIDER_AHI_L:
@@ -932,46 +1026,49 @@ switch (gad->GadgetID)
 		*((ULONG *)((ULONG)cfgMem+0x0078)) = 0x00000040 | (ULONG)((ULONG)mixDat->adc_mix_lr << 16);	// MAIN_WAV_MIX_LR	
         break;		
     case MYGAD_CHKBOX_PAULA:
-		if ((myGads[MYGAD_CHKBOX_PAULA]->Flags & GFLG_SELECTED) != 0)
-		{
-			mixDat->adc_enable |= 0x02;
-			*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
-			*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);		
-		}
-		else
-		{			
-			mixDat->adc_enable &= 0xfd;
-			*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
-			*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
-		}
+		if (typeAmiGUS == AmiGUS_Zorro2)
+			if ((myGads[MYGAD_CHKBOX_PAULA]->Flags & GFLG_SELECTED) != 0)
+			{
+				mixDat->adc_enable |= 0x02;
+				*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
+				*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);		
+			}
+			else
+			{			
+				mixDat->adc_enable &= 0xfd;
+				*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
+				*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
+			}
 		break;
     case MYGAD_CHKBOX_CDROM:
-		if ((myGads[MYGAD_CHKBOX_CDROM]->Flags & GFLG_SELECTED) != 0)
-		{
-			mixDat->adc_enable |= 0x04;
-			*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
-			*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
-		}	
-		else
-		{			
-			mixDat->adc_enable &= 0xfb;
-			*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
-			*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
-		}		
+		if (typeAmiGUS == AmiGUS_Zorro2)	
+			if ((myGads[MYGAD_CHKBOX_CDROM]->Flags & GFLG_SELECTED) != 0)
+			{
+				mixDat->adc_enable |= 0x04;
+				*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
+				*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
+			}	
+			else
+			{			
+				mixDat->adc_enable &= 0xfb;
+				*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
+				*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
+			}		
 		break;
     case MYGAD_CHKBOX_LINE:
-		if ((myGads[MYGAD_CHKBOX_LINE]->Flags & GFLG_SELECTED) != 0)
-		{
-			mixDat->adc_enable |= 0x08;
-			*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
-			*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
-		}
-		else
-		{			
-			mixDat->adc_enable &= 0xf7;	
-			*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
-			*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
-		}
+		if (typeAmiGUS == AmiGUS_Zorro2)	
+			if ((myGads[MYGAD_CHKBOX_LINE]->Flags & GFLG_SELECTED) != 0)
+			{
+				mixDat->adc_enable |= 0x08;
+				*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
+				*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
+			}
+			else
+			{			
+				mixDat->adc_enable &= 0xf7;	
+				*((ULONG *)((ULONG)cfgMem+0x0044)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);
+				*((ULONG *)((ULONG)cfgMem+0x0050)) = 0x00000022 | (ULONG)((ULONG)mixDat->adc_enable << 16);			
+			}
 		break;
     case MYGAD_CHKBOX_AHI:
 		if ((myGads[MYGAD_CHKBOX_AHI]->Flags & GFLG_SELECTED) != 0)
@@ -1059,15 +1156,18 @@ switch (gad->GadgetID)
                             GTSL_Level, 0,
                             TAG_END);
 							
-       GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_PAULA], win, NULL,
-                            GTCB_Checked, 1,
-                            TAG_END);		
-       GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_CDROM], win, NULL,
-                            GTCB_Checked, 0,
-                            TAG_END);
-       GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_LINE], win, NULL,
-                            GTCB_Checked, 0,
-                            TAG_END);
+		if (typeAmiGUS == AmiGUS_Zorro2)
+		{			
+		   GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_PAULA], win, NULL,
+								GTCB_Checked, 1,
+								TAG_END);		
+		   GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_CDROM], win, NULL,
+								GTCB_Checked, 0,
+								TAG_END);
+		   GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_LINE], win, NULL,
+								GTCB_Checked, 0,
+								TAG_END);
+		}				
        GT_SetGadgetAttrs(myGads[MYGAD_CHKBOX_AHI], win, NULL,
                             GTCB_Checked, 1,
                             TAG_END);
@@ -1085,7 +1185,12 @@ switch (gad->GadgetID)
 				GTCY_Active, 0,
 				TAG_END);
 				
-		InitCFGMem (cfgMem);					
+		if (typeAmiGUS == AmiGUS_mini)
+				GT_SetGadgetAttrs(myGads[MYGAD_CYCLE_VURANGE], win, NULL,
+				GTCY_Active, 2,
+				TAG_END);	
+				
+		InitCFGMem (cfgMem,typeAmiGUS);					
 		mixDat->ahi_vol_ll = 0x8000;
 		mixDat->ahi_vol_rr = 0x8000;
 		mixDat->mhi_vol_ll = 0x8000;
@@ -1103,6 +1208,7 @@ switch (gad->GadgetID)
 		mixDat->adc_enable = 0x0002;
 		
 		mixDat->toslink_srate = 0x0;
+		mixDat->vu_mode = 0x2;
 
 		mixDat->ahi_locked = TRUE;
 		mixDat->mhi_locked = TRUE;
@@ -1134,9 +1240,19 @@ switch (gad->GadgetID)
 		mixDat->toslink_srate = (UWORD)code;
 		*((ULONG *)((ULONG)cfgMem+0x0088)) = 0x00000070 |(ULONG)((ULONG)mixDat->toslink_srate << 16);	// MAIN_TOSLINK_CTRL
 		break;
-	
+	case MYGAD_CYCLE_VURANGE:
+		mixDat->vu_mode = (UWORD)code;
+		if (code == 0)
+			regVal = 0;
+		else
+		{
+			regVal = (UWORD)((((code-1)<<2)&0x0c)|0x2);
+			
+		}
+		*((ULONG *)((ULONG)cfgMem+0x008c)) = 0x000000d4 | (ULONG)((ULONG)regVal << 16);
+		break;	
     }
-	SetMixer(boardBase,mixDat);
+	SetMixer(boardBase,mixDat,typeAmiGUS);
 }
 
 
@@ -1170,7 +1286,7 @@ switch (code)
 ** which can be checked for success/failure.
 */
 struct Gadget *CreateAllGadgets(struct Gadget **gadListptr, void *vi,
-    UWORD topBorder, struct Gadget *myGads[])
+    UWORD topBorder, struct Gadget *myGads[], UWORD typeAmiGUS)
 {
 	struct NewGadget ng;
 	struct Gadget *gad;
@@ -1189,6 +1305,16 @@ struct Gadget *CreateAllGadgets(struct Gadget **gadListptr, void *vi,
 		"48kHz",
 		"96kHz",
 		"192kHz",
+		NULL
+    };
+	
+	static const char *vuOptions[] =
+    {
+		"OFF",
+		"LOW",
+		"MEDIUM",
+		"HIGH",
+		"MAX",
 		NULL
     };
 
@@ -1455,8 +1581,10 @@ struct Gadget *CreateAllGadgets(struct Gadget **gadListptr, void *vi,
 	ng.ng_GadgetText = "Paula";
 	ng.ng_GadgetID   = MYGAD_CHKBOX_PAULA;
 	ng.ng_Flags      = NG_HIGHLABEL | PLACETEXT_RIGHT;
-	myGads[MYGAD_CHKBOX_PAULA] = gad = CreateGadget(CHECKBOX_KIND, gad, &ng,
-						TAG_END);
+	
+	if (typeAmiGUS == AmiGUS_Zorro2)
+		myGads[MYGAD_CHKBOX_PAULA] = gad = CreateGadget(CHECKBOX_KIND, gad, &ng,
+							TAG_END);
 						
 	ng.ng_LeftEdge  += 0;
 	ng.ng_TopEdge   += 16;
@@ -1465,8 +1593,10 @@ struct Gadget *CreateAllGadgets(struct Gadget **gadListptr, void *vi,
 	ng.ng_GadgetText = "CDROM";
 	ng.ng_GadgetID   = MYGAD_CHKBOX_CDROM;
 	ng.ng_Flags      = NG_HIGHLABEL | PLACETEXT_RIGHT;
-	myGads[MYGAD_CHKBOX_CDROM] = gad = CreateGadget(CHECKBOX_KIND, gad, &ng,
-						TAG_END);	
+
+	if (typeAmiGUS == AmiGUS_Zorro2)
+		myGads[MYGAD_CHKBOX_CDROM] = gad = CreateGadget(CHECKBOX_KIND, gad, &ng,
+							TAG_END);	
 						
 	ng.ng_LeftEdge  += 0;
 	ng.ng_TopEdge   += 16;
@@ -1475,8 +1605,10 @@ struct Gadget *CreateAllGadgets(struct Gadget **gadListptr, void *vi,
 	ng.ng_GadgetText = "Line";
 	ng.ng_GadgetID   = MYGAD_CHKBOX_LINE;
 	ng.ng_Flags      = NG_HIGHLABEL | PLACETEXT_RIGHT;
-	myGads[MYGAD_CHKBOX_LINE] = gad = CreateGadget(CHECKBOX_KIND, gad, &ng,
-						TAG_END);	
+	
+	if (typeAmiGUS == AmiGUS_Zorro2)	
+		myGads[MYGAD_CHKBOX_LINE] = gad = CreateGadget(CHECKBOX_KIND, gad, &ng,
+							TAG_END);	
 
 	ng.ng_LeftEdge  = 24;
 	ng.ng_TopEdge   = topBorder + 132-14;
@@ -1579,6 +1711,23 @@ struct Gadget *CreateAllGadgets(struct Gadget **gadListptr, void *vi,
 						GTCY_Active, 0,
 						GA_Disabled, FALSE,
 						TAG_END);							
+
+	if (typeAmiGUS == AmiGUS_mini)
+	{
+		ng.ng_LeftEdge  -= 0;
+		ng.ng_TopEdge   -= 44;
+		ng.ng_Width      = 72;
+		ng.ng_Height     = 12;
+		ng.ng_GadgetText = "";
+		ng.ng_GadgetID   = MYGAD_CYCLE_VURANGE;
+		ng.ng_Flags      = 0;
+		myGads[MYGAD_CYCLE_VURANGE] = gad = CreateGadget(CYCLE_KIND, gad, &ng,
+							GTCY_Labels, (ULONG)vuOptions,
+							GTCY_Active, 0,
+							GA_Disabled, FALSE,
+							TAG_END);		
+	}
+
 						
 	return(gad);
 }
@@ -1587,7 +1736,7 @@ struct Gadget *CreateAllGadgets(struct Gadget **gadListptr, void *vi,
 
 
 void ProcessWindowEvents(struct Window *myWin,
-	struct Gadget *myGads[],struct TextFont *font,UWORD topBorder,struct mixData *mixDat,APTR boardBase,APTR cfgMem,ULONG waitMask,struct intData *intData)
+	struct Gadget *myGads[],struct TextFont *font,UWORD topBorder,struct mixData *mixDat,APTR boardBase,APTR cfgMem,ULONG waitMask,struct intData *intData,UWORD typeAmiGUS)
 {
 	struct IntuiMessage *imsg;
 	ULONG imsgClass;
@@ -1660,7 +1809,7 @@ void ProcessWindowEvents(struct Window *myWin,
 					case IDCMP_GADGETDOWN:
 					case IDCMP_GADGETUP:					
 					case IDCMP_MOUSEMOVE:					
-						HandleGadgetEvent(myWin, gad, imsgCode, myGads, &terminated,mixDat,boardBase,cfgMem,intData);
+						HandleGadgetEvent(myWin, gad, imsgCode, myGads, &terminated,mixDat,boardBase,cfgMem,intData,typeAmiGUS);
 						UpdateSliders(myWin, myGads,mixDat);
 						
 						break;
@@ -1675,7 +1824,7 @@ void ProcessWindowEvents(struct Window *myWin,
 						UpdateSliders(myWin, myGads,mixDat);
 						GT_BeginRefresh(myWin);
 						GT_EndRefresh(myWin, TRUE);
-						DrawBorders(myWin->RPort,topBorder,font);
+						DrawBorders(myWin->RPort,topBorder,font,typeAmiGUS);
 					break;
 				}
 			}
@@ -1688,7 +1837,7 @@ void GadToolsWindow(void)
 	struct TextFont 	*font;
 	struct Screen   	*myScreen;
 	struct Window   	*myWin;
-	struct Gadget   	*gadList, *myGads[24];
+	struct Gadget   	*gadList, *myGads[25];
 	struct mixData		*mixDat;
 	struct AmiGUS 	    *myAmiGUS;
 	
@@ -1696,6 +1845,8 @@ void GadToolsWindow(void)
 	struct intData 		*intData;		
 	
 	void            	*vi;
+
+	UWORD	typeAmiGUS;
 
 	APTR	boardBase;
 	
@@ -1717,7 +1868,11 @@ void GadToolsWindow(void)
 	if ((myAmiGUS) || (!requireBoard))
 	{
 		boardBase = myAmiGUS->agus_PcmBase;
+		typeAmiGUS = myAmiGUS->agus_TypeId;
 		//printf("AmiGUS found at $%lx\n",boardBase);
+		
+		//typeAmiGUS = AmiGUS_mini;
+		//typeAmiGUS = AmiGUS_Zorro2;		
 	}
 	else
 	{
@@ -1727,7 +1882,7 @@ void GadToolsWindow(void)
 
 	if (cfgMem = AllocMem(FLASH_CONFIG_SIZE,MEMF_ANY))
     {
-		InitCFGMem (cfgMem);
+		InitCFGMem (cfgMem,typeAmiGUS);
 	}
 	else 
 	{
@@ -1750,6 +1905,7 @@ void GadToolsWindow(void)
 		mixDat->adc_mix_lr = 0x0000;
 		
 		mixDat->toslink_srate = 0x0000;
+		mixDat->vu_mode = 0x2;
 		
 		mixDat->adc_enable = 0x2;		
 	}
@@ -1763,27 +1919,35 @@ void GadToolsWindow(void)
 	{
 		EraseFlash(boardBase);
 		ProgramFlash(boardBase,cfgMem);
-		SetMixer(boardBase,mixDat);		
+		SetMixer(boardBase,mixDat,typeAmiGUS);		
 	}
 
-	/* ================ Configure ADC ================ */
+    switch (typeAmiGUS) {
 
-	WriteSPI(boardBase, 0x70, 0x75);	// Enable ADC I2S Master Mode
+      case AmiGUS_Zorro2: {
+		/* ================ Configure ADC ================ */
 
-	WriteSPI(boardBase, 0x20, 0x90);	// Enable ADC I2S Master Mode
-	WriteSPI(boardBase, 0x21, 0x0);		// DSP1 Clock
-	WriteSPI(boardBase, 0x22, 0x0);		// DSP2 Clock
-	WriteSPI(boardBase, 0x23, 0x7);		// ADC Clock
+		WriteSPI(boardBase, 0x70, 0x75);	// Enable ADC I2S Master Mode
 
-	WriteSPI(boardBase, 0x26, 0x3);		// Set BCLK = CLK/2 (192kHz sampling rate)	
-	
-	WriteSPI(boardBase, 0x28, 0x0);		// Disable PLL
-	
-	WriteSPI(boardBase, 0x19, 0xff);	// Set Manual Gain Control
-	WriteSPI(boardBase, 0x01, 0x20);	// Increase Left Gain
-	WriteSPI(boardBase, 0x02, 0x20);	// Increase Right Gain
+		WriteSPI(boardBase, 0x20, 0x90);	// Enable ADC I2S Master Mode
+		WriteSPI(boardBase, 0x21, 0x0);		// DSP1 Clock
+		WriteSPI(boardBase, 0x22, 0x0);		// DSP2 Clock
+		WriteSPI(boardBase, 0x23, 0x7);		// ADC Clock
 
-	WriteSPI(boardBase, 0x70, 0x70);	// Enable ADC I2S Master Mode
+		WriteSPI(boardBase, 0x26, 0x3);		// Set BCLK = CLK/2 (192kHz sampling rate)	
+		
+		WriteSPI(boardBase, 0x28, 0x0);		// Disable PLL
+		
+		WriteSPI(boardBase, 0x19, 0xff);	// Set Manual Gain Control
+		WriteSPI(boardBase, 0x01, 0x20);	// Increase Left Gain
+		WriteSPI(boardBase, 0x02, 0x20);	// Increase Right Gain
+
+		WriteSPI(boardBase, 0x70, 0x70);	// Enable ADC I2S Master Mode
+      }
+      case AmiGUS_mini: {
+        break;
+	  }
+	}
 
 	/* ================== Interrupt Routine =============== */
 	
@@ -1843,12 +2007,12 @@ void GadToolsWindow(void)
             {
 				topBorder = myScreen->WBorTop + (myScreen->Font->ta_YSize + 1);
 
-				if (NULL == CreateAllGadgets(&gadList, vi, topBorder, myGads))
+				if (NULL == CreateAllGadgets(&gadList, vi, topBorder, myGads, typeAmiGUS))
 					printf("ERROR: Could not create gadgets\n");
 				else
 				{
 					if (NULL == (myWin = OpenWindowTags(NULL,
-							WA_Title,     "AmiGUS Mixer V0.68 - (c)2025 by O. Achten",
+							WA_Title,     "AmiGUS Mixer V0.7 - (c)2026 by O. Achten",
 							WA_Gadgets,   gadList,      WA_AutoAdjust,    TRUE,
 							WA_Width,       528,      WA_MinWidth,        50,
 							WA_InnerHeight, 154,      WA_MinHeight,       50,
@@ -1863,12 +2027,12 @@ void GadToolsWindow(void)
 						printf("ERROR: Could not open window\n");
 					else
 						{
-						InitGadgets(myWin, myGads, mixDat,boardBase,cfgMem);
-						DrawBorders(myWin->RPort,topBorder,font);
+						InitGadgets(myWin, myGads, mixDat,boardBase,cfgMem,typeAmiGUS);
+						DrawBorders(myWin->RPort,topBorder,font,typeAmiGUS);
 						
 						GT_RefreshWindow(myWin, NULL);
 
-						ProcessWindowEvents(myWin, myGads, font,topBorder,mixDat,boardBase,cfgMem,waitMask,intData);
+						ProcessWindowEvents(myWin, myGads, font,topBorder,mixDat,boardBase,cfgMem,waitMask,intData,typeAmiGUS);
 
 						CloseWindow(myWin);
 						}

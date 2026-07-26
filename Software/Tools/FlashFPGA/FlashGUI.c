@@ -416,7 +416,7 @@ void ProgramCoreFlash(APTR base, APTR memory, UWORD topborder, struct Window *my
 	while (cnt < length);
 }
 
-void initCfgMem (APTR cfg_mem)
+void initCfgMem (APTR cfg_mem, UWORD typeAmiGUS)
 {
 	ULONG cnt = 0;
 		
@@ -426,49 +426,7 @@ void initCfgMem (APTR cfg_mem)
 	} while (cnt != 0x4000);
 	
 	*((ULONG *)((ULONG)cfg_mem+0x0000)) = 0x414d4947;	// Magic Token - Unlock
-		
-/* Fix ADC Initialisation */
-
-	// ADC Reset Registers
-	*((ULONG *)((ULONG)cfg_mem+0x0004)) = 0x00000020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0008)) = 0x00fe0022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x000c)) = 0x00000024;	// MAIN_SPI_WTRIG	
-	
-	// ADC Power-Down
-	*((ULONG *)((ULONG)cfg_mem+0x0010)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0014)) = 0x00750022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0018)) = 0x00000024;	// MAIN_SPI_WTRIG	
-		
-	//  Set Manual Gain Control
-
-	*((ULONG *)((ULONG)cfg_mem+0x001c)) = 0x00190020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0020)) = 0x00ff0022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0024)) = 0x00000024;	// MAIN_SPI_WTRIG
-		
-	// Increase Left Gain
-		
-	*((ULONG *)((ULONG)cfg_mem+0x0028)) = 0x00010020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x002c)) = 0x00200022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0030)) = 0x00000024;	// MAIN_SPI_WTRIG
-		
-	// Increase Right Gain
-		
-	*((ULONG *)((ULONG)cfg_mem+0x0034)) = 0x00020020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0038)) = 0x00200022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x003c)) = 0x00000024;	// MAIN_SPI_WTRIG
-		
-	// Enable Left Inputs
-		
-	*((ULONG *)((ULONG)cfg_mem+0x0040)) = 0x00060020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0044)) = 0x00020022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0048)) = 0x00000024;	// MAIN_SPI_WTRIG		
-		
-	// Enable Right Inputs
-		
-	*((ULONG *)((ULONG)cfg_mem+0x004c)) = 0x00070020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0050)) = 0x00020022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0054)) = 0x00000024;	// MAIN_SPI_WTRIG			
-		
+				
 /* Mixer Settings */
 	
 	*((ULONG *)((ULONG)cfg_mem+0x0058)) = 0x80000030;	// MAIN_ADC_VOLUME_LL
@@ -489,20 +447,99 @@ void initCfgMem (APTR cfg_mem)
 
 	*((ULONG *)((ULONG)cfg_mem+0x0088)) = 0x00000070;	// MAIN_TOSLINK_CTRL
 
-	// Clock control - automatic clock detection
-	*((ULONG *)((ULONG)cfg_mem+0x008c)) = 0x00200020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x0090)) = 0x001f0022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x0094)) = 0x00000024;	// MAIN_SPI_WTRIG
-
-	// Set BCLK = CLK/4 (192kHz sampling rate)
-	*((ULONG *)((ULONG)cfg_mem+0x0098)) = 0x00260020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x009c)) = 0x00030022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00a0)) = 0x00000024;	// MAIN_SPI_WTRIG
+/* Card Specific Settings */	
 	
-	// ADC Power-Up
-	*((ULONG *)((ULONG)cfg_mem+0x00a4)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
-	*((ULONG *)((ULONG)cfg_mem+0x00a8)) = 0x00700022;	// MAIN_SPI_WDATA = regval
-	*((ULONG *)((ULONG)cfg_mem+0x00ac)) = 0x00000024;	// MAIN_SPI_WTRIG		
+    switch (typeAmiGUS) {
+
+      case AmiGUS_Zorro2:
+
+		/* PCM1864 ADC Settings */
+
+		// ADC Reset Registers
+		*((ULONG *)((ULONG)cfg_mem+0x0004)) = 0x00000020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x0008)) = 0x00fe0022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x000c)) = 0x00000024;	// MAIN_SPI_WTRIG	
+			
+		// ADC Power-Down
+		*((ULONG *)((ULONG)cfg_mem+0x0010)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x0014)) = 0x00750022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x0018)) = 0x00000024;	// MAIN_SPI_WTRIG	
+				
+		//  Set Manual Gain Control
+
+		*((ULONG *)((ULONG)cfg_mem+0x001c)) = 0x00190020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x0020)) = 0x00ff0022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x0024)) = 0x00000024;	// MAIN_SPI_WTRIG
+				
+		// Increase Left Gain
+				
+		*((ULONG *)((ULONG)cfg_mem+0x0028)) = 0x00010020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x002c)) = 0x00200022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x0030)) = 0x00000024;	// MAIN_SPI_WTRIG
+				
+		// Increase Right Gain
+				
+		*((ULONG *)((ULONG)cfg_mem+0x0034)) = 0x00020020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x0038)) = 0x00200022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x003c)) = 0x00000024;	// MAIN_SPI_WTRIG
+				
+		// Enable Left Inputs
+				
+		*((ULONG *)((ULONG)cfg_mem+0x0040)) = 0x00060020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x0044)) = 0x00020022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x0048)) = 0x00000024;	// MAIN_SPI_WTRIG		
+				
+		// Enable Right Inputs
+				
+		*((ULONG *)((ULONG)cfg_mem+0x004c)) = 0x00070020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x0050)) = 0x00020022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x0054)) = 0x00000024;	// MAIN_SPI_WTRIG			
+
+		// Clock control - automatic clock detection
+
+		*((ULONG *)((ULONG)cfg_mem+0x008c)) = 0x00200020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x0090)) = 0x001f0022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x0094)) = 0x00000024;	// MAIN_SPI_WTRIG
+
+		// Set BCLK = CLK/4 (192kHz sampling rate)
+
+		*((ULONG *)((ULONG)cfg_mem+0x0098)) = 0x00260020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x009c)) = 0x00030022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x00a0)) = 0x00000024;	// MAIN_SPI_WTRIG
+			
+		// ADC Power-Up
+
+		*((ULONG *)((ULONG)cfg_mem+0x00a4)) = 0x00700020;	// MAIN_SPI_ADDRESS = regnum
+		*((ULONG *)((ULONG)cfg_mem+0x00a8)) = 0x00700022;	// MAIN_SPI_WDATA = regval
+		*((ULONG *)((ULONG)cfg_mem+0x00ac)) = 0x00000024;	// MAIN_SPI_WTRIG		
+        break;
+      case AmiGUS_mini:
+			*((ULONG *)((ULONG)cfg_mem+0x0004)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0008)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x000c)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0010)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0014)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0018)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x001c)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0020)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0024)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0028)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x002c)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0030)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0034)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0038)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x003c)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0040)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0044)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0048)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x004c)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0050)) = 0x000000fe;	// NIL
+			*((ULONG *)((ULONG)cfg_mem+0x0054)) = 0x000000fe;	// NIL
+			
+		/* LED VU Meter */
+		*((ULONG *)((ULONG)cfg_mem+0x008c)) = 0x006000d4;	// MAIN_LED_CTRL
+        break;
+	  }	
 
 /* End of Stream */
 	*((ULONG *)((ULONG)cfg_mem+0x00b0)) = 0xffffffff;
@@ -770,6 +807,7 @@ VOID process_window_events(struct Window *mywin,
 
 	BPTR 	filehandle;
     long 	filesize;
+	long	coresize;
 	
 #ifdef DEBUG
 	BOOL	requireBoard = FALSE;
@@ -786,18 +824,21 @@ VOID process_window_events(struct Window *mywin,
 	ULONG	fpga_id_high;
 	ULONG	fpga_id_low;
 
+	UWORD	typeAmiGUS;
+
 	APTR	cfg_mem;
 	APTR	core_mem;
 	
 
-	wPrintF(0,"AmiGUS Flash Tool V0.44", TRUE,topborder,font,mywin);
-	wPrintF(1,"(C)2025 by Oliver Achten", FALSE,topborder,font,mywin);
+	wPrintF(0,"AmiGUS Flash Tool V0.5", TRUE,topborder,font,mywin);
+	wPrintF(1,"(C)2026 by Oliver Achten", FALSE,topborder,font,mywin);
 	
 	/* Find AmiGus Card */
 	
 	myAmiGUS = AmiGUS_FindCard(NULL);
 	if ((myAmiGUS) || (!requireBoard))
 	{
+		typeAmiGUS = myAmiGUS->agus_TypeId;		
 		board_base = myAmiGUS->agus_PcmBase;
 
 		fpga_date_minute = myAmiGUS->agus_Minute;
@@ -808,8 +849,10 @@ VOID process_window_events(struct Window *mywin,
 			
 		fpga_id_high = myAmiGUS->agus_FpgaId.idLongs[ 0 ];
 		fpga_id_low = myAmiGUS->agus_FpgaId.idLongs[ 1 ];
-
-		wPrintF(3,"AmiGUS card found!", FALSE,topborder,font,mywin);
+		if (typeAmiGUS == AmiGUS_Zorro2)
+			wPrintF(3,"AmiGUS card found!", FALSE,topborder,font,mywin);
+		else
+			wPrintF(3,"AmiGUS mini card found!", FALSE,topborder,font,mywin);			
 	}
 	else
 	{
@@ -835,7 +878,7 @@ VOID process_window_events(struct Window *mywin,
 
 	if (cfg_mem = AllocMem(FLASH_CONFIG_SIZE,MEMF_ANY))
     {
-		if (core_mem = AllocMem(FLASH_CORE_SIZE,MEMF_ANY))
+		if (core_mem = AllocMem(FLASH_CORE_SIZE+8,MEMF_ANY))
 		{
 		}
 		else
@@ -943,7 +986,12 @@ VOID process_window_events(struct Window *mywin,
 					filesize = fib->fib_Size;
 					FreeDosObject(DOS_FIB,fib);
 					
-					if (filesize == FLASH_CORE_SIZE)
+					if (typeAmiGUS == AmiGUS_Zorro2)
+						coresize = FLASH_CORE_SIZE;
+					else
+						coresize = FLASH_CORE_SIZE + 8;
+					
+					if (filesize == coresize)
 					{				
 						if (Read(filehandle, core_mem, filesize)==-1)	// Preload all memory buffers
 						{
@@ -1000,7 +1048,7 @@ VOID process_window_events(struct Window *mywin,
 				wPrintF(0,"Reset FPGA config data... done!", TRUE,topborder,font,mywin);
 				SetAPen(mywin->RPort, 0);
 				RectFill(mywin->RPort, 120, topborder+146-14, 120+253, topborder+157-14);	
-				initCfgMem(cfg_mem);
+				initCfgMem(cfg_mem,typeAmiGUS);
 				EraseConfigFlash(board_base);
 				ProgramConfigFlash(board_base,cfg_mem);
 				SetAPen(mywin->RPort, 3);
@@ -1131,7 +1179,7 @@ VOID process_window_events(struct Window *mywin,
 	}
 	
 	FreeMem(cfg_mem,FLASH_CONFIG_SIZE);
-	FreeMem(core_mem,FLASH_CORE_SIZE);
+	FreeMem(core_mem,FLASH_CORE_SIZE+8);
 }
 
 /*

@@ -87,6 +87,7 @@ release-publish: release
 	@echo $(ADF_IMAGE1)   >> $(BDIR)/TEMP_FILE_UPLOADS
 	@echo $(ADF_IMAGE2)   >> $(BDIR)/TEMP_FILE_UPLOADS
 	@echo $(ADF_IMAGE3)   >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(ADF_IMAGE4)   >> $(BDIR)/TEMP_FILE_UPLOADS
 	@echo "Files to release: \n$$(cat $(BDIR)/TEMP_FILE_UPLOADS)\n\n\n"
 	for UPLOAD_PATH in $$(cat $(BDIR)/TEMP_FILE_UPLOADS)            ; \
 	do                                                                \

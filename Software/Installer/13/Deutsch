@@ -335,14 +335,14 @@ IF WARN
     SETENV >NIL: TOOLSPATH "SYS:Expansion/AmiGUS"
   ENDIF
 
-  ASSIGN >NIL: AmiGUS-Manual:
+  ASSIGN >NIL: AmiGUSz2-Manual:
 
   IF EXISTS AmiGUS-13-SRC:Manual
     ; Installing from lha archive
     SETENV >NIL: MANUALPATH "AmiGUS-13-SRC:Manual/"
   ELSE
     ; Installing from ADF/Disk
-    SETENV >NIL: MANUALPATH "AmiGUS-Manual:"
+    SETENV >NIL: MANUALPATH "AmiGUSz2-Manual:"
   ENDIF
 
   ECHO   >  RAM:AmiGUS_installer1 "IF NOT EXISTS TOOLSPATH"

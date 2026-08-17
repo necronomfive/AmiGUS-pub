@@ -1,11 +1,11 @@
-@DATABASE "AmiGUS manual"
+@DATABASE "AmiGUS mini manual"
 
-@NODE main "AmiGUS User Manual"
+@NODE main "AmiGUS mini User Manual"
 @TOC contents
 @FONT helvetica.font 24
-@{JLEFT}@{B}@{IMG ilbm/logo0.iff}ADVANCED AMIGA SOUNDCARD
+@{JLEFT}@{B}@{IMG ilbm/logo10.iff}ADVANCED AMIGA SOUNDCARD
 @{JRIGHT}User Manual
-@{JCENTER}@{IMG ilbm/card0.iff}@{JLEFT}@{IMG ilbm/logo1.iff}@{JCENTER}@{" Next " LINK contents}
+@{JCENTER}@{IMG ilbm/card10.iff}@{JLEFT}@{IMG ilbm/logo1.iff}@{JCENTER}@{" Next " LINK contents}
 @ENDNODE
 
 @NODE contents "Table Of Contents"
@@ -15,7 +15,7 @@
 
 @{" 1     Overview                      " LINK intro}
 @{" 1.1   Introduction                  " LINK intro}
-@{" 1.2   AmiGUS Key Features           " LINK features}
+@{" 1.2   AmiGUS mini Key Features      " LINK features}
 @{" 1.3   Hardware Overview             " LINK overview}
 @{" 1.3.1 Hardware Ports                " LINK ports}
 @{" 1.3.2 Hardware Components           " LINK components}
@@ -25,29 +25,22 @@
 
 @{" 2     Installation                  " LINK hw_inst}
 @{" 2.1   Card Installation             " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-@{" 2.3   External Audio Set-Up         " LINK external}
-@{" 2.4   Software Installation         " LINK sw_inst}
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
 
-@{" 3     Software Tools                " LINK mixer1}
-@{" 3.1   Mixer Tool                    " LINK mixer1}
-@{" 3.1.1 Mixer Panel Descriptions      " LINK mixer2}
-@{" 3.2   FPGA Flash Tool               " LINK flash1}
-@{" 3.2.1 Available Options             " LINK flash2}
+@{" 3     Software Tools                " LINK sw_inst20}
+@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
+@{" 3.2   Mixer Tool                    " LINK mixer1}
+@{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
+@{" 3.3   FPGA Flash Tool               " LINK flash1}
+@{" 3.3.1 Available Options             " LINK flash2}
 
 @{" 4     amigus.library                " LINK aguslib}
 @{" 4.1   amigus.library dev kit        " LINK aguslib_dev}
 
 @{" 5     AHI Driver Framework          " LINK ahi}
-@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.1   Using AHI with AmiGUS mini    " LINK ahi_amigus}
 @{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3   Configuring AmiGUS mini AHI   " LINK ahi_config}
 @{" 5.3.1 Available Options             " LINK ahi_options}
 
 @{" 6     MHI Driver Framework          " LINK mhi}
@@ -67,13 +60,13 @@
 @{" 1     Overview                      " LINK intro}
 @{" 1.1   Introduction                  " LINK intro}
 
-Thank you very much for purchasing the AmiGUS soundcard. The
-AmiGUS was designed to enable high-resolution audio playback
-on your Amiga computer. All audio processing makes extensive
-use of hardware acceleration in order to provide this quality
-even on low-end Amiga configurations.
+Thank you very much for purchasing the AmiGUS mini soundcard. It was
+designed to enable high-resolution audio playback on your Amiga
+computer. All audio processing makes extensive use of hardware
+acceleration in order to provide this quality even on low-end Amiga
+configurations.
 
-@{" 1.2   AmiGUS Key Features           " LINK features}
+@{" 1.2   AmiGUS mini Key Features      " LINK features}
 @{" 1.3   Hardware Overview             " LINK overview}
 @{" 1.3.1 Hardware Ports                " LINK ports}
 @{" 1.3.2 Hardware Components           " LINK components}
@@ -86,15 +79,15 @@ even on low-end Amiga configurations.
 @TOC contents
 @{" 1     Overview                      " LINK intro}
 @{" 1.1   Introduction                  " LINK intro}
-@{" 1.2   AmiGUS Key Features           " LINK features}
+@{" 1.2   AmiGUS mini Key Features      " LINK features}
 
-  - Zorro II bus interface for Amiga 2000, 3000, 4000 computers
-    and compatible bus boards
-  - 24-bit, 192 kHz stereo sample DAC and ADC
-    - 1 analogue audio stereo output
-    - 3 analogue audio stereo inputs
-  - TOSLINK optical output,
-    supporting 48, 96 and 192 kHz @ 24-bit resolution
+  - PCMCIA bus interface for Amiga 600/1200 computers
+  - 24-bit, 192kHz stereo sample DAC
+    - 1 combined analogue/optical 3.5mm stereo output
+  - 24-bit, 96kHz stereo sample ADC
+    - 1 analogue audio 3.5mm stereo output
+  - mini TOSLINK optical output, supporting 48, 96 and
+    192kHz @ 24-bit resolution
   - MP3 / OGG Vorbis hardware codec chip (VLSI VS1063)
   - Digital sound processing accelerator chip
     - 3 separate software interfaces (AHI, MHI, MIDI/Wave)
@@ -103,9 +96,11 @@ even on low-end Amiga configurations.
       - Stereo panning
       - Per-voice linear sample interpolation
       - Hardware ADSR envelope
-    - Full 24-bit 192 kHz processing and mixing paths
-    - Hardware accelerated data transfers to / from DAC, ADC and MP3 chips
+    - Full 24-bit 192kHz processing and mixing paths
+    - Hardware accelerated data transfers to / from DAC,
+      ADC & MP3 chips
   - 32 MB wavetable RAM
+  - LED-based VU meter, adjustable in sensitivity
 
 @{" 1.3   Hardware Overview             " LINK overview}
 @{" 1.3.1 Hardware Ports                " LINK ports}
@@ -119,13 +114,13 @@ even on low-end Amiga configurations.
 @TOC contents
 @{" 1     Overview                      " LINK intro}
 @{" 1.1   Introduction                  " LINK intro}
-@{" 1.2   AmiGUS Key Features           " LINK features}
+@{" 1.2   AmiGUS mini Key Features      " LINK features}
 @{" 1.3   Hardware Overview             " LINK overview}
 
-In the following picture you can see an overview of the AmiGUS card,
-its interfaces and the main hardware components which provide the
-card's functionality.
-@{"Hardware Overview" system "MultiView ilbm/card1.iff"}@{IMG ilbm/card1.iff}
+In the following picture you can see an overview of the AmiGUS mini
+card, its interfaces and the main hardware components which provide
+the card's functionality.
+@{"Hardware Overview" system "MultiView ilbm/card11.iff"}@{IMG ilbm/card11.iff}
 
 @{" 1.3.1 Hardware Ports                " LINK ports}
 @{" 1.3.2 Hardware Components           " LINK components}
@@ -138,7 +133,7 @@ card's functionality.
 @TOC contents
 @{" 1     Overview                      " LINK intro}
 @{" 1.1   Introduction                  " LINK intro}
-@{" 1.2   AmiGUS Key Features           " LINK features}
+@{" 1.2   AmiGUS mini Key Features      " LINK features}
 @{" 1.3   Hardware Overview             " LINK overview}
 @{" 1.3.1 Hardware Ports                " LINK ports}
 
@@ -149,28 +144,16 @@ card's functionality.
 |                  | debug the FPGA. Should only be used for initial     |
 |                  | programming or servicing the card.                  |
 +------------------+-----------------------------------------------------+
-| Expansion Port   | Direct digital audio signal which can be provided   |
-|                  | to other cards to process the AmiGUS final mixer    |
-|                  | output.                                             |
+| Analogue &       | 3.5mm jack with combined stereo analogue / TOSLINK  |
+| TOSLINK Digital  | digital output, supporting up to 192kHz,            |
+| Output           | 24-bit audio data rates in both modes.              |
 +------------------+-----------------------------------------------------+
-| TOSLINK          | TOSLINK output which connects to an optical         |
-| Digital Output   | interface. AmiGUS supports up to 192 kHz, 24-bit    |
-|                  | audio data rates over this link.                    |
+| Analogue Input   | This port can directly connect to the AMIGA?s       |
+|                  | native PAULA audio signal, which is mixed and       |
+|                  | output with the AmiGUS mini final output.           |
 +------------------+-----------------------------------------------------+
-| Analogue Output  | Standard RCA jacks which connect to an analogue     |
-|                  | stereo line-level input.                            |
-+------------------+-----------------------------------------------------+
-| PAULA Input      | This port can directly connect to the               |
-|                  | AMIGA's native PAULA audio signal, which is mixed   |
-|                  | and output with the AmiGUS final output.            |
-+------------------+-----------------------------------------------------+
-| CD-ROM Input     | You can directly connect an internal CD-ROM audio   |
-|                  | cable to this port, which allows mixing the         |
-|                  | CD audio coming from the drive with the AmiGUS      |
-|                  | final output.                                       |
-+------------------+-----------------------------------------------------+
-| External Input   | Line-level input to connect and mix an external     |
-|                  | audio stereo source via 3.5 mm audio jack.          |
+| LED VU Meter     | Realtime display of the audio signal level,         |
+|                  | showing up to 128 levels of intensity.              |
 +------------------+-----------------------------------------------------+
 
 @{" 1.3.2 Hardware Components           " LINK components}
@@ -183,7 +166,7 @@ card's functionality.
 @TOC contents
 @{" 1     Overview                      " LINK intro}
 @{" 1.1   Introduction                  " LINK intro}
-@{" 1.2   AmiGUS Key Features           " LINK features}
+@{" 1.2   AmiGUS mini Key Features      " LINK features}
 @{" 1.3   Hardware Overview             " LINK overview}
 @{" 1.3.1 Hardware Ports                " LINK ports}
 @{" 1.3.2 Hardware Components           " LINK components}
@@ -191,11 +174,11 @@ card's functionality.
 +------------------+-----------------------------------------------------+
 | Component        | Function                                            |
 +------------------+-----------------------------------------------------+
-| Digital          | The Digital Sound Processor (HAGEN) is responsible  |
+| Digital          | The Digital Sound Processor (SHIVA) is responsible  |
 | Sound            | for most of the digital sample processing and       |
 | Processor        | mixing. It directly connects to the Amiga's         |
-| (HAGEN)          | Zorro bus and provides all necessary interfaces to  |
-|                  | the memory and audio support chips.                 |
+| (SHIVA)          | PCMCIA bus and provides all necessary interfaces    |
+|                  | to the memory and audio support chips.              |
 +------------------+-----------------------------------------------------+
 | 32 MB SDRAM      | This SDRAM memory chip can store up to 32 MB of     |
 |                  | audio sample data for digital playback and mixing.  |
@@ -204,18 +187,19 @@ card's functionality.
 | Hardware Codec   | supports hardware accelerated decoding of           |
 |                  | compressed audio streams such as MP3 or Ogg Vorbis. |
 +------------------+-----------------------------------------------------+
-| PCM1812 ADC      | The PCM1812 ADC made by Texas Instruments is        |
+| PCM1808 ADC      | The PCM1808 ADC made by Texas Instruments is        |
 |                  | responsible for converting all external audio       |
-|                  | inputs to a digital stream which is processed and   |
-|                  | mixed by the Digital Sound Processor.               |
+|                  | inputs to a 24-bit, 96kHz digital stream which is   |
+|                  | processed and mixed by the Digital Sound Processor. |
 +------------------+-----------------------------------------------------+
-| PCM1794 DAC      | The PCM1794 DAC made by Texas Instruments receives  |
-|                  | the final mixed digital audio stream and converts   |
-|                  | it to a line-level analogue audio signal. The audio |
-|                  | data rate is always 24-bit, 192 kHz.                |
+| CS4354 DAC       | The CS4354 DAC made by Cirrus Logic receives the    |
+|                  | final mixed digital audio stream and converts it to |
+|                  | a line-level analogue audio signal. The audio data  |
+|                  | rate is always 24-bit, 192kHz.                      |
 +------------------+-----------------------------------------------------+
-| Zorro II         | AmiGUS implements a Zorro II bus interface which    |
-| Interface        | supports full AutoConfig and interrupt handling.    |
+| PCMCIA           | AmiGUS mini implements a PCMCIA bus interface which |
+| Interface        | maps only to the I/O area, supporting 8MB Zorro II  |
+|                  | Autoconfig expansions.                              |
 +------------------+-----------------------------------------------------+
 
 @{" 1.4   System Requirements           " LINK system}
@@ -227,7 +211,7 @@ card's functionality.
 @TOC contents
 @{" 1     Overview                      " LINK intro}
 @{" 1.1   Introduction                  " LINK intro}
-@{" 1.2   AmiGUS Key Features           " LINK features}
+@{" 1.2   AmiGUS mini Key Features      " LINK features}
 @{" 1.3   Hardware Overview             " LINK overview}
 @{" 1.3.1 Hardware Ports                " LINK ports}
 @{" 1.3.2 Hardware Components           " LINK components}
@@ -238,21 +222,21 @@ system configurations is recommended.
 
 @{" 1.4.1 Minimum Configuration         " LINK system}
 
-       - Amiga 2000 computer
-       - 1 MB Chip, 4 MB Fast RAM
+       - Amiga 600 computer
+       - 1 MB Chip
        - 68000 CPU, 7 MHz
-       - Kickstart 1.3
+       - Kickstart 2.05
 
 @{" 1.4.2 Recommended Configuration     " LINK system}
 
-       - Amiga 2000, 3000, 4000 computer
-       - 2 MB Chip, 16 MB Fast RAM
+       - Amiga 1200 computer
+       - 2 MB Chip, 4 MB Fast RAM
        - 68030 CPU, 25 MHz
-       - Kickstart 2.x / 3.x
+       - Kickstart 3.x
 
 Even though we ensure that the most essential tools required to configure
 the card do work on all revisions of the Amiga operating system, using
-Kick 2.x / 3.x is strongly recommended to yield maximum application
+Kick 3.x is strongly recommended to yield maximum application
 compatibility.
 
 @{" 2     Installation                  " LINK hw_inst}
@@ -264,387 +248,42 @@ compatibility.
 @{" 2     Installation                  " LINK hw_inst}
 @{" 2.1   Card Installation             " LINK hw_inst}
 
-Turn off your Amiga computer and remove the case cover after removing
-the necessary screws according to your Amiga's User Manual. Find an empty
-Zorro slot, remove the place-holder bracket after unscrewing it and gently
-insert the AmiGUS card in the slot socket, while carefully aligning the
-card on both ends to the support bracket and slot opening of the case.
-When done, re-use the bracket screw to mount the card's bracket to the
-case.
+Turn-off your Amiga and insert the AmiGUS mini card into the PCMCIA port
+of your Amiga 600/1200, located on the left-hand side of the computer.
+Make sure there is enough room to accommodate for the additional space
+needed for the card itself and the cables.
 
-If you have an internal CD-ROM, connect the CD-ROM's analogue output
-located on the back of the drive with the CD-ROM input of your AmiGUS
-card.
+@{"AmiGUS mini Setup" system "MultiView ilbm/card12.iff"}@{IMG ilbm/card12.iff}
 
-In order to loop-through the native Amiga audio signal, you can either use
-the AUDIOT board delivered with your card, or, depending on your
-configuration, use the audio output which might be present on one of your
-expansion cards.
-
-Please refer to @{"chapter 2.2" LINK cdrom} for a more detailed description
-of the AmiGUS internal audio ports and use-cases.
-
-When everything is set-up, place the cover back on your Amiga and
-re-tighten all screws according to your Amiga's User Manual.
-
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-@{" 2.3   External Audio Set-Up         " LINK external}
-@{" 2.4   Software Installation         " LINK sw_inst}
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
-
-@ENDNODE
-
-@NODE cdrom "Installation - Internal Audio Set-Up - Internal CD-ROM"
-@TOC contents
-@{" 2     Installation                  " LINK hw_inst}
-@{" 2.1   Card Installation             " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-
-You can directly connect an internal CD-ROM drive to the
-AmiGUS CDROM Input via the supplied audio cable of your drive.
-
-@{"Internal CD-ROM" system "MultiView ilbm/card2.iff"}@{IMG ilbm/card2.iff}
-
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-@{" 2.3   External Audio Set-Up         " LINK external}
-@{" 2.4   Software Installation         " LINK sw_inst}
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
-
-@ENDNODE
-
-@NODE paulaaudiot "Installation - Internal Audio Set-Up - Paula loop-through AUDIOT"
-@TOC contents
-@{" 2     Installation                  " LINK hw_inst}
-@{" 2.1   Card Installation             " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-
-The AUDIOT board needs to be inserted into the video slot and connected
-to the AmiGUS via the supplied audio cable.
-
-This option is feasible for configurations where the video slot is not
-used by any card such as a flickerfixer or genlock.
-
-@{"Internal AUDIOT" system "MultiView ilbm/card3.iff"}@{IMG ilbm/card3.iff}
-
-Please note that the AmiGUS and AUDIOT board must be placed in different
-slot lanes in order to physically fit.
-
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-@{" 2.3   External Audio Set-Up         " LINK external}
-@{" 2.4   Software Installation         " LINK sw_inst}
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
-
-@ENDNODE
-
-@NODE paulaother "Installation - Internal Audio Set-Up - Paula loop-through other"
-@TOC contents
-@{" 2     Installation                  " LINK hw_inst}
-@{" 2.1   Card Installation             " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-
-For configurations which already use the video slot, there are options
-available to loop the internal PAULA signal to the AmiGUS without using
-the AUDIOT board.
-
-Following is a list of boards which supply PAULA audio output:
-
-+------------------+-----------------------------------------------------+
-| Hardware         | Description                                         |
-+------------------+-----------------------------------------------------+
-| Multifix AGA     | The card provides the Amiga audio and               |
-| Flickerfixer     | ground signals on JP1 and JP3.                      |
-+------------------+-----------------------------------------------------+
-| PicassoIV        | The graphics card provides the Amiga audio signal   |
-|                  | on two unnamed headers near the graphics slot.      |
-+------------------+-----------------------------------------------------+
-| ZZ9000 GFX Board | The card provides the Amiga audio signal on J6.     |
-+------------------+-----------------------------------------------------+
-
-@{b}2.2.3.1 Multifix AGA Flickerfixer@{ub}
-
-Please use seperatable jumper wires to connect
-- JP1 LEFT and RIGHT with the outer pins of AmiGUS's Paula-In connector,
-- and JP3 AGND with one of the middle pins respectively.
-
-@{b}Take care to NEVER connect JP3 5V TO AmiGUS's Paula-In connector.@{ub}
-
-This would destroy your hardware!
-Check again, are you sure?
-Great!
-Check once more!
-You have been warned!
-
-@{"Multifix AGA Flickerfixer connectors" system "MultiView ilbm/mflifi1.iff"}@{IMG ilbm/mflifi1.iff}
-@{"AmiGUS connector" system "MultiView ilbm/mflifi2.iff"}@{IMG ilbm/mflifi2.iff}
-
-@{b}2.2.3.2 PicassoIV@{ub}
-
-You can use a spare 4 pin CDROM audio cable here.
-
-@{"PicassoIV connectors" system "MultiView ilbm/piv1.iff"}@{IMG ilbm/piv1.iff}
-
-@{b}WARNING: This is based on assumptions and has never been tested!@{ub}
-
-Please verify and let us know by creating an issue on
-the @{"AmiGUS github repository (8)" LINK refs}:
-
-- PicassoIV's pins marked "L" are connected with
-  (a) each other and 
-  (b) to the graphics slot, 
-      either pin 3 of the front part for Amiga's filtered Paula audio,
-      or pin 33 of the rear part for unfiltered Paula audio.
-
-- PicassoIV's pins marked "R" are connected with
-  (c) each other and 
-  (d) to the graphics slot, 
-      either pin 4 of the front part for Amiga's filtered Paula audio,
-      or pin 35 of the rear part for unfiltered Paula audio.
-
-- PicassoIV's middle pins of the same header are connected with
-  (e) each other and 
-  (f) to the graphics slot, 
-      either pin 12 of the front part for Amiga ground,
-      or pin 34 and 36 of the rear part for audio ground.
-
-@{b}2.2.3.3 ZZ9000 GFX Board@{ub}
-
-@{"ZZ9000 audio connection" system "MultiView ilbm/zz1.iff"}@{IMG ilbm/zz1.iff}
-
-See @{"ZZ9000 (11)" LINK refs} manual description of J6 and the right image in
-the third row of @{"ZZ9000AX (12)" LINK refs} manuals for reference.
-
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-@{" 2.3   External Audio Set-Up         " LINK external}
-@{" 2.4   Software Installation         " LINK sw_inst}
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
-
-@ENDNODE
-
-@NODE expansion "Installation - Digital Audio Expansion"
-@TOC contents
-@{" 2     Installation                  " LINK hw_inst}
-@{" 2.1   Card Installation             " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-
-The digital audio expansion port provides the final mixed audio signal
-as a 192kHz, 24-bit I2S digital audio stream.
-
-@{"Digital Audio Expansion" system "MultiView ilbm/card4.iff"}@{IMG ilbm/card4.iff}
-
-@{" 2.3   External Audio Set-Up         " LINK external}
-@{" 2.4   Software Installation         " LINK sw_inst}
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
-
-@ENDNODE
-
-@NODE external "Installation - External Audio Set-Up"
-@TOC contents
-@{" 2     Installation                  " LINK hw_inst}
-@{" 2.1   Card Installation             " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-@{" 2.3   External Audio Set-Up         " LINK external}
-
-Pictured below are the different external audio output ports of the
-AmiGUS.
-
-@{"External Audio Set-Up" system "MultiView ilbm/card5.iff"}@{IMG ilbm/card5.iff}
-
-The AmiGUS card provides both a line-level RCA stereo output and a
-TOSLINK optical output to connect to a household stereo receiver
-equipment.
+The AmiGUS mini card provides both a line-level RCA stereo output and
+a mini TOSLINK optical output on the same 3.5mm jack to connect to
+standard household analogue or digital stereo receiver equipment.
 
 The TOSLINK output is very flexible and supports multiple sampling rates
 accommodating your output devices capabilities. The default output
-sampling rate is 48 kHz, which should be compatible with all equipment
+sampling rate is 48kHz, which should be compatible with all equipment
 providing a TOSLINK interface. Output rate can be adjusted in the mixer
 settings.
 
-The external input can be used to either loop-through the Amiga's external
-audio output by using a Cinch-to-3.5mm adaptor cable, or to connect any
-other analogue sound source which supports line-level audio output.
+The analogue input can be used to loop-through the Amiga?s external
+audio output by using a Cinch-to-3.5mm adaptor cable, or to connect
+any other analogue sound source which supports line-level audio
+output.
 
-@{" 2.4   Software Installation         " LINK sw_inst}
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
+@{" 3     Software Tools                " LINK sw_inst20}
 
 @ENDNODE
 
-@NODE sw_inst "Installation - Software Installation"
+@NODE sw_inst20 "Installation - Software Installation"
 @TOC contents
-@{" 2     Installation                  " LINK hw_inst}
-@{" 2.1   Card Installation             " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-@{" 2.3   External Audio Set-Up         " LINK external}
-@{" 2.4   Software Installation         " LINK sw_inst}
+@{" 3     Software Tools                " LINK sw_inst20}
+@{" 3.1   Installation                  " LINK sw_inst20}
 
-The AmiGUS software package comes either
-- in two lha archives,
-  - one for OS 1.3, and
-  - one for OS 2.0 and above,
-- or on multiple ADF files,
-  - one for OS 1.3,
-  - one for OS 2.0 and above, and
-  - one shared manual disk.
+The AmiGUS mini software comes in the following packages:
+- As LHA archive for OS2.x/3.x
+- As sets of ADF files for OS2.x/3.x including one Manual Disk
 
-Please do not use the OS 1.3 versions to install your AmiGUS on newer
-AmigaOS versions. They work well, and while we try our best to make
-the AmiGUS enjoyable on all compatible configurations, we cannot wield
-any magic.
-Thus, there is and there will be no support for AHI below OS 2.0, sorry.
-If you use the OS 1.3 versions on OS 2.0 or above, you will miss out on
-some of the features we could not port back to OS 1.3.
-
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
-@ENDNODE
-
-@NODE sw_inst13 "Installation - OS 1.3 Software Installation"
-@TOC contents
-@{" 2     Installation                  " LINK hw_inst}
-@{" 2.1   Card Installation             " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-@{" 2.3   External Audio Set-Up         " LINK external}
-@{" 2.4   Software Installation         " LINK sw_inst}
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-
-Commodore and its successors only released the Installer for OS 2.0 and
-later. Therefore, the AmiGUS OS 1.3 disk provides installers in different
-languages as simple Shell scripts.
-In all languages, their functionality is the same:
-
-They open a window expecting the user to provide input via keyboard.
-Positive acknowledgements are triggered by pressing the <Y> key,
-negative or rejection can be expressed by pushing the <N> key.
-In any case, <Return> or <Enter> key need to follow.
-While the current keyboard layout applies,
-the keys required stay the same.
-
-You may be asked to enter target installation paths, e.g. for the
-AmiGUS base tools. Please keep in mind that only the last level of the
-directory hierarchy may not exist at that point, otherwise an error
-message will occur and the script will be aborted. You may close orphaned
-installation windows by entering "endcli" + <Return>.
-
-The default installation path of AmiGUS tools and manual is
-Sys:Expansion/AmiGUS - which may collide with some versions of
-Commodore's Janus bridgeboard software. If you experience any issues,
-please delete the AmiGUS software installed to that location, reinstall
-and select another path.
-
-The installation procedure starts with the AmiGUS base tools.
-These are the service tools described in sections @{"3.1 Mixer Tool" LINK mixer1}
-and @{"3.2 FPGA Flash Tool" LINK flash1}, and the basic functionality
-tools PlayMIDI, PlayMP3, PlayWav and Record.
-The recommendation is be to install them to the default path.
-
-The second installation option provides the AmiGUS debug tools.
-These are described in the manual section @{"6 Driver troubleshooting" LINK drivers}.
-They are meant to provide the developers with additional debug
-information in case an AmiGUS user experiences issues, helping to diagnose
-whether these are related to the card, the drivers or other software.
-For OS 1.3, these are only available for the MHI driver so far.
-The recommendation is to skip installing them.
-If you experience trouble, you can still install them later.
-
-The third installation category tackles the basic amigus.library.
-None of the base tools or drivers will work without it. It only adds
-a tiny abstraction layer between Zorro or PCMCIA based AmiGUS cards
-enabling developers transparently writing software for AmiGUS and
-AmiGUS mini at the same point in time without thinking further about
-the underlying interface to the card.
-
-The fourth section ot the installation tackles the MHI driver, described
-in section @{"5 MHI Driver Framework" LINK mhi}.
-Recommendation would be to install it - it would only reliably work from
-the default path, so there is no option to change the path.
-But you can choose which version of the MHI driver you want to install.
-If you are running OS 1.3 with a 68020 or 68030 CPU only, feel free to use
-the 68020 version. If you want to try using AmiGUS with an 68000, choose
-that library variant, please. the 68020+ version gives you a tiny
-performance advantage, but will crash on a 68000.
-As far as we know, OS 1.3 will not work on a 68040 or 68060 CPU at all,
-so we did not offer that choice.
-We do offer using various debug versions of the MHI drivers here.
-Please refrain from using them unless you want to debug issues occuring
-in the release versions or were asked to help debugging an issue
-we cannot reproduce on our end.
-The recommendation is to just use the default, 68000 RELEASE version.
-The final choice in this category is simply copying all available drivers
-without renaming them to disk, to tinker arround with them later.
-This might be helpfull if you own an A2630 accelerator and want
-to disable it every now and then, to show off AmiGUS on both, the 68030
-and 68000 without reinstalling the drivers.
-The recommendation is not to do so.
-
-The next section is to install additional libraries,
-e.g. reqtools.library 38.390, Copyright © 1991-1994 Nico François,
-as part of the installation. The installation script will strive to
-help you check for an existing version and ask before overwriting
-anything. The recommendation is to do so, as the library is needed
-for selecting firmware update files in the FlashGUI.
-
-The last step is to optionally install the AmigaGuide manual.
-To use any AmigaGuide on AmigaOS versions earlier than 3.0,
-you will need to install the "AmigaGuide Development" version from:
-
-https://aminet.net/text/hyper/aguide34.lha
-
-To enable display of images as well, you need to copy the
-iffparse.library from OS 2.0 to your OS 1.3 installation.
-
-The recommendation is to do so, just to enjoy seeing AmigaGuides working
-in OS 1.3.
-
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
-@ENDNODE
-
-@NODE sw_inst20 "Installation - OS 2.0+ Software Installation"
-@TOC contents
-@{" 2     Installation                  " LINK hw_inst}
-@{" 2.1   Card Installation             " LINK hw_inst}
-@{" 2.2   Internal Audio Set-Up         " LINK cdrom}
-@{" 2.2.1 Internal CD-ROM               " LINK cdrom}
-@{" 2.2.2 Paula loop-through AUDIOT     " LINK paulaaudiot}
-@{" 2.2.3 Paula loop-through other      " LINK paulaother}
-@{" 2.2.4 Digital Audio Expansion       " LINK expansion}
-@{" 2.3   External Audio Set-Up         " LINK external}
-@{" 2.4   Software Installation         " LINK sw_inst}
-@{" 2.4.1 OS 1.3 Software Installation  " LINK sw_inst13}
-@{" 2.4.2 OS 2.0+ Software Installation " LINK sw_inst20}
+@{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
 
 On OS 2.0 and later, the AmiGUS software installation relies on the
 Amiga Installer being available in path from the underlying OS.
@@ -702,19 +341,20 @@ Please keep in mind that using AHI and MHI requires additional software.
 Refer to sections @{" 5 AHI Driver Framework " LINK ahi} and @{"5 MHI Driver Framework" LINK mhi}
 for a detailed description.
 
-@{" 3     Software Tools                " LINK mixer1}
+@{" 3.2   Mixer Tool                    " LINK mixer1}
 @ENDNODE
 
 @NODE mixer1 "Software Tools - Mixer Tool"
 @TOC contents
-@{" 2     Installation                  " LINK hw_inst}
-@{" 3     Software Tools                " LINK mixer1}
-@{" 3.1   Mixer Tool                    " LINK mixer1}
+@{" 3     Software Tools                " LINK sw_inst20}
+@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
+@{" 3.2   Mixer Tool                    " LINK mixer1}
 
 The AmiGUS Mixer Tool provides individual volume control over the various
 sound sources that are processed and mixed by the digital sound processor.
 
-@{"Mixer" system "MultiView ilbm/mix0.iff"}@{IMG ilbm/mix0.iff}
+@{"Mixer" system "MultiView ilbm/mix10.iff"}@{IMG ilbm/mix10.iff}
 Across the panels, you can adjust the volume using the @{b}Left / Right@{ub} volume
 sliders for channel-independent control. When the @{b}Lock@{ub} button is enabled,
 Left /Right are always set to equal values when the sliders are changed.
@@ -722,18 +362,19 @@ Left /Right are always set to equal values when the sliders are changed.
 By using the @{b}Mix@{ub} slider, it is possible to cross-mix the stereo audio
 signal, thus lessening the amount of channel separation.
 
-@{" 3.1.1 Mixer Panel Descriptions      " LINK mixer2}
-@{" 3.2   FPGA Flash Tool               " LINK flash1}
-@{" 3.2.1 Available Options             " LINK flash2}
+@{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
+@{" 3.3   FPGA Flash Tool               " LINK flash1}
+@{" 3.3.1 Available Options             " LINK flash2}
 
 @ENDNODE
 
-
 @NODE mixer2 "Software Tools - Mixer Panel Descriptions"
 @TOC contents
-@{" 3     Software Tools                " LINK mixer1}
-@{" 3.1   Mixer Tool                    " LINK mixer1}
-@{" 3.1.1 Mixer Panel Descriptions      " LINK mixer2}
+@{" 3     Software Tools                " LINK sw_inst20}
+@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
+@{" 3.2   Mixer Tool                    " LINK mixer1}
+@{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
 
 Below you will find a description of each panel's functionality and
 configuration options.
@@ -753,14 +394,10 @@ configuration options.
 |                  | which are played using the 32-voice wavetable       |
 |                  | engine.                                             |
 +------------------+-----------------------------------------------------+
-| External Sound   | @{b}General@{ub}                                             |
-|                  | This panel provides volume control over all         |
-|                  | external sounds such as the PAULA, CD-ROM and       |
-|                  | Line Input.                                         |
-|                  |                                                     |
-|                  | @{b}Inputs@{ub}                                              |
-|                  | You can enable or disable each of the external      |
-|                  | audio inputs by clicking on the individual boxes.   |
+| External Sound   | @{b}VU Mode@{ub}                                             |
+|                  | You can either turn-off or adjust the sensitivity   |
+|                  | of the external VU meter by clicking and cycling    |
+|                  | through the options.                                |
 |                  |                                                     |
 |                  | @{b}TOSLINK@{ub}                                             |
 |                  | By clicking on the cycle-gadget, you can set the    |
@@ -776,44 +413,48 @@ configuration options.
 | Reset            | loaded when the Amiga is started or reset.          |
 +------------------+-----------------------------------------------------+
 
-@{" 3.2   FPGA Flash Tool               " LINK flash1}
-@{" 3.2.1 Available Options             " LINK flash2}
+@{" 3.3   FPGA Flash Tool               " LINK flash1}
+@{" 3.3.1 Available Options             " LINK flash2}
 
 @ENDNODE
 
 @NODE flash1 "Software Tools - FPGA Flash Tool"
 @TOC contents
-@{" 3     Software Tools                " LINK mixer1}
-@{" 3.1   Mixer Tool                    " LINK mixer1}
-@{" 3.1.1 Mixer Panel Descriptions      " LINK mixer2}
-@{" 3.2   FPGA Flash Tool               " LINK flash1}
+@{" 3     Software Tools                " LINK sw_inst20}
+@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
+@{" 3.2   Mixer Tool                    " LINK mixer1}
+@{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
+@{" 3.3   FPGA Flash Tool               " LINK flash1}
 
-The FPGA Flash Tool provides detailed control over the AmiGUS FPGA
+The AmiGUS Flash Tool provides full control over the AmiGUS mini FPGA
 firmware settings.
 
-This includes updating the firmware, displaying the card's hardware status
- or initialising the configuration data used for the mixer settings.
+This includes updating the firmware, displaying the card?s hardware
+status or initialising the configuration data used for the mixer settings.
 
-@{"Flash tool" system "MultiView ilbm/flash0.iff"}@{IMG ilbm/flash0.iff}
+@{"Flash tool" system "MultiView ilbm/flash10.iff"}@{IMG ilbm/flash10.iff}
 
-@{" 3.2.1 Available Options             " LINK flash2}
+@{" 3.3.1 Available Options             " LINK flash2}
 
 @ENDNODE
 
 @NODE flash2 "Software Tools - Available Options"
 @TOC contents
-@{" 3     Software Tools                " LINK mixer1}
-@{" 3.1   Mixer Tool                    " LINK mixer1}
-@{" 3.1.1 Mixer Panel Descriptions      " LINK mixer2}
-@{" 3.2   FPGA Flash Tool               " LINK flash1}
-@{" 3.2.1 Available Options             " LINK flash2}
+@{" 3     Software Tools                " LINK sw_inst20}
+@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
+@{" 3.2   Mixer Tool                    " LINK mixer1}
+@{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
+@{" 3.3   FPGA Flash Tool               " LINK flash1}
+@{" 3.3.1 Available Options             " LINK flash2}
 
 +------------------+-----------------------------------------------------+
 | Panel            | Description                                         |
 +------------------+-----------------------------------------------------+
 | FPGA Core        | @{b}Flash@{ub}                                               |
-|                  | You can directly update the AmiGUS firmware by      |
-|                  | clicking on this button and selecting the           |
+|                  | You can directly update the AmiGUS mini firmware    |
+|                  | by clicking on this button and selecting the        |
 |                  | appropriate FPGA .upd file. Once an update file is  |
 |                  | selected, you can follow the update progress on the |
 |                  | status bar below, which can take up to 30 seconds.  |
@@ -923,9 +564,9 @@ assumed to be faster and therefore strongly recommended for use on
 68k based systems. You need to choose one of them and install it
 following their respective manual(s).
 
-Before configuring AHI for use with AmiGUS, please verify that AHI is
-already working correctly. AHI comes with a Paula driver that is
-sufficient for that purpose.
+Before configuring AHI for use with AmiGUS mini, please verify that
+AHI is already working correctly. AHI comes with a Paula driver that
+is sufficient for that purpose.
 
 Please note:
   - AHI 4 requires AmigaOS 2.0 or better to work.
@@ -935,34 +576,34 @@ Please note:
   - Due to limitations of the AHI framework, AmiGUS's AHI driver is
     limited to a 64000 Hz mixing rate.
 
-@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.1   Using AHI with AmiGUS mini    " LINK ahi_amigus}
 @{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3   Configuring AmiGUS mini AHI   " LINK ahi_config}
 @{" 5.3.1 Available Options             " LINK ahi_options}
 @ENDNODE
 
-@NODE ahi_amigus "AHI Driver Framework - Using AHI with AmiGUS"
+@NODE ahi_amigus "AHI Driver Framework - Using AHI with AmiGUS mini"
 @TOC contents
 @{" 5     AHI Driver Framework          " LINK ahi}
-@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.1   Using AHI with AmiGUS mini    " LINK ahi_amigus}
 
-AHI should be your last resort for making software use your AmiGUS.
+AHI should be your last resort for making software use your AmiGUS mini.
   - For playback of encoded music like MP3, FLAC, or OGG, please use MHI
-    and let the AmiGUS hardware codec do the heavy lifting,
+    and let the AmiGUS mini hardware codec do the heavy lifting,
   - For tracker music, use a player directly supporting the
-    AmiGUS wavetable engine, e.g. HippoPlayer 2.62 or later,
+    AmiGUS mini wavetable engine, e.g. HippoPlayer 2.67 or later,
   - None of that works for your application? Here comes AHI.
     And only here.
 
 @{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3   Configuring AmiGUS mini AHI   " LINK ahi_config}
 @{" 5.3.1 Available Options             " LINK ahi_options}
 @ENDNODE
 
 @NODE ahi_modes "AHI Driver Framework - Selecting AHI Modes"
 @TOC contents
 @{" 5     AHI Driver Framework          " LINK ahi}
-@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.1   Using AHI with AmiGUS mini    " LINK ahi_amigus}
 @{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
 
 AHI modes need to be selected to fit the purpose.
@@ -979,7 +620,7 @@ Example: Quake (clickboom) mixes audio in 16 bit, 11025 Hz.
 
 But how do you determine the right AHI settings?
 
-AmiGUS comes with an overwhelming number of choices.
+AmiGUS mini comes with an overwhelming number of choices.
 
 Here are some guidelines:
   - If your game or application prints resolution ("...16-bit...") and
@@ -1002,16 +643,16 @@ Here are some guidelines:
     Avoid them for games, if you are short on CPU time. Recommended for
     enjoying music as good as possible!
 
-@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3   Configuring AmiGUS mini AHI   " LINK ahi_config}
 @{" 5.3.1 Available Options             " LINK ahi_options}
 @ENDNODE
 
-@NODE ahi_config "AHI Driver Framework - Configuring AmiGUS AHI"
+@NODE ahi_config "AHI Driver Framework - Configuring AmiGUS mini AHI"
 @TOC contents
 @{" 5     AHI Driver Framework          " LINK ahi}
-@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.1   Using AHI with AmiGUS mini    " LINK ahi_amigus}
 @{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3   Configuring AmiGUS mini AHI   " LINK ahi_config}
 
 After all that theoretical foundation you are ready to select AmiGUS modes
 using the AHI preferences editor usually installed to Sys:Prefs/AHI.
@@ -1031,9 +672,9 @@ Recommendations:
 @NODE ahi_options "AHI Driver Framework - Available Options"
 @TOC contents
 @{" 5     AHI Driver Framework          " LINK ahi}
-@{" 5.1   Using AHI with AmiGUS         " LINK ahi_amigus}
+@{" 5.1   Using AHI with AmiGUS mini    " LINK ahi_amigus}
 @{" 5.2   Selecting AHI Modes           " LINK ahi_modes}
-@{" 5.3   Configuring AmiGUS AHI        " LINK ahi_config}
+@{" 5.3   Configuring AmiGUS mini AHI   " LINK ahi_config}
 @{" 5.3.1 Available Options             " LINK ahi_options}
 
 +------------------+-----------------------------------------------------+
@@ -1045,9 +686,9 @@ Recommendations:
 |                  | default "Music unit" and the units 0, 1, 2, and 3.  |
 |                  |                                                     |
 |                  | @{b}AHI Mode list@{ub}                                       |
-|                  | We love Paula, but this is about AmiGUS. So AmiGUS  |
-|                  | should be selected as default input/output device   |
-|                  | from the list.                                      |
+|                  | We love Paula, but this is about AmiGUS mini.       |
+|                  | So AmiGUS should be selected as default             |
+|                  | input/output device from the list.                  |
 |                  |                                                     |
 |                  | @{b}Mode details@{ub}                                        |
 |                  | Informational display only, but if the text looks   |
@@ -1068,7 +709,7 @@ Recommendations:
 |                  |                                                     |
 |                  | @{b}Input@{ub}                                               |
 |                  | Selects the audio sources to record.                |
-|                  | AmiGUS AHI driver allows recording Wave,            |
+|                  | AmiGUS mini AHI driver allows recording Wave,       |
 |                  | MHI / Codec, external sound, and                    |
 |                  | "what you hear" / all sources for the time being.   |
 +------------------+-----------------------------------------------------+
@@ -1096,7 +737,7 @@ Recommendations:
 @{" 6     MHI Driver Framework          " LINK mhi}
 
 MHI is a standard for retargetable encoded audio for classic Amigas.
-AmiGUS comes with the VLSI VS1063a audio codec chip supporting
+AmiGUS mini comes with the VLSI VS1063a audio codec chip supporting
   - MP3 (MPEG 1 and 2 audio layer III, with CBR, VBR, and ABR)
   - MP2 (layer II)
   - MPEG4 / 2 AAC-LC (with PNS), HE-AAC v2 (Level 3) (SBR + PS)
@@ -1107,11 +748,8 @@ AmiGUS comes with the VLSI VS1063a audio codec chip supporting
 Unlike AHI, MHI comes without separate system-wide preferences. Every
 application implements their own system of setting and selecting the
 desired MHI compatible library for the installed hardware.
-Per default, AmiGUS's MHI driver is installed to
+Per default, AmiGUS mini's MHI driver is installed to
 Libs:mhi/mhiamigus.library on AmigaOS 2.0 and above.
-On AmigaOS 1.3, there are problems loading libraries from other locations
-than Libs:, hence it will be installed to Libs:mhiamigus.library to
-ensure hassle-free usage.
 
 @{" 6.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
 @{" 6.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
@@ -1156,11 +794,9 @@ Add a few MP3 files to your playlist and enjoy!
 @{" 6.1   Example: MHI in AmigaAmp      " LINK mhi_amigaamp}
 @{" 6.2   Example: MHI in HippoPlayer   " LINK mhi_hippoplayer}
 
-@{"HippoPlayer (5, 6)" LINK refs} by K-P Koljonen not only works from AmigaOS 1.2
-and later but has also been successfully tested with MHI on AmigaOS 1.3
-on a 68000.
-In addition, it also supports the AmiGUS wavetable engine natively for
-tracker module playback as of version 2.62 onwards.
+@{"HippoPlayer (5, 6)" LINK refs} by K-P Koljonen supports AmiGUS mini's
+wavetable engine natively for tracker module playback as of version 2.67
+onwards.
 @{JCENTER}
 @{"HippoPlayer Main" system "MultiView ilbm/hippo0.iff"}@{IMG ilbm/hippo0.iff}
 @{JLEFT}
@@ -1173,8 +809,7 @@ the button right next to it, where it reads "mhiamigus" above.
 @{JCENTER}
 @{"HippoPlayer MHI File Requester" system "MultiView ilbm/hippo2.iff"}@{IMG ilbm/hippo2.iff}
 @{JLEFT}
-Navigate to the mhiamigus.library in AmigaOS 1.3 that will be in Libs:;
-in AmigaOS 2.0 and later it will be in Libs:MHI.
+Navigate to the mhiamigus.library in Libs:MHI.
 Select it, push the "OK" button, and save the preferences using the
 "Save" button.
 Add a few MP3 files to your playlist and enjoy!
@@ -1242,9 +877,7 @@ installation.
     the MHI driver. If that works and another player does not work with
     the MHI driver correctly, it is likely the other player's fault.
     MHIplay requires two parameters, the driver and the file,
-    e.g. in OS 1.3:
-    > mhiplay libs:mhiamigus.library music:nena/99_red_balloons.mp3
-    or OS 2.0:
+    e.g.
     > mhiplay libs:mhi/mhiamigus.library music:nena/99_red_balloons.mp3
 
 We hope you will never need this information;

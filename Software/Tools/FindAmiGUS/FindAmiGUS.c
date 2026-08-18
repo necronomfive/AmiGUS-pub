@@ -26,6 +26,21 @@
 #define AMIGUS_ZORRO2     0x000000001
 #define AMIGUS_MINI       0x000000002
 
+/******************************************************************************
+ * Private functions.
+ *****************************************************************************/
+
+/**
+ * Like string.h's stricmp.
+ * Returns the case-insensitive comparison result of the two strings.
+ *
+ * @param a
+ * @param b
+ *
+ * @return -1 if a < b,
+ *          0 if a = b,
+ *          1 if a > b.
+ */
 static LONG C_stricmp(STRPTR a, STRPTR b) {
 
   LONG result;

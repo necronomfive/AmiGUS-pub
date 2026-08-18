@@ -90,18 +90,24 @@ int main( int argc, char **argv ) {
       }
       default: {
 
-        Printf( "Found unknown AmiGUS TypeId 0x%08lx"
-                " - does FindAmiGUS need an update?\n",
-                amigus->agus_TypeId );
+        if ( talkative ) {
+
+          Printf( "Found unknown AmiGUS TypeId 0x%08lx"
+                  " - does FindAmiGUS need an update?\n",
+                  amigus->agus_TypeId );
+        }
         continue;
       }
     }
 
-    Printf( "Found %s PCM @ 0x%08lx, Wavetable @ 0x%08lx, Codec @ 0x%08lx.\n",
-      amigus->agus_TypeName,
-      amigus->agus_PcmBase,
-      amigus->agus_WavetableBase,
-      amigus->agus_CodecBase );
+    if ( talkative ) {
+
+      Printf( "Found %s PCM @ 0x%08lx, Wavetable @ 0x%08lx, Codec @ 0x%08lx.\n",
+        amigus->agus_TypeName,
+        amigus->agus_PcmBase,
+        amigus->agus_WavetableBase,
+        amigus->agus_CodecBase );
+    }
   }
 
   CloseLibrary( AmiGUS_Base );

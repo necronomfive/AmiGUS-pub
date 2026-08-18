@@ -19,14 +19,23 @@
 #include <amigus/amigus.h>
 
 #include <proto/amigus.h>
+#include <proto/dos.h>
 #include <proto/exec.h>
-
-#include <stdio.h>
-#include <string.h>
 
 // Result bitmasks!
 #define AMIGUS_ZORRO2     0x000000001
 #define AMIGUS_MINI       0x000000002
+
+static LONG C_stricmp(STRPTR a, STRPTR b) {
+
+  LONG result;
+  while (
+    !(result = (0xDF & ( *a )) - (0xDF & ( *b ))) &&
+    (*a++) &&
+    (*b++)
+  );
+  return (result > 0) - (result < 0);
+}
 
 /******************************************************************************
  * Entry point.
@@ -38,7 +47,7 @@ int main( int argc, char **argv ) {
 
   struct Library * AmiGUS_Base = NULL;
   struct AmiGUS * amigus = NULL;
-  BOOL talkative = !(( argc >= 2 ) && ( !( stricmp( argv[ 1 ], "QUIET" ))));
+  BOOL talkative = !(( argc >= 2 ) && ( !( C_stricmp( argv[ 1 ], "QUIET" ))));
   int result = 0;
 
   AmiGUS_Base = OpenLibrary( AMIGUS_LIBRARY, 0 );
@@ -46,7 +55,7 @@ int main( int argc, char **argv ) {
 
     if ( talkative ) {
 
-      printf( "Error: Cannot open %s.\n", AMIGUS_LIBRARY );
+      Printf( "Error: Cannot open %s.\n", AMIGUS_LIBRARY );
     }
     return 60;
   }
@@ -66,14 +75,14 @@ int main( int argc, char **argv ) {
       }
       default: {
 
-        printf( "Found unknown AmiGUS TypeId 0x%08lx"
+        Printf( "Found unknown AmiGUS TypeId 0x%08lx"
                 " - does FindAmiGUS need an update?\n",
                 amigus->agus_TypeId );
         continue;
       }
     }
 
-    printf( "Found %s PCM @ 0x%08lx, Wavetable @ 0x%08lx, Codec @ 0x%08lx.\n",
+    Printf( "Found %s PCM @ 0x%08lx, Wavetable @ 0x%08lx, Codec @ 0x%08lx.\n",
       amigus->agus_TypeName,
       amigus->agus_PcmBase,
       amigus->agus_WavetableBase,
@@ -82,11 +91,13 @@ int main( int argc, char **argv ) {
 
   CloseLibrary( AmiGUS_Base );
 
-  if ( !( result )) {
+  if ( talkative ) {
+    if ( !( result )) {
 
-    printf( "No AmiGUS found.\n" );
+      Printf( "No AmiGUS found.\n" );
+    }
+    Printf( "Returning 0x%08lx\n", result );
   }
-  printf( "Returning 0x%08lx\n", result );
 
   return result;
 }

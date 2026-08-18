@@ -149,6 +149,8 @@ package:
 	cp Installer/MHI.info                       $(ADF_DIR1)/
 	cp Installer/Firmware.info                  $(ADF_DIR1)/
 
+	cp Tools/FindAmiGUS/FindAmiGUS              $(ADF_DIR1)/Tools
+
 	cp Tools/FlashFPGA/FlashGUI                 $(ADF_DIR1)/Tools
 	cp Tools/FlashFPGA/FlashGUI.info            $(ADF_DIR1)/Tools
 	cp Tools/Mixer/Mixer                        $(ADF_DIR1)/Tools

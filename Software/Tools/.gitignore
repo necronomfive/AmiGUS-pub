@@ -5,6 +5,7 @@
 # Target files
 FlashFPGA/FlashGUI
 FlashFPGA/FlashGUI13
+FindAmiGUS/FindAmiGUS
 Mixer/Mixer
 Mixer/Mixer13
 PlayMIDI/PlayMidi

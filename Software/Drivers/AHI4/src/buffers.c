@@ -23,8 +23,8 @@
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
 #include "buffers.h"
+#include "compiler_extras.h"
 #include "debug.h"
-#include "SDI_compiler.h"
 
 #define MILLIS_PER_SECOND   1000
 #define DIVISOR_4MS         ( MILLIS_PER_SECOND / 250 )

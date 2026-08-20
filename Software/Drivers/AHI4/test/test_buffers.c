@@ -43,19 +43,19 @@ const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
 //96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0008
 };
 
-UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
+INLINE UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
 
   printf("ReadReg16-mock not implemented!\n");
   return 0;
 }
 
-ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
+INLINE ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
 
   printf("ReadReg32-mock not implemented!\n");
   return 0;
 }
 
-VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
+INLINE VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
 
   printf("WriteReg32-mock not implemented!\n");
 }
@@ -190,7 +190,11 @@ BOOL testGetBufferSizes( VOID ) {
             UBYTE e = flags[ m ];
             UWORD r = getBufferBytes( a, b, c, d, e );
             UWORD s = getBufferSamples( r, b, d );
-            BOOL tst = !( r % c ) && ( s <= ( a / ( e ? 100 : 25 ) )  );
+            BOOL tst = !( r % c ) && ( s <= ( a / ( e ? 10 : 25 ) )  );
+            //                                          |     |
+            //     1000ms / DIVISOR_10ms = 100 parts ---+     |
+            //     1000ms / DIVISOR_40ms =  25 parts ---------+
+            
             printf(
                 "rate %5ld size %2ld mult's %2ld stereo %ld rtime %ld => "
                 "%5ld bytes = %4ld samples \t "

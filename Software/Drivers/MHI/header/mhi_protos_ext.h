@@ -16,15 +16,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SDI_MHI_PROTOS_EXT_H
-#define SDI_MHI_PROTOS_EXT_H
+#ifndef MHI_PROTOS_EXT_H
+#define MHI_PROTOS_EXT_H
 
 // TO NEVER BE USED INSIDE THE LIBRARY CODE !!!
 
 #include <exec/types.h>
 #include <exec/tasks.h>
 
-#include "SDI_compiler.h"
+#include "compiler_extras.h"
 
 /******************************************************************************
  * MHI library interface functions rewritten into SDI_compiler macros,
@@ -36,29 +36,35 @@
  * MHI_dev/Autodoc/mhi.doc
  *****************************************************************************/
 
-ASM( APTR ) SAVEDS MHIAllocDecoder( REG( a0, struct Task * task ),
-                                    REG( d0, ULONG signal ));
+APTR __ASM__ __SAVE_DS__ MHIAllocDecoder(
+  __REG__( a0, struct Task * task ),
+  __REG__( d0, ULONG signal )
+);
 
-ASM( VOID ) SAVEDS MHIFreeDecoder( REG( a3, APTR handle ));
+VOID __ASM__ __SAVE_DS__ MHIFreeDecoder( __REG__( a3, APTR handle ));
 
-ASM( BOOL ) SAVEDS MHIQueueBuffer( REG( a3, APTR handle ),
-                                   REG( a0, APTR buffer ),
-                                   REG( d0, ULONG size ));
+BOOL __ASM__ __SAVE_DS__ MHIQueueBuffer(
+  __REG__( a3, APTR handle ),
+  __REG__( a0, APTR buffer ),
+  __REG__( d0, ULONG size )
+);
 
-ASM( APTR ) SAVEDS MHIGetEmpty( REG( a3, APTR handle ));
+APTR __ASM__ __SAVE_DS__ MHIGetEmpty( __REG__( a3, APTR handle ));
 
-ASM( UBYTE ) SAVEDS MHIGetStatus( REG( a3, APTR handle ));
+UBYTE __ASM__ __SAVE_DS__ MHIGetStatus( __REG__( a3, APTR handle ));
 
-ASM( VOID ) SAVEDS MHIPlay( REG( a3, APTR handle ));
+VOID __ASM__ __SAVE_DS__ MHIPlay( __REG__( a3, APTR handle ));
 
-ASM( VOID ) SAVEDS MHIStop( REG( a3, APTR handle ));
+VOID __ASM__ __SAVE_DS__ MHIStop( __REG__( a3, APTR handle ));
 
-ASM( VOID ) SAVEDS MHIPause( REG( a3, APTR handle ));
+VOID __ASM__ __SAVE_DS__ MHIPause( __REG__( a3, APTR handle ));
 
-ASM( ULONG ) SAVEDS MHIQuery( REG( d1, ULONG query ));
+ULONG __ASM__ __SAVE_DS__ MHIQuery( __REG__( d1, ULONG query ));
 
-ASM( VOID ) SAVEDS MHISetParam( REG( a3, APTR handle ),
-                                REG( d0, UWORD param ),
-                                REG( d1, ULONG value ));
+VOID __ASM__ __SAVE_DS__ MHISetParam(
+  __REG__( a3, APTR handle ),
+  __REG__( d0, UWORD param ),
+  __REG__( d1, ULONG value )
+);
 
-#endif /* SDI_MHI_PROTOS_EXT_H */
+#endif /* MHI_PROTOS_EXT_H */

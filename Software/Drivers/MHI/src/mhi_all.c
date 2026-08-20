@@ -17,12 +17,13 @@
  */
 
 #include <exec/types.h>
+
 #include <libraries/mhi.h>
 #include <libraries/configvars.h>
+
 #include <proto/amigus.h>
 #include <proto/exec.h>
 
-#include "SDI_mhi_protos.h"
 #include "amigus_codec.h"
 #include "amigus_hardware.h"
 #include "amigus_mhi.h"
@@ -30,6 +31,7 @@
 #include "debug.h"
 #include "errors.h"
 #include "interrupt.h"
+#include "mhi_protos.h"
 #include "support.h"
 
 /******************************************************************************
@@ -93,10 +95,10 @@ VOID UpdateEqualizer( APTR card,
  * MHI interface - public functions.
  *****************************************************************************/
 
-ASM( APTR ) SAVEDS MHIAllocDecoder(
-  REG( a0, struct Task * task ),
-  REG( d0, ULONG signal ),
-  REG( a6, struct AmiGUS_MHI * base ) 
+APTR __ASM__ __SAVE_DS__ MHIAllocDecoder(
+  __REG__( a0, struct Task * task ),
+  __REG__( d0, ULONG signal ),
+  __REG__( a6, struct AmiGUS_MHI * base ) 
 ) {
 
   struct AmiGUS_MHI_Handle * handle;
@@ -182,9 +184,9 @@ ASM( APTR ) SAVEDS MHIAllocDecoder(
   return handle;
 }
 
-ASM( VOID ) SAVEDS MHIFreeDecoder(
-  REG( a3, struct AmiGUS_MHI_Handle * handle ), 
-  REG( a6, struct AmiGUS_MHI * base )
+VOID __ASM__ __SAVE_DS__ MHIFreeDecoder(
+  __REG__( a3, struct AmiGUS_MHI_Handle * handle ), 
+  __REG__( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct Task * task = handle->agch_Task;
@@ -235,11 +237,11 @@ ASM( VOID ) SAVEDS MHIFreeDecoder(
   return;
 }
 
-ASM( BOOL ) SAVEDS MHIQueueBuffer(
-  REG( a3, struct AmiGUS_MHI_Handle * handle ),
-  REG( a0, APTR buffer ),
-  REG( d0, ULONG size),
-  REG( a6, struct AmiGUS_MHI * base )
+BOOL __ASM__ __SAVE_DS__ MHIQueueBuffer(
+  __REG__( a3, struct AmiGUS_MHI_Handle * handle ),
+  __REG__( a0, APTR buffer ),
+  __REG__( d0, ULONG size),
+  __REG__( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct List * buffers = ( struct List * ) &( handle->agch_Buffers );
@@ -287,9 +289,9 @@ ASM( BOOL ) SAVEDS MHIQueueBuffer(
   return TRUE;
 }
 
-ASM( APTR ) SAVEDS MHIGetEmpty(
-  REG( a3, struct AmiGUS_MHI_Handle * handle ),
-  REG( a6, struct AmiGUS_MHI * base )
+APTR __ASM__ __SAVE_DS__ MHIGetEmpty(
+  __REG__( a3, struct AmiGUS_MHI_Handle * handle ),
+  __REG__( a6, struct AmiGUS_MHI * base )
 ) {
 
   struct List * buffers = ( struct List * ) &( handle->agch_Buffers );
@@ -327,18 +329,18 @@ ASM( APTR ) SAVEDS MHIGetEmpty(
   return NULL;
 }
 
-ASM( UBYTE ) SAVEDS MHIGetStatus(
-  REG( a3, struct AmiGUS_MHI_Handle * handle ),
-  REG( a6, struct AmiGUS_MHI * base )
+UBYTE __ASM__ __SAVE_DS__ MHIGetStatus(
+  __REG__( a3, struct AmiGUS_MHI_Handle * handle ),
+  __REG__( a6, struct AmiGUS_MHI * base )
 ) {
 
   LOG_D(( "D: MHIGetStatus %ld start/done\n", handle->agch_Status ));
   return ( UBYTE ) handle->agch_Status;
 }
 
-ASM( VOID ) SAVEDS MHIPlay(
-  REG( a3, struct AmiGUS_MHI_Handle * handle ),
-  REG( a6, struct AmiGUS_MHI * base )
+VOID __ASM__ __SAVE_DS__ MHIPlay(
+  __REG__( a3, struct AmiGUS_MHI_Handle * handle ),
+  __REG__( a6, struct AmiGUS_MHI * base )
 ) {
 
   LOG_D(( "D: MHIPlay start\n" ));
@@ -348,9 +350,9 @@ ASM( VOID ) SAVEDS MHIPlay(
   return;
 }
 
-ASM( VOID ) SAVEDS MHIStop(
-  REG( a3, struct AmiGUS_MHI_Handle * handle ),
-  REG( a6, struct AmiGUS_MHI * base )
+VOID __ASM__ __SAVE_DS__ MHIStop(
+  __REG__( a3, struct AmiGUS_MHI_Handle * handle ),
+  __REG__( a6, struct AmiGUS_MHI * base )
 ) {
 
   LOG_D(( "D: MHIStop start\n" ));
@@ -361,9 +363,9 @@ ASM( VOID ) SAVEDS MHIStop(
   return;
 }
 
-ASM( VOID ) SAVEDS MHIPause(
-  REG( a3, struct AmiGUS_MHI_Handle * handle ),
-  REG( a6, struct AmiGUS_MHI * base )
+VOID __ASM__ __SAVE_DS__ MHIPause(
+  __REG__( a3, struct AmiGUS_MHI_Handle * handle ),
+  __REG__( a6, struct AmiGUS_MHI * base )
 ) {
 
   LOG_D(( "D: MHIPause start\n" ));
@@ -382,9 +384,9 @@ ASM( VOID ) SAVEDS MHIPause(
   return;
 }
 
-ASM( ULONG ) SAVEDS MHIQuery(
-  REG( d1, ULONG query ),
-  REG( a6, struct AmiGUS_MHI * base )
+ULONG __ASM__ __SAVE_DS__ MHIQuery(
+  __REG__( d1, ULONG query ),
+  __REG__( a6, struct AmiGUS_MHI * base )
 ) {
 
   ULONG result = MHIF_UNSUPPORTED;
@@ -451,11 +453,11 @@ ASM( ULONG ) SAVEDS MHIQuery(
   return result;
 }
 
-ASM( VOID ) SAVEDS MHISetParam(
-  REG( a3, struct AmiGUS_MHI_Handle * handle ),
-  REG( d0, UWORD param ),
-  REG( d1, ULONG value ),
-  REG( a6, struct AmiGUS_MHI * base )
+VOID __ASM__ __SAVE_DS__ MHISetParam(
+  __REG__( a3, struct AmiGUS_MHI_Handle * handle ),
+  __REG__( d0, UWORD param ),
+  __REG__( d1, ULONG value ),
+  __REG__( a6, struct AmiGUS_MHI * base )
 ) {
 
   APTR card = handle->agch_CardBase;

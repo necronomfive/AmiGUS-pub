@@ -21,6 +21,7 @@
 
 #include <exec/execbase.h>
 #include <exec/semaphores.h>
+
 #include <libraries/dos.h>
 
 /**

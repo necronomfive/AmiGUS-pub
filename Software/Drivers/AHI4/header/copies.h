@@ -21,14 +21,15 @@
 
 #include <exec/types.h>
 
-#include "SDI_compiler.h"
+#include "compiler_extras.h"
 
 /**
  * Type of the copy functions provided here.
  */
-typedef LONG ( ASM( * ) CopyFunctionType )(
-  REG( d0, ULONG * ),
-  REG( a0, ULONG * ) );
+typedef LONG ( * __ASM__ CopyFunctionType )(
+  __REG__( d0, ULONG * ),
+  __REG__( a0, ULONG * )
+);
 
 /*
  * Declaring the copy functions here - but the real external interfaces
@@ -50,9 +51,10 @@ typedef LONG ( ASM( * ) CopyFunctionType )(
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) PlaybackCopy16to8(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) );
+LONG __ASM__ PlaybackCopy16to8(
+  __REG__( d0, ULONG * bufferBase ), 
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 1 LONG, writes the same 1 LONG.
@@ -64,9 +66,10 @@ ASM(LONG) PlaybackCopy16to8(
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) PlaybackCopy16to16(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) );
+LONG __ASM__ PlaybackCopy16to16(
+  __REG__( d0, ULONG * bufferBase ), 
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 4 LONGs, a, b, c, and d,
@@ -83,9 +86,10 @@ ASM(LONG) PlaybackCopy16to16(
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) PlaybackCopy32to8(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) );
+LONG __ASM__ PlaybackCopy32to8(
+  __REG__( d0, ULONG * bufferBase ), 
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 2 LONGs, a, and b,
@@ -98,9 +102,10 @@ ASM(LONG) PlaybackCopy32to8(
  *
  * @return Number of bytes written, i.e. 4.
  */
-ASM(LONG) PlaybackCopy32to16(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) );
+LONG __ASM__ PlaybackCopy32to16(
+  __REG__( d0, ULONG * bufferBase ), 
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 4 LONGs, a, b, c, and d,
@@ -116,9 +121,10 @@ ASM(LONG) PlaybackCopy32to16(
  *
  * @return Number of bytes written, i.e. 12.
  */
-ASM(LONG) PlaybackCopy32to24(
-  REG(d0, ULONG *bufferBase), 
-  REG(a0, ULONG *bufferIndex) );
+LONG __ASM__ PlaybackCopy32to24(
+  __REG__( d0, ULONG * bufferBase ), 
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 1 LONG aka 4 samples in 8Bit Mono from AmiGUS
@@ -130,9 +136,10 @@ ASM(LONG) PlaybackCopy32to24(
  *
  * @return Number of bytes read, i.e. 4.
  */
-ASM( LONG ) RecordingCopy8Mto16S(
-  REG( d0, ULONG *bufferBase ),
-  REG( a0, ULONG *bufferIndex ));
+LONG __ASM__ RecordingCopy8Mto16S(
+  __REG__( d0, ULONG * bufferBase ),
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 1 LONG aka 2 samples in 8Bit Stereo from AmiGUS
@@ -144,9 +151,10 @@ ASM( LONG ) RecordingCopy8Mto16S(
  *
  * @return Number of bytes read, i.e. 4.
  */
-ASM( LONG ) RecordingCopy8Sto16S(
-  REG( d0, ULONG *bufferBase ),
-  REG( a0, ULONG *bufferIndex ));
+LONG __ASM__ RecordingCopy8Sto16S(
+  __REG__( d0, ULONG * bufferBase ),
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 1 LONG aka 2 samples in 16Bit Mono from AmiGUS
@@ -158,9 +166,10 @@ ASM( LONG ) RecordingCopy8Sto16S(
  *
  * @return Number of bytes read, i.e. 4.
  */
-ASM( LONG ) RecordingCopy16Mto16S(
-  REG( d0, ULONG *bufferBase ),
-  REG( a0, ULONG *bufferIndex ));
+LONG __ASM__ RecordingCopy16Mto16S(
+  __REG__( d0, ULONG * bufferBase ),
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 1 LONG aka 1 sample in 16Bit Stereo from AmiGUS
@@ -172,9 +181,10 @@ ASM( LONG ) RecordingCopy16Mto16S(
  *
  * @return Number of bytes read, i.e. 4.
  */
-ASM( LONG ) RecordingCopy16Sto16S(
-  REG( d0, ULONG *bufferBase ),
-  REG( a0, ULONG *bufferIndex ));
+LONG __ASM__ RecordingCopy16Sto16S(
+  __REG__( d0, ULONG * bufferBase ),
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 3 LONG aka 4 samples in 24Bit Mono from AmiGUS
@@ -186,9 +196,10 @@ ASM( LONG ) RecordingCopy16Sto16S(
  *
  * @return Number of bytes read, i.e. 6.
  */
-ASM( LONG ) RecordingCopy24Mto32S(
-  REG( d0, ULONG *bufferBase ),
-  REG( a0, ULONG *bufferIndex ));
+LONG __ASM__ RecordingCopy24Mto32S(
+  __REG__( d0, ULONG * bufferBase ),
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 /**
  * Reads 6 LONG aka 8 samples in 24Bit Stereo from AmiGUS
@@ -200,8 +211,9 @@ ASM( LONG ) RecordingCopy24Mto32S(
  *
  * @return Number of bytes read, i.e. 12.
  */
-ASM( LONG ) RecordingCopy24Sto32S(
-  REG( d0, ULONG *bufferBase ),
-  REG( a0, ULONG *bufferIndex ));
+LONG __ASM__ RecordingCopy24Sto32S(
+  __REG__( d0, ULONG * bufferBase ),
+  __REG__( a0, ULONG * bufferIndex )
+);
 
 #endif /* COPIES_H */

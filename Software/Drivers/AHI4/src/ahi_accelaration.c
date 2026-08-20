@@ -19,7 +19,7 @@
 
 #include <exec/libraries.h>
 
-#include "SDI_ahi_sub_protos.h"
+#include "ahi_sub_protos.h"
 
 #ifndef LOG_D
 #define LOG_D(X)
@@ -27,61 +27,67 @@
 
 /* Acceleration functions */
 
-ASM(ULONG) SAVEDS AHIsub_SetEffect(
-  REG(a0, APTR aEffect),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
+ULONG __ASM__ __SAVE_DS__ AHIsub_SetEffect(
+  __REG__( a0, APTR aEffect ),
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
+
   LOG_D(("AHIsub_SetEffect\n"));
   return AHIS_UNKNOWN;
 }
 
-ASM(ULONG) SAVEDS AHIsub_SetFreq(
-  REG(d0, UWORD aChannel),
-  REG(d1, ULONG aFreq),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl),
-  REG(d2, ULONG aFlags)
+ULONG __ASM__ __SAVE_DS__ AHIsub_SetFreq(
+  __REG__( d0, UWORD aChannel ),
+  __REG__( d1, ULONG aFreq ),
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl ),
+  __REG__( d2, ULONG aFlags )
 ) {
+
   LOG_D(("AHIsub_SetFreq\n"));
   return AHIS_UNKNOWN;
 }
 
-ASM(ULONG) SAVEDS AHIsub_SetSound(
-  REG(d0, UWORD aChannel),
-  REG(d1, UWORD aSound),
-  REG(d2, ULONG aOffset),
-  REG(d3, LONG aLength),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl),
-  REG(d4, ULONG aFlags)
+ULONG __ASM__ __SAVE_DS__ AHIsub_SetSound(
+  __REG__(d0, UWORD aChannel),
+  __REG__(d1, UWORD aSound),
+  __REG__(d2, ULONG aOffset),
+  __REG__(d3, LONG aLength),
+  __REG__(a2, struct AHIAudioCtrlDrv * aAudioCtrl),
+  __REG__(d4, ULONG aFlags)
 ) {
+
   LOG_D(("AHIsub_SetSound\n"));
   return AHIS_UNKNOWN;
 }
 
-ASM(ULONG) SAVEDS AHIsub_SetVol(
-  REG(d0, UWORD aChannel),
-  REG(d1, Fixed aVolume),
-  REG(d2, sposition aPan),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl),
-  REG(d3, ULONG aFlags)
+ULONG __ASM__ __SAVE_DS__ AHIsub_SetVol(
+  __REG__( d0, UWORD aChannel ),
+  __REG__( d1, Fixed aVolume ),
+  __REG__( d2, sposition aPan ),
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl ),
+  __REG__( d3, ULONG aFlags )
 ) {
+
   LOG_D(("AHIsub_SetVol\n"));
   return AHIS_UNKNOWN;
 }
 
-ASM(ULONG) SAVEDS AHIsub_LoadSound(
-  REG(d0, UWORD aSound),
-  REG(d1, ULONG aType),
-  REG(a0, APTR aInfo),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
+ULONG __ASM__ __SAVE_DS__ AHIsub_LoadSound(
+  __REG__( d0, UWORD aSound ),
+  __REG__( d1, ULONG aType ),
+  __REG__( a0, APTR aInfo ),
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
+
   LOG_D(("AHIsub_LoadSound\n"));
   return AHIS_UNKNOWN;
 }
 
-ASM(ULONG) SAVEDS AHIsub_UnloadSound(
-  REG(d0, UWORD aSound),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
+ULONG __ASM__ __SAVE_DS__ AHIsub_UnloadSound(
+  __REG__( d0, UWORD aSound ),
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
+
   LOG_D(("AHIsub_UnloadSound\n"));
   return AHIS_UNKNOWN;
 }

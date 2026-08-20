@@ -19,8 +19,9 @@
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
 
-#include "exec/types.h"
-#include "SDI_compiler.h"
+#include <exec/types.h>
+
+#include "compiler_extras.h"
 
 /******************************************************************************
  * Interrupt functions.
@@ -36,6 +37,6 @@
  * @return 1 if the handle's card's interrupt was pending and handled,
  *         0 otherwise.
  */
-ASM( LONG ) HandleInterrupt( REG( a0, APTR data ));
+LONG __ASM__ HandleInterrupt( __REG__( a0, APTR data ));
 
 #endif /* INTERRUPT_H */

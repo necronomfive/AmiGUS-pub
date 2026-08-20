@@ -20,7 +20,6 @@
 #define WORKER_H
 
 #include "exec/types.h"
-#include "SDI_compiler.h"
 
 BOOL CreateWorkerProcess( VOID );
 VOID DestroyWorkerProcess( VOID );

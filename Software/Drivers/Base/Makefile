@@ -75,7 +75,7 @@ LIB_LOG        ?= NO_LOG
 LIB_NAME        = amigus
 LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
-LIB_REVISION    = 0
+LIB_REVISION    = 1
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =

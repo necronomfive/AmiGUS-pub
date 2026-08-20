@@ -27,10 +27,10 @@
 #include "amigus_hardware.h"
 #include "amigus_pcmcia.h"
 #include "amigus_private.h"
+#include "amigus_protos.h"
 #include "debug.h"
 #include "errors.h"
 #include "support.h"
-#include "SDI_amigus_protos.h"
 
 /*
  * defines are limited to 32 chars due to a SAS/C insufficiency !!!
@@ -64,25 +64,28 @@ extern const char LibName[];
 
 STRPTR AmiGUS_Mini_Name = "AmiGUS mini";
 
-ASM( LONG ) /* __entry for vbcc ? */ SAVEDS INTERRUPT HandleRemovedInterrupt (
-  REG( a1, struct AmiGUS_Base * base )) {
+// TODO: Does vbcc need __entry , too?
+LONG __ASM__ __SAVE_DS__ __INTERRUPT__ HandleRemovedInterrupt (
+  __REG__( a1, struct AmiGUS_Base * base )) {
 
   LOG_INT(( "INT: PCMCIA removed.\n" ));
 
   return 0;
 }
 
-ASM( LONG ) /* __entry for vbcc ? */ SAVEDS INTERRUPT HandleInsertedInterrupt (
-  REG( a1, struct AmiGUS_Base * base )) {
+// TODO: Does vbcc need __entry , too?
+LONG __ASM__ __SAVE_DS__ __INTERRUPT__ HandleInsertedInterrupt (
+  __REG__( a1, struct AmiGUS_Base * base )) {
 
   LOG_INT(( "INT: PCMCIA inserted.\n" ));
 
   return 0;
 }
 
-ASM( ULONG ) /* __entry for vbcc ? */ SAVEDS INTERRUPT HandleStatusInterrupt (
-  REG( d0, ULONG status ),
-  REG( a1, struct AmiGUS_Base * base )) {
+// TODO: Does vbcc need __entry , too?
+ULONG __ASM__ __SAVE_DS__ __INTERRUPT__ HandleStatusInterrupt (
+  __REG__( d0, ULONG status ),
+  __REG__( a1, struct AmiGUS_Base * base )) {
 
   LOG_INT(( "INT: PCMCIA status change, now %ld.\n", status ));
   if ( CARD_STATUSF_IRQ & status ) {

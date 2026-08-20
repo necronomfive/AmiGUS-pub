@@ -17,24 +17,27 @@
  */
 
 #include <exec/libraries.h>
+
 #include <proto/exec.h>
 #include <proto/utility.h>
 
+#include "ahi_sub_protos.h"
 #include "amigus_ahi_modes.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
+#include "compiler_extras.h"
 #include "debug.h"
 #include "errors.h"
 #include "samplerate.h"
 #include "support.h"
-#include "SDI_ahi_sub_protos.h"
 
 /* Basic functions - Allocation */
 
-ASM(ULONG) SAVEDS AHIsub_AllocAudio(
-  REG(a1, struct TagItem* aTagList),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
+ULONG __ASM__ __SAVE_DS__ AHIsub_AllocAudio(
+  __REG__( a1, struct TagItem * aTagList ),
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
+
   struct TagItem *stateTag = 0;
   struct TagItem *tag;
   ULONG sampleRateId;
@@ -215,9 +218,10 @@ ASM(ULONG) SAVEDS AHIsub_AllocAudio(
   return result;
 }
 
-ASM( VOID ) SAVEDS AHIsub_FreeAudio(
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
+VOID __ASM__ __SAVE_DS__ AHIsub_FreeAudio(
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
+
   LOG_D(("D: AHIsub_FreeAudio start\n"));
 
   if ( aAudioCtrl->ahiac_DriverData != AmiGUS_AHI_Base->agb_CardBase ) {

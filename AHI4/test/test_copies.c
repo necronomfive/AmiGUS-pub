@@ -4,8 +4,7 @@
 
 #include "amigus_ahi_modes.h"
 #include "amigus_ahi_sub.h"
-#include "amigus_hardware.h"
-#include "copies.h"
+#include "compiler_extras.h"
 
 #if defined (__VBCC__)
 /* Don't care about ugly type issues with format strings! */
@@ -42,6 +41,16 @@ VOID flushFIFO( VOID ) {
   nextTestFIFO = 0;
 }
 
+/* From amigus_hardware.h */
+
+#define AMIGUS_HARDWARE_H
+
+#define AMIGUS_PCM_PLAY_FIFO_WRITE       0x0c
+
+#define AMIGUS_PCM_REC_FIFO_READ         0x8c
+
+#define AMIGUS_PCM_SAMPLE_RATE_COUNT     9       // 96kHz deactivated for AHI
+
 /* From amigus_hardware.c */
 
 const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
@@ -58,25 +67,39 @@ const LONG AmiGUSSampleRates[ AMIGUS_PCM_SAMPLE_RATE_COUNT ] = {
 //96000  // AMIGUS_PCM_SAMPLE_RATE_96000 @ index 0x0009
 };
 
-UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
+INLINE UWORD ReadReg16Fast( APTR amiGUS, ULONG offset ) {
 
   ULONG result = testLongFIFO[ nextTestFIFO ];
   ++nextTestFIFO;
   return ( UWORD )( result & 0xffFF );
 }
 
-ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
+INLINE ULONG ReadReg32Fast( APTR amiGUS, ULONG offset ) {
 
   ULONG result = testLongFIFO[ nextTestFIFO ];
   ++nextTestFIFO;
   return result;
 }
 
-VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
+UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
+
+  return ReadReg16Fast( amiGUS, offset );
+}
+
+ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
+
+  return ReadReg32Fast( amiGUS, offset );
+}
+
+INLINE VOID WriteReg32( APTR amiGUS, ULONG offset, ULONG value ) {
 
   sprintf( testFIFO[ nextTestFIFO], "%08lx", value );
   ++nextTestFIFO;
 }
+
+/* From copies.c */
+
+#include "../src/copies.c"
 
 /******************************************************************************
  * Private functions / fields under test:
@@ -468,7 +491,7 @@ BOOL testRecordingCopy8Mto16S( VOID ) {
     0x00000000,
     0x00000000 };
   ULONG index = 1; // into target!
-  ULONG exp[] = { 5, 16, 1, 6 };
+  ULONG exp[] = { 5, 4, 1, 6 };
   ULONG expF[] = {
     0x00000000,
     0x12001200,
@@ -498,7 +521,7 @@ BOOL testRecordingCopy8Mto16S( VOID ) {
   }
 
   printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
-          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes read:        %8ld (expected) - %8ld (actual) - \t%s\n"
           "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
           "AHI Buffer content:                             %s - \t%s\n",
           exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
@@ -535,7 +558,7 @@ BOOL testRecordingCopy8Sto16S( VOID ) {
     0x00000000,
     0x00000000 };
   ULONG index = 1; // into target!
-  ULONG exp[] = { 3, 8, 1, 4 };
+  ULONG exp[] = { 3, 4, 1, 4 };
   ULONG expF[] = {
     0x00000000,
     0x12003400,
@@ -563,7 +586,7 @@ BOOL testRecordingCopy8Sto16S( VOID ) {
   }
 
   printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
-          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes read:        %8ld (expected) - %8ld (actual) - \t%s\n"
           "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
           "AHI Buffer content:                             %s - \t%s\n",
           exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
@@ -600,7 +623,7 @@ BOOL testRecordingCopy16Mto16S( VOID ) {
     0x00000000,
     0x00000000 };
   ULONG index = 1; // into target!
-  ULONG exp[] = { 3, 8, 1, 4 };
+  ULONG exp[] = { 3, 4, 1, 4 };
   ULONG expF[] = {
     0x00000000,
     0x12341234,
@@ -628,7 +651,7 @@ BOOL testRecordingCopy16Mto16S( VOID ) {
   }
 
   printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
-          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes read:        %8ld (expected) - %8ld (actual) - \t%s\n"
           "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
           "AHI Buffer content:                             %s - \t%s\n",
           exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
@@ -691,7 +714,7 @@ BOOL testRecordingCopy16Sto16S( VOID ) {
   }
 
   printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
-          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes read:        %8ld (expected) - %8ld (actual) - \t%s\n"
           "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
           "AHI Buffer content:                             %s - \t%s\n",
           exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
@@ -733,7 +756,7 @@ BOOL testRecordingCopy24Mto32S( VOID ) {
     0x00000000,
     0x00000000 };
   ULONG index = 1; // into target!
-  ULONG exp[] = { 7, 24, 2, 8 };
+  ULONG exp[] = { 7, 6, 2, 8 };
   ULONG expF[] = {
     0x00000000,
     0x12340100,
@@ -765,7 +788,7 @@ BOOL testRecordingCopy24Mto32S( VOID ) {
   }
 
   printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
-          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes read:        %8ld (expected) - %8ld (actual) - \t%s\n"
           "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
           "AHI Buffer content:                             %s - \t%s\n",
           exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",
@@ -809,7 +832,7 @@ BOOL testRecordingCopy24Sto32S( VOID ) {
     0x00000000,
     0x00000000 };
   ULONG index = 1; // into target!
-  ULONG exp[] = { 7, 24, 3, 8 };
+  ULONG exp[] = { 7, 12, 3, 8 };
   ULONG expF[] = {
     0x00000000,
     0x12340100,
@@ -844,7 +867,7 @@ BOOL testRecordingCopy24Sto32S( VOID ) {
   }
 
   printf( "Next buffer index: %8ld (expected) - %8ld (actual) - \t%s\n"
-          "Bytes written:     %8ld (expected) - %8ld (actual) - \t%s\n"
+          "Bytes read:        %8ld (expected) - %8ld (actual) - \t%s\n"
           "Next FIFO index:   %8ld (expected) - %8ld (actual) - \t%s\n"
           "AHI Buffer content:                             %s - \t%s\n",
           exp[ 0 ], index, (tst0) ? "passed" : "FAIL!!",

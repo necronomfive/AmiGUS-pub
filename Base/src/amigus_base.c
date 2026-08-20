@@ -22,10 +22,10 @@
 
 #include "amigus_pcmcia.h"
 #include "amigus_private.h"
+#include "amigus_protos.h"
 #include "amigus_zorro2.h"
+#include "compiler_extras.h"
 #include "debug.h"
-#include "SDI_amigus_protos.h"
-#include "SDI_compiler.h"
 #include "support.h"
 
 /******************************************************************************
@@ -187,9 +187,9 @@ LONG HandleInterruptChanges( VOID ) {
  * AmiGUS base library - public functions.
  *****************************************************************************/
 
-ASM( AmiGUS_PTR ) SAVEDS AmiGUS_FindCard(
-  REG( a0, struct AmiGUS * card ),
-  REG( a6, struct AmiGUS_Base * base )) {
+AmiGUS_PTR __ASM__ __SAVE_DS__ AmiGUS_FindCard(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( a6, struct AmiGUS_Base * base )) {
 
   struct Node * node;
   struct AmiGUS * card_public = NULL;
@@ -216,11 +216,11 @@ ASM( AmiGUS_PTR ) SAVEDS AmiGUS_FindCard(
   return card_public;
 }
 
-ASM( ULONG ) SAVEDS AmiGUS_ReserveCard(
-  REG( a0, struct AmiGUS * card ),
-  REG( d0, LONG which ),
-  REG( d1, APTR owner ),
-  REG( a6, struct AmiGUS_Base * base )) {
+ULONG __ASM__ __SAVE_DS__ AmiGUS_ReserveCard(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( d0, LONG which ),
+  __REG__( d1, APTR owner ),
+  __REG__( a6, struct AmiGUS_Base * base )) {
 
   struct AmiGUS_Private * card_private;
   ULONG result;
@@ -239,11 +239,11 @@ ASM( ULONG ) SAVEDS AmiGUS_ReserveCard(
   return result;
 }
 
-ASM( VOID ) SAVEDS AmiGUS_FreeCard(
-  REG( a0, struct AmiGUS * card ),
-  REG( d0, LONG which ),
-  REG( d1, APTR owner ),
-  REG( a6, struct AmiGUS_Base * base )) {
+VOID __ASM__ __SAVE_DS__ AmiGUS_FreeCard(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( d0, LONG which ),
+  __REG__( d1, APTR owner ),
+  __REG__( a6, struct AmiGUS_Base * base )) {
 
   struct AmiGUS_Private * card_private;
   LONG result;
@@ -262,13 +262,13 @@ ASM( VOID ) SAVEDS AmiGUS_FreeCard(
   return;
 }
 
-ASM( ULONG ) SAVEDS AmiGUS_InstallInterrupt(
-  REG( a0, struct AmiGUS * card ),
-  REG( d0, LONG which ),
-  REG( d1, APTR owner ),
-  REG( d2, AmiGUS_Interrupt handler ),
-  REG( d3, APTR data ),
-  REG( a6, struct AmiGUS_Base * base )) {
+ULONG __ASM__ __SAVE_DS__ AmiGUS_InstallInterrupt(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( d0, LONG which ),
+  __REG__( d1, APTR owner ),
+  __REG__( d2, AmiGUS_Interrupt handler ),
+  __REG__( d3, APTR data ),
+  __REG__( a6, struct AmiGUS_Base * base )) {
 
   struct AmiGUS_Private * card_private;
   ULONG result = AmiGUS_NoError;
@@ -307,11 +307,11 @@ ASM( ULONG ) SAVEDS AmiGUS_InstallInterrupt(
   return result;
 }
 
-ASM( VOID ) SAVEDS AmiGUS_RemoveInterrupt(
-  REG( a0, struct AmiGUS * card ),
-  REG( d0, LONG which ),
-  REG( d1, APTR owner ),
-  REG( a6, struct AmiGUS_Base * base )) {
+VOID __ASM__ __SAVE_DS__ AmiGUS_RemoveInterrupt(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( d0, LONG which ),
+  __REG__( d1, APTR owner ),
+  __REG__( a6, struct AmiGUS_Base * base )) {
 
   struct AmiGUS_Private * card_private;
   LONG result = AmiGUS_NoError;
@@ -350,8 +350,9 @@ ASM( VOID ) SAVEDS AmiGUS_RemoveInterrupt(
   return;
 }
 
-ASM( LONG ) /* __entry for vbcc ? */ SAVEDS INTERRUPT HandleInterrupt (
-  REG( a1, struct AmiGUS_Base * base )) {
+// TODO: Does vbcc need __entry , too?
+LONG __ASM__ __SAVE_DS__ __INTERRUPT__ HandleInterrupt (
+  __REG__( a1, struct AmiGUS_Base * base )) {
 
   const struct List * cards = &( AmiGUS_Base->agb_Cards );
   struct AmiGUS_Private * card;

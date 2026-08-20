@@ -25,11 +25,11 @@
 
 #include "amigus_hardware.h"
 #include "amigus_private.h"
+#include "amigus_protos.h"
 #include "amigus_zorro2.h"
 #include "debug.h"
 #include "errors.h"
 #include "support.h"
-#include "SDI_amigus_protos.h"
 
 #define ANY_PRODUCT_ID   -1
 

@@ -18,12 +18,13 @@
 
 #include <exec/libraries.h>
 #include <exec/nodes.h>
+
 #include <libraries/dos.h>
 
 #include <proto/exec.h>
 
-#include "SDI_compiler.h"
-#include "SDI_amigus_protos.h"
+#include "amigus_protos.h"
+#include "compiler_extras.h"
 
 // This file lives before the library is set up completely...
 // so it does not use the default library definitions, hence:
@@ -72,10 +73,10 @@ typedef struct Library * LIB_PTR;
  * @return Pointer to the allocated library base structure,
  *         NULL otherwise.
  */
-static ASM( LIB_PTR ) SAVEDS LibInit(
-  REG( d0, struct BaseLibrary * base ),
-  REG( a0, SEGLISTPTR seglist ),
-  REG( a6, struct Library * _SysBase ));
+static LIB_PTR __ASM__ __SAVE_DS__ LibInit(
+  __REG__( d0, struct BaseLibrary * base ),
+  __REG__( a0, SEGLISTPTR seglist ),
+  __REG__( a6, struct Library * _SysBase ));
 
 /**
  * Library opening code - run every time when the library is OpenLibrary-ed.
@@ -84,8 +85,8 @@ static ASM( LIB_PTR ) SAVEDS LibInit(
  *
  * @return Pointer to the allocated library base structure.
  */
-static ASM( LIB_PTR ) SAVEDS LibOpen(
-  REG( a6, struct BaseLibrary * base ));
+static LIB_PTR __ASM__ __SAVE_DS__ LibOpen(
+  __REG__( a6, struct BaseLibrary * base ));
 
 /**
  * Library closing code - run every time when the library is CloseLibrary-ed.
@@ -95,8 +96,8 @@ static ASM( LIB_PTR ) SAVEDS LibOpen(
  * @return NULL if the library is still opened at least once,
  *         return value of LibExpunge otherwise.
  */
-static ASM( SEGLISTPTR ) SAVEDS LibClose(
-  REG( a6, struct BaseLibrary * base ));
+static SEGLISTPTR __ASM__ __SAVE_DS__ LibClose(
+  __REG__( a6, struct BaseLibrary * base ));
 
 /**
  * Library extinction - run only once when library is erased from memory.
@@ -106,8 +107,8 @@ static ASM( SEGLISTPTR ) SAVEDS LibClose(
  * @return NULL if the library is still opened at least once,
  *         list of the code segments to erase/return to empty pool otherwise.
  */
-static ASM( SEGLISTPTR ) SAVEDS LibExpunge(
-  REG( a6, struct BaseLibrary * base ));
+static SEGLISTPTR __ASM__ __SAVE_DS__ LibExpunge(
+  __REG__( a6, struct BaseLibrary * base ));
 
 /******************************************************************************
  * OS required library basics - private data declarations.
@@ -145,7 +146,7 @@ extern const APTR LibInitTab[];
  *
  * @return 0 as OS return code.
  */
-ASM( LONG ) SAVEDS LibNull( VOID ) {
+LONG __ASM__ __SAVE_DS__ LibNull( VOID ) {
 
     return 0;
 }
@@ -240,10 +241,10 @@ const APTR LibInitTab[] = {
  * OS required library basics - private function definitions.
  *****************************************************************************/
 
-static ASM( LIB_PTR ) SAVEDS LibInit(
-  REG( d0, struct BaseLibrary * base ),
-  REG( a0, SEGLISTPTR seglist ),
-  REG( a6, struct Library * _SysBase )) {
+static LIB_PTR __ASM__ __SAVE_DS__ LibInit(
+  __REG__( d0, struct BaseLibrary * base ),
+  __REG__( a0, SEGLISTPTR seglist ),
+  __REG__( a6, struct Library * _SysBase )) {
 
   ULONG p = ( ULONG ) base;
   ULONG t = p + sizeof( LIBRARY_TYPE );
@@ -281,8 +282,8 @@ static ASM( LIB_PTR ) SAVEDS LibInit(
   return NULL;
 }
 
-static ASM( LIB_PTR ) SAVEDS LibOpen(
-  REG( a6, struct BaseLibrary * base )) {
+static LIB_PTR __ASM__ __SAVE_DS__ LibOpen(
+  __REG__( a6, struct BaseLibrary * base )) {
 
   ObtainSemaphore( &base->LockSemaphore );
 
@@ -294,8 +295,8 @@ static ASM( LIB_PTR ) SAVEDS LibOpen(
   return ( struct Library * ) base;
 }
 
-static ASM( SEGLISTPTR ) SAVEDS LibClose(
-  REG( a6, struct BaseLibrary * base )) {
+static SEGLISTPTR __ASM__ __SAVE_DS__ LibClose(
+  __REG__( a6, struct BaseLibrary * base )) {
 
   ObtainSemaphore( &base->LockSemaphore );
 
@@ -314,8 +315,8 @@ static ASM( SEGLISTPTR ) SAVEDS LibClose(
   return NULL;
 }
 
-static ASM( SEGLISTPTR ) SAVEDS LibExpunge(
-  REG( a6, struct BaseLibrary * base )) {
+static SEGLISTPTR __ASM__ __SAVE_DS__ LibExpunge(
+  __REG__( a6, struct BaseLibrary * base )) {
 
   SEGLISTPTR ret;
 

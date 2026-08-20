@@ -35,7 +35,7 @@
  * Interrupt functions - public function definitions.
  *****************************************************************************/
 
-ASM( LONG ) HandleInterrupt( REG( a0, APTR data )) {
+LONG __ASM__ HandleInterrupt( __REG__( a0, APTR data )) {
 
   LONG result = 0;
 

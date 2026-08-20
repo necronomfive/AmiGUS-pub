@@ -22,24 +22,18 @@
  * Low-Level hardware access functions - public function definitions.
  *****************************************************************************/
 
-UWORD ReadReg16( APTR card, ULONG offset ) {
+// Lowest level went to header, as INLINE does not work outside own file
+// - or its includes -
+// in most compilers, e.g. SAS/C and vbcc.
 
-  return *(( UWORD * )(( ULONG ) card + offset ));
+UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
+
+  return ReadReg16Fast( amiGUS, offset );
 }
 
-ULONG ReadReg32( APTR card, ULONG offset ) {
+ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
 
-  return *(( ULONG * )(( ULONG ) card + offset ));
-}
-
-VOID WriteReg16( APTR card, ULONG offset, UWORD value ) {
-
-  *(( UWORD * )(( ULONG ) card + offset )) = value;
-}
-
-VOID WriteReg32( APTR card, ULONG offset, ULONG value ) {
-
-  *(( ULONG * )(( ULONG ) card + offset )) = value;
+  return ReadReg32Fast( amiGUS, offset );
 }
 
 /******************************************************************************
@@ -70,7 +64,7 @@ const STRPTR AmiGUSInputs[ AMIGUS_PCM_INPUTS_COUNT ] = {
   "External / see Mixer",
   "MHI / Codec",
   "WaveTable",
-  // "AHI / PCM",                    // Deactivated - needs splitting 1 card for 2 clients
+  // "AHI / PCM",         // Deactivated - needs splitting 1 card for 2 clients
   "ALL / What-You-Hear"
 };
 

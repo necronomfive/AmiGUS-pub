@@ -26,6 +26,7 @@
 #include "amigus_hardware.h"
 #include "amigus_pcm.h"
 #include "buffers.h"
+#include "compiler_extras.h"
 #include "debug.h"
 #include "errors.h"
 #include "support.h"
@@ -79,8 +80,8 @@ VOID FillBuffer( BYTE buffer ) {
 #endif
 #if 1
 
-typedef ASM(BOOL) PreTimerType( REG(a2, struct AHIAudioCtrlDrv *) );
-typedef ASM(VOID) PostTimerType( REG(a2, struct AHIAudioCtrlDrv *) );
+typedef BOOL __ASM__ PreTimerType( __REG__( a2, struct AHIAudioCtrlDrv * ));
+typedef VOID __ASM__ PostTimerType( __REG__( a2, struct AHIAudioCtrlDrv * ));
 
 INLINE VOID FillBuffer( BYTE buffer ) {
 
@@ -237,7 +238,8 @@ INLINE VOID HandleRecording( VOID ) {
             recording->agpr_BufferMax[ 1 ] ));
 }
 
-/*__entry for vbcc*/ SAVEDS VOID WorkerProcess( VOID ) {
+/* TODO: Does that need__entry for vbcc? */ 
+__SAVE_DS__ VOID WorkerProcess( VOID ) {
 
   ULONG signals = TRUE;
 

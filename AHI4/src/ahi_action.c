@@ -21,6 +21,7 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 
+#include "ahi_sub_protos.h"
 #include "amigus_ahi_modes.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_pcm.h"
@@ -30,18 +31,17 @@
 #include "errors.h"
 #include "interrupt.h"
 #include "support.h"
-#include "SDI_ahi_sub_protos.h"
 #include "worker.h"
 
 /* Basic functions - Actions */
 
-ASM(VOID) SAVEDS AHIsub_Disable(
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
+VOID __ASM__ __SAVE_DS__ AHIsub_Disable(
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
 
   // LOG_D(("AHIsub_Disable\n"));
 #if 0
-  WriteReg16( AmiGUS_AHI_Base->agb_CardBase,
+  Write__REG__16( AmiGUS_AHI_Base->agb_CardBase,
               AMIGUS_PCM_MAIN_INT_ENABLE,
               AMIGUS_INT_F_MASK_CLEAR
             | AMIGUS_INT_F_PLAY_FIFO_EMPTY
@@ -55,8 +55,8 @@ ASM(VOID) SAVEDS AHIsub_Disable(
 }
 
 
-ASM(VOID) SAVEDS AHIsub_Enable(
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
+VOID __ASM__ __SAVE_DS__ AHIsub_Enable(
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
 
 #if 0
@@ -73,7 +73,7 @@ ASM(VOID) SAVEDS AHIsub_Enable(
     targetState |=
       AMIGUS_INT_F_REC_FIFO_FULL | AMIGUS_INT_F_REC_FIFO_WATERMARK;
   }
-  WriteReg16(
+  Write__REG__16(
     AmiGUS_AHI_Base->agb_CardBase,
     AMIGUS_PCM_MAIN_INT_ENABLE,
     targetState );
@@ -83,10 +83,11 @@ ASM(VOID) SAVEDS AHIsub_Enable(
   return;
 }
 
-ASM(ULONG) SAVEDS AHIsub_Start(
-  REG(d0, ULONG aFlags),
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
+ULONG __ASM__ __SAVE_DS__ AHIsub_Start(
+  __REG__( d0, ULONG aFlags ),
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
+
   LOG_D(("D: AHIsub_Start start\n"));
 
   if ( aAudioCtrl->ahiac_DriverData != AmiGUS_AHI_Base->agb_CardBase ) {
@@ -156,9 +157,9 @@ ASM(ULONG) SAVEDS AHIsub_Start(
   return AHIE_OK;
 }
 
-ASM(VOID) SAVEDS AHIsub_Update(
-  REG(d0, ULONG aFlags),
-  REG(a2, struct AHIAudioCtrlDrv *newAudioCtrl)
+VOID __ASM__ __SAVE_DS__ AHIsub_Update(
+  __REG__( d0, ULONG aFlags ),
+  __REG__( a2, struct AHIAudioCtrlDrv * newAudioCtrl )
 ) {
 
   const struct AHIAudioCtrlDrv *oldAudioCtrl = AmiGUS_AHI_Base->agb_AudioCtrl;
@@ -230,10 +231,11 @@ ASM(VOID) SAVEDS AHIsub_Update(
   return;
 }
 
-ASM(VOID) SAVEDS AHIsub_Stop(
-  REG(d0, ULONG aFlags),
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
+VOID __ASM__ __SAVE_DS__ AHIsub_Stop(
+  __REG__( d0, ULONG aFlags ),
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
+
   LOG_D(( "D: AHIsub_Stop start\n" ));
 
   if ( aAudioCtrl->ahiac_DriverData != AmiGUS_AHI_Base->agb_CardBase ) {

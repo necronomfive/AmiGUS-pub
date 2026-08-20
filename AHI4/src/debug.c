@@ -16,12 +16,11 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
- #include <proto/dos.h>
+#include <proto/dos.h>
 #include <proto/exec.h>
 
-#include "SDI_compiler.h"
-
 #include "amigus_ahi_sub.h"
+#include "compiler_extras.h"
 #include "debug.h"
 #include "errors.h"
 #include "support.h"
@@ -40,7 +39,10 @@
  * @param c Character to place.
  * @param target Pointer to the target location pointer.
  */
-ASM( VOID ) debug_mPutChProc( REG( d0, UBYTE c ), REG( a3, UBYTE ** target )) {
+VOID __ASM__ debug_mPutChProc(
+  __REG__( d0, UBYTE c ), 
+  __REG__( a3, UBYTE ** target )
+) {
 
   **target = c;
   ++( *target );
@@ -57,7 +59,7 @@ ASM( VOID ) debug_mPutChProc( REG( d0, UBYTE c ), REG( a3, UBYTE ** target )) {
 
 // Comes with a tiny performance impact,
 // so... rather not do it.
-ASM( VOID ) RawPutCharC( REG( d0, UBYTE putCh ) {
+VOID __ASM__ RawPutCharC( __REG__( d0, UBYTE putCh ) {
 
   RawPutChar(putCh);
 }

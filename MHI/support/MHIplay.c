@@ -45,6 +45,8 @@
 /*                                                   */
 /*****************************************************/
 
+#include <clib/compiler-specific.h>
+
 #include <exec/types.h>
 #include <exec/libraries.h>
 #include <exec/memory.h>
@@ -55,8 +57,6 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/mhi.h>
-
-#include "SDI_compiler.h"
 
 // inlines created by
 // fd2pragma SPECIAL 70 CLIB /clib/mhi_protos.h INFILE mhi_lib.fd TO /INLINE/
@@ -111,7 +111,10 @@ struct Library *MHIBase;
 
 static char Version[] = "\0$VER: MHIplay 1.001 (06.04.2025)\0";
 
-ASM( VOID ) mPutChProc( REG( d0, UBYTE c ), REG( a3, UBYTE ** target )) {
+VOID __ASM__ mPutChProc(
+  __REG__( d0, UBYTE c ),
+  __REG__( a3, UBYTE ** target )
+) {
 
   **target = c;
   ++( *target );

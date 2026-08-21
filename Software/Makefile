@@ -149,8 +149,6 @@ package:
 	cp Installer/MHI.info                       $(ADF_DIR1)/
 	cp Installer/Firmware.info                  $(ADF_DIR1)/
 
-	cp Tools/FindAmiGUS/FindAmiGUS              $(ADF_DIR1)/Tools
-
 	cp Tools/FlashFPGA/FlashGUI                 $(ADF_DIR1)/Tools
 	cp Tools/FlashFPGA/FlashGUI.info            $(ADF_DIR1)/Tools
 	cp Tools/Mixer/Mixer                        $(ADF_DIR1)/Tools
@@ -165,13 +163,16 @@ package:
 	cp Tools/PlayWAVetable/PlayWAVetable.info   $(ADF_DIR1)/Tools
 	cp Tools/Record/Record                      $(ADF_DIR1)/Tools
 	cp Tools/Record/Record.info                 $(ADF_DIR1)/Tools
-	
+
 	cp Drivers/Base/target/get_mem_log          $(ADF_DIR1)/Base/GetAmiGUSMemLog
 	cp Installer/program.info                   $(ADF_DIR1)/Base/GetAmiGUSMemLog.info
 	cp Drivers/Base/target/amigus_lib_check     $(ADF_DIR1)/Base/AmiGUSLibCheck
 	cp Installer/program.info                   $(ADF_DIR1)/Base/AmiGUSLibCheck.info
 	cp Drivers/Base/target/amigus-dev.lha       $(ADF_DIR1)/Base
 	cp Drivers/Base/target/*.library*           $(ADF_DIR1)/Base
+
+	cp Tools/FindAmiGUS/FindAmiGUS              $(ADF_DIR1)/
+	cp Drivers/Base/target/*.library-000-NO_LOG $(ADF_DIR1)/amigus.library
 
 	cp Drivers/AHI4/target/get_mem_log          $(ADF_DIR1)/AHI4/GetAhiMemLog
 	cp Installer/program.info                   $(ADF_DIR1)/AHI4/GetAhiMemLog.info

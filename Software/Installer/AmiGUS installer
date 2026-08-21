@@ -586,7 +586,7 @@
 (onerror (TERMINATE))
 
 (set cards_found
-  (run "Tools/FindAmiGUS")
+  (run "FindAmiGUS")
 )
 
 (set amigus_z2_found

@@ -26,8 +26,8 @@
 @{" 2     Installation                  " LINK hw_inst}
 @{" 2.1   Card Installation             " LINK hw_inst}
 
-@{" 3     Software Tools                " LINK sw_inst20}
-@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3     Software Tools                " LINK sw_inst}
+@{" 3.1   Installation                  " LINK sw_inst}
 @{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
 @{" 3.2   Mixer Tool                    " LINK mixer1}
 @{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
@@ -270,20 +270,32 @@ audio output by using a Cinch-to-3.5 mm adaptor cable, or to connect
 any other analogue sound source which supports line-level audio
 output.
 
-@{" 3     Software Tools                " LINK sw_inst20}
+@{" 3     Software Tools                " LINK sw_inst}
 
 @ENDNODE
 
-@NODE sw_inst20 "Installation - Software Installation"
+@NODE sw_inst "Installation - Software Installation"
 @TOC contents
 @{" 2     Installation                  " LINK hw_inst}
-@{" 3     Software Tools                " LINK sw_inst20}
-@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3     Software Tools                " LINK sw_inst}
+@{" 3.1   Installation                  " LINK sw_inst}
 
 The AmiGUS mini software comes in the following packages:
 - As an LHA archive for OS 2.x/3.x
 - As sets of ADF files for OS 2.x/3.x including one Manual Disk
 
+@{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
+@{" 3.2   Mixer Tool                    " LINK mixer1}
+@{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
+@{" 3.3   FPGA Flash Tool               " LINK flash1}
+@{" 3.3.1 Available Options             " LINK flash2}
+
+@ENDNODE
+
+@NODE sw_inst20 "Installation - Software Installation"
+@TOC contents
+@{" 3     Software Tools                " LINK sw_inst}
+@{" 3.1   Installation                  " LINK sw_inst}
 @{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
 
 On OS 2.0 and later, the AmiGUS software installation relies on the
@@ -344,12 +356,16 @@ Refer to sections @{" 5 AHI Driver Framework " LINK ahi} and @{"5 MHI Driver Fra
 for a detailed description.
 
 @{" 3.2   Mixer Tool                    " LINK mixer1}
+@{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
+@{" 3.3   FPGA Flash Tool               " LINK flash1}
+@{" 3.3.1 Available Options             " LINK flash2}
+
 @ENDNODE
 
 @NODE mixer1 "Software Tools - Mixer Tool"
 @TOC contents
-@{" 3     Software Tools                " LINK sw_inst20}
-@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3     Software Tools                " LINK sw_inst}
+@{" 3.1   Installation                  " LINK sw_inst}
 @{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
 @{" 3.2   Mixer Tool                    " LINK mixer1}
 
@@ -372,8 +388,8 @@ signal, thus lessening the amount of channel separation.
 
 @NODE mixer2 "Software Tools - Mixer Panel Descriptions"
 @TOC contents
-@{" 3     Software Tools                " LINK sw_inst20}
-@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3     Software Tools                " LINK sw_inst}
+@{" 3.1   Installation                  " LINK sw_inst}
 @{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
 @{" 3.2   Mixer Tool                    " LINK mixer1}
 @{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
@@ -422,8 +438,8 @@ configuration options.
 
 @NODE flash1 "Software Tools - FPGA Flash Tool"
 @TOC contents
-@{" 3     Software Tools                " LINK sw_inst20}
-@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3     Software Tools                " LINK sw_inst}
+@{" 3.1   Installation                  " LINK sw_inst}
 @{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
 @{" 3.2   Mixer Tool                    " LINK mixer1}
 @{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
@@ -443,8 +459,8 @@ status or initialising the configuration data used for the mixer settings.
 
 @NODE flash2 "Software Tools - Available Options"
 @TOC contents
-@{" 3     Software Tools                " LINK sw_inst20}
-@{" 3.1   Installation                  " LINK sw_inst20}
+@{" 3     Software Tools                " LINK sw_inst}
+@{" 3.1   Installation                  " LINK sw_inst}
 @{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
 @{" 3.2   Mixer Tool                    " LINK mixer1}
 @{" 3.2.1 Mixer Panel Descriptions      " LINK mixer2}
@@ -489,7 +505,7 @@ status or initialising the configuration data used for the mixer settings.
 
 @NODE aguslib "amigus.library"
 @TOC contents
-@{" 3     Software Tools                " LINK mixer1}
+@{" 3     Software Tools                " LINK sw_inst}
 @{" 4     amigus.library                " LINK aguslib}
 
 amigus.library is the basis of the tools or drivers will work without it.

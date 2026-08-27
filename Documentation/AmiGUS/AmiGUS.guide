@@ -673,13 +673,14 @@ can at least read it conveniently using an older version.
 Again, the installation comes in multiple languages and should just work
 the same in all languages. If you would like to see the installation
 procedure and/or the manual translated to other languages, feel free to
-reach out to us e.g. via our github presence.
+reach out to us e.g. via our GitHub presence.
 
 "Novice User", "Intermediate User" and "Expert User" level installations
 are available.
 
 "Novice User" installs all recommended parts without further questions
 to the recommended destinations. This should work fine for most users.
+
 Please note:
 - If you downgrade your CPU after installation and experience issues
   running any AmiGUS software, you may need to reinstall the drivers.
@@ -857,7 +858,7 @@ Zorro or PCMCIA interfaces to the cards.
 Therefore, it provides detection, reservation, and interrupt handling for
 all variants of the AmiGUS cards. Instead of using card.resource,
 expansion.library, or banging Gary directly, using the amigus.library
-shall abstract the hardware so developers can use the AmiGUS chip's
+abstracts the hardware so developers can use the AmiGUS chip's
 RBI (Register Banging Interface) without impacting AmiGUS's variant.
 
 @{" 4.1   amigus.library dev kit        " LINK aguslib_dev}
@@ -884,7 +885,7 @@ The process using amigus.library is pretty straight forward.
    ||    - Installs an interrupt handling routine for you.
 4) ||+-> Calls your "LONG HandleInterrupt( APTR __regA0 data)" function
    ||    - Remember, the interrupt handler is called by C code, so you
-   ||      wanna save/restore registers to/from stack at the
+   ||      will want to save/restore registers to/from stack at the
    ||      beginning/end if writing ASM.
 5) |+--> AmiGUS_RemoveInterrupt
    |     - Removes your interrupt handler again
@@ -912,10 +913,10 @@ AmiGUS register map, please refer to the @{"AmiGUS github repository (10)" LINK 
 
 AHI is a retargetable audio subsystem for Amiga-like operating systems,
 originally developed by Martin Blom.
-Not only have major audio applications, like SoundFX and DigiBooster adapted
-this standard, but many PC/Windows ports, Mac emulators, and even some
-exclusive software implemented their audio functionality employing AHI to
-allow use of sound cards for playback and recording.
+Not only have major audio applications, like SoundFX and DigiBooster,
+adapted this standard, but many PC/Windows ports, Mac emulators, and even
+some exclusive software implemented their audio functionality employing
+AHI to allow use of sound cards for playback and recording.
 
 Although there is @{"AHI 6.0 (2)" LINK refs} available for download, @{"AHI 4.18 (1)" LINK refs} is
 assumed to be faster and therefore strongly recommended for use on
@@ -982,8 +983,9 @@ AmiGUS comes with an overwhelming number of choices.
 
 Here are some guidelines:
   - If your game or application prints resolution ("...16-bit...") and
-    sample rate ("...44.1 kHz..." or "...11025 Hz..." information somewhere,
-    please use that information to adapt the AHI mode accordingly.
+    sample rate ("...44.1 kHz..." or "...11025 Hz...") information
+    somewhere, please use that information to adapt the AHI mode
+    accordingly.
   - Otherwise, for PC ports, 16-bit resolution and 44100 Hz
     are usually fine.
   - "Mono" modes do not save a lot of CPU time, avoid them.

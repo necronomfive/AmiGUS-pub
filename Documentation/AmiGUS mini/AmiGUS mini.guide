@@ -82,12 +82,12 @@ configurations.
 @{" 1.2   AmiGUS mini Key Features      " LINK features}
 
   - PCMCIA bus interface for Amiga 600/1200 computers
-  - 24-bit, 192kHz stereo sample DAC
-    - 1 combined analogue/optical 3.5mm stereo output
-  - 24-bit, 96kHz stereo sample ADC
-    - 1 analogue audio 3.5mm stereo output
+  - 24-bit, 192 kHz stereo sample DAC
+    - 1 combined analogue/optical 3.5 mm stereo output
+  - 24-bit, 96 kHz stereo sample ADC
+    - 1 analogue audio 3.5 mm stereo output
   - mini TOSLINK optical output, supporting 48, 96 and
-    192kHz @ 24-bit resolution
+    192 kHz @ 24-bit resolution
   - MP3 / OGG Vorbis hardware codec chip (VLSI VS1063)
   - Digital sound processing accelerator chip
     - 3 separate software interfaces (AHI, MHI, MIDI/Wave)
@@ -96,7 +96,7 @@ configurations.
       - Stereo panning
       - Per-voice linear sample interpolation
       - Hardware ADSR envelope
-    - Full 24-bit 192kHz processing and mixing paths
+    - Full 24-bit 192 kHz processing and mixing paths
     - Hardware accelerated data transfers to / from DAC,
       ADC & MP3 chips
   - 32 MB wavetable RAM
@@ -144,11 +144,11 @@ the card's functionality.
 |                  | debug the FPGA. Should only be used for initial     |
 |                  | programming or servicing the card.                  |
 +------------------+-----------------------------------------------------+
-| Analogue &       | 3.5mm jack with combined stereo analogue / TOSLINK  |
-| TOSLINK Digital  | digital output, supporting up to 192kHz,            |
+| Analogue &       | 3.5 mm jack with combined stereo analogue / TOSLINK |
+| TOSLINK Digital  | digital output, supporting up to 192 kHz,           |
 | Output           | 24-bit audio data rates in both modes.              |
 +------------------+-----------------------------------------------------+
-| Analogue Input   | This port can directly connect to the AMIGA?s       |
+| Analogue Input   | This port can directly connect to the AMIGA's       |
 |                  | native PAULA audio signal, which is mixed and       |
 |                  | output with the AmiGUS mini final output.           |
 +------------------+-----------------------------------------------------+
@@ -189,16 +189,16 @@ the card's functionality.
 +------------------+-----------------------------------------------------+
 | PCM1808 ADC      | The PCM1808 ADC made by Texas Instruments is        |
 |                  | responsible for converting all external audio       |
-|                  | inputs to a 24-bit, 96kHz digital stream which is   |
+|                  | inputs to a 24-bit, 96 kHz digital stream which is  |
 |                  | processed and mixed by the Digital Sound Processor. |
 +------------------+-----------------------------------------------------+
 | CS4354 DAC       | The CS4354 DAC made by Cirrus Logic receives the    |
 |                  | final mixed digital audio stream and converts it to |
 |                  | a line-level analogue audio signal. The audio data  |
-|                  | rate is always 24-bit, 192kHz.                      |
+|                  | rate is always 24-bit, 192 kHz.                     |
 +------------------+-----------------------------------------------------+
 | PCMCIA           | AmiGUS mini implements a PCMCIA bus interface which |
-| Interface        | maps only to the I/O area, supporting 8MB Zorro II  |
+| Interface        | maps only to the I/O area, supporting 8 MB Zorro II |
 |                  | Autoconfig expansions.                              |
 +------------------+-----------------------------------------------------+
 
@@ -218,7 +218,7 @@ the card's functionality.
 @{" 1.4   System Requirements           " LINK system}
 
 In order to make full use of AmiGUS features, the following range of
-system configurations is recommended.
+system configurations is recommended:
 
 @{" 1.4.1 Minimum Configuration         " LINK system}
 
@@ -248,25 +248,25 @@ compatibility.
 @{" 2     Installation                  " LINK hw_inst}
 @{" 2.1   Card Installation             " LINK hw_inst}
 
-Turn-off your Amiga and insert the AmiGUS mini card into the PCMCIA port
+Turn off your Amiga and insert the AmiGUS mini card into the PCMCIA port
 of your Amiga 600/1200, located on the left-hand side of the computer.
-Make sure there is enough room to accommodate for the additional space
-needed for the card itself and the cables.
+Make sure there is enough room to accommodate the additional space needed
+for the card itself and the cables.
 
 @{"AmiGUS mini Setup" system "MultiView ilbm/card12.iff"}@{IMG ilbm/card12.iff}
 
 The AmiGUS mini card provides both a line-level RCA stereo output and
-a mini TOSLINK optical output on the same 3.5mm jack to connect to
+a mini TOSLINK optical output on the same 3.5 mm jack to connect to
 standard household analogue or digital stereo receiver equipment.
 
 The TOSLINK output is very flexible and supports multiple sampling rates
 accommodating your output devices capabilities. The default output
-sampling rate is 48kHz, which should be compatible with all equipment
+sampling rate is 48 kHz, which should be compatible with all equipment
 providing a TOSLINK interface. Output rate can be adjusted in the mixer
 settings.
 
-The analogue input can be used to loop-through the Amiga?s external
-audio output by using a Cinch-to-3.5mm adaptor cable, or to connect
+The analogue input can be used to loop-through the Amiga's external
+audio output by using a Cinch-to-3.5 mm adaptor cable, or to connect
 any other analogue sound source which supports line-level audio
 output.
 
@@ -280,8 +280,8 @@ output.
 @{" 3.1   Installation                  " LINK sw_inst20}
 
 The AmiGUS mini software comes in the following packages:
-- As LHA archive for OS2.x/3.x
-- As sets of ADF files for OS2.x/3.x including one Manual Disk
+- As an LHA archive for OS 2.x/3.x
+- As sets of ADF files for OS 2.x/3.x including one Manual Disk
 
 @{" 3.1.1 OS 2.0+ Software Installation " LINK sw_inst20}
 
@@ -289,7 +289,7 @@ On OS 2.0 and later, the AmiGUS software installation relies on the
 Amiga Installer being available in path from the underlying OS.
 
 But Commodore only introduced the Installer in OS 2.1 and since then,
-it is part of the AmiagaOS installation. So before installing the
+it is part of the AmigaOS installation. So before installing the
 AmiGUS software on OS 2.0, you may need to install the Installer from:
 
 https://aminet.net/util/misc/Installer-43_3.lha
@@ -312,13 +312,14 @@ can at least read it conveniently using an older version.
 Again, the installation comes in multiple languages and should just work
 the same in all languages. If you would like to see the installation
 procedure and/or the manual translated to other languages, feel free to
-reach out to us e.g. via our github presence.
+reach out to us e.g. via our GitHub presence.
 
 "Novice User", "Intermediate User" and "Expert User" level installations
 are available.
 
 "Novice User" installs all recommended parts without further questions
 to the recommended destinations. This should work fine for most users.
+
 Please note:
 - If you downgrade your CPU after installation and experience issues
   running any AmiGUS software, you may need to reinstall the drivers.
@@ -395,14 +396,14 @@ configuration options.
 |                  | engine.                                             |
 +------------------+-----------------------------------------------------+
 | External Sound   | @{b}VU Mode@{ub}                                             |
-|                  | You can either turn-off or adjust the sensitivity   |
+|                  | You can either turn off or adjust the sensitivity   |
 |                  | of the external VU meter by clicking and cycling    |
 |                  | through the options.                                |
 |                  |                                                     |
 |                  | @{b}TOSLINK@{ub}                                             |
-|                  | By clicking on the cycle-gadget, you can set the    |
+|                  | By clicking on the cycle gadget, you can set the    |
 |                  | audio sample rate of the TOSLINK output. Available  |
-|                  | options are 48kHz, 96kHz and 192kHz.                |
+|                  | options are 48 kHz, 96 kHz and 192 kHz.             |
 +------------------+-----------------------------------------------------+
 | Levels           | Realtime display of the stereo audio signal levels. |
 |                  | By clicking on the cycle gadget below, you can      |
@@ -430,7 +431,7 @@ configuration options.
 The AmiGUS Flash Tool provides full control over the AmiGUS mini FPGA
 firmware settings.
 
-This includes updating the firmware, displaying the card?s hardware
+This includes updating the firmware, displaying the card's hardware
 status or initialising the configuration data used for the mixer settings.
 
 @{"Flash tool" system "MultiView ilbm/flash10.iff"}@{IMG ilbm/flash10.iff}
@@ -491,16 +492,15 @@ status or initialising the configuration data used for the mixer settings.
 
 amigus.library is the basis of the tools or drivers will work without it.
 It only adds a tiny abstraction layer on top of the AmiGUS cards enabling
-developers transparently writing software for AmiGUS and AmiGUS mini at
-the same point in time without thinking further about the underlying
+developers to transparently write software for AmiGUS and AmiGUS mini at
+the same point in time without worrying about the underlying
 Zorro or PCMCIA interfaces to the cards. 
 
 Therefore, it provides detection, reservation, and interrupt handling for
 all variants of the AmiGUS cards. Instead of using card.resource,
 expansion.library, or banging Gary directly, using the amigus.library
-shall abstract the hardware so developers can use the AmiGUS chip's
-RBI (Register Banging Interface) without taking further care of the
-AmiGUS's variant.
+abstracts the hardware so developers can use the AmiGUS chip's
+RBI (Register Banging Interface) without impacting the AmiGUS's variant.
 
 @{" 4.1   amigus.library dev kit        " LINK aguslib_dev}
 @ENDNODE
@@ -526,7 +526,7 @@ The process using amigus.library is pretty straight forward.
    ||    - Installs an interrupt handling routine for you.
 4) ||+-> Calls your "LONG HandleInterrupt( APTR __regA0 data)" function
    ||    - Remember, the interrupt handler is called by C code, so you
-   ||      wanna save/restore registers to/from stack at the
+   ||      will want to save/restore registers to/from stack at the
    ||      beginning/end if writing ASM.
 5) |+--> AmiGUS_RemoveInterrupt
    |     - Removes your interrupt handler again
@@ -553,15 +553,15 @@ AmiGUS register map, please refer to the @{"AmiGUS github repository (10)" LINK 
 @{" 5     AHI Driver Framework          " LINK ahi}
 
 AHI is a retargetable audio subsystem for Amiga-like operating systems,
-originally developed by Martin Bloom.
-Not only have major audio applications, like SoundFX and DigiBooster adapted
-this standard - many PC/Windows ports, Mac emulators, and even some
-exclusive software implemented their audio functionality employing AHI to
-allow use of sound cards for playback and recording.
+originally developed by Martin Blom.
+Not only have major audio applications, like SoundFX and DigiBooster,
+adapted this standard, but many PC/Windows ports, Mac emulators, and even
+some exclusive software implemented their audio functionality employing
+AHI to allow use of sound cards for playback and recording.
 
 Although there is @{"AHI 6.0 (2)" LINK refs} available for download, @{"AHI 4.18 (1)" LINK refs} is
 assumed to be faster and therefore strongly recommended for use on
-68k based systems. You need to choose one of them and install it
+68k-based systems. You need to choose one of them and install it
 following their respective manual(s).
 
 Before configuring AHI for use with AmiGUS mini, please verify that
@@ -624,12 +624,13 @@ AmiGUS mini comes with an overwhelming number of choices.
 
 Here are some guidelines:
   - If your game or application prints resolution ("...16-bit...") and
-    sample rate ("...44.1 kHz..." or "...11025 Hz..." information somewhere,
-    please use that information to adapt the AHI mode accordingly.
+    sample rate ("...44.1 kHz..." or "...11025 Hz...") information
+    somewhere, please use that information to adapt the AHI mode
+    accordingly.
   - Otherwise, for PC ports, 16-bit resolution and 44100 Hz
     are usually fine.
   - "Mono" modes do not save a lot of CPU time, avoid them.
-  - "Stereo" modes know "left" and "right" and nothing in between, fine
+  - "Stereo" modes know "left" and "right" and nothing in between; fine
     for PC ports, they will mix as needed.
   - "Stereo++" modes allow positioning instruments between the "left" and
     "right" extremes, but these are useful only if the client software can
@@ -687,7 +688,7 @@ Recommendations:
 |                  |                                                     |
 |                  | @{b}AHI Mode list@{ub}                                       |
 |                  | We love Paula, but this is about AmiGUS mini.       |
-|                  | So AmiGUS should be selected as default             |
+|                  | So AmiGUS should be selected as the default         |
 |                  | input/output device from the list.                  |
 |                  |                                                     |
 |                  | @{b}Mode details@{ub}                                        |
@@ -737,7 +738,7 @@ Recommendations:
 @{" 6     MHI Driver Framework          " LINK mhi}
 
 MHI is a standard for retargetable encoded audio for classic Amigas.
-AmiGUS mini comes with the VLSI VS1063a audio codec chip supporting
+AmiGUS mini comes with the VLSI VS1063a audio codec chip supporting:
   - MP3 (MPEG 1 and 2 audio layer III, with CBR, VBR, and ABR)
   - MP2 (layer II)
   - MPEG4 / 2 AAC-LC (with PNS), HE-AAC v2 (Level 3) (SBR + PS)

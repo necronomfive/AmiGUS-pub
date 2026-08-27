@@ -276,6 +276,7 @@ output.
 
 @NODE sw_inst20 "Installation - Software Installation"
 @TOC contents
+@{" 2     Installation                  " LINK hw_inst}
 @{" 3     Software Tools                " LINK sw_inst20}
 @{" 3.1   Installation                  " LINK sw_inst20}
 

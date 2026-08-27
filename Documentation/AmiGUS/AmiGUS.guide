@@ -846,6 +846,7 @@ This includes updating the firmware, displaying the card's hardware status
 @ENDNODE
 
 @NODE aguslib "amigus.library"
+@TOC contents
 @{" 3     Software Tools                " LINK mixer1}
 @{" 4     amigus.library                " LINK aguslib}
 
@@ -865,6 +866,7 @@ RBI (Register Banging Interface) without impacting AmiGUS's variant.
 @ENDNODE
 
 @NODE aguslib_dev "AmiGUS development RBI"
+@TOC contents
 @{" 4     amigus.library                " LINK aguslib}
 @{" 4.1   amigus.library dev kit        " LINK aguslib_dev}
 
@@ -1256,6 +1258,7 @@ please be patient, we did our best!
 
 @NODE credits "Appendices - Credits"
 @TOC contents
+@{" 7     Driver troubleshooting        " LINK drivers}
 @{" 8     Appendices                    " LINK credits}
 @{" 8.1   Credits                       " LINK credits}
 

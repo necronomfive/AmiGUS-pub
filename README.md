@@ -127,37 +127,21 @@ The above diagram shows all relevant ports and components of the AmiGUS mini car
 |**Altera 10M08 FPGA**| Main processing unit, receives and generates digital audio streams in 192kHz |[Register Map](https://github.com/necronomfive/AmiGUS-pub/raw/main/Documentation/AmiGUS/AmiGUS_Register_Map.xlsx)|
 |**32MB SDRAM**| Memory for sample storage, clocked at 122.2MHz  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/42_45S83200J_16160J-462626.pdf)  |
 |**VS1063 Decoder**| Decoder chip from VLSI, supports MP3,OGG and FLAC  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/vs1063ds.pdf) [HW Guide](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/vs1063hg.pdf) |
-|**PCM1862 ADC**| Analogue to digital coverter, captures audtio from all external inputs @192kHz, 24-bit| [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/pcm1862.pdf) |
-|**PCM1794 DAC**| Digital to analogue converter, outputs final mixing result @192kHz 24-bit  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/pcm1794a.pdf) |
-|**ZORRO II Bus**| AmiGUS supports Zorro II, non-DMA I/O accesses.| [Zorro Spec](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/zorro3.pdf) |
+|**PCM1808 ADC**| Analogue to digital coverter, captures audio from all external inputs @96kHz, 24-bit| [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/pcm1808.pdf) |
+|**CS4354 DAC**| Digital to analogue converter, outputs final mixing result @192kHz 24-bit  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/CS4354.pdf) |
+|**PCMCIA Interface**| AmiGUS mini implements a PCMCIA bus interface which maps only to the I/O area.| [Zorro Spec](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/zorro3.pdf) |
 
 ### _List of ports_
 |Port|Function|
 |-|-|
-|**TOSLINK**| Optical output to sound system, supports up to 96kHz @20-bit. |
-|**Analogue Output**| Stereo output via RCA jacks at 192kHz @24-bit. |
+|**Analogue & TOSLINK Output**| 3.5mm jack with combined stereo analogue / TOSLINK digital output, supporting up to 192kHz, 24-bit audio data rates in both modes.. |
 |**JTAG Port**| FPGA programming interface, Altera USB blaster compatible. |
-|**Expansion Port**| Digital output of final mix, can be input to other cards. |
-|**PAULA Input**| Internal connector for mixing PAULA sound to AmiGUS output.|
-|**CDROM Input**| Internal connector for connecting a CDROM drive to the AmiGUS.|
-|**EXTERNAL Input**| External line-in jack to mix or capture any sound source.|
+|**Analogue Input**| This port can directly connect to the AMIGA’s native PAULA audio signal, which is mixed and output with the AmiGUS mini final output.. |
+|**LED VU Meter**| Realtime display of the audio signal level, showing up to 128 levels of intensity.|
 
-## How to Build your AmiGUS
-Here you find all materials to build your own personal AmiGUS card. Most soldering parts have been chosen so that you can build the card, even if you have novice soldering skills. If you are unsure, we recommend to either contact a person who is trustworthy and has the required soldering skills, or buy the card from one of our resellers.
-### _PCB Data_
-| File  | Description |
-|-|-|
-|[Download](https://github.com/necronomfive/AmiGUS-pub/raw/main/PCB/Gerbers/Version_13/250909_Amigus_PCB.zip) | PCB manufacturing files |
-|[Download](https://github.com/necronomfive/AmiGUS-pub/raw/main/PCB/BOM/AmiGUS_BOM_Rev13.xlsx)| BOM for all components and Mouser references (if available) |
-|[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/PCB/Schematics/AmiGUS_Schematics_V13.pdf) | AmiGUS card schematics. |
+## How to Build your AmiGUS mini
 
-In terms of PCB manufacturing, both PCBWAY and JLPCB were able to produce functional boards during our prototyping phase. 
-It is recommended that you specify either chamfering or beveling for the slot edge connector in order to prevent mechanical damage to the Zorro slots.
-
-### _Slot Bracket Data_
-| File  | Description |
-|-|-|
-|[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/AmiGUS_Bracket.pdf) | AmiGUS slot bracket holes. |
+### PCB manufacturing files will be released on Sep 14th, 2027
 
 ## AmiGUS Software
 ### _FPGA Core Firmware_

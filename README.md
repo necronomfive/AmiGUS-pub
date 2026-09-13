@@ -49,9 +49,8 @@ And since we are at it right now, you can own an **AmiGUS** too, either by buyin
 
 ## PCMCIA Version (aka AmiGUS mini)
 
-* **PCMCIA** card for **Amiga 600 / 1200.
-* **Standard RCA** stereo output, **192kHz @24-bit**.
-* **3.5mm analogue**/**mini TOSLINK** output, supporting 48, 96 and 192kHz @ 24-bit resolution
+* **PCMCIA** card for **Amiga 600 / 1200** coputer.
+* **3.5mm analogue**/**mini TOSLINK** stereo output, supporting 48, 96 and 192kHz @ 24-bit resolution
 * **3.5mm analogue audio input**, sampled at **96kHz @24-bit**.
 * **High-quality digital mixer** which operates at full **192kHz @24-bit** resolution.
 * **AHI stream interface**, supporting **8-/16- & 24-bit** modes for playback and recording.
@@ -129,7 +128,7 @@ The above diagram shows all relevant ports and components of the AmiGUS mini car
 |**VS1063 Decoder**| Decoder chip from VLSI, supports MP3,OGG and FLAC  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/vs1063ds.pdf) [HW Guide](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/vs1063hg.pdf) |
 |**PCM1808 ADC**| Analogue to digital coverter, captures audio from all external inputs @96kHz, 24-bit| [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/pcm1808.pdf) |
 |**CS4354 DAC**| Digital to analogue converter, outputs final mixing result @192kHz 24-bit  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/CS4354.pdf) |
-|**PCMCIA Interface**| AmiGUS mini implements a PCMCIA bus interface which maps only to the I/O area.| [Zorro Spec](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/zorro3.pdf) |
+|**PCMCIA Interface**| AmiGUS mini implements a PCMCIA bus interface which maps only to the I/O area.| [Zorro Spec](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/pcmcia.pdf) |
 
 ### _List of ports_
 |Port|Function|

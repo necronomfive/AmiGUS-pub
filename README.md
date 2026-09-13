@@ -1,5 +1,5 @@
 # Welcome to AmiGUS!
-<img src=\Media\Pics\Title.png width="1000">
+<img src=\Media\Pics\Title_New.png width="1000">
 
 **AmiGUS** is a modern high quality sound card for the Amiga. It was designed to provide the right combination of accelerated hardware and software features to bring the full multimedia experience to all Amiga users. 
 

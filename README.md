@@ -120,7 +120,7 @@ The above diagram shows all relevant ports and components of the AmiGUS mini car
 
 |**AmiGUS mini User Manual**|
 |-|
-|[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/AmiGUS mini/AmiGUS_mini_User_Manual.pdf)|
+|[Download]("https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/AmiGUS mini/AmiGUS_mini_User_Manual.pdf")|
 
 |Part|Function| Documentation|
 |-|-|-|

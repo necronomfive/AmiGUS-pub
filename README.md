@@ -44,7 +44,9 @@ And since we are at it right now, you can own an **AmiGUS** too, either by buyin
 * 68030 @25Mhz
 * 2 MB Chip / 16 MB Fast
 * OS 3.9 or 3.2.2
-  
+ 
+# 
+ 
 ## AmiGUS Parts & Function Overview
 <img src=\Media\Pics\PCB_Outline.png width="1000">
 The above diagram shows all relevant ports and components of the AmiGUS card.

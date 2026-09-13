@@ -120,11 +120,11 @@ The above diagram shows all relevant ports and components of the AmiGUS mini car
 
 |**AmiGUS mini User Manual**|
 |-|
-|[Download]("https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/AmiGUS mini/AmiGUS_mini_User_Manual.pdf")|
+|[Download](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/AmiGUS_mini/AmiGUS_mini_User_Manual.pdf)|
 
 |Part|Function| Documentation|
 |-|-|-|
-|**Altera 10M08 FPGA**| Main processing unit, receives and generates digital audio streams in 192kHz |[Register Map](https://github.com/necronomfive/AmiGUS-pub/raw/main/Documentation/AmiGUS/AmiGUS_Register_Map.xlsx)|
+|**Altera 10M08 FPGA**| Main processing unit, receives and generates digital audio streams in 192kHz |[Register Map](https://github.com/necronomfive/AmiGUS-pub/raw/main/Documentation/AmiGUS_mini/AmiGUS_mini_Register_Map.xlsx)|
 |**32MB SDRAM**| Memory for sample storage, clocked at 122.2MHz  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/42_45S83200J_16160J-462626.pdf)  |
 |**VS1063 Decoder**| Decoder chip from VLSI, supports MP3,OGG and FLAC  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/vs1063ds.pdf) [HW Guide](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/vs1063hg.pdf) |
 |**PCM1808 ADC**| Analogue to digital coverter, captures audio from all external inputs @96kHz, 24-bit| [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/pcm1808.pdf) |
@@ -197,7 +197,7 @@ This work is licensed under a
 ### _AmiGUS Base Software_
 
 AmiGUS Base Software\
-Copyright (C) 2025 by Oliver Achten
+Copyright (C) 2026 by Oliver Achten
 
 These programs are free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -215,7 +215,7 @@ along with these programs.  If not, see <http://www.gnu.org/licenses/>.
 ### _AmiGUS AHI Driver_
 
 AmiGUS AHI Driver\
-Copyright (C) 2025 by Christoph Faßbach
+Copyright (C) 2026 by Christoph Faßbach
 
 AmiGUS.audio driver is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -232,7 +232,7 @@ along with AmiGUS.audio driver. If not, see <http://www.gnu.org/licenses/>.
 ### _AmiGUS MHI Driver_
 
 AmiGUS MHI Driver\
-Copyright (C) 2025 by Christoph Faßbach
+Copyright (C) 2026 by Christoph Faßbach
 
 mhiamigus.library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

@@ -146,12 +146,12 @@ The above diagram shows all relevant ports and components of the AmiGUS mini car
 ## AmiGUS Software
 ### _FPGA Core Firmware_
 
-Firmware release can be found [here.](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/Releases/)
+Firmware release can be found [here.](https://github.com/necronomfive/AmiGUS-pub/tree/main/AmiGUS/FPGA/Releases/)
 
-The [Quartus folder](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/Releases/Quartus) contains .pof files for Altera's Quartus software.
+The [Quartus folder](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/AmiGUS/Releases/Quartus) contains .pof files for Altera's Quartus software.
 These are needed for the initial bring-up of self-made AmiGUS cards especially.
 
-The [Amiga .upd files](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/Releases/Amiga) can be flashed using the AmiGUS Flash & Configuration tool.
+The [Amiga .upd files](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/AmiGUS/Releases/Amiga) can be flashed using the AmiGUS Flash & Configuration tool.
 
 The AmiGUS Flash tool and the latest .upd file are part of the software release package for your Amiga.
 
@@ -183,7 +183,7 @@ Here you will find links to other projects which support AmiGUS.
 ### _AmiGUS Printed Circuit Board_
 [![CC BY-NC-ND 4.0][cc-by-nc-nd-shield]][cc-by-nc-nd]\
 AmiGUS PCB\
-Copyright (C) 2025 by Oliver Achten
+Copyright (C) 2026 by Oliver Achten
 
 This work is licensed under a
 [Creative Commons Attribution-NonCommercial-NoDerivs 4.0 International License][cc-by-nc-nd].

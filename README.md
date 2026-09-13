@@ -111,6 +111,8 @@ The above diagram shows all relevant ports and components of the AmiGUS card.
 |**CDROM Input**| Internal connector for connecting a CDROM drive to the AmiGUS.|
 |**EXTERNAL Input**| External line-in jack to mix or capture any sound source.|
 
+#
+
 ## AmiGUS mini Parts & Function Overview
 
 <img src=\Media\Pics\PCB_Outline_Mini.png width="1000">

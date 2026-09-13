@@ -49,10 +49,10 @@ And since we are at it right now, you can own an **AmiGUS** too, either by buyin
 
 ## PCMCIA Version (aka AmiGUS mini)
 
-* **Zorro II** card for **Amiga 2000 / 3000 /4000** computers, or compatible bus boards.
+* **PCMCIA** card for **Amiga 600 / 1200.
 * **Standard RCA** stereo output, **192kHz @24-bit**.
-* **TOSLINK** optical output, supporting **48kHz, 96kHz & 192kHz @24-bit**.
-* **3x analogue audio inputs** (PAULA, CD-ROM, EXTERNAL), sampled at **192kHz @24-bit**.
+* **3.5mm analogue**/**mini TOSLINK** output, supporting 48, 96 and 192kHz @ 24-bit resolution
+* **3.5mm analogue audio input**, sampled at **96kHz @24-bit**.
 * **High-quality digital mixer** which operates at full **192kHz @24-bit** resolution.
 * **AHI stream interface**, supporting **8-/16- & 24-bit** modes for playback and recording.
 * **MP3/OGG/FLAC/WMA** hardware decoder **(VLSI VS1063)**, enhanced by a powerful DMA stream buffer.
@@ -66,18 +66,18 @@ And since we are at it right now, you can own an **AmiGUS** too, either by buyin
 * **32 MB on-board sample memory** - ready to be used for **Multichannel Sample Tracking** or **MIDI**.
 * **Flash-based mixer settings** which are automatically loaded on start-up.
 * **Upgradable FPGA Core** via **JTAG**, or **Amiga-based flash tool**.
-* **Open Hardware** - Gerbers and FPGA Bitstream <ins>freely available</ins>.
+* **Open Hardware** - Gerbers and FPGA bitstream available on **Sep. 14th, 2027**.
   
 ### _Minimum Amiga Configuration_
-* Amiga 2000
+* Amiga 600 Computer
 * 68000 @7.09MHz
-* 1 MB Chip / 4 MB Fast
-* OS 1.3
+* 1 MB Chip
+* OS 2.05
 ### _Recommended Amiga Configuration_
-* Amiga 2000 / 3000 / 4000
+* Amiga 1200 Computer
 * 68030 @25Mhz
-* 2 MB Chip / 16 MB Fast
-* OS 3.9 or 3.2.2
+* 2 MB Chip / 4 MB Fast
+* OS 3.x
  
 #
  

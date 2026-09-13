@@ -128,7 +128,7 @@ The above diagram shows all relevant ports and components of the AmiGUS mini car
 |**VS1063 Decoder**| Decoder chip from VLSI, supports MP3,OGG and FLAC  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/vs1063ds.pdf) [HW Guide](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/vs1063hg.pdf) |
 |**PCM1808 ADC**| Analogue to digital coverter, captures audio from all external inputs @96kHz, 24-bit| [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/pcm1808.pdf) |
 |**CS4354 DAC**| Digital to analogue converter, outputs final mixing result @192kHz 24-bit  | [Datasheet](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/CS4354.pdf) |
-|**PCMCIA Interface**| AmiGUS mini implements a PCMCIA bus interface which maps only to the I/O area.| [Zorro Spec](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/pcmcia.pdf) |
+|**PCMCIA Interface**| AmiGUS mini implements a PCMCIA bus interface which maps only to the I/O area.| [PCMCIA Spec](https://github.com/necronomfive/AmiGUS-pub/tree/main/Documentation/Datasheets/pcmcia.pdf) |
 
 ### _List of ports_
 |Port|Function|

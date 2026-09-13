@@ -112,6 +112,7 @@ The above diagram shows all relevant ports and components of the AmiGUS card.
 |**EXTERNAL Input**| External line-in jack to mix or capture any sound source.|
 
 ## AmiGUS mini Parts & Function Overview
+
 <img src=\Media\Pics\PCB_Outline_Mini.png width="1000">
 The above diagram shows all relevant ports and components of the AmiGUS mini card.
 
@@ -141,6 +142,8 @@ The above diagram shows all relevant ports and components of the AmiGUS mini car
 ## How to Build your AmiGUS mini
 
 ### PCB manufacturing files will be released on Sep 14th, 2027
+
+#
 
 ## AmiGUS Software
 ### _FPGA Core Firmware_

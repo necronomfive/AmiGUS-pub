@@ -294,7 +294,7 @@ VOID CancelVS1063Playback( APTR amiGUS ) {
 
       WriteReg32( amiGUS, AMIGUS_CODEC_FIFO_WRITE, endFill );
     }
-    while( ReadReg32( amiGUS, AMIGUS_CODEC_FIFO_USAGE ) );
+    while( ReadReg32( amiGUS, AMIGUS_CODEC_FIFO_USAGE ));
   }
   // step 4
   LOG_V(( "V: End of file step 4\n" ));

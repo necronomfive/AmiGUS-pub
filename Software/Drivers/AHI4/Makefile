@@ -38,8 +38,10 @@ ifeq ($(findstring /home,$(HOME)), /home)
   # Could do --user username:pass instead - but not cool in repo ;)
   INSTALL0       = curl --netrc --upload-file $(MODE_FILE_DEST) ftp://192.168.0.4/cf0/Devs/AudioModes/
   INSTALL0       = curl --netrc --upload-file $(MODE_FILE_DEST) ftp://192.168.0.12/sda4/Devs/AudioModes/
+  INSTALL0       = curl --netrc --upload-file $(MODE_FILE_DEST) ftp://192.168.0.60/cf3/Devs/AudioModes/
   INSTALL1       = curl --netrc --upload-file $(LIB_FILE_DEST)  ftp://192.168.0.4/cf0/Devs/AHI/$(LIB_NAME).audio
   INSTALL1       = curl --netrc --upload-file $(LIB_FILE_DEST)  ftp://192.168.0.12/sda4/Devs/AHI/$(LIB_NAME).audio
+  INSTALL1       = curl --netrc --upload-file $(LIB_FILE_DEST)  ftp://192.168.0.60/cf3/Devs/AHI/$(LIB_NAME).audio
   INSTALL2       =
 else
   AMIGAOS       = 1
@@ -76,7 +78,7 @@ LIB_LOG        ?= NO_LOG
 LIB_NAME        = AmiGUS
 LIB_FILE        = $(LIB_NAME).audio
 LIB_VERSION     = 4
-LIB_REVISION    = 22
+LIB_REVISION    = 23
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =
@@ -232,7 +234,6 @@ test_copies: FOLDERS $(LIB_OBJS)
 	@echo " "
 	$(CC) $(CFLAGS) test/$@.o test/$@.c
 	$(LD) $(LFLAGS) test/$@ $(LFLAGS1) $(LFLAGST1) test/$@.o \
-            $(BDIR)copies-$(LIB_CPU)-$(LIB_LOG).o \
             $(BDIR)amigus_ahi_modes-$(LIB_CPU)-$(LIB_LOG).o \
             $(LFLAGST2)
 	@echo " "

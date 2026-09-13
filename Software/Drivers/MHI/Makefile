@@ -39,6 +39,7 @@ ifeq ($(findstring /home,$(HOME)), /home)
   # Could do --user username:pass instead - but not cool in repo ;)
   INSTALL1      = curl --connect-timeout 2 --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.4/cf0/Libs/MHI/$(LIB_NAME).library
   INSTALL1      = curl --connect-timeout 2 --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.12/sda4/Libs/MHI/$(LIB_NAME).library
+  INSTALL1      = curl --netrc --upload-file $(LIB_FILE_DEST)       ftp://192.168.0.60/cf3/Libs/MHI/$(LIB_NAME).library
   INSTALL0      = cp $(LIB_FILE_DEST) ~/Documents/FS-UAE/Shared/MHI/$(LIB_NAME).library
 else
   AMIGAOS       = 1
@@ -75,7 +76,7 @@ LIB_LOG        ?= NO_LOG
 LIB_NAME        = mhiamigus
 LIB_FILE        = $(LIB_NAME).library
 LIB_VERSION     = 1
-LIB_REVISION    = 12
+LIB_REVISION    = 13
 LIB_PREFIX      = _LIB_
 
 LIB_LIBS        =

@@ -20,15 +20,15 @@
 
 #include "amigus_hardware.h"
 #include "amigus_mhi.h"
+#include "compiler_extras.h"
 #include "debug.h"
-#include "SDI_compiler.h"
 
 /******************************************************************************
  * Low-Level hardware access functions - private functions.
  *****************************************************************************/
 
 INLINE UWORD ReadSPI(
-  APTR card,
+  APTR amiGUS,
   UWORD SPIregister,
   UWORD blockedSPImask,
   UWORD offsetSPIstatus,
@@ -42,24 +42,24 @@ INLINE UWORD ReadSPI(
   Disable();
   do {
 
-    status = ReadReg16( card, offsetSPIstatus );
+    status = ReadReg16( amiGUS, offsetSPIstatus );
 
   } while ( status & blockedSPImask );
-  WriteReg16( card, offsetSPIaddress, SPIregister );
-  WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
+  WriteReg16( amiGUS, offsetSPIaddress, SPIregister );
+  WriteReg16( amiGUS, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
   do {
 
-    status = ReadReg16( card, offsetSPIstatus );
+    status = ReadReg16( amiGUS, offsetSPIstatus );
 
   } while ( status & blockedSPImask );
-  result = ReadReg16( card, offsetSPIread );
+  result = ReadReg16( amiGUS, offsetSPIread );
   Enable();
 
   return result;
 }
 
 INLINE VOID WriteSPI(
-  APTR card,
+  APTR amiGUS,
   UWORD SPIregister,
   UWORD SPIvalue,
   UWORD blockedSPImask,
@@ -73,12 +73,12 @@ INLINE VOID WriteSPI(
   Disable();
   do {
 
-    status = ReadReg16( card, offsetSPIstatus );
+    status = ReadReg16( amiGUS, offsetSPIstatus );
 
   } while ( status & blockedSPImask );
-  WriteReg16( card, offsetSPIaddress, SPIregister );
-  WriteReg16( card, offsetSPIwrite, SPIvalue );
-  WriteReg16( card, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
+  WriteReg16( amiGUS, offsetSPIaddress, SPIregister );
+  WriteReg16( amiGUS, offsetSPIwrite, SPIvalue );
+  WriteReg16( amiGUS, offsetSPItrigger, AMIGUS_CODEC_SPI_STROBE );
   Enable();
 }
 
@@ -86,19 +86,23 @@ INLINE VOID WriteSPI(
  * Low-Level hardware access functions - public function definitions.
  *****************************************************************************/
 
-UWORD ReadReg16( APTR card, ULONG offset ) {
+// Lowest level went to header, as INLINE does not work outside own file
+// - or its includes -
+// in most compilers, e.g. SAS/C and vbcc.
 
-  return *(( UWORD * )(( ULONG ) card + offset ));
+UWORD ReadReg16( APTR amiGUS, ULONG offset ) {
+
+  return ReadReg16Fast( amiGUS, offset );
 }
 
-ULONG ReadReg32( APTR card, ULONG offset ) {
+ULONG ReadReg32( APTR amiGUS, ULONG offset ) {
 
-  return *(( ULONG * )(( ULONG ) card + offset ));
+  return ReadReg32Fast( amiGUS, offset );
 }
 
-UWORD ReadCodecSPI( APTR card, UWORD SPIregister ) {
+UWORD ReadCodecSPI( APTR amiGUS, UWORD SPIregister ) {
 
-  return ReadSPI( card,
+  return ReadSPI( amiGUS,
                   SPIregister,
                   AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,
                   AMIGUS_CODEC_SPI_STATUS,
@@ -113,19 +117,9 @@ UWORD ReadVS1063Mem( APTR amiGUS, UWORD address ) {
   return ReadCodecSPI( amiGUS, VS1063_CODEC_SCI_WRAM );
 }
 
-VOID WriteReg16( APTR card, ULONG offset, UWORD value ) {
+VOID WriteCodecSPI( APTR amiGUS, UWORD SPIregister, UWORD SPIvalue ) {
 
-  *(( UWORD * )(( ULONG ) card + offset )) = value;
-}
-
-VOID WriteReg32( APTR card, ULONG offset, ULONG value ) {
-
-  *(( ULONG * )(( ULONG ) card + offset )) = value;
-}
-
-VOID WriteCodecSPI( APTR card, UWORD SPIregister, UWORD SPIvalue ) {
-
-  WriteSPI( card,
+  WriteSPI( amiGUS,
             SPIregister,
             SPIvalue,
             AMIGUS_CODEC_SPI_F_DREQ | AMIGUS_CODEC_SPI_F_BUSY,

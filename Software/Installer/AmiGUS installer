@@ -137,6 +137,10 @@
      "WAV files.\n"
      "Debug Tools - Tools to help debug AHI and MHI drivers when needed.\n"
      "Manual - AmiGUS's AmigaGuide manual. Recommended.\n"
+     "AmiGUS Manual - AmiGUS's AmigaGuide manual. "
+     "Recommended for your AmiGUS version.\n"
+     "AmiGUS mini Manual - AmiGUS mini's AmigaGuide manual. "
+     "Recommended for your AmiGUS version.\n"
      "\n"
 ))
 
@@ -180,16 +184,28 @@
 (cat "Debug Tools"
 ))
 
-(set #component_manual
-(cat "Manual"
+(set #component_manual_z2
+(cat "AmiGUS Manual"
 ))
 
-(set #component_firmware
-(cat "Firmware"
+(set #component_manual_mini
+(cat "AmiGUS mini Manual"
 ))
 
-(set #insert_manual_disk
+(set #component_firmware_z2
+(cat "AmiGUS Firmware"
+))
+
+(set #component_firmware_mini
+(cat "AmiGUS mini Firmware"
+))
+
+(set #insert_manual_z2_disk
 (cat "Insert disk \"AmiGUS Manual\" in any drive, please."
+))
+
+(set #insert_manual_mini_disk
+(cat "Insert disk \"AmiGUS mini Manual\" in any drive, please."
 ))
 
 (set #insert_manual_disk_help
@@ -199,7 +215,7 @@
 ))
 
 (set #which_manual_target
-(cat "Where shall the AmiGUS AmigaGuide manual be installed?\n"
+(cat "Where shall the AmigaGuide manual be installed?\n"
 ))
 
 (set #which_manual_target_help
@@ -359,7 +375,7 @@
 ))
 
 (set #what_components_help
-(cat "\nIn diesem Abschnitt können sie auswählen, welche Teile des AmiGUS "
+(cat "\nIn diesem Abschnitt können Sie auswählen, welche Teile des AmiGUS "
      "Softwarepakets installiert werden sollen. Alle Teile sollten unabhängig "
      "voneinander funktionieren.\n.\n"
      "\n"
@@ -385,7 +401,10 @@
      "Einstellungen als WAV Dateien aufzunehmen.\n"
      "Debugwerkzeuge - Verschiedene Werkzeuge, um beim debuggen der "
      "AHI und MHI Treiber zu helfen, wenn nötig.\n"
-     "Anleitung - AmiGUS's AmigaGuide Benutzerhandbuch. Empfohlen.\n"
+     "AmiGUS Anleitung - AmiGUS's AmigaGuide Benutzerhandbuch. "
+     "Empfohlen für Ihre AmiGUS Version.\n"
+     "AmiGUS mini Anleitung - AmiGUS mini's AmigaGuide Benutzerhandbuch. "
+     "Empfohlen für Ihre AmiGUS Version.\n"
      "\n"
 ))
 
@@ -429,16 +448,28 @@
 (cat "Debugwerkzeuge"
 ))
 
-(set #component_manual
-(cat "Anleitung"
+(set #component_manual_z2
+(cat "AmiGUS Anleitung"
 ))
 
-(set #component_firmware
-(cat "Firmware"
+(set #component_manual_mini
+(cat "AmiGUS mini Anleitung"
 ))
 
-(set #insert_manual_disk
-(cat "Bitte die \"AmiGUS Manual\"-Diskette in ein Laufwerk einlegen."
+(set #component_firmware_z2
+(cat "AmiGUS Firmware"
+))
+
+(set #component_firmware_mini
+(cat "AmiGUS mini Firmware"
+))
+
+(set #insert_manual_z2_disk
+(cat "Bitte die \"AmiGUS Zorro2 Manual\"-Diskette in ein Laufwerk einlegen."
+))
+
+(set #insert_manual_mini_disk
+(cat "Bitte die \"AmiGUS mini Manual\"-Diskette in ein Laufwerk einlegen."
 ))
 
 (set #insert_manual_disk_help
@@ -448,7 +479,7 @@
 ))
 
 (set #which_manual_target
-(cat "Wo soll das AmiGUS AmigaGuide Handbuch installiert werden?\n"
+(cat "Wo soll das AmigaGuide Handbuch installiert werden?\n"
 ))
 
 (set #which_manual_target_help
@@ -554,6 +585,34 @@
 
 (onerror (TERMINATE))
 
+(set cards_found
+  (run "FindAmiGUS")
+)
+
+(set amigus_z2_found
+  (BITAND %00000001 cards_found)
+)
+
+(set amigus_mini_found
+  (BITAND %00000010 cards_found)
+)
+
+(set what_default
+;         dcba9876543210
+  (BITOR %00001101111111
+    (BITOR
+      (BITOR
+        (shiftleft amigus_z2_found $0c)
+        (shiftleft amigus_z2_found $0a)
+      )
+      (BITOR
+        (shiftleft amigus_mini_found $0c)
+        (shiftleft amigus_mini_found $0a)
+      )
+    )
+  )
+)
+
 (set what
   (askoptions 
     (prompt #what_components)
@@ -568,14 +627,16 @@
              #component_midi
              #component_record 
              #component_debug
-             #component_manual
-             #component_firmware )
-    (default %011101111111)
+             #component_manual_z2
+             #component_manual_mini
+             #component_firmware_z2
+             #component_firmware_mini )
+    (default what_default)
   )
 )
 
 (if
-  (BITAND what %000010101111)
+  (BITAND what %00000010101111)
   (
     (set drivers_target
       (askdir
@@ -611,7 +672,7 @@
 )
 
 (if
-  (BITAND what %000000000001)
+  (BITAND what %00000000000001)
   (
     (set driver_name "AHI")
     (install_driver)
@@ -652,7 +713,7 @@
 (complete 10)
 
 (if
-  (BITAND what %000000000010)
+  (BITAND what %00000000000010)
   (
     (set driver_name "MHI")
     (install_driver)
@@ -683,7 +744,7 @@
 
 (set tools_target "SYS:Expansion/AmiGUS")
 (if
-  (BITAND what %000111111100)
+  (BITAND what %00000111111100)
   (
     (set tools_target
       (askdir (prompt #which_tools_target)
@@ -700,7 +761,7 @@
 (complete 25)
 
 (if
-  (BITAND what %000000000100)
+  (BITAND what %00000000000100)
   (copyfiles
     (source (tackon source_folder "Mixer"))
     (dest tools_target)
@@ -711,7 +772,7 @@
 (complete 30)
 
 (if
-  (BITAND what %000000001000)
+  (BITAND what %00000000001000)
   (copyfiles
     (source (tackon source_folder "FlashGUI"))
     (dest tools_target)
@@ -722,7 +783,7 @@
 (complete 35)
 
 (if
-  (BITAND what %000000010000)
+  (BITAND what %00000000010000)
   (copyfiles
     (source (tackon source_folder "PlayWAV"))
     (dest tools_target)
@@ -731,7 +792,7 @@
 )
 
 (if
-  (BITAND what %000000100000)
+  (BITAND what %00000000100000)
   (copyfiles
     (source (tackon source_folder "PlayWAVetable"))
     (dest tools_target)
@@ -742,7 +803,7 @@
 (complete 40)
 
 (if
-  (BITAND what %000001000000)
+  (BITAND what %00000001000000)
   (copyfiles
     (source (tackon source_folder "PlayMP3"))
     (dest tools_target)
@@ -753,7 +814,7 @@
 (complete 45)
 
 (if
-  (BITAND what %000010000000)
+  (BITAND what %00000010000000)
   (copyfiles
     (source (tackon source_folder "PlayMIDI"))
     (dest tools_target)
@@ -764,7 +825,7 @@
 (complete 50)
 
 (if
-  (BITAND what %000100000000)
+  (BITAND what %0000100000000)
   (copyfiles
     (source (tackon source_folder "Record"))
     (dest tools_target)
@@ -775,7 +836,7 @@
 (complete 55)
 
 (if
-  (BITAND what %001000000000)
+  (BITAND what %00001000000000)
   (
     (set debug_target
       (askdir (prompt #which_debug_target)
@@ -828,26 +889,63 @@
 (complete 60)
 
 (if
-  (BITAND what %010000000000)
+  (BITAND what %00110000000000)
+  (set manual_target
+    (askdir (prompt #which_manual_target)
+      (help #which_manual_target_help)
+      (default tools_target)
+      (newpath)
+    )
+  )
+)
+
+(if
+  (BITAND what %00010000000000)
   (
     (if
       (exists "Manual/AmiGUS.guide")
       (set source_folder "Manual")
       (
         (askdisk
-          (prompt #insert_manual_disk)
+          (prompt #insert_manual_z2_disk)
           (help #insert_manual_disk_help)
-          (dest "AmiGUS-Manual")
+          (dest "AmiGUSz2-Manual")
           (assigns)
         )
-        (set source_folder "AmiGUS-Manual:")
+        (set source_folder "AmiGUSz2-Manual:")
       )
     )
-    (set manual_target
-      (askdir (prompt #which_manual_target)
-        (help #which_manual_target_help)
-        (default tools_target)
-        (newpath)
+    (makedir manual_target (infos))
+    (copyfiles
+      (source source_folder)
+      (pattern "#?.guide")
+      (dest manual_target)
+      (infos)
+    )
+    (copyfiles
+      (source (tackon source_folder "ilbm"))
+      (dest (tackon manual_target "ilbm"))
+      (all)
+    )
+  )
+)
+
+(complete 70)
+
+(if
+  (BITAND what %00100000000000)
+  (
+    (if
+      (exists "Manual/AmiGUS mini.guide")
+      (set source_folder "Manual")
+      (
+        (askdisk
+          (prompt #insert_manual_mini_disk)
+          (help #insert_manual_disk_help)
+          (dest "AmiGUSmini-Manual")
+          (assigns)
+        )
+        (set source_folder "AmiGUSmini-Manual:")
       )
     )
     (makedir manual_target (infos))
@@ -868,8 +966,15 @@
 (complete 80)
 
 (if
-  (BITAND what %100000000000)
+  (BITAND what %11000000000000)
   (
+    (set firmware_target
+      (askdir (prompt #which_firmware_target)
+        (help #which_firmware_target_help)
+        (default tools_target)
+        (newpath)
+      )
+    )
     (if
       (= 2 (exists "Firmware"))
       (set source_folder "Firmware")
@@ -883,13 +988,13 @@
         (set source_folder "AmiGUS-Firmware:")
       )
     )
-    (set firmware_target
-      (askdir (prompt #which_firmware_target)
-        (help #which_firmware_target_help)
-        (default tools_target)
-        (newpath)
-      )
-    )
+  )
+)
+
+; AmiGUS Zorro2 Firmware
+(if
+  (BITAND what %01000000000000)
+  (  
     (makedir firmware_target (infos))
     (copyfiles
       (source source_folder)
@@ -897,6 +1002,21 @@
       (dest firmware_target)
       (infos)
     )
+  )
+)
+
+; AmiGUS mini Firmware
+(if
+  (BITAND what %10000000000000)
+  (
+    (message "No AmiGUS mini firmware updates available yet.")
+;    (makedir firmware_target (infos))
+;    (copyfiles
+;      (source source_folder)
+;      (pattern "#?.upd")
+;      (dest firmware_target)
+;      (infos)
+;    )
   )
 )
 

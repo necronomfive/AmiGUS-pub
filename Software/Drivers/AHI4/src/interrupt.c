@@ -23,6 +23,7 @@
 
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
+#include "compiler_extras.h"
 #include "debug.h"
 #include "interrupt.h"
 
@@ -122,7 +123,7 @@ INLINE VOID HandleRecording( VOID ) {
     recording->agpr_BufferIndex[ *current ] ));
 }
 
-ASM( LONG ) HandleInterrupt( REG( a0, APTR data )) {
+LONG __ASM__ HandleInterrupt( __REG__( a0, APTR data )) {
 
   APTR card = AmiGUS_AHI_Base->agb_CardBase;
   const UWORD enable = ReadReg16( card, AMIGUS_PCM_INT_ENABLE );

@@ -16,16 +16,17 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SDI_AMIGUS_PROTOS_H
-#define SDI_AMIGUS_PROTOS_H
+#ifndef AMIGUS_PROTOS_H
+#define AMIGUS_PROTOS_H
 
 // TO NEVER BE USED OUTSIDE THE LIBRARY CODE !!!
 
 #include <amigus/amigus.h>
+
 #include <exec/types.h>
 
 #include "amigus_private.h"
-#include "SDI_compiler.h"
+#include "compiler_extras.h"
 
 // Fixes a bug in VBCC - somehow it would not compile the return value of
 // AmiGUS_FindCard otherwise.
@@ -47,9 +48,10 @@ typedef struct AmiGUS * AmiGUS_PTR;
  *
  * @return New ( struct AmiGUS * ) card or NULL if none available.
  */
-ASM( AmiGUS_PTR ) SAVEDS AmiGUS_FindCard(
-  REG( a0, struct AmiGUS * card ),
-  REG( a6, struct AmiGUS_Base * base ));
+AmiGUS_PTR __ASM__ __SAVE_DS__ AmiGUS_FindCard(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( a6, struct AmiGUS_Base * base )
+);
 
 /**
  * Reserves an AmiGUS card, be it Zorro2 or PCMCIA.
@@ -76,11 +78,12 @@ ASM( AmiGUS_PTR ) SAVEDS AmiGUS_FindCard(
  *         - AmiGUS_NotFound / 0x0404 / 1028 if card is NULL,
  *         - Some bitmask containing 0x0100 + the part flag if already in use
  */
-ASM( ULONG ) SAVEDS AmiGUS_ReserveCard(
-  REG( a0, struct AmiGUS * card ),
-  REG( d0, LONG which ),
-  REG( d1, APTR owner ),
-  REG( a6, struct AmiGUS_Base * base ));
+ULONG __ASM__ __SAVE_DS__ AmiGUS_ReserveCard(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( d0, LONG which ),
+  __REG__( d1, APTR owner ),
+  __REG__( a6, struct AmiGUS_Base * base )
+);
 
 /**
  * Frees ("un-reserves") an AmiGUS card, be it Zorro2 or PCMCIA.
@@ -101,11 +104,12 @@ ASM( ULONG ) SAVEDS AmiGUS_ReserveCard(
  *                Same as used in AmiGUS_ReserveCard().
  * @param base    Ignore, library magic.
  */
-ASM( VOID ) SAVEDS AmiGUS_FreeCard(
-  REG( a0, struct AmiGUS * card ),
-  REG( d0, LONG which ),
-  REG( d1, APTR owner ),
-  REG( a6, struct AmiGUS_Base * base ));
+VOID __ASM__ __SAVE_DS__ AmiGUS_FreeCard(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( d0, LONG which ),
+  __REG__( d1, APTR owner ),
+  __REG__( a6, struct AmiGUS_Base * base )
+);
 
 /**
  * Installs an interrupt handler into amigus.library,
@@ -142,13 +146,14 @@ ASM( VOID ) SAVEDS AmiGUS_FreeCard(
  *         - AmiGUS_NotFound / 0x0404 / 1028 if card is NULL,
  *         - AmiGUS_NotYours / 0x0200 / 512 if card is not owned.
  */
-ASM( ULONG ) SAVEDS AmiGUS_InstallInterrupt(
-  REG( a0, struct AmiGUS * card ),
-  REG( d0, LONG which ),
-  REG( d1, APTR owner ),
-  REG( d2, AmiGUS_Interrupt handler ),
-  REG( d3, APTR data ),
-  REG( a6, struct AmiGUS_Base * base ));
+ULONG __ASM__ __SAVE_DS__ AmiGUS_InstallInterrupt(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( d0, LONG which ),
+  __REG__( d1, APTR owner ),
+  __REG__( d2, AmiGUS_Interrupt handler ),
+  __REG__( d3, APTR data ),
+  __REG__( a6, struct AmiGUS_Base * base )
+);
 
 /**
  * Removes an interrupt handler from amigus.library,
@@ -174,11 +179,12 @@ ASM( ULONG ) SAVEDS AmiGUS_InstallInterrupt(
  *                the interrupt handler.
  * @param base    Ignore, library magic.
  */
-ASM( VOID ) SAVEDS AmiGUS_RemoveInterrupt(
-  REG( a0, struct AmiGUS * card ),
-  REG( d0, LONG which ),
-  REG( d1, APTR owner ),
-  REG( a6, struct AmiGUS_Base * base ));
+VOID __ASM__ __SAVE_DS__ AmiGUS_RemoveInterrupt(
+  __REG__( a0, struct AmiGUS * card ),
+  __REG__( d0, LONG which ),
+  __REG__( d1, APTR owner ),
+  __REG__( a6, struct AmiGUS_Base * base )
+);
 
 /******************************************************************************
  * AmiGUS base library interrupt function written in SDI_compiler macros,
@@ -194,7 +200,9 @@ ASM( VOID ) SAVEDS AmiGUS_RemoveInterrupt(
  * @return 1 if there was at least one card's interrupt pending that was handled,
  *         0 otherwise.
  */
-ASM( LONG ) /* __entry for vbcc ? */ SAVEDS INTERRUPT HandleInterrupt (
-  REG( a1, struct AmiGUS_Base * base ));
+// TODO: Does vbcc need __entry , too?
+LONG __ASM__ __SAVE_DS__ __INTERRUPT__ HandleInterrupt (
+  __REG__( a1, struct AmiGUS_Base * base )
+);
 
-#endif /* SDI_AMIGUS_PROTOS_H */
+#endif /* AMIGUS_PROTOS_H */

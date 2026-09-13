@@ -21,24 +21,26 @@
 
 #include <limits.h>
 
+#include "ahi_sub_protos.h"
 #include "amigus_ahi_sub.h"
 #include "amigus_hardware.h"
 #include "buffers.h"
+#include "compiler_extras.h"
 #include "debug.h"
 #include "errors.h"
 #include "samplerate.h"
 #include "support.h"
-#include "SDI_ahi_sub_protos.h"
 
 /* Query functions */
 
-ASM(LONG) SAVEDS AHIsub_GetAttr(
-  REG(d0, ULONG aAttribute),
-  REG(d1, LONG aArgument),
-  REG(d2, LONG aDefault),
-  REG(a1, struct TagItem* aTagList),
-  REG(a2, struct AHIAudioCtrlDrv* aAudioCtrl)
+LONG __ASM__ __SAVE_DS__ AHIsub_GetAttr(
+  __REG__( d0, ULONG aAttribute ),
+  __REG__( d1, LONG aArgument ),
+  __REG__( d2, LONG aDefault ),
+  __REG__( a1, struct TagItem* aTagList ),
+  __REG__( a2, struct AHIAudioCtrlDrv* aAudioCtrl )
 ) {
+
   LONG result = aDefault;
   switch ( aAttribute ) {
     case AHIDB_Bits: {
@@ -220,10 +222,10 @@ VOID setAhiVolumeToAmiGUS( Fixed volume, ULONG volumeRegisterOffset ) {
   WriteReg32( AmiGUS_AHI_Base->agb_CardBase, volumeRegisterOffset, volume );
 }
 
-ASM(LONG) SAVEDS AHIsub_HardwareControl(
-  REG(d0, ULONG aAttribute),
-  REG(d1, LONG aArgument),
-  REG(a2, struct AHIAudioCtrlDrv *aAudioCtrl)
+LONG __ASM__ __SAVE_DS__ AHIsub_HardwareControl(
+  __REG__( d0, ULONG aAttribute ),
+  __REG__( d1, LONG aArgument ),
+  __REG__( a2, struct AHIAudioCtrlDrv * aAudioCtrl )
 ) {
 
   LONG result = FALSE;

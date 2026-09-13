@@ -19,7 +19,8 @@
 #ifndef AMIGUS_H
 #define AMIGUS_H
 
-#include <amigus/SDI_compiler.h>
+#include <clib/compiler-specific.h>
+
 #include <exec/types.h>
 
 /**
@@ -106,6 +107,6 @@ struct AmiGUS {
  *   0 if the interrupt was not handled,
  *   1 if the interrupt was handled.
  */
-typedef ASM( LONG ) ( * AmiGUS_Interrupt )( REG( a0, APTR data ));
+typedef LONG __ASM__ ( * AmiGUS_Interrupt )( __REG__( a0, APTR data ));
 
 #endif /* AMIGUS_H */

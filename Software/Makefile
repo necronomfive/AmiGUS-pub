@@ -24,6 +24,7 @@ ADF_DIR1           = $(BDIR)/AmiGUS-ADF1
 ADF_DIR2           = $(BDIR)/AmiGUS-ADF2
 ADF_DIR3           = $(BDIR)/AmiGUS-ADF3
 ADF_DIR4           = $(BDIR)/AmiGUS-ADF4
+ADF_DIR5           = $(BDIR)/AmiGUS-ADF5
 
 TOOL_DIR           = $(TARGET_DIR)/Tools
 AHI_DIR            = $(TARGET_DIR)/AHI4
@@ -36,9 +37,10 @@ MANUAL_DIR         = $(TARGET_DIR)/Manual
 TARGET_LHA         = $(BDIR)/AmiGUS-`date +%Y%m%d`.lha
 TARGET_LHA13       = $(BDIR)/AmiGUS13-`date +%Y%m%d`.lha
 ADF_IMAGE1         = $(BDIR)/AmiGUS-Tools-`date +%Y%m%d`.adf
-ADF_IMAGE2         = $(BDIR)/AmiGUS-Manual-`date +%Y%m%d`.adf
-ADF_IMAGE3         = $(BDIR)/AmiGUS-OS1.3-`date +%Y%m%d`.adf
-ADF_IMAGE4         = $(BDIR)/AmiGUS-Firmware-`date +%Y%m%d`.adf
+ADF_IMAGE2         = $(BDIR)/AmiGUS-OS1.3-`date +%Y%m%d`.adf
+ADF_IMAGE3         = $(BDIR)/AmiGUS-Firmware-`date +%Y%m%d`.adf
+ADF_IMAGE4         = $(BDIR)/AmiGUSz2-Manual-`date +%Y%m%d`.adf
+ADF_IMAGE5         = $(BDIR)/AmiGUSmini-Manual-`date +%Y%m%d`.adf
 
 DRIVER_MAKES = $(shell find Drivers -mindepth 1 -maxdepth 2 -type f -name Makefile)
 DRIVERS = $(dir $(DRIVER_MAKES))
@@ -87,6 +89,8 @@ release-publish: release
 	@echo $(ADF_IMAGE1)   >> $(BDIR)/TEMP_FILE_UPLOADS
 	@echo $(ADF_IMAGE2)   >> $(BDIR)/TEMP_FILE_UPLOADS
 	@echo $(ADF_IMAGE3)   >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(ADF_IMAGE4)   >> $(BDIR)/TEMP_FILE_UPLOADS
+	@echo $(ADF_IMAGE5)   >> $(BDIR)/TEMP_FILE_UPLOADS
 	@echo "Files to release: \n$$(cat $(BDIR)/TEMP_FILE_UPLOADS)\n\n\n"
 	for UPLOAD_PATH in $$(cat $(BDIR)/TEMP_FILE_UPLOADS)            ; \
 	do                                                                \
@@ -124,8 +128,9 @@ package:
 	       $(ADF_DIR1) $(ADF_IMAGE1) \
 	       $(ADF_DIR2) $(ADF_IMAGE2) \
 	       $(ADF_DIR3) $(ADF_IMAGE3) \
-	       $(ADF_DIR4) $(ADF_IMAGE4)
-	mkdir -p $(ADF_DIR1) $(ADF_DIR2) $(ADF_DIR3) $(ADF_DIR4) \
+	       $(ADF_DIR4) $(ADF_IMAGE4) \
+	       $(ADF_DIR5) $(ADF_IMAGE5)
+	mkdir -p $(ADF_DIR1) $(ADF_DIR2) $(ADF_DIR3) $(ADF_DIR4) $(ADF_DIR5) \
 	         $(TARGET_DIR) $(TARGET_DIR13)
 
 	###########################################################################
@@ -158,13 +163,16 @@ package:
 	cp Tools/PlayWAVetable/PlayWAVetable.info   $(ADF_DIR1)/Tools
 	cp Tools/Record/Record                      $(ADF_DIR1)/Tools
 	cp Tools/Record/Record.info                 $(ADF_DIR1)/Tools
-	
+
 	cp Drivers/Base/target/get_mem_log          $(ADF_DIR1)/Base/GetAmiGUSMemLog
 	cp Installer/program.info                   $(ADF_DIR1)/Base/GetAmiGUSMemLog.info
 	cp Drivers/Base/target/amigus_lib_check     $(ADF_DIR1)/Base/AmiGUSLibCheck
 	cp Installer/program.info                   $(ADF_DIR1)/Base/AmiGUSLibCheck.info
 	cp Drivers/Base/target/amigus-dev.lha       $(ADF_DIR1)/Base
 	cp Drivers/Base/target/*.library*           $(ADF_DIR1)/Base
+
+	cp Tools/FindAmiGUS/FindAmiGUS              $(ADF_DIR1)/
+	cp Drivers/Base/target/*.library-000-NO_LOG $(ADF_DIR1)/amigus.library
 
 	cp Drivers/AHI4/target/get_mem_log          $(ADF_DIR1)/AHI4/GetAhiMemLog
 	cp Installer/program.info                   $(ADF_DIR1)/AHI4/GetAhiMemLog.info
@@ -208,48 +216,67 @@ package:
 	@echo ""
 
 	###########################################################################
-	# Firmware adf
+	# OS1.3 adf
 	###########################################################################
 
-	mkdir -p $(ADF_DIR4)/Firmware
+	mkdir -p $(ADF_DIR2)/Tools $(ADF_DIR2)/Firmware $(ADF_DIR2)/Base $(ADF_DIR2)/MHI
 
-	cp Installer/Disk.info                      $(ADF_DIR4)/
+	cp Installer/13/Tools.info                  $(ADF_DIR2)/Tools.info
+	cp Installer/13/MHI.info                    $(ADF_DIR2)/MHI.info
+	cp Installer/13/Firmware.info               $(ADF_DIR2)/Firmware.info
+	cp Installer/13/Libs.info                   $(ADF_DIR2)/Libs.info
 
-	LATEST_FW=`find ../FPGA/Releases/Amiga/ | grep "\.upd" | sort | tail -n 1` ;\
-	BASENAME_FW=`basename $$LATEST_FW`                          ;\
-	cp $$LATEST_FW                              $(ADF_DIR4)/Firmware       ;\
-	cp Installer/fw.info                        $(ADF_DIR4)/Firmware/$$BASENAME_FW.info
+	cp Tools/Mixer/Mixer13                      $(ADF_DIR2)/Tools
+	cp Tools/Mixer/Mixer13.info                 $(ADF_DIR2)/Tools
+	cp Tools/FlashFPGA/FlashGUI13               $(ADF_DIR2)/Tools
+	cp Tools/FlashFPGA/FlashGUI13.info          $(ADF_DIR2)/Tools
+	cp Tools/PlayMIDI/PlayMidi                  $(ADF_DIR2)/Tools
+	cp Tools/PlayMIDI/PlayMidi.info             $(ADF_DIR2)/Tools
+	cp Tools/PlayMP3/PlayMP3                    $(ADF_DIR2)/Tools
+	cp Tools/PlayMP3/PlayMP3.info               $(ADF_DIR2)/Tools
+	cp Tools/PlayWAV/PlayWav                    $(ADF_DIR2)/Tools
+	cp Tools/PlayWAV/PlayWav.info               $(ADF_DIR2)/Tools
+	cp Tools/PlayWAVetable/PlayWAVetable        $(ADF_DIR2)/Tools
+	cp Tools/PlayWAVetable/PlayWAVetable.info   $(ADF_DIR2)/Tools
+	cp Tools/Record/Record                      $(ADF_DIR2)/Tools
+	cp Tools/Record/Record.info                 $(ADF_DIR2)/Tools
+	cp -R dependencies/libs                     $(ADF_DIR2)/Libs
 
-	# uses python's amitools - https://github.com/cnvogelg/amitools
-	@echo ""
-	xdftool $(ADF_IMAGE4) format AmiGUS-Firmware ofs
+	cp Drivers/Base/target/get_mem_log          $(ADF_DIR2)/Base/GetAmiGUSMemLog
+	cp Installer/program.info                   $(ADF_DIR2)/Base/GetAmiGUSMemLog.info
+	cp Drivers/Base/target/amigus_lib_check     $(ADF_DIR2)/Base/AmiGUSLibCheck
+	cp Installer/program.info                   $(ADF_DIR2)/Base/AmiGUSLibCheck.info
+	cp Drivers/Base/target/amigus-dev.lha       $(ADF_DIR2)/Base
+	cp Drivers/Base/target/*.library*           $(ADF_DIR2)/Base
 
-	@echo ""
-	@IFS='§' ;                                        \
-	for ITEM in $(ADF_DIR4)/* ;                       \
-	  do                                              \
-	    xdftool $(ADF_IMAGE4) write $${ITEM};         \
-	    echo "xdftool $(ADF_IMAGE4) write $${ITEM}" ; \
-	  done
-	@echo ""
+	cp Drivers/MHI/target/get_mem_log           $(ADF_DIR2)/MHI/GetMhiMemLog
+	cp Installer/program.info                   $(ADF_DIR2)/MHI/GetMhiMemLog.info
+	cp Drivers/MHI/target/mhi_lib_check         $(ADF_DIR2)/MHI/MHILibCheck
+	cp Installer/program.info                   $(ADF_DIR2)/MHI/MHILibCheck.info
+	cp Drivers/MHI/target/MHIplay               $(ADF_DIR2)/MHI/MHIplay
+	cp Installer/program.info                   $(ADF_DIR2)/MHI/MHIplay.info
+	cp Drivers/MHI/target/*.library*000*        $(ADF_DIR2)/MHI/
+	cp Drivers/MHI/target/*.library*020*        $(ADF_DIR2)/MHI/
 
-	###########################################################################
-	# Manual adf
-	###########################################################################
+	cp Drivers/MHI/COPYING                      $(ADF_DIR2)/GPL.txt
+	cp Installer/13/GPL.txt.info                $(ADF_DIR2)/GPL.txt.info
+	cp Drivers/MHI/COPYING.LESSER               $(ADF_DIR2)/LGPL.txt
+	cp Installer/13/LGPL.txt.info               $(ADF_DIR2)/LGPL.txt.info
+	cp Installer/CC-BY-NC-ND.txt                $(ADF_DIR2)/CC-BY-NC-ND.txt
+	cp Installer/13/CC-BY-NC-ND.txt.info        $(ADF_DIR2)/CC-BY-NC-ND.txt.info
+	cp Installer/ReadMeFirst.txt                $(ADF_DIR2)/ReadMeFirst.txt
+	cp Installer/13/ReadMeFirst.txt.info        $(ADF_DIR2)/ReadMeFirst.txt.info
 
 	cp Installer/Disk.info                      $(ADF_DIR2)/
-	cp ../Documentation/AmiGUS/AmiGUS.guide     $(ADF_DIR2)/AmiGUSv39.guide
-	sed -e "s#MultiView#Sys:Utilities/WDisplay#" \
-	    -e "s#ilbm/#AmiGUS-Manual:ilbm/#"        \
-	    ../Documentation/AmiGUS/AmiGUS.guide  > $(ADF_DIR2)/AmiGUSv38.guide
-	cp -R ../Documentation/AmiGUS/ilbm          $(ADF_DIR2)
-	cp Installer/AmiGUS.guide                   $(ADF_DIR2)
-	cp Installer/AmiGUS.guide.info              $(ADF_DIR2)
-	cp Installer/AmiGUS.guide.infoV38           $(ADF_DIR2)
+
+	cp Installer/13/English                     $(ADF_DIR2)/
+	cp Installer/13/English.info                $(ADF_DIR2)/
+	cp Installer/13/Deutsch                     $(ADF_DIR2)/
+	cp Installer/13/Deutsch.info                $(ADF_DIR2)/
 
 	# uses python's amitools - https://github.com/cnvogelg/amitools
 	@echo ""
-	xdftool $(ADF_IMAGE2) format AmiGUS-Manual ofs
+	xdftool $(ADF_IMAGE2) format AmiGUS-OS13 ofs
 
 	@echo ""
 	@IFS='§' ;                                        \
@@ -261,67 +288,21 @@ package:
 	@echo ""
 
 	###########################################################################
-	# OS1.3 adf
+	# Firmware adf
 	###########################################################################
 
-	mkdir -p $(ADF_DIR3)/Tools $(ADF_DIR3)/Firmware $(ADF_DIR3)/Base $(ADF_DIR3)/MHI
-
-	cp Installer/13/Tools.info                  $(ADF_DIR3)/Tools.info
-	cp Installer/13/MHI.info                    $(ADF_DIR3)/MHI.info
-	cp Installer/13/Firmware.info               $(ADF_DIR3)/Firmware.info
-	cp Installer/13/Libs.info                   $(ADF_DIR3)/Libs.info
-
-	cp Tools/Mixer/Mixer13                      $(ADF_DIR3)/Tools
-	cp Tools/Mixer/Mixer13.info                 $(ADF_DIR3)/Tools
-	cp Tools/FlashFPGA/FlashGUI13               $(ADF_DIR3)/Tools
-	cp Tools/FlashFPGA/FlashGUI13.info          $(ADF_DIR3)/Tools
-	cp Tools/PlayMIDI/PlayMidi                  $(ADF_DIR3)/Tools
-	cp Tools/PlayMIDI/PlayMidi.info             $(ADF_DIR3)/Tools
-	cp Tools/PlayMP3/PlayMP3                    $(ADF_DIR3)/Tools
-	cp Tools/PlayMP3/PlayMP3.info               $(ADF_DIR3)/Tools
-	cp Tools/PlayWAV/PlayWav                    $(ADF_DIR3)/Tools
-	cp Tools/PlayWAV/PlayWav.info               $(ADF_DIR3)/Tools
-	cp Tools/PlayWAVetable/PlayWAVetable        $(ADF_DIR3)/Tools
-	cp Tools/PlayWAVetable/PlayWAVetable.info   $(ADF_DIR3)/Tools
-	cp Tools/Record/Record                      $(ADF_DIR3)/Tools
-	cp Tools/Record/Record.info                 $(ADF_DIR3)/Tools
-	cp -R dependencies/libs                     $(ADF_DIR3)/Libs
-
-	cp Drivers/Base/target/get_mem_log          $(ADF_DIR3)/Base/GetAmiGUSMemLog
-	cp Installer/program.info                   $(ADF_DIR3)/Base/GetAmiGUSMemLog.info
-	cp Drivers/Base/target/amigus_lib_check     $(ADF_DIR3)/Base/AmiGUSLibCheck
-	cp Installer/program.info                   $(ADF_DIR3)/Base/AmiGUSLibCheck.info
-	cp Drivers/Base/target/amigus-dev.lha       $(ADF_DIR3)/Base
-	cp Drivers/Base/target/*.library*           $(ADF_DIR3)/Base
-
-	cp Drivers/MHI/target/get_mem_log           $(ADF_DIR3)/MHI/GetMhiMemLog
-	cp Installer/program.info                   $(ADF_DIR3)/MHI/GetMhiMemLog.info
-	cp Drivers/MHI/target/mhi_lib_check         $(ADF_DIR3)/MHI/MHILibCheck
-	cp Installer/program.info                   $(ADF_DIR3)/MHI/MHILibCheck.info
-	cp Drivers/MHI/target/MHIplay               $(ADF_DIR3)/MHI/MHIplay
-	cp Installer/program.info                   $(ADF_DIR3)/MHI/MHIplay.info
-	cp Drivers/MHI/target/*.library*000*        $(ADF_DIR3)/MHI/
-	cp Drivers/MHI/target/*.library*020*        $(ADF_DIR3)/MHI/
-
-	cp Drivers/MHI/COPYING                      $(ADF_DIR3)/GPL.txt
-	cp Installer/13/GPL.txt.info                $(ADF_DIR3)/GPL.txt.info
-	cp Drivers/MHI/COPYING.LESSER               $(ADF_DIR3)/LGPL.txt
-	cp Installer/13/LGPL.txt.info               $(ADF_DIR3)/LGPL.txt.info
-	cp Installer/CC-BY-NC-ND.txt                $(ADF_DIR3)/CC-BY-NC-ND.txt
-	cp Installer/13/CC-BY-NC-ND.txt.info        $(ADF_DIR3)/CC-BY-NC-ND.txt.info
-	cp Installer/ReadMeFirst.txt                $(ADF_DIR3)/ReadMeFirst.txt
-	cp Installer/13/ReadMeFirst.txt.info        $(ADF_DIR3)/ReadMeFirst.txt.info
+	mkdir -p $(ADF_DIR3)/Firmware
 
 	cp Installer/Disk.info                      $(ADF_DIR3)/
 
-	cp Installer/13/English                     $(ADF_DIR3)/
-	cp Installer/13/English.info                $(ADF_DIR3)/
-	cp Installer/13/Deutsch                     $(ADF_DIR3)/
-	cp Installer/13/Deutsch.info                $(ADF_DIR3)/
+	LATEST_FW=`find ../FPGA/Releases/Amiga/ | grep "\.upd" | sort | tail -n 1` ;\
+	BASENAME_FW=`basename $$LATEST_FW`                          ;\
+	cp $$LATEST_FW                              $(ADF_DIR3)/Firmware       ;\
+	cp Installer/fw.info                        $(ADF_DIR3)/Firmware/$$BASENAME_FW.info
 
 	# uses python's amitools - https://github.com/cnvogelg/amitools
 	@echo ""
-	xdftool $(ADF_IMAGE3) format AmiGUS-OS13 ofs
+	xdftool $(ADF_IMAGE3) format AmiGUS-Firmware ofs
 
 	@echo ""
 	@IFS='§' ;                                        \
@@ -333,6 +314,60 @@ package:
 	@echo ""
 
 	###########################################################################
+	# AmiGUS Zorro2 Manual adf
+	###########################################################################
+
+	cp Installer/Disk.info                                  $(ADF_DIR4)/
+	cp ../Documentation/AmiGUS/AmiGUS.guide                 $(ADF_DIR4)/AmiGUSv39.guide
+	sed -e "s#MultiView#Sys:Utilities/WDisplay#" \
+	    -e "s#ilbm/#AmiGUS-Manual:ilbm/#"        \
+	    ../Documentation/AmiGUS/AmiGUS.guide  >             $(ADF_DIR4)/AmiGUSv38.guide
+	cp -R ../Documentation/AmiGUS/ilbm                      $(ADF_DIR4)
+	cp Installer/AmiGUS.guide                               $(ADF_DIR4)
+	cp Installer/AmiGUS.guide.info                          $(ADF_DIR4)
+	cp Installer/AmiGUS.guide.infoV38                       $(ADF_DIR4)
+
+	# uses python's amitools - https://github.com/cnvogelg/amitools
+	@echo ""
+	xdftool $(ADF_IMAGE4) format AmiGUSz2-Manual ofs
+
+	@echo ""
+	@IFS='§' ;                                        \
+	for ITEM in $(ADF_DIR4)/* ;                       \
+	  do                                              \
+	    xdftool $(ADF_IMAGE4) write $${ITEM};         \
+	    echo "xdftool $(ADF_IMAGE4) write $${ITEM}" ; \
+	  done
+	@echo ""
+
+	###########################################################################
+	# AmiGUS mini Manual adf
+	###########################################################################
+
+	cp Installer/Disk.info                                  $(ADF_DIR5)/
+	cp "../Documentation/AmiGUS mini/AmiGUS mini.guide"     $(ADF_DIR5)/AmiGUSminiV39.guide
+	sed -e "s#MultiView#Sys:Utilities/WDisplay#" \
+	    -e "s#ilbm/#AmiGUS-Manual:ilbm/#"        \
+	    "../Documentation/AmiGUS mini/AmiGUS mini.guide"  > $(ADF_DIR5)/AmiGUSminiV38.guide
+	cp -R "../Documentation/AmiGUS mini/ilbm"               $(ADF_DIR5)
+	cp "Installer/AmiGUS mini.guide"                        $(ADF_DIR5)
+	cp "Installer/AmiGUS mini.guide.info"                   $(ADF_DIR5)
+	cp "Installer/AmiGUS mini.guide.infoV38"                $(ADF_DIR5)
+
+	# uses python's amitools - https://github.com/cnvogelg/amitools
+	@echo ""
+	xdftool $(ADF_IMAGE5) format AmiGUSmini-Manual ofs
+
+	@echo ""
+	@IFS='§' ;                                        \
+	for ITEM in $(ADF_DIR5)/* ;                       \
+	  do                                              \
+	    xdftool $(ADF_IMAGE5) write $${ITEM};         \
+	    echo "xdftool $(ADF_IMAGE5) write $${ITEM}" ; \
+	  done
+	@echo ""
+
+	###########################################################################
 	# LHA
 	###########################################################################
 
@@ -340,8 +375,9 @@ package:
 	mkdir -p $(TARGET_DIR)/Manual
 
 	cp -R $(ADF_DIR1)/*                         $(TARGET_DIR)
-	cp -R $(ADF_DIR2)/*                         $(TARGET_DIR)/Manual
-	cp -R $(ADF_DIR4)/*                         $(TARGET_DIR)
+	cp -R $(ADF_DIR3)/*                         $(TARGET_DIR)
+	cp -R $(ADF_DIR4)/*                         $(TARGET_DIR)/Manual
+	cp -R $(ADF_DIR5)/*                         $(TARGET_DIR)/Manual
 
 	rm $(TARGET_DIR)/Disk.info
 	rm $(TARGET_DIR)/Manual/Disk.info
@@ -355,8 +391,8 @@ package:
 	cp Installer/drawer.info                    $(TARGET_DIR13).info
 	mkdir -p $(TARGET_DIR13)/Manual
 
-	cp -R $(ADF_DIR3)/*                         $(TARGET_DIR13)
-	cp -R $(ADF_DIR2)/*                         $(TARGET_DIR13)/Manual
+	cp -R $(ADF_DIR2)/*                         $(TARGET_DIR13)
+	cp -R $(ADF_DIR4)/*                         $(TARGET_DIR13)/Manual
 
 	rm $(TARGET_DIR13)/Disk.info
 	rm $(TARGET_DIR13)/Manual/Disk.info
@@ -371,6 +407,7 @@ package:
 	-cp $(ADF_IMAGE2) /media/chritoph/HXC/
 	-cp $(ADF_IMAGE3) /media/chritoph/HXC/
 	-cp $(ADF_IMAGE4) /media/chritoph/HXC/
+	-cp $(ADF_IMAGE5) /media/chritoph/HXC/
 
 	###########################################################################
 	# DONE

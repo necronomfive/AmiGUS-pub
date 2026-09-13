@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#define DEBUG
+#define DEBUG
 #define INTUI_V36_NAMES_ONLY
 
 #include <exec/types.h>
@@ -838,7 +838,9 @@ VOID process_window_events(struct Window *mywin,
 	myAmiGUS = AmiGUS_FindCard(NULL);
 	if ((myAmiGUS) || (!requireBoard))
 	{
-		typeAmiGUS = myAmiGUS->agus_TypeId;		
+		typeAmiGUS = myAmiGUS->agus_TypeId;	
+		typeAmiGUS = AmiGUS_mini;
+		
 		board_base = myAmiGUS->agus_PcmBase;
 
 		fpga_date_minute = myAmiGUS->agus_Minute;

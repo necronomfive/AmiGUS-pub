@@ -5,13 +5,16 @@
 
 By supporting established frameworks such as **AHI** and **MHI**, we ensure that the card is compatible to a wide range of already existing applications. In addition, the card's true power lies in its highly sophisticated wavetable engine, which provides a powerful feature upgrade to PAULA, supporting 32 true hardware voices using 32 MB of sample memory.
 
-The good news is that, in order to use these features, you don't need a fast CPU. **AmiGUS** can be used on **ALL** Amigas with a free Zorro Slot, since all of the computational heavy-lifting is performed by the hardware acclerated functions on the card.
+The good news is that, in order to use these features, you don't need a fast CPU. **AmiGUS** can be used on **ALL** Amigas with a free Zorro or PCMCIA Slot, since all of the computational heavy-lifting is performed by the hardware acclerated functions on the card.
 
 And since we are at it right now, you can own an **AmiGUS** too, either by buying it from one of our **supported resellers**, or you just download the card's design files provided here and **build one on your own!**
 
 ### _Let the Amiga sound revolution begin now!_
 
-## AmiGUS Feature List
+# AmiGUS Feature List
+
+## Zorro Version (aka AmiGUS)
+
 * **Zorro II** card for **Amiga 2000 / 3000 /4000** computers, or compatible bus boards.
 * **Standard RCA** stereo output, **192kHz @24-bit**.
 * **TOSLINK** optical output, supporting **48kHz, 96kHz & 192kHz @24-bit**.

@@ -146,7 +146,7 @@ The above diagram shows all relevant ports and components of the AmiGUS mini car
 ## AmiGUS Software
 ### _FPGA Core Firmware_
 
-Firmware release can be found [here.](https://github.com/necronomfive/AmiGUS-pub/tree/main/AmiGUS/FPGA/Releases/)
+Firmware release can be found [here.](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/AmiGUS/Releases/)
 
 The [Quartus folder](https://github.com/necronomfive/AmiGUS-pub/tree/main/FPGA/AmiGUS/Releases/Quartus) contains .pof files for Altera's Quartus software.
 These are needed for the initial bring-up of self-made AmiGUS cards especially.
